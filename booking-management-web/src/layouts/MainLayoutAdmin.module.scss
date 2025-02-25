@@ -1,0 +1,43 @@
+.main-layout-admin {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-main);
+  height: 100%;
+  width: 200px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0;
+  height: 50px;
+  width: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--bg-hover);
+    color: var(--color-white);
+  }
+}
+
+.sidebar-item.active {
+  background: var(--bg-active);
+  color: var(--color-white);
+  font-weight: 500;
+}
