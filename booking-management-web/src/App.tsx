@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayoutAdmin from "./layouts/MainLayoutAdmin";
-import { Booking, Dashboard, Employee, Room } from "./pages/pages-admin";
+import { Booking, Dashboard, Employee, Room, RoomDetail } from "./pages/pages-admin";
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="booking" element={<Booking />} />
           <Route path="room" element={<Room />} />
+          <Route path="room/detail" element={<RoomDetail />} />
           <Route path="employee" element={<Employee />} />
         </Route>
 
