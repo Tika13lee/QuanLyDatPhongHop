@@ -27,7 +27,7 @@
   text-align: center;
   padding: 3px 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
   font-weight: 400;
   color: var(--text-primary);
   border-bottom: none;

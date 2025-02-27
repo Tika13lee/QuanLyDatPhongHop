@@ -3,8 +3,8 @@
   align-items: center;
   gap: 20px;
   height: 100%;
-  width: 100%;
-  padding: 10px 20px;
+  width: 98%;
+  padding: 10px 0;
 }
 
 .location-container {
@@ -17,10 +17,10 @@
 
 .location-form-container,
 .room-form-container {
-  padding: 20px;
-  background: white;
+  padding: 15px;
+  background: var(--color-white);
   border-radius: 5px;
-  box-shadow: 0px 4px 8px rgba(233, 11, 11, 0.1);
+  box-shadow: 0px 4px 8px rgba(233, 11, 11, 0.3);
 
   h2 {
     margin-bottom: 15px;
@@ -53,7 +53,7 @@
 
   label {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     width: 100px;
     display: block;
@@ -63,13 +63,13 @@
     width: 100%;
     padding: 7px 10px;
     font-size: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     transition: all 0.3s ease;
 
     &:focus {
       outline: none;
-      border-color: var(--btn-main);
+      border-color: var(--border-focus);
       box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
     }
   }
@@ -82,7 +82,7 @@
 }
 
 .submit-btn {
-  width: 120px;
+  width: 110px;
   padding: 7px 10px;
   font-size: 16px;
   font-weight: bold;
@@ -100,14 +100,13 @@
 
 /* location table */
 .table-container {
-  background: white;
-  border-radius: 5px;
+  background: var(--color-white);
   text-align: center;
 
   h3 {
     margin: 10px 0;
     font-size: 20px;
-    color: #333;
+    color: var(--text-primary);
   }
 }
 
@@ -115,7 +114,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .search {
@@ -126,24 +125,24 @@
   input {
     padding: 7px 10px;
     font-size: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     transition: all 0.3s ease;
     width: 300px;
 
     &:focus {
       outline: none;
-      border-color: var(--btn-main);
+      border-color: var(--border-focus);
       box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
     }
   }
 }
 
 .table-wrapper {
-  max-height: calc(100vh - 455px);
+  max-height: 290px;
   overflow-y: auto;
-  border-radius: 0 0 5px 5px;
-  border: 1px solid #ddd;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
 
   &::-webkit-scrollbar {
     width: 5px;
@@ -171,7 +170,7 @@
   thead {
     position: sticky;
     top: 0;
-    background: var(--bg-secondary);
+    background: var(--bg-active);
     z-index: 10;
   }
 
@@ -179,14 +178,14 @@
   td {
     padding: 5px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
+    border: 1px solid var(--border-color);
   }
 }
 
 .location-table th {
-  background: #007bff;
-  font-weight: bold;
+  font-weight: 600;
   color: white;
 }
 
@@ -199,22 +198,6 @@
   height: 100%;
   width: 100%;
   max-width: 700px;
-}
-
-select,
-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-  }
 }
 
 .device-group {
@@ -263,7 +246,7 @@ input {
   thead {
     position: sticky;
     top: 0;
-    background: var(--bg-secondary);
+    background: var(--bg-active);
     z-index: 10;
   }
 
@@ -277,13 +260,16 @@ input {
 }
 
 .device-table th {
-  background: #007bff;
-  color: white;
-  font-weight: bold;
+  color: var(--color-white);
+  font-weight: 600;
 }
 
 .device-table tbody tr:hover {
   background: #f5f5f5;
+}
+
+.checkbox {
+  width: fit-content;
 }
 
 .device-quantity {
@@ -292,21 +278,4 @@ input {
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-
-.create-btn {
-  width: 120px;
-  padding: 7px 10px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  background: var(--btn-main);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-
-  &:hover {
-    background: var(--bg-hover);
-  }
 }

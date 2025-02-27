@@ -1,34 +1,39 @@
 import classNames from "classnames/bind";
 import styles from "./CreateRoom.module.scss";
-import { MdSearch } from "../../../components/icons/icons";
-import IconWrapper from "../../../components/icons/IconWrapper";
+import { LocationProps, locations, statusesRoom } from "../../../data/data";
+import { useState } from "react";
 
 const cx = classNames.bind(styles);
 
-const locations = [
-  { branch: "Hà Nội", building: "Tòa A", floor: "3", number: "P301" },
-  { branch: "HCM", building: "Tòa B", floor: "5", number: "P502" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-  { branch: "Đà Nẵng", building: "Tòa C", floor: "2", number: "P203" },
-];
-
 const roomTypes = ["Phòng họp nhỏ", "Phòng họp lớn", "Phòng hội thảo"];
-const statuses = ["Trống", "Đang sử dụng", "Bảo trì"];
 const approvers = ["Nguyễn Văn A", "Trần Thị B", "Lê Minh C"];
 const devices = ["Máy chiếu", "Tivi", "Bảng trắng", "Hệ thống âm thanh"];
 
 const CreateRoom = () => {
+  // Hiển thị vi trí đuợc chọn trong bảng lên form
+  const [dataLocations, setDataLocations] = useState(locations);
+  const [selectedLocation, setSelectedLocation] = useState({
+    branch: "",
+    building: "",
+    floor: "",
+    number: "",
+  });
+
+  const handleRowClick = (location: LocationProps) => {
+    setSelectedLocation(location);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSelectedLocation((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <div className={cx("create-container")}>
       <div className={cx("location-container")}>
         <div className={cx("location-form-container")}>
           <h2>Tạo Vị Trí Phòng Họp</h2>
+
           <form className={cx("form")}>
             <div className={cx("form-row")}>
               <div className={cx("form-group")}>
@@ -36,6 +41,8 @@ const CreateRoom = () => {
                 <input
                   type="text"
                   name="branch"
+                  value={selectedLocation.branch}
+                  onChange={handleInputChange}
                   placeholder="Nhập chi nhánh..."
                 />
               </div>
@@ -44,6 +51,8 @@ const CreateRoom = () => {
                 <input
                   type="text"
                   name="building"
+                  value={selectedLocation.building}
+                  onChange={handleInputChange}
                   placeholder="Nhập tòa nhà..."
                 />
               </div>
@@ -52,13 +61,21 @@ const CreateRoom = () => {
             <div className={cx("form-row")}>
               <div className={cx("form-group")}>
                 <label>Tầng:</label>
-                <input type="text" name="floor" placeholder="Nhập tầng..." />
+                <input
+                  type="text"
+                  name="floor"
+                  value={selectedLocation.floor}
+                  onChange={handleInputChange}
+                  placeholder="Nhập tầng..."
+                />
               </div>
               <div className={cx("form-group")}>
                 <label>Số phòng:</label>
                 <input
                   type="text"
                   name="number"
+                  value={selectedLocation.number}
+                  onChange={handleInputChange}
                   placeholder="Nhập số phòng..."
                 />
               </div>
@@ -94,7 +111,7 @@ const CreateRoom = () => {
               </thead>
               <tbody>
                 {locations.map((loc, index) => (
-                  <tr key={index}>
+                  <tr key={index} onClick={() => handleRowClick(loc)}>
                     <td>{loc.branch}</td>
                     <td>{loc.building}</td>
                     <td>{loc.floor}</td>
@@ -159,7 +176,7 @@ const CreateRoom = () => {
             <div className={cx("form-group")}>
               <select>
                 <option value="">Chọn trạng thái...</option>
-                {statuses.map((status, index) => (
+                {statusesRoom.map((status, index) => (
                   <option key={index} value={status}>
                     {status}
                   </option>
@@ -194,7 +211,7 @@ const CreateRoom = () => {
                   {devices.map((device, index) => (
                     <tr key={index}>
                       <td>
-                        <input type="checkbox" />
+                        <input type="checkbox" className={cx("checkbox")} />
                       </td>
                       <td>{device}</td>
                       <td>
