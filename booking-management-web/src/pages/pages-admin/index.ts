@@ -1,7 +1,8 @@
 import Dashboard from "./dashboard/Dashboard";
 import Employee from "./employee/Employee";
 import Room from "./room/Room";
-import Booking from "./booking/Booking";
+import BookingMgmt from "./booking/BookingMgmt";
 import RoomDetail from "./room/RoomDetail";
+import Location from "./location/Location";
 
-export { Dashboard, Employee, Room, Booking, RoomDetail };
+export { Dashboard, Employee, Room, BookingMgmt, RoomDetail, Location };

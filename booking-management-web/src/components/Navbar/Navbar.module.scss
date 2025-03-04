@@ -16,3 +16,118 @@
   padding: 0 20px;
   margin: 0 auto;
 }
+
+// search bar
+.search-container {
+  position: relative;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    height: 33px;
+    width: 500px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+
+    &:focus {
+      border: 1px solid var(--bg-active);
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+  }
+
+  button {
+    position: absolute;
+    right: 0;
+    padding: 5.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--color-white);
+    background: var(--btn-main);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: var(--btn-hover);
+    }
+  }
+}
+
+// Search popup
+.search-popup {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  max-width: 500px;
+  background: var(--color-white);
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  animation: fadeIn 0.1s ease-in-out;
+
+  .search-results {
+    max-height: 200px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--bg-scroll-track);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--bg-scroll-thumb);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--bg-scroll-thumb-hover);
+    }
+  }
+
+  .result-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.1s ease-in-out;
+
+    &:hover {
+      background: var(--bg-active);
+      color: var(--color-white);
+    }
+  }
+
+  .no-results {
+    padding: 10px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.divider {
+  height: 35px;
+  width: 1px;
+  background: var(--color-white);
+}

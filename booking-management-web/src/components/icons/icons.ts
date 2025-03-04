@@ -1,4 +1,25 @@
-import { MdOutlineInfo, MdSearch } from "react-icons/md";
-import { IoIosArrowBack } from "react-icons/io";
+import {
+  MdOutlineInfo,
+  MdSearch,
+  MdDeselect,
+  MdArrowForward,
+  MdOutlineEdit,
+} from "react-icons/md";
+import {
+  IoIosArrowBack,
+  IoIosArrowForward,
+  IoIosArrowDown,
+} from "react-icons/io";
+import { FaRegBell } from "react-icons/fa";
 
-export { MdOutlineInfo, MdSearch , IoIosArrowBack };
+export {
+  MdOutlineEdit,
+  FaRegBell,
+  IoIosArrowDown,
+  IoIosArrowForward,
+  MdArrowForward,
+  MdDeselect,
+  MdOutlineInfo,
+  MdSearch,
+  IoIosArrowBack,
+};

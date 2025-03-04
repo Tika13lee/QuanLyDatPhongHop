@@ -10,30 +10,21 @@ const cx = classNames.bind(styles);
 const approvers = ["Nguyễn Văn A", "Trần Thị B", "Lê Minh C"];
 
 function ListRoom() {
-
   return (
     <div className={cx("list-container")}>
       <div className={cx("search-container")}>
-        {/* Thanh tìm kiếm nhanh */}
-        <div className={cx("search-bar")}>
-          <h3>Tìm Kiếm Phòng Họp</h3>
-          <input type="text" placeholder="Tìm kiếm nhanh theo tên..." />
-          <button>Tìm kiếm</button>
-        </div>
-
         {/* Tìm kiếm nâng cao */}
         <div className={cx("advanced-search")}>
           <h3>Tìm kiếm nâng cao (theo nhiều chỉ tiêu)</h3>
 
           <div className={cx("form-row")}>
             <div className={cx("form-group")}>
-              <label>Vị trí:</label>
+              <label>Chi nhánh:</label>
               <select>
-                <option value="">Chọn vị trí...</option>
+                <option value="">Chọn chi nhánh</option>
                 {locations.map((loc) => (
                   <option key={loc.id} value={loc.id}>
-                    {loc.branch} - {loc.building} - Floor {loc.floor} - Room{" "}
-                    {loc.number}
+                    {loc.branch}
                   </option>
                 ))}
               </select>
@@ -97,13 +88,13 @@ function ListRoom() {
               <tr key={room.id}>
                 <td>{room.name}</td>
                 <td>
-                  {room.location.branch}, {room.location.building}, Floor{" "}
-                  {room.location.floor}, Room {room.location.number}
+                  {room.location.branch}, {room.location.building}, tầng{" "}
+                  {room.location.floor}, phòng {room.location.number}
                 </td>
                 <td>{room.capacity}</td>
                 <td>${room.price}</td>
                 <td>
-                  {room.approver.map((approver) => (
+                  {room.approvers.map((approver) => (
                     <span key={approver.id}>{approver.name}, </span>
                   ))}
                 </td>

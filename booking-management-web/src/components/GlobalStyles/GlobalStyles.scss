@@ -3,7 +3,7 @@
 
 :root {
   --text-primary: #212529;
-  --text-secondary: #A4A8AC;
+  --text-secondary: #7c7f83;
   --bg-main: #0B2C56;
   --bg-active: #0056B3;
   --bg-hover: #567EA8;
@@ -16,6 +16,9 @@
   --border-color: #ced4da;
   --border-focus: #007bff;
   --border-error: #dc3545;
+  --bg-scroll-thumb: #8ab4f8;
+  --bg-scroll-track: #f0f0f0;
+  --bg-scroll-thumb-hover: #6b9ffb;
 }
 
 * {
