@@ -4,6 +4,7 @@ import vn.com.kltn_project_v1.dtos.RoomDTO;
 import vn.com.kltn_project_v1.exceptions.DataNotFoundException;
 import vn.com.kltn_project_v1.model.Location;
 import vn.com.kltn_project_v1.model.Room;
+import vn.com.kltn_project_v1.model.StatusRoom;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface IRoom {
     public List<Room> getRoomsByBranch( Long locationId) throws DataNotFoundException;
     public boolean changeStatusRoom(Long roomId, String status) throws DataNotFoundException;
     public List<RoomDTO> getAllRooms(int page, int size, String sortBy) throws DataNotFoundException;
+    public List<RoomDTO> sreachRooms(int capacity, int price, StatusRoom statusRoom);
 }

@@ -99,7 +99,16 @@ public class RoomService implements IRoom {
         Page<Room> pageRooms = roomRepository.findAll(pageable); // Lấy Page<Room>
         List<Room> rooms = pageRooms.getContent(); // Lấy List<Room> từ Page<Room>
 
+        return convertRoomToRoomDTO(rooms);
 
+    }
+
+    @Override
+    public List<RoomDTO> sreachRooms(int capacity, int price, StatusRoom statusRoom) {
+        List<Room> rooms = roomRepository.findRooms(capacity, price, statusRoom);
+        return convertRoomToRoomDTO(rooms);
+    }
+    public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         List<RoomDTO> roomDTOS = rooms.stream().map(room -> {
             RoomDTO roomDTO = new RoomDTO();
             roomDTO.setRoomName(room.getRoomName());

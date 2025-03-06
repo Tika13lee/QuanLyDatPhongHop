@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RoomDTO;
 import vn.com.kltn_project_v1.model.Room;
+import vn.com.kltn_project_v1.model.StatusRoom;
 import vn.com.kltn_project_v1.services.IRoom;
 
 @RestController
@@ -40,9 +41,17 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         }
     }
     @GetMapping("/getAllRooms")
-    public ResponseEntity<?> getAllRooms(@RequestParam int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "roomId") String sortBy) {
+    public ResponseEntity<?> getAllRooms(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "roomId") String sortBy) {
         try {
             return ResponseEntity.ok(roomService.getAllRooms(page, size, sortBy));
+        }catch (Exception e){
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @GetMapping("/sreachRooms")
+    public ResponseEntity<?> sreachRooms(@RequestParam(defaultValue = "0") int capacity, @RequestParam(defaultValue = "0") int price, StatusRoom statusRoom){
+        try {
+            return ResponseEntity.ok(roomService.sreachRooms(capacity, price, statusRoom));
         }catch (Exception e){
             return ResponseEntity.ok(e.toString());
         }
