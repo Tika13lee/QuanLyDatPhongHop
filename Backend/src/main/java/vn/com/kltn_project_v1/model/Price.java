@@ -17,12 +17,12 @@ public class Price {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long priceId;
 
-    private double value;
+    private int value;
     private Date timeApply;
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    public Price(double value, Date timeApply, Type type) {
+    public Price(int value, Date timeApply, Type type) {
         this.value = value;
         this.timeApply = timeApply;
         this.type = type;

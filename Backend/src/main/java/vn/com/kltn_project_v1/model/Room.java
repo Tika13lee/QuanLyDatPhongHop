@@ -30,5 +30,8 @@ public class Room {
     private Price price;
     @ElementCollection
     private List<String> imgs;
+    @ManyToOne
+    @JoinColumn(name = "approverId")
+    private Employee approver;
 
 }

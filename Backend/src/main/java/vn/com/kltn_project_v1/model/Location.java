@@ -9,7 +9,6 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +18,7 @@ public class Location {
     private String floor;
     private String number;
 
-    @OneToOne(mappedBy = "location")
+    @OneToOne(mappedBy = "location",fetch = FetchType.LAZY)
     private Room room;
 
     public Location(String branch, String building, String floor, String number) {

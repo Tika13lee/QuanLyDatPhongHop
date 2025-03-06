@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.com.kltn_project_v1.model.Device;
+import vn.com.kltn_project_v1.model.Employee;
+import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.TypeRoom;
 
 import java.util.List;
@@ -24,6 +26,7 @@ public class RoomDTO {
     private int price;
     private List<String> imgs;
     private List<Room_DeviceDTO> room_deviceDTOS;
-
+    private AppoverDTO approver;
+    private List<ReservationDTO> reservationDTOS;
 
 }

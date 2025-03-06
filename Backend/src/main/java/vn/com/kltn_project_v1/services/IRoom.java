@@ -11,5 +11,5 @@ public interface IRoom {
     public Room createRoom(RoomDTO room) throws DataNotFoundException;
     public List<Room> getRoomsByBranch( Long locationId) throws DataNotFoundException;
     public boolean changeStatusRoom(Long roomId, String status) throws DataNotFoundException;
-
+    public List<RoomDTO> getAllRooms(int page, int size, String sortBy) throws DataNotFoundException;
 }

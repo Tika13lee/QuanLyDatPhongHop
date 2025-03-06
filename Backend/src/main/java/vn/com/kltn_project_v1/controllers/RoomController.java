@@ -39,6 +39,14 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/getAllRooms")
+    public ResponseEntity<?> getAllRooms(@RequestParam int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "roomId") String sortBy) {
+        try {
+            return ResponseEntity.ok(roomService.getAllRooms(page, size, sortBy));
+        }catch (Exception e){
+            return ResponseEntity.ok(e.toString());
+        }
+    }
 
 
 }
