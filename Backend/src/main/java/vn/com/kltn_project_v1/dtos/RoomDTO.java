@@ -20,7 +20,7 @@ public class RoomDTO {
     private int capacity;
     private String statusRoom;
     private TypeRoom typeRoom;
-    private LocationDTO locationDTO;
+    private LocationDTO location;
     private int price;
     private List<String> imgs;
     private List<Room_DeviceDTO> room_deviceDTOS;

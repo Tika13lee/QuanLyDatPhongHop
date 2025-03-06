@@ -23,7 +23,7 @@ public class RoomService implements IRoom {
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
         Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
-        Location location = locationRepository.findLocationByBranchAndBuildingAndFloorAndNumber(roomDTO.getLocationDTO().getBranch(),roomDTO.getLocationDTO().getBuilding(),roomDTO.getLocationDTO().getFloor(),roomDTO.getLocationDTO().getNumber())
+        Location location = locationRepository.findLocationByBranchAndBuildingAndFloorAndNumber(roomDTO.getLocation().getBranch(),roomDTO.getLocation().getBuilding(),roomDTO.getLocation().getFloor(),roomDTO.getLocation().getNumber())
                 .orElseThrow(()->new DataNotFoundException("Location not found"));
         Room room = Room.builder()
                 .roomName(roomDTO.getRoomName())

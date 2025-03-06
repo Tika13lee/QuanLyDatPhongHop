@@ -1,9 +1,6 @@
 package vn.com.kltn_project_v1.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -21,4 +18,14 @@ public class Location {
     private String building;
     private String floor;
     private String number;
+
+    @OneToOne(mappedBy = "location")
+    private Room room;
+
+    public Location(String branch, String building, String floor, String number) {
+        this.branch = branch;
+        this.building = building;
+        this.floor = floor;
+        this.number = number;
+    }
 }

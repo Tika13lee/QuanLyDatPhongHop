@@ -22,4 +22,19 @@ public class LocationService implements ILocation {
         return locationRepository.findLocationByBranchAndBuildingAndFloorAndNumber(branch, building, floor, number)
                 .orElseThrow(()->new RuntimeException("Location not found"));
     }
+
+    @Override
+    public Location addLocation(Location location) {
+        return locationRepository.save(location);
+    }
+
+    @Override
+    public Location updateLocation(Location location) {
+        return locationRepository.save(location);
+    }
+
+    @Override
+    public List<Location> findLocationsByRoomIsNull() {
+        return locationRepository.findLocationsByRoomIsNull();
+    }
 }
