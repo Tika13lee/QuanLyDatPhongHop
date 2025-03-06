@@ -9,13 +9,6 @@ const cx = classNames.bind(styles);
 const Room = () => {
   const [activeTab, setActiveTab] = useState("list");
 
-  const rooms = Array.from({ length: 20 }, (_, i) => ({
-    id: `P00${i + 1}`,
-    name: `Phòng họp ${String.fromCharCode(65 + (i % 5))}`,
-    capacity: Math.floor(Math.random() * 30) + 10,
-    status: ["Đang sử dụng", "Trống", "Bảo trì"][i % 3],
-  }));
-
   return (
     <div className={cx("room-container")}>
       <div className={cx("tab-container")}>

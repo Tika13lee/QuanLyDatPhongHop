@@ -3,6 +3,8 @@ import classNames from "classnames/bind";
 import styles from "./User-avatar-with-menu.module.scss";
 import UserAvatar from "./UserAvatar";
 import {} from "react-icons/bs";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +15,9 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
   size,
   borderColor,
 }) => {
+
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);

@@ -5,10 +5,14 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useState } from "react";
 import IconWrapper from "../components/icons/IconWrapper";
 import { IoIosArrowDown, IoIosArrowForward } from "../components/icons/icons";
+import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
 
 const cx = classNames.bind(styles);
 
 const MainLayoutAdmin = () => {
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+
   const [isBookingOpen, setIsBookingOpen] = useState(true);
   const [isRoomOpen, setIsRoomOpen] = useState(true);
 
@@ -32,16 +36,27 @@ const MainLayoutAdmin = () => {
               className={cx("dropdown-header")}
               onClick={() => setIsBookingOpen(!isBookingOpen)}
             >
-              <span>QL Lịch Đặt Phòng</span>
-                <IconWrapper
-                  icon={!isBookingOpen ? IoIosArrowForward : IoIosArrowDown}
-                  color={isBookingOpen ? "#fff" : "#7c7f83"}
-                />
+              <span className={cx({ "booking-open": isBookingOpen })}>
+                QL Lịch Đặt Phòng
+              </span>
+              <IconWrapper
+                icon={!isBookingOpen ? IoIosArrowForward : IoIosArrowDown}
+                color={isBookingOpen ? "#fff" : "#7c7f83"}
+              />
             </div>
             {isBookingOpen && (
               <div className={cx("dropdown-menu")}>
                 <NavLink
-                  to="/admin/booking-mgmt"
+                  to="/admin/overview"
+                  className={({ isActive }) =>
+                    cx("dropdown-item", { active: isActive })
+                  }
+                >
+                  Tổng quát
+                </NavLink>
+
+                <NavLink
+                  to="/admin/waiting-list"
                   className={({ isActive }) =>
                     cx("dropdown-item", { active: isActive })
                   }
@@ -61,39 +76,14 @@ const MainLayoutAdmin = () => {
             )}
           </div>
 
-          <div className={cx("dropdown")}>
-            <div
-              className={cx("dropdown-header")}
-              onClick={() => setIsRoomOpen(!isRoomOpen)}
-            >
-              <span>QL Phòng Họp</span>
-                <IconWrapper
-                  icon={!isRoomOpen ? IoIosArrowForward : IoIosArrowDown}
-                  color={isRoomOpen ? "#fff" : "#7c7f83"}
-                />
-            </div>
-            {isRoomOpen && (
-              <div className={cx("dropdown-menu")}>
-                <NavLink
-                  to="/admin/room"
-                  className={({ isActive }) =>
-                    cx("dropdown-item", { active: isActive })
-                  }
-                >
-                  Danh sách Phòng Họp
-                </NavLink>
-
-                <NavLink
-                  to="/admin/room/approved"
-                  className={({ isActive }) =>
-                    cx("dropdown-item", { active: isActive })
-                  }
-                >
-                  Phân Quyền Phê Duyệt
-                </NavLink>
-              </div>
-            )}
-          </div>
+          <NavLink
+            to="/admin/room"
+            className={({ isActive }) =>
+              cx("sidebar-item", { active: isActive })
+            }
+          >
+            QL Phòng Họp
+          </NavLink>
 
           <NavLink
             to="/admin/location"

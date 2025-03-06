@@ -70,7 +70,7 @@
       padding: 10px 16px;
       color: var(--text-secondary);
       text-decoration: none;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.1s ease;
       padding-left: 40px;
 
       &:hover {
@@ -85,4 +85,8 @@
       }
     }
   }
+}
+
+.booking-open {
+  color: #cdc6c6;
 }

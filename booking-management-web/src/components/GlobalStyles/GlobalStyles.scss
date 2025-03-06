@@ -4,14 +4,15 @@
 :root {
   --text-primary: #212529;
   --text-secondary: #7c7f83;
-  --bg-main: #0B2C56;
-  --bg-active: #0056B3;
-  --bg-hover: #567EA8;
+  --bg-main: #0b2c56;
+  --bg-active: #0056b3;
+  --bg-hover: #567ea8;
   --bg-primary: #c2dcfa;
   --color-white: #ffffff;
   --color-error: #c31818;
-  --btn-main: #0D6EFD;
-  --btn-hover: #455C7D;
+  --btn-main: #0d6efd;
+  --btn-hover: #455c7d;
+  --btn-edit: #f39c12;
   --tab-hover: #e6e9ef;
   --border-color: #ced4da;
   --border-focus: #007bff;
@@ -19,6 +20,8 @@
   --bg-scroll-thumb: #8ab4f8;
   --bg-scroll-track: #f0f0f0;
   --bg-scroll-thumb-hover: #6b9ffb;
+  --item-hover: aliceblue;
+  --item-active: #b8d4f8;
 }
 
 * {

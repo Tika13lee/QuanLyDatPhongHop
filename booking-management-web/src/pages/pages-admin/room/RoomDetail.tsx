@@ -29,10 +29,6 @@ const RoomDetail = () => {
     }
   }, [id, dispatch]);
 
-  if (!roomDetail) {
-    return <p>Phòng không tồn tại!</p>;
-  }
-
   // Chuyển đổi giữa chế độ xem tuần và tháng
   const toggleView = () => {
     setView(view === "week" ? "month" : "week");
@@ -45,6 +41,10 @@ const RoomDetail = () => {
   const handleCloseModal = () => {
     setIsModelEditOpen(false);
   };
+
+  if (!roomDetail) {
+    return <p>Phòng không tồn tại!</p>;
+  }
 
   return (
     <div className={cx("room-detail-container")}>

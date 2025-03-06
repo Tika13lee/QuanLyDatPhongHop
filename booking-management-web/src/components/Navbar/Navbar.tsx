@@ -4,10 +4,16 @@ import IconWrapper from "../icons/IconWrapper";
 import { FaRegBell, MdSearch } from "../icons/icons";
 import UserAvatarWithMenu from "../UserAvatar/UserAvatarWithMenu";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import { login } from "../../features/authSlice";
 
 const cx = classNames.bind(styles);
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<string[]>([]);
@@ -18,7 +24,7 @@ const Navbar = () => {
     setSearchOpen(true);
   };
 
-  // Đóng modal khi click bên ngoài hoặc bấm ESC
+  // Đóng modal search khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -49,7 +55,7 @@ const Navbar = () => {
             <input
               ref={inputRef}
               type="search"
-              placeholder="Tìm kiếm nhanh theo tên..."
+              placeholder="Tìm kiếm nhanh theo tên phòng họp"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={handleFocus}
@@ -83,6 +89,16 @@ const Navbar = () => {
           <IconWrapper icon={FaRegBell} size={20} color="#000" />
           <div className={cx("divider")} />
           <UserAvatarWithMenu imgUrl="https://i.pravatar.cc/300" />
+          {/* {isLoggedIn ? (
+            <UserAvatarWithMenu imgUrl="https://i.pravatar.cc/300" />
+          ) : (
+            <button
+              className={cx("login-btn")}
+              onClick={() => dispatch(login())}
+            >
+              Login
+            </button>
+          )} */}
         </div>
       </div>
     </div>

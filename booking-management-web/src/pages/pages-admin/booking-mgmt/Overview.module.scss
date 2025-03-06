@@ -1,0 +1,136 @@
+.overview-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+  gap: 20px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.filterContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.datePicker {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.actionButtons button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--btn-main);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.actionButtons button:hover {
+  background-color: var(--btn-hover);
+}
+
+// Lịch theo tuần
+.schedule-container {
+  border: 1px solid var(--border-color);
+  overflow: auto;
+  max-width: 1285px;
+  max-height: 580px;
+  position: relative;
+  table-layout: auto;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-scroll-track);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--bg-scroll-thumb);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-scroll-thumb-hover);
+  }
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+
+  th,
+  td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    height: 50px;
+    min-width: 150px;
+  }
+
+  .cell {
+    background-color: var(--color-white);
+    cursor: pointer;
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+.schedule-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-active);
+  z-index: 2;
+  color: var(--color-white);
+}
+
+.schedule-table tbody td:first-child,
+.schedule-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  background-color: #567ea8;
+  z-index: 3;
+  color: var(--color-white);
+}
+
+.schedule-table thead th:first-child {
+  z-index: 15;
+  background-color: rgb(150, 155, 85);
+}
+
+.schedule-table thead th:first-child,
+.schedule-table tbody td:first-child {
+  border: none !important;
+  width: auto;
+  min-width: 85px;
+  max-width: 150px;
+}
+
+.schedule-table tbody td:first-child {
+  text-align: right;
+  vertical-align: super;
+  padding: 0;
+  padding-right: 10px;
+}

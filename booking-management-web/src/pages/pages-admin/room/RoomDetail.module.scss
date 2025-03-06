@@ -196,6 +196,17 @@
   }
 }
 
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .modal-content {
   background: var(--color-white);
   padding: 30px 20px;
@@ -208,6 +219,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  animation: slideDown 0.3s ease-out;
 }
 
 .btn-save {

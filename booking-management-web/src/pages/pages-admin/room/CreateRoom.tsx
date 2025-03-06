@@ -1,136 +1,14 @@
 import classNames from "classnames/bind";
 import styles from "./CreateRoom.module.scss";
-import { devices, LocationProps, locations, statusesRoom } from "../../../data/data";
-import { useState } from "react";
+import { devices, locations, statusesRoom, typeRoom } from "../../../data/data";
 
 const cx = classNames.bind(styles);
 
-const roomTypes = ["Phòng họp nhỏ", "Phòng họp lớn", "Phòng hội thảo"];
 const approvers = ["Nguyễn Văn A", "Trần Thị B", "Lê Minh C"];
-// const devices = [
-//   "Máy chiếu",
-//   "Tivi",
-//   "Bảng trắng",
-//   "Hệ thống âm thanh",
-//   "Hệ thống âm thanh",
-//   "Hệ thống âm thanh",
-// ];
 
 const CreateRoom = () => {
-  // Hiển thị vi trí đuợc chọn trong bảng lên form
-  const [dataLocations, setDataLocations] = useState(locations);
-  const [selectedLocation, setSelectedLocation] = useState({
-    branch: "",
-    building: "",
-    floor: "",
-    number: "",
-  });
-
-  const handleRowClick = (location: LocationProps) => {
-    setSelectedLocation(location);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSelectedLocation((prev) => ({ ...prev, [name]: value }));
-  };
-
   return (
     <div className={cx("create-container")}>
-      {/* <div className={cx("location-container")}>
-        <div className={cx("location-form-container")}>
-          <h2>Tạo Vị Trí Phòng Họp</h2>
-
-          <form className={cx("form")}>
-            <div className={cx("form-row")}>
-              <div className={cx("form-group")}>
-                <label>Chi nhánh:</label>
-                <input
-                  type="text"
-                  name="branch"
-                  value={selectedLocation.branch}
-                  onChange={handleInputChange}
-                  placeholder="Nhập chi nhánh..."
-                />
-              </div>
-              <div className={cx("form-group")}>
-                <label>Tòa nhà:</label>
-                <input
-                  type="text"
-                  name="building"
-                  value={selectedLocation.building}
-                  onChange={handleInputChange}
-                  placeholder="Nhập tòa nhà..."
-                />
-              </div>
-            </div>
-
-            <div className={cx("form-row")}>
-              <div className={cx("form-group")}>
-                <label>Tầng:</label>
-                <input
-                  type="text"
-                  name="floor"
-                  value={selectedLocation.floor}
-                  onChange={handleInputChange}
-                  placeholder="Nhập tầng..."
-                />
-              </div>
-              <div className={cx("form-group")}>
-                <label>Số phòng:</label>
-                <input
-                  type="text"
-                  name="number"
-                  value={selectedLocation.number}
-                  onChange={handleInputChange}
-                  placeholder="Nhập số phòng..."
-                />
-              </div>
-            </div>
-
-            <div className={cx("btn-row")}>
-              <button type="button" className={cx("submit-btn")}>
-                Tạo vị trí
-              </button>
-              <button type="button" className={cx("submit-btn")}>
-                Chỉnh sửa
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div className={cx("table-container")}>
-          <div className={cx("table-header")}>
-            <h3>Danh Sách Vị Trí</h3>
-            <div className={cx("search")}>
-              <input type="search" placeholder="Tìm kiếm vị trí" />
-            </div>
-          </div>
-          <div className={cx("table-wrapper")}>
-            <table className={cx("location-table")}>
-              <thead>
-                <tr>
-                  <th>Chi nhánh</th>
-                  <th>Tòa nhà</th>
-                  <th>Tầng</th>
-                  <th>Số phòng</th>
-                </tr>
-              </thead>
-              <tbody>
-                {locations.map((loc, index) => (
-                  <tr key={index} onClick={() => handleRowClick(loc)}>
-                    <td>{loc.branch}</td>
-                    <td>{loc.building}</td>
-                    <td>{loc.floor}</td>
-                    <td>{loc.number}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div> */}
-
       <div className={cx("room-form-container")}>
         <form className={cx("form")}>
           <div className={cx("row-container")}>
@@ -171,7 +49,7 @@ const CreateRoom = () => {
               <div className={cx("form-row")}>
                 <select>
                   <option value="">Chọn loại phòng...</option>
-                  {roomTypes.map((type, index) => (
+                  {typeRoom.map((type, index) => (
                     <option key={index} value={type}>
                       {type}
                     </option>

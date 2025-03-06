@@ -155,7 +155,7 @@ export const rooms: RoomProps[] = [
         date: "2025-03-07",
         timeStart: "14:00",
         timeEnd: "16:00",
-        title: "Họp khẩn",
+        title: "Họp khẩn cấp",
         status: "Đã đặt",
       },
     ],
@@ -297,8 +297,121 @@ export const rooms: RoomProps[] = [
       },
     ],
   },
+  {
+    id: 5,
+    name: "Phòng họp E",
+    location: findLocationById(5)!,
+    capacity: 25,
+    roomImg:
+      "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-12.jpg",
+    price: 110,
+    approvers: [
+      { id: 9, name: "Bùi Đức I" },
+      { id: 10, name: "Đỗ Mai J" },
+    ],
+    typeRoom: "Mặc định",
+    statusRoom: "Có sẵn",
+    devices: [
+      { id: 15, name: "Tivi", quantity: 2 },
+      { id: 16, name: "Loa di động", quantity: 2 },
+      { id: 17, name: "Laptop", quantity: 1 },
+    ],
+    schedules: [
+      {
+        id: 8,
+        date: "2025-03-09",
+        timeStart: "14:00",
+        timeEnd: "16:00",
+        title: "Họp chiến lược",
+        status: "Chờ phê duyệt",
+      },
+      {
+        id: 10,
+        date: "2025-03-09",
+        timeStart: "16:00",
+        timeEnd: "16:30",
+        title: "Họp chiến lược",
+        status: "Chờ phê duyệt",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Phòng họp E",
+    location: findLocationById(5)!,
+    capacity: 25,
+    roomImg:
+      "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-12.jpg",
+    price: 110,
+    approvers: [
+      { id: 9, name: "Bùi Đức I" },
+      { id: 10, name: "Đỗ Mai J" },
+    ],
+    typeRoom: "Mặc định",
+    statusRoom: "Có sẵn",
+    devices: [
+      { id: 15, name: "Tivi", quantity: 2 },
+      { id: 16, name: "Loa di động", quantity: 2 },
+      { id: 17, name: "Laptop", quantity: 1 },
+    ],
+    schedules: [
+      {
+        id: 8,
+        date: "2025-03-09",
+        timeStart: "14:00",
+        timeEnd: "16:00",
+        title: "Họp chiến lược",
+        status: "Chờ phê duyệt",
+      },
+      {
+        id: 10,
+        date: "2025-03-09",
+        timeStart: "16:00",
+        timeEnd: "16:30",
+        title: "Họp chiến lược",
+        status: "Chờ phê duyệt",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Phòng họp E",
+    location: findLocationById(5)!,
+    capacity: 25,
+    roomImg:
+      "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-12.jpg",
+    price: 110,
+    approvers: [
+      { id: 9, name: "Bùi Đức I" },
+      { id: 10, name: "Đỗ Mai J" },
+    ],
+    typeRoom: "Mặc định",
+    statusRoom: "Có sẵn",
+    devices: [
+      { id: 15, name: "Tivi", quantity: 2 },
+      { id: 16, name: "Loa di động", quantity: 2 },
+      { id: 17, name: "Laptop", quantity: 1 },
+    ],
+    schedules: [
+      {
+        id: 8,
+        date: "2025-03-09",
+        timeStart: "14:00",
+        timeEnd: "16:00",
+        title: "Họp chiến lược",
+        status: "Chờ phê duyệt",
+      },
+      {
+        id: 10,
+        date: "2025-03-09",
+        timeStart: "16:00",
+        timeEnd: "16:30",
+        title: "Họp chiến lược",
+        status: "Chờ phê duyệt",
+      },
+    ],
+  },
 ];
-
 
 // trạng thái phòng
 export const statusesRoom = [
@@ -353,5 +466,109 @@ export const devices: DeviceProps[] = [
     id: 7,
     deviceName: "Bàn ghế",
     description: "Bàn ghế tiêu chuẩn",
+  },
+];
+
+// dịch vụ
+export type ServiceProps = {
+  id: number;
+  serviceName: string;
+  description: string;
+  price: number;
+};
+
+export const services: ServiceProps[] = [
+  {
+    id: 1,
+    serviceName: "Đồ ăn",
+    description: "Đồ ăn tiệc",
+    price: 100,
+  },
+  {
+    id: 2,
+    serviceName: "Đồ uống",
+    description: "Đồ uống tiệc",
+    price: 50,
+  },
+  {
+    id: 3,
+    serviceName: "Trang trí",
+    description: "Trang trí tiệc",
+    price: 200,
+  },
+  {
+    id: 4,
+    serviceName: "Âm nhạc",
+    description: "Âm nhạc tiệc",
+    price: 150,
+  },
+];
+
+// đặt phòng
+export type ReservationProps = {
+  id: number;
+  time: string;
+  timeStart: string;
+  timeEnd: string;
+  note: string;
+  description: string;
+  title: string;
+  services?: ServiceProps[];
+  frequency?: string;
+  approvalType: boolean;
+  booker: {
+    id: number;
+    name: string;
+    img: string;
+  };
+  room: {
+    id: number;
+    name: string;
+    location: LocationProps;
+    capacity: number;
+    roomImg: string;
+    price: number;
+    typeRoom: string;
+    statusRoom: string;
+    devices: {
+      id: number;
+      name: string;
+      quantity: number;
+    }[];
+  };
+};
+
+export const reservations: ReservationProps[] = [
+  {
+    id: 1,
+    time: "2025-03-01",
+    timeStart: "08:00",
+    timeEnd: "10:00",
+    note: "Họp nhóm",
+    description: "Họp nhóm",
+    title: "Họp nhóm",
+    approvalType: true,
+    booker: {
+      id: 1,
+      name: "Nguyễn Văn A",
+      img: "https://i.pravatar.cc/150?img=1",
+    },
+    room: rooms[0],
+  },
+  {
+    id: 2,
+    time: "2025-03-03",
+    timeStart: "10:30",
+    timeEnd: "12:00",
+    note: "Họp dự án",
+    description: "Họp dự án",
+    title: "Họp dự án",
+    approvalType: false,
+    booker: {
+      id: 2,
+      name: "Trần Thị B",
+      img: "https://i.pravatar.cc/150?img=2",
+    },
+    room: rooms[1],
   },
 ];

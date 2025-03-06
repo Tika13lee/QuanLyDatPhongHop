@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayoutAdmin from "./layouts/MainLayoutAdmin";
 import {
-  BookingMgmt,
   Dashboard,
   Employee,
   Location,
+  Overview,
   Room,
   RoomDetail,
+  WaitingList,
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
 import { Booking } from "./pages/pages-user";
@@ -24,7 +25,8 @@ function App() {
 
           <Route path="/admin" element={<MainLayoutAdmin />}>
             <Route index element={<Dashboard />} />
-            <Route path="booking-mgmt" element={<BookingMgmt />} />
+            <Route path="overview" element={<Overview />} />
+            <Route path="waiting-list" element={<WaitingList />} />
             <Route path="room" element={<Room />} />
             <Route path="room/detail/:id" element={<RoomDetail />} />
             <Route path="location" element={<Location />} />
