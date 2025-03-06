@@ -16,4 +16,10 @@ public class LocationService implements ILocation {
     public List<Location> getAllLocation() {
         return locationRepository.findAll();
     }
+
+    @Override
+    public Location findLocation(String branch, String building, String floor, String number) {
+        return locationRepository.findLocationByBranchAndBuildingAndFloorAndNumber(branch, building, floor, number)
+                .orElseThrow(()->new RuntimeException("Location not found"));
+    }
 }

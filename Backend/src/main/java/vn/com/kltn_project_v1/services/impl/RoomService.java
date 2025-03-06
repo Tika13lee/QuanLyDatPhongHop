@@ -23,7 +23,7 @@ public class RoomService implements IRoom {
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
         Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
-        Location location = locationRepository.findById(roomDTO.getLocationId())
+        Location location = locationRepository.findLocationByBranchAndBuildingAndFloorAndNumber(roomDTO.getLocationDTO().getBranch(),roomDTO.getLocationDTO().getBuilding(),roomDTO.getLocationDTO().getFloor(),roomDTO.getLocationDTO().getNumber())
                 .orElseThrow(()->new DataNotFoundException("Location not found"));
         Room room = Room.builder()
                 .roomName(roomDTO.getRoomName())
@@ -38,7 +38,7 @@ public class RoomService implements IRoom {
         roomDTO.getRoom_deviceDTOS().forEach(rd->{
             Device device = null;
             try {
-                device = deviceRepository.findById(rd.getDeviceId())
+                device = deviceRepository.findDeviceByDeviceName(rd.getDeviceName())
                         .orElseThrow(()->new DataNotFoundException("Device not found"));
             } catch (DataNotFoundException e) {
                 throw new RuntimeException(e);

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface IDevice {
     List<Device> findAll();
+    Device findByName(String name);
 }

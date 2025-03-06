@@ -5,13 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.naming.Name;
-
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Room_DeviceDTO {
-    private String deviceName;
-    private int quantity;
+@Getter
+@Setter
+public class LocationDTO {
+    private String branch;
+    private String building;
+    private String floor;
+    private String number;
+
+
 }

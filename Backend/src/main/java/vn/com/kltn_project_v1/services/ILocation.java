@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ILocation {
     public List<Location> getAllLocation();
+    public Location findLocation(String branch, String building, String floor, String number);
 }

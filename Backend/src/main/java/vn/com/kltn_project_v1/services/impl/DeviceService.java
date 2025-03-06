@@ -17,4 +17,10 @@ public class DeviceService implements IDevice {
     public List<Device> findAll() {
         return deviceRepository.findAll();
     }
+
+    @Override
+    public Device findByName(String name) {
+        return deviceRepository.findDeviceByDeviceName(name)
+                .orElseThrow(()->new RuntimeException("Device not found"));
+    }
 }
