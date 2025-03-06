@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Location {
     private String number;
 
     @OneToOne(mappedBy = "location",fetch = FetchType.LAZY)
+    @JsonIgnore
     private Room room;
 
     public Location(String branch, String building, String floor, String number) {

@@ -16,4 +16,5 @@ public class DeviceController {
     public ResponseEntity<?> getAllDevices() {
         return ResponseEntity.ok(deviceService.findAll());
     }
+
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RoomDTO;
 import vn.com.kltn_project_v1.model.Room;
 import vn.com.kltn_project_v1.model.StatusRoom;
+import vn.com.kltn_project_v1.services.IDevice;
 import vn.com.kltn_project_v1.services.IRoom;
 
 @RestController
@@ -14,6 +15,8 @@ import vn.com.kltn_project_v1.services.IRoom;
 public class RoomController {
     @Autowired
     private IRoom roomService;
+    @Autowired
+    private IDevice deviceService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createRoom(@RequestBody RoomDTO roomDTO) {
@@ -49,13 +52,20 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         }
     }
     @GetMapping("/sreachRooms")
-    public ResponseEntity<?> sreachRooms(@RequestParam(defaultValue = "0") int capacity, @RequestParam(defaultValue = "0") int price, StatusRoom statusRoom){
+    public ResponseEntity<?> searchRooms(@RequestParam(defaultValue = "0") int capacity, @RequestParam(defaultValue = "0") int price, StatusRoom statusRoom){
         try {
             return ResponseEntity.ok(roomService.sreachRooms(capacity, price, statusRoom));
         }catch (Exception e){
             return ResponseEntity.ok(e.toString());
         }
     }
-
+    @PostMapping("/addDeviceToRoom")
+    public ResponseEntity<?> addDeviceToRoom(@RequestParam Long deviceId,@RequestParam Long roomId, @RequestParam(defaultValue = "1") int quantity){
+        try {
+            return ResponseEntity.ok(deviceService.createRoomDevice(roomId, deviceId, quantity));
+        }catch (Exception e){
+            return ResponseEntity.ok(e.toString());
+        }
+    }
 
 }
