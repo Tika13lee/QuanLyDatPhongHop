@@ -5,8 +5,12 @@ import RoomDetail from "./room/RoomDetail";
 import Location from "./location/Location";
 import Overview from "./booking-mgmt/Overview";
 import WaitingList from "./booking-mgmt/WaitingList";
+import Device from "./device/Device";
+import Service from "./service/Serivice";
 
 export {
+  Service,
+  Device,
   WaitingList,
   Overview,
   Location,

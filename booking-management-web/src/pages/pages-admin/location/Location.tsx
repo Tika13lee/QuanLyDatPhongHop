@@ -1,11 +1,17 @@
 import classNames from "classnames/bind";
 import styles from "./Location.module.scss";
-import { locations } from "../../../data/data";
-import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
 function Location() {
+  const { locations, loading, error } = useSelector(
+    (state: RootState) => state.location
+  );
+
+  console.log("locations", locations);
+
   return (
     <div className={cx("location-container")}>
       <div className={cx("location-header")}>
@@ -56,7 +62,6 @@ function Location() {
             </div>
           </form>
         </div>
-        <div className={cx("location-search")}></div>
       </div>
 
       {/* Bảng danh sách */}
@@ -73,18 +78,30 @@ function Location() {
             </tr>
           </thead>
           <tbody>
-            {locations.map((loc) => (
-              <tr key={loc.id}>
-                <td>{loc.id}</td>
-                <td>{loc.branch}</td>
-                <td>{loc.building}</td>
-                <td>{loc.floor}</td>
-                <td>{loc.number}</td>
-                <td>
-                  <button className={styles["edit-btn"]}>Sửa</button>
+            {loading ? (
+              <tr>
+                <td colSpan={6} className={cx("loading-message")}>
+                  Đang tải dữ liệu...
                 </td>
               </tr>
-            ))}
+            ) : error || !locations || locations.length === 0 ? (
+              <tr>
+                <td colSpan={6}>Không có dữ liệu</td>
+              </tr>
+            ) : (
+              locations.map((loc, index) => (
+                <tr key={loc.locationId}>
+                  <td>{index + 1}</td>
+                  <td>{loc.branch}</td>
+                  <td>{loc.building}</td>
+                  <td>{loc.floor}</td>
+                  <td>{loc.number}</td>
+                  <td>
+                    <button className={cx("edit-btn")}>Sửa</button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

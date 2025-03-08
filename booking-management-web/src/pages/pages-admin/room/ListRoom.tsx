@@ -1,19 +1,53 @@
 import classNames from "classnames/bind";
 import styles from "./ListRoom.module.scss";
-import { locations, rooms, statusesRoom } from "../../../data/data";
+import { RoomProps, rooms, statusesRoom } from "../../../data/data";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
+import { useRef, useState } from "react";
+import useFetch from "../../../hooks/useFetch";
 
 const cx = classNames.bind(styles);
 
-const approvers = ["Nguyễn Văn A", "Trần Thị B", "Lê Minh C"];
-
 function ListRoom() {
+  // Lấy dữ liệu locations từ Redux Store
+  const {
+    locations,
+    loading: locationsLoading,
+    error: locationsError,
+  } = useSelector((state: RootState) => state.location);
+
+  const [filters, setFilters] = useState({
+    // branch: "",
+    capacity: "",
+    price: "",
+    statusRoom: "",
+  });
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 7;
+  const [searching, setSearching] = useState(false);
+
+  const { data, error, loading } = useFetch<RoomProps[]>(
+    searching
+      ? `http://localhost:8080/api/v1/room/sreachRooms?capacity=${filters.capacity}&statusRoom=${filters.statusRoom}&price=${filters.price}&page=${page}&size=${pageSize}`
+      : `http://localhost:8080/api/v1/room/getAllRooms?page=${page}&size=${pageSize}`
+  );
+
+  console.log("data", data);
+
+  const handleSearch = () => {
+    setSearching(true);
+    setPage(1);
+  };
+
   return (
     <div className={cx("list-container")}>
+      {/* khung tìm kiếm */}
       <div className={cx("search-container")}>
-        {/* Tìm kiếm nâng cao */}
         <div className={cx("advanced-search")}>
           <h3>Tìm kiếm nâng cao (theo nhiều chỉ tiêu)</h3>
 
@@ -22,9 +56,13 @@ function ListRoom() {
               <label>Chi nhánh:</label>
               <select>
                 <option value="">Chọn chi nhánh</option>
-                {locations.map((loc) => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.branch}
+                {[
+                  ...new Set(
+                    locations?.map((location) => location.branch) || []
+                  ),
+                ].map((branch, index) => (
+                  <option key={index} value={branch}>
+                    {branch}
                   </option>
                 ))}
               </select>
@@ -32,33 +70,40 @@ function ListRoom() {
 
             <div className={cx("form-group")}>
               <label>Sức chứa:</label>
-              <input type="number" placeholder="Nhập sức chứa..." />
+              <input
+                type="number"
+                placeholder="Nhập sức chứa..."
+                value={filters.capacity}
+                onChange={(e) => {
+                  setFilters({ ...filters, capacity: e.target.value });
+                }}
+              />
             </div>
 
             <div className={cx("form-group")}>
               <label>Giá:</label>
-              <input type="number" placeholder="Nhập giá..." />
+              <input
+                type="number"
+                placeholder="Nhập giá..."
+                value={filters.price}
+                onChange={(e) => {
+                  setFilters({ ...filters, price: e.target.value });
+                }}
+              />
             </div>
 
             <div className={cx("form-group")}>
               <label>Trạng thái:</label>
-              <select>
+              <select
+                value={filters.statusRoom}
+                onChange={(e) =>
+                  setFilters({ ...filters, statusRoom: e.target.value })
+                }
+              >
                 <option value="">Chọn trạng thái...</option>
                 {statusesRoom.map((status, index) => (
-                  <option key={index} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={cx("form-group")}>
-              <label>Người phê duyệt:</label>
-              <select>
-                <option value="">Chọn người phê duyệt...</option>
-                {approvers.map((person, index) => (
-                  <option key={index} value={person}>
-                    {person}
+                  <option key={index} value={status.value}>
+                    {status.label}
                   </option>
                 ))}
               </select>
@@ -66,11 +111,14 @@ function ListRoom() {
           </div>
 
           <div className={cx("btn-row")}>
-            <button className={cx("search-btn")}>Đặt lại</button>
+            <button className={cx("search-btn")} onClick={() => handleSearch()}>
+              Tìm kiếm
+            </button>
           </div>
         </div>
       </div>
 
+      {/* danh sách phòng họp */}
       <div className={cx("table-wrapper")}>
         <table className={cx("room-table")}>
           <thead>
@@ -84,29 +132,69 @@ function ListRoom() {
             </tr>
           </thead>
           <tbody>
-            {rooms.map((room) => (
-              <tr key={room.id}>
-                <td>{room.name}</td>
-                <td>
-                  {room.location.branch}, {room.location.building}, tầng{" "}
-                  {room.location.floor}, phòng {room.location.number}
-                </td>
-                <td>{room.capacity}</td>
-                <td>${room.price}</td>
-                <td>
-                  {room.approvers.map((approver) => (
-                    <span key={approver.id}>{approver.name}, </span>
-                  ))}
-                </td>
-                <td className={cx("icon-info")}>
-                  <Link to={`detail/${room.id}`}>
-                    <IconWrapper icon={MdOutlineInfo} color="#0670C7" />
-                  </Link>
+            {Array.isArray(data) && data.length > 0 ? (
+              data.map((room, index) => (
+                <tr key={index}>
+                  <td>{room.roomName}</td>
+                  <td>
+                    {room.location
+                      ? `${room.location.branch}, ${room.location.building}, tầng ${room.location.floor}, phòng ${room.location.number}`
+                      : "Không có thông tin vị trí"}
+                  </td>
+                  <td>{room.capacity}</td>
+                  <td>${room.price}</td>
+                  <td>
+                    {Array.isArray(room.approvers) && room.approvers.length > 0
+                      ? room.approvers.map((approver) => (
+                          <span key={approver.id}>{approver.name}, </span>
+                        ))
+                      : "Không có người phê duyệt"}
+                  </td>
+                  <td className={cx("icon-info")}>
+                    <Link to={`detail/${room.id}`}>
+                      <IconWrapper icon={MdOutlineInfo} color="#0670C7" />
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} style={{ textAlign: "center" }}>
+                  Không có dữ liệu
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
+      </div>
+
+      {/* Nút chuyển trang */}
+      <div className={cx("pagination")}>
+        <button
+          className={cx("page-btn")}
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+        >
+          {"<"} Trước
+        </button>
+
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            className={cx("page-btn", { active: page === index + 1 })}
+            onClick={() => setPage(index + 1)}
+          >
+            {index + 1}
+          </button>
+        ))}
+
+        <button
+          className={cx("page-btn")}
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          Sau {">"}
+        </button>
       </div>
     </div>
   );

@@ -85,7 +85,7 @@ input {
 // table-room
 .table-wrapper {
   width: 97%;
-  height: 385px;
+  height: 350px;
   overflow-y: auto;
   border-radius: 5px;
   border: 1px solid var(--border-color);
@@ -139,4 +139,42 @@ input {
 .icon-info {
   cursor: pointer;
   text-align: center;
+}
+
+// chuyển trang
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.page-btn {
+  background-color: var(--color-white);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.page-btn:hover {
+  background-color: #0670c7;
+  color: var(--color-white);
+}
+
+.page-btn.active {
+  background-color: #0670c7;
+  color: var(--color-white);
+  border: 1px solid #0670c7;
+}
+
+.page-btn:disabled {
+  background-color: #ddd;
+  color: #888;
+  cursor: not-allowed;
 }

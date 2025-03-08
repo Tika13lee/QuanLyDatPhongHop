@@ -37,7 +37,7 @@ function ApprovalList() {
             {selectedReservation.timeStart} - {selectedReservation.timeEnd}
           </p>
           <p>
-            <strong>Phòng:</strong> {selectedReservation.room.name}
+            <strong>Phòng:</strong> {selectedReservation.room.roomName}
           </p>
           <p className="room-location">
             <strong>Vị trí:</strong> {selectedReservation.room.location.branch} -{" "}

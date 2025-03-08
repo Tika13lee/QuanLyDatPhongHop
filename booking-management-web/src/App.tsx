@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayoutAdmin from "./layouts/MainLayoutAdmin";
 import {
   Dashboard,
+  Device,
   Employee,
   Location,
   Overview,
   Room,
   RoomDetail,
+  Service,
   WaitingList,
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
@@ -30,6 +32,8 @@ function App() {
             <Route path="room" element={<Room />} />
             <Route path="room/detail/:id" element={<RoomDetail />} />
             <Route path="location" element={<Location />} />
+            <Route path="device" element={<Device />} />
+            <Route path="service" element={<Service />} />
             <Route path="employee" element={<Employee />} />
           </Route>
 

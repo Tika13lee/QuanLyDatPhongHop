@@ -81,7 +81,7 @@ const RoomDetail = () => {
           {/* Thông tin chi tiết */}
           <div className={cx("room-info")}>
             <div className={cx("room-header")}>
-              <span className={cx("room-title")}>{roomDetail.name}</span>
+              <span className={cx("room-title")}>{roomDetail.roomName}</span>
               <div className={cx("btn-edit")} onClick={handleOpenModal}>
                 <IconWrapper icon={MdOutlineEdit} size={22} />
               </div>
@@ -98,7 +98,7 @@ const RoomDetail = () => {
                       <input
                         type="text"
                         id="room-name"
-                        defaultValue={roomDetail.name}
+                        defaultValue={roomDetail.roomName}
                       />
                     </div>
 

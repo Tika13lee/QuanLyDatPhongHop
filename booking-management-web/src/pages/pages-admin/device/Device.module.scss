@@ -1,17 +1,17 @@
-.location-container {
+.device-container {
   flex: 1;
   margin: 20px auto;
   background: var(--color-white);
   padding: 0 20px;
 }
 
-.location-header {
+.device-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.location-info {
+.device-info {
   width: 45%;
   padding: 20px;
   background: var(--color-white);
@@ -65,7 +65,7 @@
   &:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 5px rgba(83, 152, 226, 0.5);
   }
 }
 
@@ -76,7 +76,7 @@
 }
 
 .submit-btn {
-  width: 100px;
+  width: 130px;
   padding: 10px;
   font-size: 14px;
   font-weight: bold;
@@ -101,8 +101,8 @@
 
 
 
-// location table
-.location-list {
+// device table
+.device-list {
   width: 100%;
   margin-top: 20px;
   overflow-y: auto;
@@ -128,7 +128,7 @@
   }
 }
 
-.location-table {
+.device-table {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
@@ -149,7 +149,7 @@
 }
 
 
-.location-table th {
+.device-table th {
   background-color: var(--bg-active);
   color: var(--color-white);
   font-weight: 500;
@@ -168,3 +168,4 @@
 .edit-btn:hover {
   background-color: #0056b3;
 }
+

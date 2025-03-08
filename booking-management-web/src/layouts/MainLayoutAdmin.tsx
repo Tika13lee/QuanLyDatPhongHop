@@ -2,15 +2,36 @@ import classNames from "classnames/bind";
 import styles from "./MainLayoutAdmin.module.scss";
 import Navbar from "../components/Navbar/Navbar";
 import { NavLink, Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconWrapper from "../components/icons/IconWrapper";
 import { IoIosArrowDown, IoIosArrowForward } from "../components/icons/icons";
-import { useSelector } from "react-redux";
-import { RootState } from "../app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../app/store";
+import { fetchLocations } from "../features/locationSlice";
+import { fetchDevices } from "../features/deviceSlice";
 
 const cx = classNames.bind(styles);
 
 const MainLayoutAdmin = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { locations, loading, error } = useSelector(
+    (state: RootState) => state.location
+  );
+
+  const { devices } = useSelector((state: RootState) => state.device);
+
+  useEffect(() => {
+    if (locations.length === 0) {
+      dispatch(fetchLocations());
+    }
+  }, [dispatch, locations.length]);
+  
+  useEffect(() => {
+    if (devices.length === 0) {
+      dispatch(fetchDevices());
+    }
+  }, [dispatch, devices.length]);
+
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   const [isBookingOpen, setIsBookingOpen] = useState(true);
