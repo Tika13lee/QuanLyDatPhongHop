@@ -18,6 +18,7 @@ import java.util.List;
 
 
 public class RoomDTO {
+    private Long roomId;
     private String roomName;
     private int capacity;
     private String statusRoom;
@@ -26,7 +27,7 @@ public class RoomDTO {
     private int price;
     private List<String> imgs;
     private List<Room_DeviceDTO> room_deviceDTOS;
-    private AppoverDTO approver;
+    private ApproverDTO approver;
     private List<ReservationDTO> reservationDTOS;
 
 }

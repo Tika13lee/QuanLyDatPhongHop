@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ public class Account implements UserDetails {
     private String password;
     @Column(columnDefinition = "boolean default false")
     private boolean role; // true: admin, false: user
+    @JsonIgnore
     @OneToOne(mappedBy = "account")
     private Employee employee;
 
@@ -38,7 +40,7 @@ public class Account implements UserDetails {
     }
     @Override
     public String getPassword() {
-        return password;
+        return "";
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 
 -- Dumping database structure for ql_datphong
-CREATE DATABASE IF NOT EXISTS `ql_datphong` /*!40100 DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci */;
+CREATE DATABASE IF NOT EXISTS `ql_datphong` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
 USE `ql_datphong`;
 
 -- Dumping structure for table ql_datphong.account
@@ -46,7 +46,7 @@ INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`) VALUES
 -- Dumping structure for table ql_datphong.cancel_reservation
 CREATE TABLE IF NOT EXISTS `cancel_reservation` (
   `cancel_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `reason` varchar(255) DEFAULT NULL,
+  `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `time` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`cancel_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `cancel_reservation` (
 -- Dumping structure for table ql_datphong.department
 CREATE TABLE IF NOT EXISTS `department` (
   `department_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `dep_name` varchar(255) DEFAULT NULL,
+  `dep_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `location_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`department_id`),
   UNIQUE KEY `UKe19n7n78ppli0pc6nstem49ya` (`location_id`),
@@ -73,18 +73,19 @@ INSERT INTO `department` (`department_id`, `dep_name`, `location_id`) VALUES
 CREATE TABLE IF NOT EXISTS `device` (
   `device_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `description` varchar(255) DEFAULT NULL,
-  `device_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `device_name` varchar(255) DEFAULT NULL,
   `price_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`device_id`),
   KEY `FKrvclitsabx4joc0l97unv1bjc` (`price_id`),
   CONSTRAINT `FKrvclitsabx4joc0l97unv1bjc` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.device: ~3 rows (approximately)
+-- Dumping data for table ql_datphong.device: ~4 rows (approximately)
 INSERT INTO `device` (`device_id`, `description`, `device_name`, `price_id`) VALUES
 	(1, ' ', 'projector', 5),
 	(2, ' ', 'whiteboard', 6),
-	(3, ' ', 'tv', 7);
+	(3, ' ', 'tv', 7),
+	(6, 'Lớn, 1000B', 'Công cụ loa', 16);
 
 -- Dumping structure for table ql_datphong.employee
 CREATE TABLE IF NOT EXISTS `employee` (
@@ -102,9 +103,9 @@ CREATE TABLE IF NOT EXISTS `employee` (
   KEY `FKbejtwvg9bxus2mffsm3swj3u9` (`department_id`),
   CONSTRAINT `FKbejtwvg9bxus2mffsm3swj3u9` FOREIGN KEY (`department_id`) REFERENCES `department` (`department_id`),
   CONSTRAINT `FKcfg6ajo8oske94exynxpf7tf9` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.employee: ~11 rows (approximately)
+-- Dumping data for table ql_datphong.employee: ~12 rows (approximately)
 INSERT INTO `employee` (`employee_id`, `avatar`, `email`, `employee_name`, `is_actived`, `phone`, `account_id`, `department_id`) VALUES
 	(1, NULL, '123@gmail.com', 'Dat1', b'1', '0914653334', 1, 1),
 	(2, NULL, '123@gmail.com', 'Dat2', b'1', '0914653333', 2, 1),
@@ -127,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `location` (
   `floor` varchar(255) DEFAULT NULL,
   `number` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.location: ~9 rows (approximately)
 INSERT INTO `location` (`location_id`, `branch`, `building`, `floor`, `number`) VALUES
@@ -150,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   PRIMARY KEY (`log_id`),
   UNIQUE KEY `UK7vj7qw714561rssch090tw994` (`account_id`),
   CONSTRAINT `FK503ama154cr4d3cyc7741l4b7` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.log: ~0 rows (approximately)
 
@@ -159,11 +160,11 @@ CREATE TABLE IF NOT EXISTS `price` (
   `price_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `time_apply` datetime(6) DEFAULT NULL,
   `type` enum('DEVICE','ROOM','SERVICE') DEFAULT NULL,
-  `value` double NOT NULL,
+  `value` int(11) NOT NULL,
   PRIMARY KEY (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.price: ~12 rows (approximately)
+-- Dumping data for table ql_datphong.price: ~17 rows (approximately)
 INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 	(1, '2025-02-28 00:39:47.000000', 'ROOM', 100),
 	(2, '2025-02-28 00:39:47.000000', 'ROOM', 110),
@@ -178,7 +179,10 @@ INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 	(11, '2025-02-28 00:39:47.000000', 'SERVICE', 30),
 	(12, '2025-02-28 04:30:17.306000', 'ROOM', 100),
 	(13, '2025-02-28 04:58:29.651000', 'ROOM', 100),
-	(14, '2025-02-28 05:01:32.108000', 'ROOM', 100);
+	(14, '2025-02-28 05:01:32.108000', 'ROOM', 100),
+	(15, '2025-03-11 00:44:20.757000', 'DEVICE', 100),
+	(16, '2025-03-11 00:45:34.401000', 'DEVICE', 100),
+	(17, '2025-03-11 02:24:34.428000', 'SERVICE', 100);
 
 -- Dumping structure for table ql_datphong.reservation
 CREATE TABLE IF NOT EXISTS `reservation` (
@@ -204,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   CONSTRAINT `FK6p46jda7n10vl4kr1n0c6et6v` FOREIGN KEY (`booker_id`) REFERENCES `employee` (`employee_id`),
   CONSTRAINT `FKlqrdx9b1dwg69ldb480uok3w2` FOREIGN KEY (`cancle_reservation_id`) REFERENCES `cancel_reservation` (`cancel_id`),
   CONSTRAINT `FKm8xumi0g23038cw32oiva2ymw` FOREIGN KEY (`room_id`) REFERENCES `room` (`room_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.reservation: ~13 rows (approximately)
 INSERT INTO `reservation` (`reservation_id`, `description`, `frequency`, `note`, `status_reservation`, `time`, `time_check_in`, `time_check_out`, `time_end`, `time_start`, `title`, `total`, `booker_id`, `cancle_reservation_id`, `room_id`) VALUES
@@ -230,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `reservation_employee` (
   KEY `FKjy9lleglu0rdpbehgboh1p3r4` (`reservation_id`),
   CONSTRAINT `FKjy9lleglu0rdpbehgboh1p3r4` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`),
   CONSTRAINT `FKmc5vf42lypo9yrgftkonn2bvh` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.reservation_employee: ~14 rows (approximately)
 INSERT INTO `reservation_employee` (`reservation_id`, `employee_id`) VALUES
@@ -249,16 +253,10 @@ INSERT INTO `reservation_employee` (`reservation_id`, `employee_id`) VALUES
 	(5, 6),
 	(1, 6);
 
--- Dumping structure for table ql_datphong.reservation_file_paths
-CREATE TABLE IF NOT EXISTS `reservation_file_paths` (
-  `reservation_reservation_id` bigint(20) NOT NULL,
-  `file_paths` varchar(255) DEFAULT NULL,
-  KEY `FKchwrit7lhcf142bui6a74ypv2` (`reservation_reservation_id`),
-  CONSTRAINT `FKchwrit7lhcf142bui6a74ypv2` FOREIGN KEY (`reservation_reservation_id`) REFERENCES `reservation` (`reservation_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+-- Dumping structure for table ql_datphong.ɳdservation_file_pat  
+IF NOT EXISTS ;
 
--- Dumping data for table ql_datphong.reservation_file_paths: ~0 rows (approximately)
-
+-- Dumping data for table ql_datphong.ɳdservation_file_pat  : ~0 rows (approximately)
 -- Dumping structure for table ql_datphong.reservation_service
 CREATE TABLE IF NOT EXISTS `reservation_service` (
   `reservation_id` bigint(20) NOT NULL,
@@ -284,21 +282,24 @@ CREATE TABLE IF NOT EXISTS `room` (
   `type_room` enum('CONFERENCEROOM','DEFAULT','VIP') DEFAULT NULL,
   `location_id` bigint(20) DEFAULT NULL,
   `price_id` bigint(20) DEFAULT NULL,
+  `approver_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`room_id`),
   UNIQUE KEY `UKfjnal9itsdgfdr3ow1ul532bt` (`location_id`),
   KEY `FKeu3mfjn8pcwbb7jh9rb6tcs32` (`price_id`),
+  KEY `FKj7m6our9ety1o5mxrmpgen6qp` (`approver_id`),
   CONSTRAINT `FKeu3mfjn8pcwbb7jh9rb6tcs32` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`),
+  CONSTRAINT `FKj7m6our9ety1o5mxrmpgen6qp` FOREIGN KEY (`approver_id`) REFERENCES `employee` (`employee_id`),
   CONSTRAINT `FKrqejnp96gs9ldf7o6fciylxkt` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.room: ~6 rows (approximately)
-INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_room`, `location_id`, `price_id`) VALUES
-	(1, 4, 'SS', 'AVAILABLE', 'DEFAULT', 4, 1),
-	(2, 4, 'VV', 'AVAILABLE', 'DEFAULT', 6, 3),
-	(3, 4, 'KK', 'AVAILABLE', 'VIP', 7, 4),
-	(4, 4, 'SW', 'AVAILABLE', 'DEFAULT', 5, 2),
-	(7, 4, 'NS', 'AVAILABLE', 'VIP', 8, 12),
-	(8, 4, 'NS', 'AVAILABLE', 'VIP', 9, 14);
+INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_room`, `location_id`, `price_id`, `approver_id`) VALUES
+	(1, 4, 'SS', 'AVAILABLE', 'DEFAULT', 4, 1, 1),
+	(2, 4, 'VV', 'AVAILABLE', 'DEFAULT', 6, 3, 1),
+	(3, 4, 'KK', 'AVAILABLE', 'VIP', 7, 4, 1),
+	(4, 4, 'SW', 'AVAILABLE', 'DEFAULT', 5, 2, NULL),
+	(7, 4, 'NS', 'AVAILABLE', 'VIP', 8, 12, NULL),
+	(8, 4, 'Duy trì', 'MAINTAIN', 'VIP', 9, 14, NULL);
 
 -- Dumping structure for table ql_datphong.room_device
 CREATE TABLE IF NOT EXISTS `room_device` (
@@ -311,15 +312,17 @@ CREATE TABLE IF NOT EXISTS `room_device` (
   CONSTRAINT `FKi0ck9pu6eoan6rntpybydtp29` FOREIGN KEY (`device_id`) REFERENCES `device` (`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.room_device: ~8 rows (approximately)
+-- Dumping data for table ql_datphong.room_device: ~10 rows (approximately)
 INSERT INTO `room_device` (`quantity`, `room_id`, `device_id`) VALUES
 	(1, 1, 1),
 	(1, 3, 1),
 	(1, 4, 1),
+	(2, 7, 1),
 	(2, 8, 1),
 	(1, 1, 2),
+	(2, 2, 2),
 	(1, 8, 2),
-	(1, 2, 3),
+	(2, 2, 3),
 	(1, 3, 3);
 
 -- Dumping structure for table ql_datphong.room_imgs
@@ -346,14 +349,15 @@ CREATE TABLE IF NOT EXISTS `service` (
   PRIMARY KEY (`service_id`),
   KEY `FKlseq2n8malh1ngayy79q62kal` (`price_id`),
   CONSTRAINT `FKlseq2n8malh1ngayy79q62kal` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.service: ~4 rows (approximately)
+-- Dumping data for table ql_datphong.service: ~5 rows (approximately)
 INSERT INTO `service` (`service_id`, `description`, `service_name`, `price_id`) VALUES
 	(1, ' ', 'small', 8),
 	(2, ' ', 'big', 9),
 	(3, ' ', 'vip', 10),
-	(4, ' ', 'con', 11);
+	(4, ' ', 'con', 11),
+	(5, 'Nhanh', 'Loai A', 17);
 
 -- Dumping structure for table ql_datphong.token
 CREATE TABLE IF NOT EXISTS `token` (
@@ -367,7 +371,7 @@ CREATE TABLE IF NOT EXISTS `token` (
   PRIMARY KEY (`token_id`),
   KEY `FKftkstvcfb74ogw02bo5261kno` (`account_id`),
   CONSTRAINT `FKftkstvcfb74ogw02bo5261kno` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.token: ~0 rows (approximately)
 

@@ -19,7 +19,10 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         List<Room> findByBranch(String branch);
         @NonNull
         Page<Room>findAll(@Nullable Pageable pageable);
-        @Query("select r from Room r where ( :capacity=0 or r.capacity = :capacity) and ( :price=0 or r.price.value = :price )and r.statusRoom =:statusRoom")
-        List<Room> findRooms(@Param("capacity") int capacity,@Param("price") int price_value,@Param("statusRoom") StatusRoom statusRoom);
+        @NonNull
+        @Query("select r from Room r where (:branch is null or r.location.branch = :branch)  and ( :capacity=0 or r.capacity = :capacity) and ( :price=0 or r.price.value = :price )and( :statusRoom is null or r.statusRoom =:statusRoom)")
+        Page<Room> findRooms(@Param("branch")String branch, @Param("capacity") int capacity,@Param("price") int price_value,@Param("statusRoom") StatusRoom statusRoom, Pageable pageable);
+        @Query("SELECT r FROM Room r WHERE LOWER(r.roomName) LIKE LOWER(CONCAT('%', :roomName, '%'))")
+        List<Room> searchRoomsByName(@Param("roomName") String roomName);
 
 }

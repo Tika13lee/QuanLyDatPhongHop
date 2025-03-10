@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,9 +10,11 @@ import vn.com.kltn_project_v1.services.ILocation;
 
 @RestController
 @RequestMapping("/api/v1/location")
+@CrossOrigin(origins = "http://localhost:3000")
 public class LocationController {
     @Autowired
     private ILocation locationService;
+    private ModelMapper modelMapper = new ModelMapper();
     @GetMapping("/getAllLocation")
     public ResponseEntity<?> getAllLocation() {
         return ResponseEntity.ok(locationService.getAllLocation());
@@ -22,11 +25,15 @@ public class LocationController {
     }
     @PutMapping("/updateLocation")
     public ResponseEntity<?> updateLocation(@RequestBody LocationDTO locationDTO) {
-        return ResponseEntity.ok(locationService.updateLocation(new Location(locationDTO.getBranch(), locationDTO.getBuilding(), locationDTO.getFloor(), locationDTO.getNumber())));
+        return ResponseEntity.ok(locationService.updateLocation(modelMapper.map(locationDTO, Location.class)));
     }
     @GetMapping("/getLocationsByRoomIsNull")
     public ResponseEntity<?> getLocationsByRoomIsNull() {
         return ResponseEntity.ok(locationService.findLocationsByRoomIsNull());
     }
-
+    @DeleteMapping("/deleteLocation")
+    public ResponseEntity<?> deleteLocation(@RequestBody LocationDTO locationDTO) {
+        locationService.DeleteLocation(modelMapper.map(locationDTO, Location.class));
+        return ResponseEntity.ok().build();
+    }
 }

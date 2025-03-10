@@ -1,0 +1,13 @@
+package vn.com.kltn_project_v1.services;
+
+import vn.com.kltn_project_v1.dtos.ServiceDTO;
+import vn.com.kltn_project_v1.model.Service;
+
+import java.util.List;
+
+public interface IService {
+    List<Service> findAll();
+    Service createService(ServiceDTO serviceDTO);
+    Service updateService(ServiceDTO serviceDTO);
+    void deleteService(Long id);
+}

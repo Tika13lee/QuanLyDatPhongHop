@@ -16,8 +16,14 @@ public class Device {
     private long deviceId;
     @Column(columnDefinition = "NVARCHAR(255)")
     private String deviceName;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String description;
     @ManyToOne
     @JoinColumn(name = "priceId")
     private Price price;
+
+    public Device(String deviceName, String description) {
+        this.deviceName = deviceName;
+        this.description = description;
+    }
 }

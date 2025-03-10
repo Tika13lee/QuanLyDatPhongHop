@@ -1,6 +1,5 @@
 package vn.com.kltn_project_v1.controllers;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +11,7 @@ import vn.com.kltn_project_v1.services.IRoom;
 
 @RestController
 @RequestMapping("/api/v1/room")
+@CrossOrigin(origins = "http://localhost:3000")
 public class RoomController {
     @Autowired
     private IRoom roomService;
@@ -46,17 +46,18 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
     @GetMapping("/getAllRooms")
     public ResponseEntity<?> getAllRooms(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "roomId") String sortBy) {
         try {
+
             return ResponseEntity.ok(roomService.getAllRooms(page, size, sortBy));
         }catch (Exception e){
-            return ResponseEntity.ok(e.toString());
+            return ResponseEntity.badRequest().build();
         }
     }
-    @GetMapping("/sreachRooms")
-    public ResponseEntity<?> searchRooms(@RequestParam(defaultValue = "0") int capacity, @RequestParam(defaultValue = "0") int price, StatusRoom statusRoom){
+    @GetMapping("/searchRooms")
+    public ResponseEntity<?> searchRooms(@RequestParam(required = false)String branch , @RequestParam(defaultValue = "0") int capacity, @RequestParam(defaultValue = "0") int price,@RequestParam(required = false) StatusRoom statusRoom, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "roomId") String sortBy){
         try {
-            return ResponseEntity.ok(roomService.sreachRooms(capacity, price, statusRoom));
+            return ResponseEntity.ok(roomService.searchRooms(branch, capacity, price, statusRoom, page, size, sortBy));
         }catch (Exception e){
-            return ResponseEntity.ok(e.toString());
+            return ResponseEntity.badRequest().build();
         }
     }
     @PostMapping("/addDeviceToRoom")
@@ -64,7 +65,23 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         try {
             return ResponseEntity.ok(deviceService.createRoomDevice(roomId, deviceId, quantity));
         }catch (Exception e){
-            return ResponseEntity.ok(e.toString());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PostMapping("/addApproveToRoom")
+    public ResponseEntity<?> addApproveToRoom(@RequestParam Long roomId, @RequestParam String phoneApprover){
+        try {
+            return ResponseEntity.ok(roomService.addApproverToRoom(roomId, phoneApprover));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/searchRoomByName")
+    public ResponseEntity<?> searchRoomByName(@RequestParam String roomName){
+        try {
+            return ResponseEntity.ok(roomService.searchRoomByName(roomName));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
     }
 

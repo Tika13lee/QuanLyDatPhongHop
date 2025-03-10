@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LocationDTO {
+    private long locationId;
     private String branch;
     private String building;
     private String floor;

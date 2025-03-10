@@ -9,7 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppoverDTO {
-    private Long id;
-    private String name;
+public class ServiceDTO {
+    private Long serviceId;
+    private String serviceName;
+    private String description;
+    private int price;
+    private Long priceId;
 }

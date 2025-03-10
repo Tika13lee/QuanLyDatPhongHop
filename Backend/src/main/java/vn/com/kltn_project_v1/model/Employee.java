@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,8 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "departmentId")
     private Department department;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "accountId")
     private Account account;
 

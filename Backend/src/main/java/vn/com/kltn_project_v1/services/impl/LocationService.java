@@ -37,4 +37,9 @@ public class LocationService implements ILocation {
     public List<Location> findLocationsByRoomIsNull() {
         return locationRepository.findLocationsByRoomIsNull();
     }
+
+    @Override
+    public void DeleteLocation(Location location) {
+         locationRepository.delete(location);
+    }
 }

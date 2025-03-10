@@ -10,4 +10,5 @@ public interface ILocation {
     public Location addLocation(Location location);
     public Location updateLocation(Location location);
     public List<Location> findLocationsByRoomIsNull();
+    public void DeleteLocation(Location location);
 }

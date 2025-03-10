@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.com.kltn_project_v1.dtos.*;
+import vn.com.kltn_project_v1.entityRespones.RoomRespone;
 import vn.com.kltn_project_v1.exceptions.DataNotFoundException;
 import vn.com.kltn_project_v1.model.*;
 import vn.com.kltn_project_v1.repositories.*;
@@ -28,6 +29,7 @@ public class RoomService implements IRoom {
     private final LocationRepository locationRepository;
     private final ReservationRepository reservationRepository;
     private final ModelMapper modelMapper;
+    private final EmployeeRepository employeeRepository;
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
         Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
@@ -93,24 +95,48 @@ public class RoomService implements IRoom {
     }
 
     @Override
-    public List<RoomDTO> getAllRooms(int page, int size, String sortBy) throws DataNotFoundException {
+    public RoomRespone getAllRooms(int page, int size, String sortBy) throws DataNotFoundException {
 
         PageRequest pageable = PageRequest.of(page, size, Sort.by(sortBy));
         Page<Room> pageRooms = roomRepository.findAll(pageable); // Lấy Page<Room>
         List<Room> rooms = pageRooms.getContent(); // Lấy List<Room> từ Page<Room>
 
-        return convertRoomToRoomDTO(rooms);
-
+        return RoomRespone.builder()
+                .roomDTOS(convertRoomToRoomDTO(rooms))
+                .totalPage(pageRooms.getTotalPages())
+                .build();
     }
 
     @Override
-    public List<RoomDTO> sreachRooms(int capacity, int price, StatusRoom statusRoom) {
-        List<Room> rooms = roomRepository.findRooms(capacity, price, statusRoom);
-        return convertRoomToRoomDTO(rooms);
+    public RoomRespone searchRooms(String branch,int capacity, int price, StatusRoom statusRoom, int page, int size, String sortBy) throws DataNotFoundException {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<Room> pageRooms = roomRepository.findRooms(branch, capacity, price, statusRoom, pageable);
+        List<Room> rooms = pageRooms.getContent();
+        return RoomRespone.builder()
+                .roomDTOS(convertRoomToRoomDTO(rooms))
+                .totalPage(pageRooms.getTotalPages())
+                .build();
     }
+
+    @Override
+    public Room addApproverToRoom(Long roomId, String phoneAppover) throws DataNotFoundException {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(()->new DataNotFoundException("Room not found"));
+        Employee employee = employeeRepository.findEmployeeByPhone(phoneAppover).orElseThrow();
+        room.setApprover(employee);
+        roomRepository.save(room);
+        return room;
+    }
+
+    @Override
+    public List<Room> searchRoomByName(String roomName) {
+        return roomRepository.searchRoomsByName(roomName);
+    }
+
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         List<RoomDTO> roomDTOS = rooms.stream().map(room -> {
             RoomDTO roomDTO = new RoomDTO();
+            roomDTO.setRoomId(room.getRoomId());
             roomDTO.setRoomName(room.getRoomName());
             roomDTO.setCapacity(room.getCapacity());
             roomDTO.setStatusRoom(room.getStatusRoom().name());
@@ -139,10 +165,10 @@ public class RoomService implements IRoom {
             });
             roomDTO.setRoom_deviceDTOS(room_deviceDTOS);
             if (room.getApprover()!=null) {
-                AppoverDTO appoverDTO = new AppoverDTO();
-                appoverDTO.setId(room.getApprover().getEmployeeId());
-                appoverDTO.setName(room.getApprover().getEmployeeName());
-                roomDTO.setApprover(appoverDTO);
+                ApproverDTO approverDTO = new ApproverDTO();
+                approverDTO.setPhone(room.getApprover().getPhone());
+                approverDTO.setName(room.getApprover().getEmployeeName());
+                roomDTO.setApprover(approverDTO);
             }
             ArrayList<ReservationDTO> reservationDTOS = new ArrayList<>();
             reservationRepository.findReservationsByRoomRoomId(room.getRoomId()).forEach(reservation -> {
