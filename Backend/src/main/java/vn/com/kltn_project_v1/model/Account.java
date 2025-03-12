@@ -33,6 +33,12 @@ public class Account implements UserDetails {
     public Account() {
     }
 
+    public Account(String userName, String password, boolean role) {
+        this.userName = userName;
+        this.password = password;
+        this.role = role;
+    }
+
     @Override
     // roleEntity -> roleImpl
     public Collection<? extends GrantedAuthority> getAuthorities() {

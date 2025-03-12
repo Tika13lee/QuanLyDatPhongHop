@@ -20,4 +20,8 @@ public class Department {
     @JoinColumn(name = "locationId")
     private Location location;
 
+    public Department(String depName, Location location) {
+        this.depName = depName;
+        this.location = location;
+    }
 }
