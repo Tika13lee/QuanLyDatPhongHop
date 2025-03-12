@@ -113,18 +113,18 @@ CREATE TABLE IF NOT EXISTS `employee` (
 
 -- Dumping data for table ql_datphong.employee: ~13 rows (approximately)
 INSERT INTO `employee` (`employee_id`, `avatar`, `email`, `employee_name`, `is_actived`, `phone`, `account_id`, `department_id`) VALUES
-	(1, 'https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-cute-45.jpg', '123@gmail.com', 'Dat1', b'1', '0914653334', 1, 1),
-	(2, NULL, '123@gmail.com', 'Dat2', b'1', '0914653333', 2, 1),
-	(3, NULL, '123@gmail.com', 'Dat3', b'1', '0914653332', 3, 1),
-	(4, NULL, '123@gmail.com', 'Kieu', b'1', '0914653331', 4, 2),
-	(5, NULL, '123@gmail.com', 'Hieu', b'1', '0914653321', 5, 2),
-	(6, NULL, '123@gmail.com', 'Bao', b'1', '0914653221', 6, 2),
-	(7, NULL, '123@gmail.com', 'Dung', b'1', '0914652221', 7, 2),
-	(8, NULL, '123@gmail.com', 'Huy', b'1', '0912652221', 8, 3),
-	(9, NULL, '123@gmail.com', 'Huong', b'1', '0912672221', 9, 3),
-	(10, NULL, '123@gmail.com', 'Hue', b'1', '0912672921', 10, 3),
-	(11, NULL, '123@gmail.com', 'Hao', b'1', '0919672921', 11, 3),
-	(12, NULL, '123@gmail.com', 'Ki', b'1', '0919642921', 12, 3),
+	(1, 'https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-cute-45.jpg', '123@gmail.com', 'Nguyễn Trọng Đạt', b'1', '0914653334', 1, 1),
+	(2, NULL, '123@gmail.com', 'Võ Tấn Dũng', b'1', '0914653333', 2, 1),
+	(3, NULL, '123@gmail.com', 'Nguyễn Gia Huy', b'1', '0914653332', 3, 1),
+	(4, NULL, '123@gmail.com', 'Lê Quang Huy', b'1', '0914653331', 4, 2),
+	(5, NULL, '123@gmail.com', 'Võ Hiếu', b'1', '0914653321', 5, 2),
+	(6, NULL, '123@gmail.com', 'Nguyễn Thị Dung', b'1', '0914653221', 6, 2),
+	(7, NULL, '123@gmail.com', 'Trần Nhật Hưng', b'1', '0914652221', 7, 2),
+	(8, NULL, '123@gmail.com', 'Nguyễn Thái Duy', b'1', '0912652221', 8, 3),
+	(9, NULL, '123@gmail.com', 'Nguyễn Quang Đạt', b'1', '0912672221', 9, 3),
+	(10, NULL, '123@gmail.com', 'Lê Thị Sáu', b'1', '0912672921', 10, 3),
+	(11, NULL, '123@gmail.com', 'Nguyễn Tấn', b'1', '0919672921', 11, 3),
+	(12, NULL, '123@gmail.com', 'Lê Bảo', b'1', '0919642921', 12, 3),
 	(17, '', 'dat123@gmail.com', 'Trọng Đạt', b'1', '0934707416', 13, 1);
 
 -- Dumping structure for table ql_datphong.location
@@ -137,18 +137,27 @@ CREATE TABLE IF NOT EXISTS `location` (
   PRIMARY KEY (`location_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.location: ~10 rows (approximately)
+-- Dumping data for table ql_datphong.location: ~19 rows (approximately)
 INSERT INTO `location` (`location_id`, `branch`, `building`, `floor`, `number`) VALUES
-	(1, 'Đà Nẵng', 'A1', '1', '02'),
+	(1, 'Hồ Chí Minh', 'A', '1', '02'),
 	(2, 'Hà Nội', 'B', '1', '01'),
-	(3, 'Thành phố Hồ Chí Minh', 'A', '2', '01'),
-	(4, 'SG', 'B', '1', '01'),
-	(5, 'SG', 'A', '1', '01'),
-	(6, 'SG', 'B', '2', '01'),
-	(7, 'SG', 'A', '2', '03'),
-	(8, 'HN', 'A', '2', '02'),
-	(9, 'SG', 'B', '1', '02'),
-	(11, 'Nguyễn Văn Bảo', 'A20', '7', '7001');
+	(3, 'Hồ Chí Minh', 'A', '2', '01'),
+	(4, 'Hồ Chí Minh', 'B', '1', '01'),
+	(5, 'Hồ Chí Minh', 'A', '1', '01'),
+	(6, 'Hồ Chí Minh', 'B', '2', '01'),
+	(7, 'Hồ Chí Minh', 'A', '2', '03'),
+	(8, 'Hồ Chí Minh', 'A', '2', '02'),
+	(9, 'Hồ Chí Minh', 'B', '1', '02'),
+	(11, 'Hồ Chí Minh', 'A', '3', '04'),
+	(12, 'Hồ Chí Minh', 'A', '3', '05'),
+	(13, 'Hồ Chí Minh', 'A', '3', '01'),
+	(14, 'Hồ Chí Minh', 'A', '3', '02'),
+	(15, 'Hồ Chí Minh', 'A', '3', '03'),
+	(16, 'Hồ Chí Minh', 'A', '3', '06'),
+	(17, 'Hồ Chí Minh', 'A', '3', '07'),
+	(18, 'Hồ Chí Minh', 'A', '3', '08'),
+	(19, 'Hồ Chí Minh', 'A', '3', '09'),
+	(20, 'Hồ Chí Minh', 'A', '3', '10');
 
 -- Dumping structure for table ql_datphong.log
 CREATE TABLE IF NOT EXISTS `log` (
@@ -202,7 +211,21 @@ INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 	(26, '2025-03-12 00:06:10.515000', 'SERVICE', 2000),
 	(27, '2025-03-12 00:07:21.110000', 'SERVICE', 2000),
 	(28, '2025-03-12 00:08:41.990000', 'SERVICE', 2000),
-	(29, '2025-03-12 00:14:56.789000', 'DEVICE', 0);
+	(29, '2025-03-12 00:14:56.789000', 'DEVICE', 0),
+	(32, '2025-03-13 04:53:57.490000', 'ROOM', 1000),
+	(33, '2025-03-13 04:56:01.784000', 'ROOM', 1000),
+	(34, '2025-03-13 04:59:21.717000', 'ROOM', 1000),
+	(35, '2025-03-13 04:59:40.153000', 'ROOM', 1000),
+	(36, '2025-03-13 05:02:08.056000', 'ROOM', 1000),
+	(37, '2025-03-13 05:03:52.899000', 'ROOM', 1000),
+	(38, '2025-03-13 05:04:53.258000', 'ROOM', 1000),
+	(39, '2025-03-13 05:05:16.770000', 'ROOM', 1000),
+	(40, '2025-03-13 05:05:34.797000', 'ROOM', 1000),
+	(41, '2025-03-13 05:06:03.696000', 'ROOM', 1000),
+	(42, '2025-03-13 05:06:20.721000', 'ROOM', 1000),
+	(43, '2025-03-13 05:06:37.372000', 'ROOM', 1000),
+	(44, '2025-03-13 05:06:50.023000', 'ROOM', 1000),
+	(45, '2025-03-13 05:07:04.977000', 'ROOM', 1000);
 
 -- Dumping structure for table ql_datphong.reservation
 CREATE TABLE IF NOT EXISTS `reservation` (
@@ -232,21 +255,21 @@ CREATE TABLE IF NOT EXISTS `reservation` (
 
 -- Dumping data for table ql_datphong.reservation: ~15 rows (approximately)
 INSERT INTO `reservation` (`reservation_id`, `description`, `frequency`, `note`, `status_reservation`, `time`, `time_check_in`, `time_check_out`, `time_end`, `time_start`, `title`, `total`, `booker_id`, `cancle_reservation_id`, `room_id`) VALUES
-	(1, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 08:30:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 08:30:00.000000', 'Khoa hoc', 400, 1, NULL, 1),
-	(2, ' ', 'ONE_TIME', ' ', 'PENDING', '2025-02-28 01:35:28.000000', '2025-03-01 08:30:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 08:30:00.000000', 'Ke hoach truyen thong', 400, 2, NULL, 1),
-	(3, ' ', 'ONE_TIME', ' ', 'PENDING', '2025-02-28 01:35:28.000000', '2025-03-02 08:30:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 08:30:00.000000', 'suy duong', 400, 1, NULL, 1),
-	(4, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-03 08:30:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 08:30:00.000000', 'bao cao ', 400, 3, NULL, 4),
-	(5, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-04 08:30:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 08:30:00.000000', 'Tong ket quy', 400, 1, NULL, 1),
-	(6, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-05 08:30:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 08:30:00.000000', 'Thuyet trinh', 400, 1, NULL, 2),
-	(7, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-06 08:30:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 08:30:00.000000', 'tt1', 400, 4, NULL, 1),
-	(8, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-07 08:30:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 08:30:00.000000', 'tt2', 400, 1, NULL, 1),
-	(9, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-08 08:30:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 08:30:00.000000', 'tt3', 400, 1, NULL, 3),
-	(10, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-09 08:30:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 08:30:00.000000', 'tt4', 400, 1, NULL, 3),
-	(11, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-10 08:30:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 08:30:00.000000', 'tt5', 400, 5, NULL, 3),
-	(12, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-11 08:30:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 08:30:00.000000', 'tt6', 400, 1, NULL, 1),
-	(13, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 08:30:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 08:30:00.000000', 'tt7', 400, 1, NULL, 1),
-	(14, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-12 10:30:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 10:30:00.000000', 'tt8', 400, 1, NULL, 1),
-	(15, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 14:30:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 14:30:00.000000', 'tt9', 400, 2, NULL, 1);
+	(1, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 08:30:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 08:30:00.000000', 'Nghiên cứu khoa học', 400, 1, NULL, 1),
+	(2, ' ', 'ONE_TIME', ' ', 'PENDING', '2025-02-28 01:35:28.000000', '2025-03-01 08:30:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 08:30:00.000000', 'Kế hoạch truyền thông', 300, 2, NULL, 1),
+	(3, ' ', 'ONE_TIME', ' ', 'PENDING', '2025-02-28 01:35:28.000000', '2025-03-02 08:30:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 08:30:00.000000', 'Báo cáo hệ thống', 400, 1, NULL, 1),
+	(4, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-03 08:30:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 08:30:00.000000', 'Báo cáo tuần ', 400, 3, NULL, 4),
+	(5, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-04 08:30:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 08:30:00.000000', 'Báo cáo quý', 400, 1, NULL, 1),
+	(6, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-05 08:30:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 08:30:00.000000', 'Tổng kết quý', 400, 1, NULL, 2),
+	(7, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-06 08:30:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 08:30:00.000000', 'Lên kế hoạch tổng thu', 400, 4, NULL, 1),
+	(8, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-07 08:30:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 08:30:00.000000', 'Chốt vấn đề cần thiết', 400, 1, NULL, 1),
+	(9, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-08 08:30:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 08:30:00.000000', 'Khó khăn về việc học', 400, 1, NULL, 3),
+	(10, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-09 08:30:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 08:30:00.000000', 'Cách tận dụng AI', 400, 1, NULL, 3),
+	(11, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-10 08:30:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 08:30:00.000000', 'Sự mơ hồ trong công việc', 400, 5, NULL, 3),
+	(12, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-11 08:30:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 08:30:00.000000', 'Cách khai thác IDE', 400, 1, NULL, 1),
+	(13, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 08:30:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 08:30:00.000000', 'Tổng kết cả năm', 400, 1, NULL, 1),
+	(14, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-12 10:30:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 10:30:00.000000', 'Thường tuần', 400, 1, NULL, 1),
+	(15, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 14:30:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 14:30:00.000000', 'Lên kế hoạch thu chi', 400, 2, NULL, 1);
 
 -- Dumping structure for table ql_datphong.reservation_employee
 CREATE TABLE IF NOT EXISTS `reservation_employee` (
@@ -320,14 +343,24 @@ CREATE TABLE IF NOT EXISTS `room` (
   CONSTRAINT `FKrqejnp96gs9ldf7o6fciylxkt` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.room: ~6 rows (approximately)
+-- Dumping data for table ql_datphong.room: ~16 rows (approximately)
 INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_room`, `location_id`, `price_id`, `approver_id`) VALUES
-	(1, 4, 'SS', 'AVAILABLE', 'DEFAULT', 4, 1, 1),
-	(2, 4, 'VV', 'AVAILABLE', 'DEFAULT', 6, 3, 1),
-	(3, 4, 'KK', 'AVAILABLE', 'VIP', 7, 4, 1),
-	(4, 4, 'SW', 'AVAILABLE', 'DEFAULT', 5, 2, 1),
-	(7, 4, 'NS', 'AVAILABLE', 'VIP', 8, 12, 1),
-	(8, 4, 'Duy trì', 'MAINTAIN', 'VIP', 9, 14, 1);
+	(1, 4, 'Maria', 'AVAILABLE', 'DEFAULT', 4, 1, 1),
+	(2, 4, 'Vokka', 'AVAILABLE', 'DEFAULT', 6, 3, 1),
+	(3, 4, 'Hazel', 'AVAILABLE', 'VIP', 7, 4, 1),
+	(4, 4, 'Buffter', 'AVAILABLE', 'DEFAULT', 5, 2, 1),
+	(7, 4, 'Phòng họp doanh nghiệp', 'AVAILABLE', 'VIP', 8, 12, 1),
+	(8, 4, 'Phòng thứ cấp', 'MAINTAIN', 'VIP', 9, 14, 1),
+	(9, 4, 'Phòng họp tài chính', 'AVAILABLE', 'VIP', 13, 36, NULL),
+	(10, 4, 'Phòng họp A3.02', 'AVAILABLE', 'VIP', 14, 37, NULL),
+	(11, 4, 'Matcha 1A', 'AVAILABLE', 'VIP', 15, 38, NULL),
+	(12, 4, 'Visiusss', 'AVAILABLE', 'VIP', 11, 39, NULL),
+	(13, 4, 'Salabeto', 'AVAILABLE', 'VIP', 12, 40, NULL),
+	(14, 4, 'Alaxender', 'AVAILABLE', 'VIP', 16, 41, NULL),
+	(15, 4, 'Napolaon', 'AVAILABLE', 'VIP', 17, 42, NULL),
+	(16, 4, 'Nankaasai', 'AVAILABLE', 'VIP', 18, 43, NULL),
+	(17, 4, 'Naddascva', 'AVAILABLE', 'VIP', 19, 44, NULL),
+	(18, 4, 'JoBatcap', 'AVAILABLE', 'VIP', 20, 45, NULL);
 
 -- Dumping structure for table ql_datphong.room_device
 CREATE TABLE IF NOT EXISTS `room_device` (
@@ -347,6 +380,15 @@ INSERT INTO `room_device` (`quantity`, `room_id`, `device_id`) VALUES
 	(1, 4, 1),
 	(2, 7, 1),
 	(2, 8, 1),
+	(2, 10, 1),
+	(2, 11, 1),
+	(2, 12, 1),
+	(2, 13, 1),
+	(2, 14, 1),
+	(2, 15, 1),
+	(2, 16, 1),
+	(2, 17, 1),
+	(2, 18, 1),
 	(1, 1, 2),
 	(2, 2, 2),
 	(1, 8, 2),
@@ -367,7 +409,27 @@ INSERT INTO `room_imgs` (`room_room_id`, `imgs`) VALUES
 	(7, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
 	(8, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
 	(8, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
-	(1, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg');
+	(1, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
+	(9, '1'),
+	(9, '2'),
+	(10, '1'),
+	(10, '2'),
+	(11, '1'),
+	(11, '2'),
+	(12, '1'),
+	(12, '2'),
+	(13, '1'),
+	(13, '2'),
+	(14, '1'),
+	(14, '2'),
+	(15, '1'),
+	(15, '2'),
+	(16, '1'),
+	(16, '2'),
+	(17, '1'),
+	(17, '2'),
+	(18, '1'),
+	(18, '2');
 
 -- Dumping structure for table ql_datphong.service
 CREATE TABLE IF NOT EXISTS `service` (

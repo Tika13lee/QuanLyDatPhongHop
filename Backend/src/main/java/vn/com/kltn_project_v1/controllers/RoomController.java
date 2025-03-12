@@ -27,7 +27,7 @@ public class RoomController {
             Room newRoom = roomService.createRoom(roomDTO);
             return ResponseEntity.ok(newRoom);
         }catch (Exception e){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(e.toString());
         }
     }
     @GetMapping("/getRoomsByBranch")
