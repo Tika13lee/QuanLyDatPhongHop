@@ -133,6 +133,13 @@ public class RoomService implements IRoom {
         return roomRepository.searchRoomsByName(roomName);
     }
 
+    @Override
+    public RoomDTO getRoomById(Long roomId) throws DataNotFoundException {
+         Room room = roomRepository.findById(roomId)
+                .orElseThrow(()->new DataNotFoundException("Room not found"));
+            return ConverRoomToDTO(room);
+    }
+
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         List<RoomDTO> roomDTOS = rooms.stream().map(room -> {
             RoomDTO roomDTO = new RoomDTO();
@@ -179,6 +186,50 @@ public class RoomService implements IRoom {
             return roomDTO;
         }).toList();
         return roomDTOS;
+    }
+    public RoomDTO ConverRoomToDTO(Room room){
+        RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setRoomId(room.getRoomId());
+        roomDTO.setRoomName(room.getRoomName());
+        roomDTO.setCapacity(room.getCapacity());
+        roomDTO.setStatusRoom(room.getStatusRoom().name());
+        roomDTO.setTypeRoom(room.getTypeRoom());
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setBranch(room.getLocation().getBranch());
+        locationDTO.setBuilding(room.getLocation().getBuilding());
+        locationDTO.setFloor(room.getLocation().getFloor());
+        locationDTO.setNumber(room.getLocation().getNumber());
+        roomDTO.setLocation(locationDTO);
+
+        try {
+            Price price = priceRepository.findById(room.getPrice().getPriceId())
+                    .orElseThrow(()->new DataNotFoundException("Price not found"));
+            roomDTO.setPrice(price.getValue());
+        } catch (DataNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        roomDTO.setImgs(room.getImgs());
+        ArrayList<Room_DeviceDTO> room_deviceDTOS = new ArrayList<>();
+        room_deviceRepository.findByRoomId(room.getRoomId()).forEach(rd->{
+            Room_DeviceDTO room_deviceDTO = new Room_DeviceDTO();
+            room_deviceDTO.setDeviceName(rd.getRoom_deviceId().getDevice().getDeviceName());
+            room_deviceDTO.setQuantity(rd.getQuantity());
+            room_deviceDTOS.add(room_deviceDTO);
+        });
+        roomDTO.setRoom_deviceDTOS(room_deviceDTOS);
+        if (room.getApprover()!=null) {
+            ApproverDTO approverDTO = new ApproverDTO();
+            approverDTO.setPhone(room.getApprover().getPhone());
+            approverDTO.setName(room.getApprover().getEmployeeName());
+            roomDTO.setApprover(approverDTO);
+        }
+        ArrayList<ReservationDTO> reservationDTOS = new ArrayList<>();
+        reservationRepository.findReservationsByRoomRoomId(room.getRoomId()).forEach(reservation -> {
+            ReservationDTO reservationDTO = modelMapper.map(reservation,ReservationDTO.class);
+            reservationDTOS.add(reservationDTO);
+        });
+        roomDTO.setReservationDTOS(reservationDTOS);
+        return roomDTO;
     }
 
 }

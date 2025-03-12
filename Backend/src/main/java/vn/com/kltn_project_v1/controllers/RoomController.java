@@ -84,5 +84,13 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/getRoomById")
+    public ResponseEntity<?> getRoomById(@RequestParam Long roomId){
+        try {
+            return ResponseEntity.ok(roomService.getRoomById(roomId));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

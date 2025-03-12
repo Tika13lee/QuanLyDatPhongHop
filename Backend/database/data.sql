@@ -253,10 +253,16 @@ INSERT INTO `reservation_employee` (`reservation_id`, `employee_id`) VALUES
 	(5, 6),
 	(1, 6);
 
--- Dumping structure for table ql_datphong.ɳdservation_file_pat  
-IF NOT EXISTS ;
+-- Dumping structure for table ql_datphong.reservation_file_paths
+CREATE TABLE IF NOT EXISTS `reservation_file_paths` (
+  `reservation_reservation_id` bigint(20) NOT NULL,
+  `file_paths` varchar(255) DEFAULT NULL,
+  KEY `FKchwrit7lhcf142bui6a74ypv2` (`reservation_reservation_id`),
+  CONSTRAINT `FKchwrit7lhcf142bui6a74ypv2` FOREIGN KEY (`reservation_reservation_id`) REFERENCES `reservation` (`reservation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.ɳdservation_file_pat  : ~0 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_file_paths: ~0 rows (approximately)
+
 -- Dumping structure for table ql_datphong.reservation_service
 CREATE TABLE IF NOT EXISTS `reservation_service` (
   `reservation_id` bigint(20) NOT NULL,

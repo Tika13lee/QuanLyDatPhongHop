@@ -17,4 +17,5 @@ public interface IRoom {
     public RoomRespone searchRooms(String branch, int capacity, int price, StatusRoom statusRoom, int page, int size, String sortBy) throws DataNotFoundException;
     public Room addApproverToRoom(Long roomId, String phoneApprover) throws DataNotFoundException;
     public List<Room> searchRoomByName(String roomName);
+    public RoomDTO getRoomById(Long roomId) throws DataNotFoundException;
 }
