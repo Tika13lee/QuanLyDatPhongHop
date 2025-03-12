@@ -8,6 +8,6 @@ import java.util.List;
 public interface IService {
     List<Service> findAll();
     Service createService(ServiceDTO serviceDTO);
-    Service updateService(ServiceDTO serviceDTO);
+    Service upDateService(ServiceDTO serviceDTO);
     void deleteService(Long id);
 }

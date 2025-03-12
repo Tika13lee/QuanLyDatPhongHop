@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IEmployee {
     public Employee createEmployee(EmployeeDTO employeeDTO);
-    public Employee updateEmployee(EmployeeDTO employeeDTO);
+    public Employee upDateEmployee(EmployeeDTO employeeDTO);
     public void deleteEmployee(Long employeeId);
     public Employee getEmployeeByPhone(String phone);
     public List<Employee> getAllEmployee();

@@ -20,9 +20,9 @@ public class EmployeeController {
     public ResponseEntity<?> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
         return ResponseEntity.ok(employeeService.createEmployee(employeeDTO));
     }
-    @PutMapping("/updateEmployee")
-    public ResponseEntity<?> updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        return ResponseEntity.ok(employeeService.updateEmployee(employeeDTO));
+    @PutMapping("/upDateEmployee")
+    public ResponseEntity<?> upDateEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        return ResponseEntity.ok(employeeService.upDateEmployee(employeeDTO));
     }
     @DeleteMapping("/deleteEmployee")
     public ResponseEntity<?> deleteEmployee(@RequestParam Long employeeId) {

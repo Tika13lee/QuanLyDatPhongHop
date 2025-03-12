@@ -20,9 +20,9 @@ public class ServiceController {
     public ResponseEntity<?> addService(@RequestBody ServiceDTO serviceDTO) {
         return ResponseEntity.ok(serviceService.createService(serviceDTO));
     }
-    @PutMapping("/updateService")
-    public ResponseEntity<?> updateService(@RequestBody ServiceDTO serviceDTO) {
-        return ResponseEntity.ok(serviceService.updateService(serviceDTO));
+    @PutMapping("/upDateService")
+    public ResponseEntity<?> upDateService(@RequestBody ServiceDTO serviceDTO) {
+        return ResponseEntity.ok(serviceService.upDateService(serviceDTO));
     }
     @DeleteMapping("/deleteService")
     public ResponseEntity<?> deleteService(@RequestBody ServiceDTO serviceDTO) {

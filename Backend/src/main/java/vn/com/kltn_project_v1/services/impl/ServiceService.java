@@ -34,7 +34,7 @@ public class ServiceService implements IService {
     }
 
     @Override
-    public Service updateService(ServiceDTO serviceDTO) {
+    public Service upDateService(ServiceDTO serviceDTO) {
         Service service = modelMapper.map(serviceDTO, Service.class);
         service.setPrice(priceRepository.findById(serviceDTO.getPriceId()).orElse(null));
         return serviceRepository.save(service);

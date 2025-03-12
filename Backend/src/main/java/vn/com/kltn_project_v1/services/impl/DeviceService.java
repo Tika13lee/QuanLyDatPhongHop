@@ -12,6 +12,7 @@ import vn.com.kltn_project_v1.repositories.Room_DeviceRepository;
 import vn.com.kltn_project_v1.services.IDevice;
 
 import java.util.Date;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -42,7 +43,7 @@ public class DeviceService implements IDevice {
     }
 
     @Override
-    public Device updateDevice(DeviceDTO deviceDTO) {
+    public Device upDateDevice(DeviceDTO deviceDTO) {
         Device device = modelMapper.map(deviceDTO, Device.class);
         device.setPrice(priceRepository.findById(deviceDTO.getPriceId()).orElse(null));
         return deviceRepository.save(device);

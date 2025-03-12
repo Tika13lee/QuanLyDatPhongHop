@@ -32,7 +32,7 @@ public class EmployeeService implements IEmployee {
     }
 
     @Override
-    public Employee updateEmployee(EmployeeDTO employeeDTO) {
+    public Employee upDateEmployee(EmployeeDTO employeeDTO) {
         Employee employee = ConvertToEntity(employeeDTO);
         return employeeRepository.save(employee);
     }

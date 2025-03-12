@@ -18,4 +18,7 @@ public class ReservationViewDTO {
     private Date timeStart;
     private Date timeEnd;
     private StatusReservation statusReservation;
+    private Date time;
+    private String img;
+    private String nameBooker;
 }

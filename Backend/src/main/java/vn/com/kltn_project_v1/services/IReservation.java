@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IReservation {
     List<ReservationViewDTO> getAllReservationInRoom(long roomId,Date  dayStart, Date dayEnd);
+    List<ReservationViewDTO> getAllReservationPending();
+    List<ReservationViewDTO> getAllReservationWaitingCancel();
 }

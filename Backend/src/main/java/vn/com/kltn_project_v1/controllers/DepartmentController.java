@@ -20,9 +20,9 @@ public class DepartmentController {
     public ResponseEntity<?> addDepartment(@RequestBody DepartmentDTO departmentDTO) {
         return ResponseEntity.ok(departmentService.createDepartment(departmentDTO));
     }
-    @PutMapping("/updateDepartment")
-    public ResponseEntity<?> updateDepartment(@RequestBody DepartmentDTO departmentDTO) {
-        return ResponseEntity.ok(departmentService.updateDepartment(departmentDTO));
+    @PutMapping("/upDateDepartment")
+    public ResponseEntity<?> upDateDepartment(@RequestBody DepartmentDTO departmentDTO) {
+        return ResponseEntity.ok(departmentService.upDateDepartment(departmentDTO));
     }
     @DeleteMapping("/deleteDepartment")
     public ResponseEntity<?> deleteDepartment(@RequestParam Long departmentId) {

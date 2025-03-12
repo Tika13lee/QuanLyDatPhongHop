@@ -27,7 +27,7 @@ public class DepartmentService implements IDepartment {
     }
 
     @Override
-    public Department updateDepartment(DepartmentDTO departmentDTO) {
+    public Department upDateDepartment(DepartmentDTO departmentDTO) {
         Department department = modelMapper.map(departmentDTO, Department.class);
         department.setLocation(locationRepository.findById(departmentDTO.getLocationId()).orElse(null));
         return departmentRepository.save(department);

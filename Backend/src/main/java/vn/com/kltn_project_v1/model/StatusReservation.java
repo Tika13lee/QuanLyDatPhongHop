@@ -6,5 +6,6 @@ public enum StatusReservation {
     WAITING,
     CHECKED_IN,
     CANCELED,
-    COMPLETED
+    COMPLETED,
+    WAITING_CANCEL,
 }

@@ -29,7 +29,7 @@ public class LocationService implements ILocation {
     }
 
     @Override
-    public Location updateLocation(Location location) {
+    public Location upDateLocation(Location location) {
         return locationRepository.save(location);
     }
 

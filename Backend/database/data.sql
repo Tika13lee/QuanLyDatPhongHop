@@ -47,7 +47,7 @@ INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`) VALUES
 CREATE TABLE IF NOT EXISTS `cancel_reservation` (
   `cancel_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `time` datetime(6) DEFAULT NULL,
+  `time` Datetime(6) DEFAULT NULL,
   PRIMARY KEY (`cancel_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
@@ -146,7 +146,7 @@ INSERT INTO `location` (`location_id`, `branch`, `building`, `floor`, `number`) 
 CREATE TABLE IF NOT EXISTS `log` (
   `log_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `action` varchar(255) DEFAULT NULL,
-  `time` datetime(6) DEFAULT NULL,
+  `time` Datetime(6) DEFAULT NULL,
   `account_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`log_id`),
   UNIQUE KEY `UK7vj7qw714561rssch090tw994` (`account_id`),
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `log` (
 -- Dumping structure for table ql_datphong.price
 CREATE TABLE IF NOT EXISTS `price` (
   `price_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `time_apply` datetime(6) DEFAULT NULL,
+  `time_apply` Datetime(6) DEFAULT NULL,
   `type` enum('DEVICE','ROOM','SERVICE') DEFAULT NULL,
   `value` int(11) NOT NULL,
   PRIMARY KEY (`price_id`)
@@ -191,11 +191,11 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   `frequency` enum('DAILY','MONTHLY','ONE_TIME','WEEKLY') DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
   `status_reservation` enum('CANCELED','CHECKED_IN','COMPLETED','PENDING','WAITING','WAITING_PAYMENT') DEFAULT NULL,
-  `time` datetime(6) DEFAULT NULL,
-  `time_check_in` datetime(6) DEFAULT NULL,
-  `time_check_out` datetime(6) DEFAULT NULL,
-  `time_end` datetime(6) DEFAULT NULL,
-  `time_start` datetime(6) DEFAULT NULL,
+  `time` Datetime(6) DEFAULT NULL,
+  `time_check_in` Datetime(6) DEFAULT NULL,
+  `time_check_out` Datetime(6) DEFAULT NULL,
+  `time_end` Datetime(6) DEFAULT NULL,
+  `time_start` Datetime(6) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `total` int(11) NOT NULL,
   `booker_id` bigint(20) DEFAULT NULL,
@@ -369,7 +369,7 @@ INSERT INTO `service` (`service_id`, `description`, `service_name`, `price_id`) 
 CREATE TABLE IF NOT EXISTS `token` (
   `token_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `expired` bit(1) NOT NULL,
-  `expiry_date` datetime(6) DEFAULT NULL,
+  `expiry_Date` Datetime(6) DEFAULT NULL,
   `revoked` bit(1) NOT NULL,
   `token` varchar(255) DEFAULT NULL,
   `token_type` varchar(255) DEFAULT NULL,

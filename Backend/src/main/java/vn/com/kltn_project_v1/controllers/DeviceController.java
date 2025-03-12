@@ -22,9 +22,9 @@ public class DeviceController {
     public ResponseEntity<?> addDevice(@RequestBody DeviceDTO deviceDTO) {
         return ResponseEntity.ok(deviceService.createDevice(deviceDTO));
     }
-    @PutMapping("/updateDevice")
-    public ResponseEntity<?> updateDevice(@RequestBody DeviceDTO deviceDTO) {
-        return ResponseEntity.ok(deviceService.updateDevice(deviceDTO));
+    @PutMapping("/upDateDevice")
+    public ResponseEntity<?> upDateDevice(@RequestBody DeviceDTO deviceDTO) {
+        return ResponseEntity.ok(deviceService.upDateDevice(deviceDTO));
     }
     @DeleteMapping("/deleteDevice")
     public ResponseEntity<?> deleteDevice(@RequestBody DeviceDTO deviceDTO) {

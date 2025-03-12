@@ -11,7 +11,7 @@ public interface IDevice {
     Device findByName(String name);
     Device createDevice(DeviceDTO deviceDTO);
 
-    Device updateDevice(DeviceDTO deviceDTO);
+    Device upDateDevice(DeviceDTO deviceDTO);
     void deleteDevice(Long id);
 
     Room_Device createRoomDevice(Long roomId,Long deviceId, int quantity);

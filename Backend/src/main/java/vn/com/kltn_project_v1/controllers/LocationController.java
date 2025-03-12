@@ -23,9 +23,9 @@ public class LocationController {
     public ResponseEntity<?> addLocation(@RequestBody LocationDTO locationDTO) {
         return ResponseEntity.ok(locationService.addLocation(new Location(locationDTO.getBranch(), locationDTO.getBuilding(), locationDTO.getFloor(), locationDTO.getNumber())));
     }
-    @PutMapping("/updateLocation")
-    public ResponseEntity<?> updateLocation(@RequestBody LocationDTO locationDTO) {
-        return ResponseEntity.ok(locationService.updateLocation(modelMapper.map(locationDTO, Location.class)));
+    @PutMapping("/upDateLocation")
+    public ResponseEntity<?> upDateLocation(@RequestBody LocationDTO locationDTO) {
+        return ResponseEntity.ok(locationService.upDateLocation(modelMapper.map(locationDTO, Location.class)));
     }
     @GetMapping("/getLocationsByRoomIsNull")
     public ResponseEntity<?> getLocationsByRoomIsNull() {

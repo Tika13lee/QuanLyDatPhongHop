@@ -2,8 +2,6 @@ package vn.com.kltn_project_v1.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity

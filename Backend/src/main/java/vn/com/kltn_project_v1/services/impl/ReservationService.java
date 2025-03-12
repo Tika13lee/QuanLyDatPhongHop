@@ -29,4 +29,32 @@ public class ReservationService implements IReservation {
         });
         return reservationViewDTOS;
     }
+
+    @Override
+    public List<ReservationViewDTO> getAllReservationPending() {
+        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationPending();
+        return convertApprovalReservation(reservations);
+    }
+
+    @Override
+    public List<ReservationViewDTO> getAllReservationWaitingCancel() {
+        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationWaitingCancel();
+        return convertApprovalReservation(reservations);
+    }
+
+    private List<ReservationViewDTO> convertApprovalReservation(List<Reservation> reservations) {
+        ArrayList<ReservationViewDTO> reservationViewDTOS = new ArrayList<>();
+        reservations.forEach(r->{
+            ReservationViewDTO reservationViewDTO = new ReservationViewDTO();
+            reservationViewDTO.setReservationId(r.getReservationId());
+            reservationViewDTO.setImg(r.getBooker().getAvatar());
+            reservationViewDTO.setNameBooker(r.getBooker().getEmployeeName());
+            reservationViewDTO.setTime(r.getTime());
+            reservationViewDTO.setTimeEnd(r.getTimeEnd());
+            reservationViewDTO.setTimeStart(r.getTimeStart());
+            reservationViewDTO.setTitle(r.getTitle());
+            reservationViewDTOS.add(reservationViewDTO);
+        });
+        return reservationViewDTOS;
+    }
 }
