@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS `account` (
   `role` bit(1) NOT NULL,
   `user_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.account: ~12 rows (approximately)
+-- Dumping data for table ql_datphong.account: ~13 rows (approximately)
 INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`) VALUES
 	(1, '123', b'0', '0914653334'),
 	(2, '1234', b'1', '0914653333'),
@@ -41,13 +41,14 @@ INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`) VALUES
 	(9, '123', b'0', '0912672221'),
 	(10, '123', b'0', '0912672921'),
 	(11, '123', b'0', '0919672921'),
-	(12, '123', b'0', '0919642921');
+	(12, '123', b'0', '0919642921'),
+	(13, '1111', b'0', '0934707416');
 
 -- Dumping structure for table ql_datphong.cancel_reservation
 CREATE TABLE IF NOT EXISTS `cancel_reservation` (
   `cancel_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `time` Datetime(6) DEFAULT NULL,
+  `time` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`cancel_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
@@ -78,14 +79,19 @@ CREATE TABLE IF NOT EXISTS `device` (
   PRIMARY KEY (`device_id`),
   KEY `FKrvclitsabx4joc0l97unv1bjc` (`price_id`),
   CONSTRAINT `FKrvclitsabx4joc0l97unv1bjc` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.device: ~4 rows (approximately)
+-- Dumping data for table ql_datphong.device: ~9 rows (approximately)
 INSERT INTO `device` (`device_id`, `description`, `device_name`, `price_id`) VALUES
-	(1, ' ', 'projector', 5),
+	(1, ' ', 'projector', 10),
 	(2, ' ', 'whiteboard', 6),
 	(3, ' ', 'tv', 7),
-	(6, 'Lớn, 1000B', 'Công cụ loa', 16);
+	(6, 'Lớn, 1000B', 'Công cụ loa', 10),
+	(7, 'macbook', 'laptop', 18),
+	(8, 'tốt', 'Máy chiếu', 19),
+	(9, 'Loại lớn', 'Máy chiếu', 20),
+	(10, 'Lớn', 'Máy chiếu', 21),
+	(11, '', 'Loại Q', 10);
 
 -- Dumping structure for table ql_datphong.employee
 CREATE TABLE IF NOT EXISTS `employee` (
@@ -103,11 +109,11 @@ CREATE TABLE IF NOT EXISTS `employee` (
   KEY `FKbejtwvg9bxus2mffsm3swj3u9` (`department_id`),
   CONSTRAINT `FKbejtwvg9bxus2mffsm3swj3u9` FOREIGN KEY (`department_id`) REFERENCES `department` (`department_id`),
   CONSTRAINT `FKcfg6ajo8oske94exynxpf7tf9` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.employee: ~12 rows (approximately)
+-- Dumping data for table ql_datphong.employee: ~13 rows (approximately)
 INSERT INTO `employee` (`employee_id`, `avatar`, `email`, `employee_name`, `is_actived`, `phone`, `account_id`, `department_id`) VALUES
-	(1, NULL, '123@gmail.com', 'Dat1', b'1', '0914653334', 1, 1),
+	(1, 'https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-cute-45.jpg', '123@gmail.com', 'Dat1', b'1', '0914653334', 1, 1),
 	(2, NULL, '123@gmail.com', 'Dat2', b'1', '0914653333', 2, 1),
 	(3, NULL, '123@gmail.com', 'Dat3', b'1', '0914653332', 3, 1),
 	(4, NULL, '123@gmail.com', 'Kieu', b'1', '0914653331', 4, 2),
@@ -118,7 +124,8 @@ INSERT INTO `employee` (`employee_id`, `avatar`, `email`, `employee_name`, `is_a
 	(9, NULL, '123@gmail.com', 'Huong', b'1', '0912672221', 9, 3),
 	(10, NULL, '123@gmail.com', 'Hue', b'1', '0912672921', 10, 3),
 	(11, NULL, '123@gmail.com', 'Hao', b'1', '0919672921', 11, 3),
-	(12, NULL, '123@gmail.com', 'Ki', b'1', '0919642921', 12, 3);
+	(12, NULL, '123@gmail.com', 'Ki', b'1', '0919642921', 12, 3),
+	(17, '', 'dat123@gmail.com', 'Trọng Đạt', b'1', '0934707416', 13, 1);
 
 -- Dumping structure for table ql_datphong.location
 CREATE TABLE IF NOT EXISTS `location` (
@@ -128,25 +135,26 @@ CREATE TABLE IF NOT EXISTS `location` (
   `floor` varchar(255) DEFAULT NULL,
   `number` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.location: ~9 rows (approximately)
+-- Dumping data for table ql_datphong.location: ~10 rows (approximately)
 INSERT INTO `location` (`location_id`, `branch`, `building`, `floor`, `number`) VALUES
-	(1, 'HN', 'A', '1', '01'),
-	(2, 'HN', 'B', '1', '01'),
-	(3, 'SG', 'A', '2', '01'),
+	(1, 'Đà Nẵng', 'A1', '1', '02'),
+	(2, 'Hà Nội', 'B', '1', '01'),
+	(3, 'Thành phố Hồ Chí Minh', 'A', '2', '01'),
 	(4, 'SG', 'B', '1', '01'),
 	(5, 'SG', 'A', '1', '01'),
 	(6, 'SG', 'B', '2', '01'),
 	(7, 'SG', 'A', '2', '03'),
 	(8, 'HN', 'A', '2', '02'),
-	(9, 'SG', 'B', '1', '02');
+	(9, 'SG', 'B', '1', '02'),
+	(11, 'Nguyễn Văn Bảo', 'A20', '7', '7001');
 
 -- Dumping structure for table ql_datphong.log
 CREATE TABLE IF NOT EXISTS `log` (
   `log_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `action` varchar(255) DEFAULT NULL,
-  `time` Datetime(6) DEFAULT NULL,
+  `time` datetime(6) DEFAULT NULL,
   `account_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`log_id`),
   UNIQUE KEY `UK7vj7qw714561rssch090tw994` (`account_id`),
@@ -158,13 +166,13 @@ CREATE TABLE IF NOT EXISTS `log` (
 -- Dumping structure for table ql_datphong.price
 CREATE TABLE IF NOT EXISTS `price` (
   `price_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `time_apply` Datetime(6) DEFAULT NULL,
+  `time_apply` datetime(6) DEFAULT NULL,
   `type` enum('DEVICE','ROOM','SERVICE') DEFAULT NULL,
   `value` int(11) NOT NULL,
   PRIMARY KEY (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.price: ~17 rows (approximately)
+-- Dumping data for table ql_datphong.price: ~29 rows (approximately)
 INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 	(1, '2025-02-28 00:39:47.000000', 'ROOM', 100),
 	(2, '2025-02-28 00:39:47.000000', 'ROOM', 110),
@@ -182,7 +190,19 @@ INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 	(14, '2025-02-28 05:01:32.108000', 'ROOM', 100),
 	(15, '2025-03-11 00:44:20.757000', 'DEVICE', 100),
 	(16, '2025-03-11 00:45:34.401000', 'DEVICE', 100),
-	(17, '2025-03-11 02:24:34.428000', 'SERVICE', 100);
+	(17, '2025-03-11 02:24:34.428000', 'SERVICE', 100),
+	(18, '2025-03-11 23:20:02.175000', 'DEVICE', 30),
+	(19, '2025-03-11 23:26:22.527000', 'DEVICE', 10),
+	(20, '2025-03-11 23:27:59.331000', 'DEVICE', 30),
+	(21, '2025-03-11 23:29:37.996000', 'DEVICE', 50),
+	(22, '2025-03-12 00:00:46.587000', 'SERVICE', 2000),
+	(23, '2025-03-12 00:02:34.191000', 'SERVICE', 2010),
+	(24, '2025-03-12 00:02:59.238000', 'SERVICE', 2000),
+	(25, '2025-03-12 00:03:59.731000', 'SERVICE', 2000),
+	(26, '2025-03-12 00:06:10.515000', 'SERVICE', 2000),
+	(27, '2025-03-12 00:07:21.110000', 'SERVICE', 2000),
+	(28, '2025-03-12 00:08:41.990000', 'SERVICE', 2000),
+	(29, '2025-03-12 00:14:56.789000', 'DEVICE', 0);
 
 -- Dumping structure for table ql_datphong.reservation
 CREATE TABLE IF NOT EXISTS `reservation` (
@@ -190,12 +210,12 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   `description` varchar(255) DEFAULT NULL,
   `frequency` enum('DAILY','MONTHLY','ONE_TIME','WEEKLY') DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
-  `status_reservation` enum('CANCELED','CHECKED_IN','COMPLETED','PENDING','WAITING','WAITING_PAYMENT') DEFAULT NULL,
-  `time` Datetime(6) DEFAULT NULL,
-  `time_check_in` Datetime(6) DEFAULT NULL,
-  `time_check_out` Datetime(6) DEFAULT NULL,
-  `time_end` Datetime(6) DEFAULT NULL,
-  `time_start` Datetime(6) DEFAULT NULL,
+  `status_reservation` enum('CANCELED','CHECKED_IN','COMPLETED','PENDING','WAITING','WAITING_PAYMENT','WAITING_CANCEL') DEFAULT NULL,
+  `time` datetime(6) DEFAULT NULL,
+  `time_check_in` datetime(6) DEFAULT NULL,
+  `time_check_out` datetime(6) DEFAULT NULL,
+  `time_end` datetime(6) DEFAULT NULL,
+  `time_start` datetime(6) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `total` int(11) NOT NULL,
   `booker_id` bigint(20) DEFAULT NULL,
@@ -208,23 +228,25 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   CONSTRAINT `FK6p46jda7n10vl4kr1n0c6et6v` FOREIGN KEY (`booker_id`) REFERENCES `employee` (`employee_id`),
   CONSTRAINT `FKlqrdx9b1dwg69ldb480uok3w2` FOREIGN KEY (`cancle_reservation_id`) REFERENCES `cancel_reservation` (`cancel_id`),
   CONSTRAINT `FKm8xumi0g23038cw32oiva2ymw` FOREIGN KEY (`room_id`) REFERENCES `room` (`room_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.reservation: ~13 rows (approximately)
+-- Dumping data for table ql_datphong.reservation: ~15 rows (approximately)
 INSERT INTO `reservation` (`reservation_id`, `description`, `frequency`, `note`, `status_reservation`, `time`, `time_check_in`, `time_check_out`, `time_end`, `time_start`, `title`, `total`, `booker_id`, `cancle_reservation_id`, `room_id`) VALUES
-	(1, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'Khoa hoc', 400, 1, NULL, 1),
-	(2, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'Ke hoach truyen thong', 400, 2, NULL, 1),
-	(3, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'suy duong', 400, 1, NULL, 1),
-	(4, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'bao cao ', 400, 3, NULL, 4),
-	(5, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'Tong ket quy', 400, 1, NULL, 1),
-	(6, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'Thuyet trinh', 400, 1, NULL, 2),
-	(7, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt1', 400, 4, NULL, 1),
-	(8, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt2', 400, 1, NULL, 1),
-	(9, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt3', 400, 1, NULL, 3),
-	(10, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt4', 400, 1, NULL, 3),
-	(11, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt5', 400, 5, NULL, 3),
-	(12, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt6', 400, 1, NULL, 1),
-	(13, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 01:35:29.000000', '2025-02-28 01:35:30.000000', '2025-02-28 01:35:31.000000', '2025-02-28 01:35:34.000000', 'tt7', 400, 1, NULL, 1);
+	(1, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 08:30:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 08:30:00.000000', 'Khoa hoc', 400, 1, NULL, 1),
+	(2, ' ', 'ONE_TIME', ' ', 'PENDING', '2025-02-28 01:35:28.000000', '2025-03-01 08:30:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 08:30:00.000000', 'Ke hoach truyen thong', 400, 2, NULL, 1),
+	(3, ' ', 'ONE_TIME', ' ', 'PENDING', '2025-02-28 01:35:28.000000', '2025-03-02 08:30:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 08:30:00.000000', 'suy duong', 400, 1, NULL, 1),
+	(4, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-03 08:30:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 08:30:00.000000', 'bao cao ', 400, 3, NULL, 4),
+	(5, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-04 08:30:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 08:30:00.000000', 'Tong ket quy', 400, 1, NULL, 1),
+	(6, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-05 08:30:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 08:30:00.000000', 'Thuyet trinh', 400, 1, NULL, 2),
+	(7, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-06 08:30:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 08:30:00.000000', 'tt1', 400, 4, NULL, 1),
+	(8, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-07 08:30:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 08:30:00.000000', 'tt2', 400, 1, NULL, 1),
+	(9, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-08 08:30:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 08:30:00.000000', 'tt3', 400, 1, NULL, 3),
+	(10, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-09 08:30:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 08:30:00.000000', 'tt4', 400, 1, NULL, 3),
+	(11, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-10 08:30:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 08:30:00.000000', 'tt5', 400, 5, NULL, 3),
+	(12, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-11 08:30:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 08:30:00.000000', 'tt6', 400, 1, NULL, 1),
+	(13, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 08:30:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 08:30:00.000000', 'tt7', 400, 1, NULL, 1),
+	(14, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-12 10:30:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 10:30:00.000000', 'tt8', 400, 1, NULL, 1),
+	(15, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 14:30:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 14:30:00.000000', 'tt9', 400, 2, NULL, 1);
 
 -- Dumping structure for table ql_datphong.reservation_employee
 CREATE TABLE IF NOT EXISTS `reservation_employee` (
@@ -303,9 +325,9 @@ INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_roo
 	(1, 4, 'SS', 'AVAILABLE', 'DEFAULT', 4, 1, 1),
 	(2, 4, 'VV', 'AVAILABLE', 'DEFAULT', 6, 3, 1),
 	(3, 4, 'KK', 'AVAILABLE', 'VIP', 7, 4, 1),
-	(4, 4, 'SW', 'AVAILABLE', 'DEFAULT', 5, 2, NULL),
-	(7, 4, 'NS', 'AVAILABLE', 'VIP', 8, 12, NULL),
-	(8, 4, 'Duy trì', 'MAINTAIN', 'VIP', 9, 14, NULL);
+	(4, 4, 'SW', 'AVAILABLE', 'DEFAULT', 5, 2, 1),
+	(7, 4, 'NS', 'AVAILABLE', 'VIP', 8, 12, 1),
+	(8, 4, 'Duy trì', 'MAINTAIN', 'VIP', 9, 14, 1);
 
 -- Dumping structure for table ql_datphong.room_device
 CREATE TABLE IF NOT EXISTS `room_device` (
@@ -339,12 +361,13 @@ CREATE TABLE IF NOT EXISTS `room_imgs` (
   CONSTRAINT `FKrnck0q2se0qpxlgrq4e17b3mi` FOREIGN KEY (`room_room_id`) REFERENCES `room` (`room_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.room_imgs: ~4 rows (approximately)
+-- Dumping data for table ql_datphong.room_imgs: ~5 rows (approximately)
 INSERT INTO `room_imgs` (`room_room_id`, `imgs`) VALUES
-	(7, '1'),
-	(7, '2'),
-	(8, '1'),
-	(8, '2');
+	(7, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
+	(7, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
+	(8, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
+	(8, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
+	(1, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg');
 
 -- Dumping structure for table ql_datphong.service
 CREATE TABLE IF NOT EXISTS `service` (
@@ -355,21 +378,30 @@ CREATE TABLE IF NOT EXISTS `service` (
   PRIMARY KEY (`service_id`),
   KEY `FKlseq2n8malh1ngayy79q62kal` (`price_id`),
   CONSTRAINT `FKlseq2n8malh1ngayy79q62kal` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.service: ~5 rows (approximately)
+-- Dumping data for table ql_datphong.service: ~14 rows (approximately)
 INSERT INTO `service` (`service_id`, `description`, `service_name`, `price_id`) VALUES
-	(1, ' ', 'small', 8),
+	(1, ' tốt 1', 'small', 12),
 	(2, ' ', 'big', 9),
 	(3, ' ', 'vip', 10),
 	(4, ' ', 'con', 11),
-	(5, 'Nhanh', 'Loai A', 17);
+	(5, 'Nhanh', 'Loai A', 17),
+	(7, 'tốt', 'Loại B', 22),
+	(8, '', 'Loại C', 23),
+	(9, 'tốt', 'Loại D', 24),
+	(10, '', 'Loại E', 25),
+	(11, '', 'Loại F', 26),
+	(12, '', 'Loại I', 27),
+	(13, '', 'Loại H', 28),
+	(14, ' ', 'small', 10),
+	(15, ' tốt', 'small', 20);
 
 -- Dumping structure for table ql_datphong.token
 CREATE TABLE IF NOT EXISTS `token` (
   `token_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `expired` bit(1) NOT NULL,
-  `expiry_Date` Datetime(6) DEFAULT NULL,
+  `expiry_date` datetime(6) DEFAULT NULL,
   `revoked` bit(1) NOT NULL,
   `token` varchar(255) DEFAULT NULL,
   `token_type` varchar(255) DEFAULT NULL,

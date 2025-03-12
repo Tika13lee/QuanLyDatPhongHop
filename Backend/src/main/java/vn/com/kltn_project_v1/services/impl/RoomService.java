@@ -7,11 +7,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.com.kltn_project_v1.dtos.*;
+import vn.com.kltn_project_v1.dtos.Overview.ReservationViewDTO;
 import vn.com.kltn_project_v1.dtos.Overview.RoomViewDTO;
 import vn.com.kltn_project_v1.entityRespones.RoomRespone;
 import vn.com.kltn_project_v1.exceptions.DataNotFoundException;
 import vn.com.kltn_project_v1.model.*;
 import vn.com.kltn_project_v1.repositories.*;
+import vn.com.kltn_project_v1.services.IReservation;
 import vn.com.kltn_project_v1.services.IRoom;
 
 import java.awt.print.Pageable;
@@ -31,6 +33,7 @@ public class RoomService implements IRoom {
     private final ReservationRepository reservationRepository;
     private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
+    private final IReservation reservationService;
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
         Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
@@ -138,69 +141,26 @@ public class RoomService implements IRoom {
     public RoomDTO getRoomById(Long roomId) throws DataNotFoundException {
          Room room = roomRepository.findById(roomId)
                 .orElseThrow(()->new DataNotFoundException("Room not found"));
-            return ConverRoomToDTO(room);
+            return convertRoomToDTO(room);
     }
 
     @Override
-    public List<RoomViewDTO> getRoomOverView(String branch) throws DataNotFoundException {
+    public List<RoomViewDTO> getRoomOverView(String branch,Date  dayStart, Date dayEnd) throws DataNotFoundException {
         List<Room> rooms = roomRepository.findByBranch(branch);
-        List<RoomViewDTO> roomViewDTOS = rooms.stream().map(room -> {
+        return rooms.stream().map(room -> {
             RoomViewDTO roomViewDTO = new RoomViewDTO();
             roomViewDTO.setRoomId(room.getRoomId());
             roomViewDTO.setRoomName(room.getRoomName());
+            List<ReservationViewDTO> reservationViewDTOS = reservationService.getAllReservationInRoom(room.getRoomId(), dayStart, dayEnd);
+            roomViewDTO.setReservationViewDTOS(reservationViewDTOS);
             return roomViewDTO;
         }).toList();
-        return roomViewDTOS;
     }
 
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
-        List<RoomDTO> roomDTOS = rooms.stream().map(room -> {
-            RoomDTO roomDTO = new RoomDTO();
-            roomDTO.setRoomId(room.getRoomId());
-            roomDTO.setRoomName(room.getRoomName());
-            roomDTO.setCapacity(room.getCapacity());
-            roomDTO.setStatusRoom(room.getStatusRoom().name());
-            roomDTO.setTypeRoom(room.getTypeRoom());
-            LocationDTO locationDTO = new LocationDTO();
-            locationDTO.setBranch(room.getLocation().getBranch());
-            locationDTO.setBuilding(room.getLocation().getBuilding());
-            locationDTO.setFloor(room.getLocation().getFloor());
-            locationDTO.setNumber(room.getLocation().getNumber());
-            roomDTO.setLocation(locationDTO);
-
-            try {
-                Price price = priceRepository.findById(room.getPrice().getPriceId())
-                        .orElseThrow(()->new DataNotFoundException("Price not found"));
-                roomDTO.setPrice(price.getValue());
-            } catch (DataNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            roomDTO.setImgs(room.getImgs());
-            ArrayList<Room_DeviceDTO> room_deviceDTOS = new ArrayList<>();
-            room_deviceRepository.findByRoomId(room.getRoomId()).forEach(rd->{
-                Room_DeviceDTO room_deviceDTO = new Room_DeviceDTO();
-                room_deviceDTO.setDeviceName(rd.getRoom_deviceId().getDevice().getDeviceName());
-                room_deviceDTO.setQuantity(rd.getQuantity());
-                room_deviceDTOS.add(room_deviceDTO);
-            });
-            roomDTO.setRoom_deviceDTOS(room_deviceDTOS);
-            if (room.getApprover()!=null) {
-                ApproverDTO approverDTO = new ApproverDTO();
-                approverDTO.setPhone(room.getApprover().getPhone());
-                approverDTO.setName(room.getApprover().getEmployeeName());
-                roomDTO.setApprover(approverDTO);
-            }
-            ArrayList<ReservationDTO> reservationDTOS = new ArrayList<>();
-            reservationRepository.findReservationsByRoomRoomId(room.getRoomId()).forEach(reservation -> {
-                ReservationDTO reservationDTO = modelMapper.map(reservation,ReservationDTO.class);
-                reservationDTOS.add(reservationDTO);
-            });
-            roomDTO.setReservationDTOS(reservationDTOS);
-            return roomDTO;
-        }).toList();
-        return roomDTOS;
+        return rooms.stream().map(this::convertRoomToDTO).toList();
     }
-    public RoomDTO ConverRoomToDTO(Room room){
+    public RoomDTO convertRoomToDTO(Room room){
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setRoomId(room.getRoomId());
         roomDTO.setRoomName(room.getRoomName());

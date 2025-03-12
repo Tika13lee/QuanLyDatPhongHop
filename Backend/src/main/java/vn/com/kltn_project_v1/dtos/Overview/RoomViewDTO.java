@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,4 +14,5 @@ import lombok.Setter;
 public class RoomViewDTO {
     private Long roomId;
     private String roomName;
+    private List<ReservationViewDTO> reservationViewDTOS;
 }

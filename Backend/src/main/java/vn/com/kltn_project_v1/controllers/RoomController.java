@@ -1,6 +1,7 @@
 package vn.com.kltn_project_v1.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RoomDTO;
@@ -8,6 +9,8 @@ import vn.com.kltn_project_v1.model.Room;
 import vn.com.kltn_project_v1.model.StatusRoom;
 import vn.com.kltn_project_v1.services.IDevice;
 import vn.com.kltn_project_v1.services.IRoom;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/room")
@@ -93,9 +96,9 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         }
     }
     @GetMapping("/getRoomOverView")
-    public ResponseEntity<?> getRoomOverView(@RequestParam String branch){
+    public ResponseEntity<?> getRoomOverView(@RequestParam String branch, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayEnd){
         try {
-            return ResponseEntity.ok(roomService.getRoomOverView(branch));
+            return ResponseEntity.ok(roomService.getRoomOverView(branch,dayStart,dayEnd));
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }

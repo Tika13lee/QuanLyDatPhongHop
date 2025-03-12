@@ -42,6 +42,11 @@ public class ReservationService implements IReservation {
         return convertApprovalReservation(reservations);
     }
 
+    @Override
+    public Reservation getReservationById(Long reservationId) {
+        return reservationRepository.findById(reservationId).orElse(null);
+    }
+
     private List<ReservationViewDTO> convertApprovalReservation(List<Reservation> reservations) {
         ArrayList<ReservationViewDTO> reservationViewDTOS = new ArrayList<>();
         reservations.forEach(r->{
