@@ -1,11 +1,11 @@
 import { useState } from "react";
-import axios, { AxiosResponse , AxiosRequestConfig } from "axios";
+import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 
 type PostResult<T> = {
   data: T | null;
   loading: boolean;
   error: Error | null;
-  postData: (body: any, config?: AxiosRequestConfig) => Promise<AxiosResponse<T> | null>;
+  postData: (body: any, config?: AxiosRequestConfig, method?: "POST" | "PUT") => Promise<AxiosResponse<T> | null>;
 };
 
 const usePost = <T>(url: string): PostResult<T> => {
@@ -13,12 +13,17 @@ const usePost = <T>(url: string): PostResult<T> => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const postData = async (body: any, config?: AxiosRequestConfig) => {
+  const postData = async (body: any, config?: AxiosRequestConfig, method: "POST" | "PUT" = "POST") => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post<T>(url, body, config);
+      const response = await axios({
+        method: method,
+        url: url,
+        data: body,
+        ...config,
+      });
       setData(response.data);
       return response;
     } catch (err) {
@@ -28,7 +33,7 @@ const usePost = <T>(url: string): PostResult<T> => {
       setLoading(false);
     }
   };
-// tôi muốn trả về postData để có thể gọi hàm này từ component khác
+
   return { data, loading, error, postData };
 };
 

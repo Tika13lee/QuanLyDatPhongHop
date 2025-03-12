@@ -12,7 +12,7 @@ type LoginForm = {
 
 const Login = () => {
   return (
-    <div className={cx("container")}>
+    // <div className={cx("container")}>
       <form className={cx("form")}>
         <h2 className={cx("title")}>Đăng Nhập</h2>
 
@@ -30,7 +30,7 @@ const Login = () => {
           Đăng Nhập
         </button>
       </form>
-    </div>
+    // </div>
   );
 };
 

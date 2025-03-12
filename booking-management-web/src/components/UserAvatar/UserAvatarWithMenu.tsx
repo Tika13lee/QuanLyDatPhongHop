@@ -15,10 +15,8 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
   size,
   borderColor,
 }) => {
-
-  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +45,10 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
 
       {isMenuOpen && (
         <div ref={menuRef} className={cx("dropdown-menu")}>
-          <div className={cx("dropdown-item")}>
+          <div
+            className={cx("dropdown-item")}
+            onClick={() => setIsProfileOpen(true)}
+          >
             <span>Hồ sơ cá nhân</span>
           </div>
           <div className={cx("dropdown-item")}>
@@ -62,6 +63,22 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
           <div className={cx("dropdown-divider")} />
           <div className={cx("dropdown-item")}>
             <span>Đăng xuất</span>
+          </div>
+        </div>
+      )}
+
+      {isProfileOpen && (
+        <div
+          className={cx("popup-overlay")}
+          onClick={() => setIsProfileOpen(false)}
+        >
+          <div
+            className={cx("popup-content")}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Hồ sơ cá nhân</h2>
+            <p>Thông tin chi tiết về người dùng</p>
+            <button onClick={() => setIsProfileOpen(false)}>Đóng</button>
           </div>
         </div>
       )}

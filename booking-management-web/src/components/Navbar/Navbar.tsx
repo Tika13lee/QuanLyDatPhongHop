@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { login } from "../../features/authSlice";
+import useFetch from "../../hooks/useFetch";
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +20,9 @@ const Navbar = () => {
   const [results, setResults] = useState<string[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   const handleFocus = () => {
     setSearchOpen(true);
@@ -43,6 +47,30 @@ const Navbar = () => {
     };
   }, []);
 
+  const {
+    data: rooms,
+    loading,
+    error,
+  } = useFetch<any[]>(
+    `http://localhost:8080/api/v1/room/searchRoomByName?roomName=${searchQuery}`
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Hủy bỏ timeout trước đó nếu có
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    // Tạo một timeout mới để trì hoãn việc gọi API
+    const newTimer = setTimeout(() => {
+      setSearchQuery(value);
+    }, 1000);
+    setDebounceTimer(newTimer);
+  };
+
   return (
     <div className={cx("navbar-container")}>
       <div className={cx("navbar")}>
@@ -57,7 +85,7 @@ const Navbar = () => {
               type="search"
               placeholder="Tìm kiếm nhanh theo tên phòng họp"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleInputChange}
               onFocus={handleFocus}
             />
             <button>
@@ -71,10 +99,14 @@ const Navbar = () => {
               onMouseDown={(e) => e.preventDefault()}
             >
               <div className={cx("search-results")}>
-                {results.length > 0 ? (
-                  results.map((result, index) => (
+                {loading ? (
+                  <p>Đang tìm kiếm...</p>
+                ) : error ? (
+                  <p>Lỗi khi tìm kiếm</p>
+                ) : rooms && rooms.length > 0 ? (
+                  rooms.map((room, index) => (
                     <div key={index} className={cx("result-item")}>
-                      {result}
+                      {room.roomName}
                     </div>
                   ))
                 ) : (

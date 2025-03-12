@@ -90,16 +90,13 @@
 }
 
 .submit-btn:last-child {
-  background: #F39C12;
+  background: #f39c12;
   margin-right: 0;
 }
 
 .submit-btn:hover {
   opacity: 0.8;
 }
-
-
-
 
 // service table
 .service-list {
@@ -146,8 +143,15 @@
     text-align: center;
     border: 1px solid var(--border-color);
   }
-}
 
+  tr {
+    cursor: pointer;
+  }
+
+  tr:hover {
+    background-color: var(--bg-primary);
+  }
+}
 
 .service-table th {
   background-color: var(--bg-active);
@@ -168,4 +172,3 @@
 .edit-btn:hover {
   background-color: #0056b3;
 }
-

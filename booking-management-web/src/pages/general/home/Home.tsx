@@ -1,6 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 import Navbar from "../../../components/Navbar/Navbar";
+import Login from "../login/Login";
 
 const cx = classNames.bind(styles);
 

@@ -55,7 +55,7 @@
   display: flex;
   flex: 1;
   gap: 20px;
-  padding: 0 10px;
+  // padding: 0 10px;
 }
 
 .room-info-container {
@@ -65,7 +65,7 @@
   background: var(--color-white);
   padding: 10px 20px;
   gap: 5px;
-  width: 23%;
+  width: 20%;
   height: 600px;
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
@@ -105,9 +105,11 @@
 /* Phần thông tin */
 .room-info {
   flex: 2;
+  width: 100%;
 }
 
 .room-header {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;

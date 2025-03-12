@@ -18,9 +18,21 @@ const daysOfWeek = [
 
 const WeeklySchedule = () => {
   const roomDetail = useSelector((state: RootState) => state.room.selectedRoom);
+
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
+
+  // Kiểm tra dữ liệu: roomDetail và roomDetail.reservationDTOS có tồn tại và không rỗng
+  if (
+    !roomDetail ||
+    !roomDetail.reservationDTOS ||
+    roomDetail.reservationDTOS.length === 0
+  ) {
+    return <div>Không có dữ liệu đặt phòng.</div>;
+  }
+
+  const reservations = roomDetail.reservationDTOS;
 
   // hàm tạo mảng thời gian
   const timeSlots = Array.from({ length: 23 }, (_, i) => {
@@ -33,9 +45,9 @@ const WeeklySchedule = () => {
   const changeWeek = (direction: "previous" | "next") => {
     const currentDate = new Date(selectedDate);
     if (direction === "previous") {
-      currentDate.setDate(currentDate.getDate() - 7); // Lùi về tuần trước
+      currentDate.setDate(currentDate.getDate() - 7);
     } else {
-      currentDate.setDate(currentDate.getDate() + 7); // Tiến lên tuần sau
+      currentDate.setDate(currentDate.getDate() + 7);
     }
     setSelectedDate(currentDate.toISOString().split("T")[0]);
   };
@@ -61,7 +73,13 @@ const WeeklySchedule = () => {
     return `${day}/${month}/${year}`;
   };
 
-  if (!roomDetail) return <p>Không có dữ liệu lịch đặt phòng</p>;
+  // Hàm chuyển đổi từ định dạng ISO thành giờ và phút
+  const formatTime = (isoString: string) => {
+    const time = new Date(isoString);
+    return `${String(time.getHours()).padStart(2, "0")}:${String(
+      time.getMinutes()
+    ).padStart(2, "0")}`;
+  };
 
   return (
     <div className={cx("scheduleContainer")}>
@@ -116,14 +134,24 @@ const WeeklySchedule = () => {
                 <tr key={index}>
                   <td className={cx("timeColumn")}>{time}</td>
                   {daysOfWeek.map((day, i) => {
-                    const bookedSchedule = roomDetail.schedules.find(
-                      (schedule) =>
-                        schedule.date === weekDates[i] &&
-                        schedule.timeStart <= time &&
-                        schedule.timeEnd > time
-                    );
+                    const bookedSchedule = reservations?.find((reservation) => {
+                      // Tách thời gian giờ và phút từ timeStart và timeEnd
+                      const startTime = formatTime(reservation.timeStart);
+                      const endTime = formatTime(reservation.timeEnd);
 
-                    const isStartTime = bookedSchedule?.timeStart === time;
+                      // So sánh thời gian với thời gian trong bảng
+                      return (
+                        reservation.timeStart.split("T")[0] === weekDates[i] &&
+                        startTime <= time &&
+                        endTime > time
+                      );
+                    });
+
+                    const isStartTime =
+                      bookedSchedule?.timeStart.split("T")[1].split(":")[0] ===
+                        time.split(":")[0] &&
+                      bookedSchedule?.timeStart.split("T")[1].split(":")[1] ===
+                        time.split(":")[1];
 
                     return (
                       <td
@@ -133,9 +161,9 @@ const WeeklySchedule = () => {
                         })}
                         colSpan={isStartTime ? 1 : 0}
                       >
-                        {isStartTime ? (
+                        {bookedSchedule && isStartTime ? (
                           <div className={cx("booked-title")}>
-                            {bookedSchedule.title}
+                            {bookedSchedule?.title}
                           </div>
                         ) : (
                           ""

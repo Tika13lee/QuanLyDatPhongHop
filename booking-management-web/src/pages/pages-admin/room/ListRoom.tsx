@@ -6,8 +6,9 @@ import { MdOutlineInfo } from "../../../components/icons/icons";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +20,7 @@ function ListRoom() {
     error: locationsError,
   } = useSelector((state: RootState) => state.location);
 
+  // lấy dữ liệu lọc từ form tìm kiếm
   const [filters, setFilters] = useState({
     // branch: "",
     capacity: "",
@@ -26,22 +28,46 @@ function ListRoom() {
     statusRoom: "",
   });
 
+  const [rooms, setRooms] = useState<RoomProps[]>([]);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const pageSize = 7;
-  const [searching, setSearching] = useState(false);
 
-  const { data, error, loading } = useFetch<RoomProps[]>(
-    searching
-      ? `http://localhost:8080/api/v1/room/sreachRooms?capacity=${filters.capacity}&statusRoom=${filters.statusRoom}&price=${filters.price}&page=${page}&size=${pageSize}`
-      : `http://localhost:8080/api/v1/room/getAllRooms?page=${page}&size=${pageSize}`
-  );
+  // Gọi API lấy danh sách phòng của trang 1
+  useEffect(() => {
+    fetchRooms(page);
+  }, []);
 
-  console.log("data", data);
+  // Gọi API lấy danh sách phòng
+  const fetchRooms = async (pageNumber: number) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/room/getAllRooms?page=${
+          pageNumber - 1
+        }&size=${pageSize}`
+      );
+      setRooms(response.data.roomDTOS);
+      setTotalPage(response.data.totalPage);
+      console.log("response", response);
+      setPage(pageNumber);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách phòng:", error);
+    }
+  };
 
-  const handleSearch = () => {
-    setSearching(true);
-    setPage(1);
+  // Gọi API khi tìm kiếm
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/room/searchRooms?capacity=${filters.capacity}&statusRoom=${filters.statusRoom}&price=${filters.price}`
+      );
+      setRooms(response.data.roomDTOS);
+      console.log(response)
+      setTotalPage(response.data.totalPage);
+      setPage(1);
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm phòng:", error);
+    }
   };
 
   return (
@@ -96,9 +122,9 @@ function ListRoom() {
               <label>Trạng thái:</label>
               <select
                 value={filters.statusRoom}
-                onChange={(e) =>
-                  setFilters({ ...filters, statusRoom: e.target.value })
-                }
+                onChange={(e) => {
+                  setFilters({ ...filters, statusRoom: e.target.value });
+                }}
               >
                 <option value="">Chọn trạng thái...</option>
                 {statusesRoom.map((status, index) => (
@@ -132,8 +158,8 @@ function ListRoom() {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(data) && data.length > 0 ? (
-              data.map((room, index) => (
+            {Array.isArray(rooms) && rooms.length > 0 ? (
+              rooms.map((room, index) => (
                 <tr key={index}>
                   <td>{room.roomName}</td>
                   <td>
@@ -151,7 +177,7 @@ function ListRoom() {
                       : "Không có người phê duyệt"}
                   </td>
                   <td className={cx("icon-info")}>
-                    <Link to={`detail/${room.id}`}>
+                    <Link to={`detail/${room.roomId}`}>
                       <IconWrapper icon={MdOutlineInfo} color="#0670C7" />
                     </Link>
                   </td>
@@ -170,32 +196,52 @@ function ListRoom() {
 
       {/* Nút chuyển trang */}
       <div className={cx("pagination")}>
+        {/* Nút "Trước" */}
         <button
           className={cx("page-btn")}
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          onClick={() => {
+            setPage((prev) => {
+              const newPage = Math.max(prev - 1, 1); 
+              fetchRooms(newPage);
+              return newPage;
+            });
+          }}
           disabled={page === 1}
         >
           {"<"} Trước
         </button>
 
-        {[...Array(totalPages)].map((_, index) => (
+        {/* Các nút trang */}
+        {[...Array(totalPage)].map((_, index) => (
           <button
             key={index}
             className={cx("page-btn", { active: page === index + 1 })}
-            onClick={() => setPage(index + 1)}
+            onClick={() => {
+              const newPage = index + 1;
+              setPage(newPage); 
+              fetchRooms(newPage);
+            }}
           >
             {index + 1}
           </button>
         ))}
 
+        {/* Nút "Sau" */}
         <button
           className={cx("page-btn")}
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages}
+          onClick={() => {
+            setPage((prev) => {
+              const newPage = Math.min(prev + 1, totalPage);
+              fetchRooms(newPage);
+              return newPage;
+            });
+          }}
+          disabled={page >= totalPage || totalPage === 1}
         >
           Sau {">"}
         </button>
       </div>
+
     </div>
   );
 }

@@ -65,7 +65,7 @@ function ApprovalList() {
               <ul>
                 {selectedReservation.room.devices.map((device, index) => (
                   <li key={index}>
-                    <span>{device.name}</span>
+                    <span>{device.deviceName}</span>
                     <span>{device.quantity} cái</span>
                   </li>
                 ))}
