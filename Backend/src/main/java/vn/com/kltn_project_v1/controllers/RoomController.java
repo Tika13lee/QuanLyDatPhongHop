@@ -103,5 +103,13 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/getRoomByEmployee")
+    public ResponseEntity<?> getRoomByEmployee(@RequestParam String phone){
+        try {
+            return ResponseEntity.ok(roomService.getRoomByEmployee(phone));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

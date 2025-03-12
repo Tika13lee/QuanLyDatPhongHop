@@ -21,4 +21,5 @@ public interface IRoom {
     public List<Room> searchRoomByName(String roomName);
     public RoomDTO getRoomById(Long roomId) throws DataNotFoundException;
     public List<RoomViewDTO> getRoomOverView(String branch, Date dayStart, Date dayEnd) throws DataNotFoundException;
+    public List<Room> getRoomByEmployee(String phone) throws DataNotFoundException;
 }

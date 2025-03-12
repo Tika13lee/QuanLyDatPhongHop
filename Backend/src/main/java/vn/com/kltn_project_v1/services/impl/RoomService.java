@@ -157,6 +157,11 @@ public class RoomService implements IRoom {
         }).toList();
     }
 
+    @Override
+    public List<Room> getRoomByEmployee(String phone) throws DataNotFoundException {
+        return reservationRepository.findDistinctRoomsByBookerPhone(phone);
+    }
+
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         return rooms.stream().map(this::convertRoomToDTO).toList();
     }

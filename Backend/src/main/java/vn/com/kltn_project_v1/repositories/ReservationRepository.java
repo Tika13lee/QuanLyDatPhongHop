@@ -3,6 +3,7 @@ package vn.com.kltn_project_v1.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import vn.com.kltn_project_v1.model.Reservation;
+import vn.com.kltn_project_v1.model.Room;
 
 import java.util.Date;
 import java.util.List;
@@ -15,4 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findReservationsByStatusReservationPending();
     @Query("select r from Reservation r where r.statusReservation = 'WAITING_CANCEL'")
     List<Reservation> findReservationsByStatusReservationWaitingCancel();
+    @Query("SELECT DISTINCT r.room FROM Reservation r WHERE r.booker.phone = ?1")
+    List<Room> findDistinctRoomsByBookerPhone(String phone);
+
 }
