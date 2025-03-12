@@ -162,6 +162,32 @@ public class RoomService implements IRoom {
         return reservationRepository.findDistinctRoomsByBookerPhone(phone);
     }
 
+    @Override
+    public List<Room> searchRoomByAttribute(String[] branchs, int minCapacity, int maxCapacity, int minPrice, int maxPrice, TypeRoom[] typeRooms) throws DataNotFoundException {
+        ArrayList<Room> rooms = new ArrayList<>();
+        for (String branch : branchs) {
+            List<Room> roomsByBranch = roomRepository.findByBranch(branch);
+            rooms.addAll(roomsByBranch);
+        }
+
+
+        if (maxCapacity!=0){
+            List<Room> roomsByCapacity = roomRepository.findRoomsByCapacityRange(minCapacity, maxCapacity);
+            rooms.retainAll(roomsByCapacity);
+        }
+        if (maxPrice!=0){
+            List<Room> roomsByPrice = roomRepository.findRoomsByPriceRange(minPrice, maxPrice);
+            rooms.retainAll(roomsByPrice);
+        }
+        
+        for (TypeRoom typeRoom : typeRooms) {
+            List<Room> roomsByTypeRoom = roomRepository.findRoomsByTypeRoom(typeRoom);
+            rooms.retainAll(roomsByTypeRoom);
+        }
+        return rooms;
+
+    }
+
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         return rooms.stream().map(this::convertRoomToDTO).toList();
     }

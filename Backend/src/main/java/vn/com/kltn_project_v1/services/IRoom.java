@@ -7,6 +7,7 @@ import vn.com.kltn_project_v1.exceptions.DataNotFoundException;
 import vn.com.kltn_project_v1.model.Location;
 import vn.com.kltn_project_v1.model.Room;
 import vn.com.kltn_project_v1.model.StatusRoom;
+import vn.com.kltn_project_v1.model.TypeRoom;
 
 import java.util.Date;
 import java.util.List;
@@ -22,4 +23,5 @@ public interface IRoom {
     public RoomDTO getRoomById(Long roomId) throws DataNotFoundException;
     public List<RoomViewDTO> getRoomOverView(String branch, Date dayStart, Date dayEnd) throws DataNotFoundException;
     public List<Room> getRoomByEmployee(String phone) throws DataNotFoundException;
+    public List<Room> searchRoomByAttribute(String[] branch, int minCapacity, int maxCapacity, int minPrice, int maxPrice, TypeRoom[] typeRoom) throws DataNotFoundException;
 }

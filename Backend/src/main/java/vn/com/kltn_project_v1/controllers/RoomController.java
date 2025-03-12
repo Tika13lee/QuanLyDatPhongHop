@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RoomDTO;
 import vn.com.kltn_project_v1.model.Room;
 import vn.com.kltn_project_v1.model.StatusRoom;
+import vn.com.kltn_project_v1.model.TypeRoom;
 import vn.com.kltn_project_v1.services.IDevice;
 import vn.com.kltn_project_v1.services.IRoom;
 
@@ -107,6 +108,24 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
     public ResponseEntity<?> getRoomByEmployee(@RequestParam String phone){
         try {
             return ResponseEntity.ok(roomService.getRoomByEmployee(phone));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/searchRoomByAttribute")
+    public ResponseEntity<?> searchRoomByAttribute(@RequestParam String[] branchs, @RequestParam(defaultValue = "0") int minCapacity, @RequestParam(defaultValue = "0") int maxCapacity, @RequestParam(defaultValue = "0") int minPrice, @RequestParam(defaultValue = "0") int maxPrice, @RequestParam TypeRoom[] typeRooms){
+        try {
+
+            System.out.println(minCapacity);
+            System.out.println(maxCapacity);
+            System.out.println(minPrice);
+            System.out.println(maxPrice);
+            for (TypeRoom typeRoom : typeRooms) {
+                System.out.println(typeRoom);
+
+            }
+
+            return ResponseEntity.ok(roomService.searchRoomByAttribute(branchs, minCapacity, maxCapacity, minPrice, maxPrice, typeRooms));
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
