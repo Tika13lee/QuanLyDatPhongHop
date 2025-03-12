@@ -28,7 +28,7 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "departmentId")
     private Department department;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @JoinColumn(name = "accountId")
     private Account account;

@@ -92,5 +92,13 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/getRoomOverView")
+    public ResponseEntity<?> getRoomOverView(@RequestParam String branch){
+        try {
+            return ResponseEntity.ok(roomService.getRoomOverView(branch));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.com.kltn_project_v1.model.Frequency;
+import vn.com.kltn_project_v1.model.StatusReservation;
 
 import java.util.Date;
 import java.util.List;
@@ -25,5 +26,5 @@ public class ReservationDTO {
     private long roomId;
     private List<Long> employeeIds;
     private List<Long> serviceIds;
-
+    private StatusReservation statusReservation;
 }

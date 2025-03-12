@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.com.kltn_project_v1.dtos.*;
+import vn.com.kltn_project_v1.dtos.Overview.RoomViewDTO;
 import vn.com.kltn_project_v1.entityRespones.RoomRespone;
 import vn.com.kltn_project_v1.exceptions.DataNotFoundException;
 import vn.com.kltn_project_v1.model.*;
@@ -138,6 +139,18 @@ public class RoomService implements IRoom {
          Room room = roomRepository.findById(roomId)
                 .orElseThrow(()->new DataNotFoundException("Room not found"));
             return ConverRoomToDTO(room);
+    }
+
+    @Override
+    public List<RoomViewDTO> getRoomOverView(String branch) throws DataNotFoundException {
+        List<Room> rooms = roomRepository.findByBranch(branch);
+        List<RoomViewDTO> roomViewDTOS = rooms.stream().map(room -> {
+            RoomViewDTO roomViewDTO = new RoomViewDTO();
+            roomViewDTO.setRoomId(room.getRoomId());
+            roomViewDTO.setRoomName(room.getRoomName());
+            return roomViewDTO;
+        }).toList();
+        return roomViewDTOS;
     }
 
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){

@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.services;
 
+import vn.com.kltn_project_v1.dtos.Overview.RoomViewDTO;
 import vn.com.kltn_project_v1.dtos.RoomDTO;
 import vn.com.kltn_project_v1.entityRespones.RoomRespone;
 import vn.com.kltn_project_v1.exceptions.DataNotFoundException;
@@ -18,4 +19,5 @@ public interface IRoom {
     public Room addApproverToRoom(Long roomId, String phoneApprover) throws DataNotFoundException;
     public List<Room> searchRoomByName(String roomName);
     public RoomDTO getRoomById(Long roomId) throws DataNotFoundException;
+    public List<RoomViewDTO> getRoomOverView(String branch) throws DataNotFoundException;
 }

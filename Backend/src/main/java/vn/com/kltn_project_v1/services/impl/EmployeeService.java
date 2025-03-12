@@ -39,7 +39,11 @@ public class EmployeeService implements IEmployee {
 
     @Override
     public void deleteEmployee(Long employeeId) {
-        employeeRepository.deleteById(employeeId);
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+        if(employee != null){
+            employee.setActived(false);
+            employeeRepository.save(employee);
+        }
     }
 
     @Override
