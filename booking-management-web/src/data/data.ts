@@ -1,3 +1,9 @@
+export type RoomViewProps = {
+  roomId: number;
+  roomName: string;
+  reservationViewDTOS: ReservationProps[];
+}
+
 // location
 export type LocationProps = {
   locationId?: number;
@@ -80,6 +86,21 @@ export const locations: LocationProps[] = [
   },
 ];
 
+// nhân viên
+export type EmployeeProps = {
+  employeeId: number;
+  employeeName: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  actived: boolean;
+  department: {
+    departmentId: number;
+    depName: string;
+    location: LocationProps;
+  };
+};
+
 // Tìm vị trí theo id
 const findLocationById = (id: number): LocationProps | undefined =>
   locations.find((location) => location.locationId === id);
@@ -90,8 +111,8 @@ export type RoomProps = {
   roomName: string;
   location: LocationProps;
   capacity: number;
-  roomImg: string[];
-  price: number;
+  imgs: string[];
+  price: PriceProps;
   typeRoom: string;
   statusRoom: string;
   approvers: {
@@ -156,33 +177,124 @@ export type ServiceProps = {
 
 // đặt phòng
 export type ReservationProps = {
-  id: number;
+  reservationId: number;
   time: string;
   timeStart: string;
   timeEnd: string;
+  title: string;
+  img: string;
+  nameBooker: string;
+  statusReservation: string,
+};
+export type ReservationDetailProps = {
+  reservationId: number;
+  time: string; 
+  timeStart: string; // ISO Date string
+  timeEnd: string; // ISO Date string
+  timeCheckIn: string; // ISO Date string
+  timeCheckOut: string; // ISO Date string
   note: string;
+  filePaths: string[];
   description: string;
   title: string;
-  services?: ServiceProps[];
-  frequency?: string;
-  approvalType: boolean;
+  total: number;
+  frequency: string;
+  statusReservation: string;
+
   booker: {
-    id: number;
-    name: string;
-    img: string;
+    employeeId: number;
+    employeeName: string;
+    email: string;
+    phone: string;
+    avatar: string | null;
+    department: {
+      departmentId: number;
+      depName: string;
+      location: {
+        locationId: number;
+        branch: string;
+        building: string;
+        floor: string;
+        number: string;
+      };
+    };
+    actived: boolean;
   };
+
+  attendants: {
+    employeeId: number;
+    employeeName: string;
+    email: string;
+    phone: string;
+    avatar: string | null;
+    department: {
+      departmentId: number;
+      depName: string;
+      location: {
+        locationId: number;
+        branch: string;
+        building: string;
+        floor: string;
+        number: string;
+      };
+    };
+    actived: boolean;
+  }[];
+
+  services?: {
+    serviceId: number;
+    serviceName: string;
+    description: string;
+    price: {
+      priceId: number;
+      value: number;
+      timeApply: string;
+      type: string;
+    };
+  }[];
+
   room: {
     roomId: number;
     roomName: string;
-    location: LocationProps;
     capacity: number;
-    roomImg: string[];
-    price: number;
-    typeRoom: string;
     statusRoom: string;
-    devices: RoomDeviceProps[];
+    typeRoom: string;
+    location: {
+      locationId: number;
+      branch: string;
+      building: string;
+      floor: string;
+      number: string;
+    };
+    price: {
+      priceId: number;
+      value: number;
+      timeApply: string;
+      type: string;
+    };
+    imgs: string[];
+    approver: {
+      employeeId: number;
+      employeeName: string;
+      email: string;
+      phone: string;
+      avatar: string | null;
+      department: {
+        departmentId: number;
+        depName: string;
+        location: {
+          locationId: number;
+          branch: string;
+          building: string;
+          floor: string;
+          number: string;
+        };
+      };
+      actived: boolean;
+    };
   };
 };
+
 
 export const devices: DeviceProps[] = [
   {
@@ -236,10 +348,10 @@ export const rooms: RoomProps[] = [
     roomName: "Phòng họp A",
     location: findLocationById(1)!,
     capacity: 20,
-    roomImg: [
+    imgs: [
       "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg",
     ],
-    price: 100,
+    price: { priceID: 1, value: 100, time: "2025-03-01", type: "Giờ" },
     approvers: [
       { id: 1, name: "Nguyễn Văn A" },
       { id: 2, name: "Trần Thị B" },
@@ -284,10 +396,10 @@ export const rooms: RoomProps[] = [
     roomName: "Phòng họp B",
     location: findLocationById(2)!,
     capacity: 30,
-    roomImg: [
+    imgs: [
       "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-9.jpg",
     ],
-    price: 120,
+    price: { priceID: 1, value: 100, time: "2025-03-01", type: "Giờ" },
     approvers: [
       { id: 3, name: "Lê Hoàng C" },
       { id: 4, name: "Phạm Thị D" },
@@ -324,10 +436,10 @@ export const rooms: RoomProps[] = [
     roomName: "Phòng họp C",
     location: findLocationById(3)!,
     capacity: 15,
-    roomImg: [
+    imgs: [
       "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-10.jpg",
     ],
-    price: 80,
+    price: { priceID: 1, value: 100, time: "2025-03-01", type: "Giờ" },
     approvers: [
       { id: 5, name: "Nguyễn Thị E" },
       { id: 6, name: "Trần Minh F" },
@@ -355,10 +467,10 @@ export const rooms: RoomProps[] = [
     roomName: "Phòng họp D",
     location: findLocationById(4)!,
     capacity: 40,
-    roomImg: [
+    imgs: [
       "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-11.jpg",
     ],
-    price: 150,
+    price: { priceID: 1, value: 100, time: "2025-03-01", type: "Giờ" },
     approvers: [
       { id: 7, name: "Phan Văn G" },
       { id: 8, name: "Lý Thị H" },
@@ -386,10 +498,10 @@ export const rooms: RoomProps[] = [
     roomName: "Phòng họp E",
     location: findLocationById(5)!,
     capacity: 25,
-    roomImg: [
+    imgs: [
       "https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-12.jpg",
     ],
-    price: 110,
+    price: { priceID: 1, value: 100, time: "2025-03-01", type: "Giờ" }, 
     approvers: [
       { id: 9, name: "Bùi Đức I" },
       { id: 10, name: "Đỗ Mai J" },
@@ -422,37 +534,37 @@ export const rooms: RoomProps[] = [
   },
 ];
 
-export const reservations: ReservationProps[] = [
-  {
-    id: 1,
-    time: "2025-03-01",
-    timeStart: "08:00",
-    timeEnd: "10:00",
-    note: "Họp nhóm",
-    description: "Họp nhóm",
-    title: "Họp nhóm",
-    approvalType: true,
-    booker: {
-      id: 1,
-      name: "Nguyễn Văn A",
-      img: "https://i.pravatar.cc/150?img=1",
-    },
-    room: rooms[0],
-  },
-  {
-    id: 2,
-    time: "2025-03-03",
-    timeStart: "10:30",
-    timeEnd: "12:00",
-    note: "Họp dự án",
-    description: "Họp dự án",
-    title: "Họp dự án",
-    approvalType: false,
-    booker: {
-      id: 2,
-      name: "Trần Thị B",
-      img: "https://i.pravatar.cc/150?img=2",
-    },
-    room: rooms[1],
-  },
-];
+// export const reservations: ReservationProps[] = [
+//   {
+//     id: 1,
+//     time: "2025-03-01",
+//     timeStart: "08:00",
+//     timeEnd: "10:00",
+//     note: "Họp nhóm",
+//     description: "Họp nhóm",
+//     title: "Họp nhóm",
+//     approvalType: true,
+//     booker: {
+//       id: 1,
+//       name: "Nguyễn Văn A",
+//       img: "https://i.pravatar.cc/150?img=1",
+//     },
+//     room: rooms[0],
+//   },
+//   {
+//     id: 2,
+//     time: "2025-03-03",
+//     timeStart: "10:30",
+//     timeEnd: "12:00",
+//     note: "Họp dự án",
+//     description: "Họp dự án",
+//     title: "Họp dự án",
+//     approvalType: false,
+//     booker: {
+//       id: 2,
+//       name: "Trần Thị B",
+//       img: "https://i.pravatar.cc/150?img=2",
+//     },
+//     room: rooms[1],
+//   },
+// ];

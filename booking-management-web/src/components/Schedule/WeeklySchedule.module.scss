@@ -94,6 +94,9 @@
     position: relative;
     min-height: 50px;
     transition: background 0.2s ease-in-out;
+    padding: 10px;
+    height: 50px;
+    min-width: 150px;
   }
 
   th {
@@ -111,14 +114,25 @@
   }
 }
 
-/* Xóa viền giữa các ô đặt lịch */
-.booked + .booked {
-  border-top: none !important;
+.scheduleTable thead th:first-child,
+.scheduleTable tbody td:first-child {
+  border: none !important;
+  width: auto;
+  min-width: 85px;
+  max-width: 150px;
 }
+
+.scheduleTable tbody td:first-child {
+  text-align: right;
+  vertical-align: super;
+  padding: 0;
+  padding-right: 10px;
+}
+
 
 /* Tô màu FULL */
 .booked {
-  background: rgba(255, 183, 3, 0.8); /* Màu vàng đậm hơn */
+  background: rgba(255, 183, 3, 0.8);
   font-weight: bold;
   transition: background 0.3s ease-in-out;
   color: #fff;

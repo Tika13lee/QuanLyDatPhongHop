@@ -1,65 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Employee.module.scss";
+import { EmployeeProps } from "../../../data/data";
+import useFetch from "../../../hooks/useFetch";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
-interface Employee {
-  id: number;
-  name: string;
-  email: string;
-  age: number;
-  phone: string;
-  image: string;
-  position: string;
-  department: string;
-}
-
-const EmployeeManagement: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: 1,
-      name: "Nguyen Van A",
-      email: "nguyenvana@example.com",
-      age: 30,
-      phone: "0901234567",
-      image: "https://via.placeholder.com/50",
-      position: "Developer",
-      department: "IT",
-    },
-    {
-      id: 2,
-      name: "Nguyen Van A",
-      email: "nguyenvana@example.com",
-      age: 30,
-      phone: "0901234567",
-      image: "https://via.placeholder.com/50",
-      position: "Developer",
-      department: "IT",
-    },
-    {
-      id: 3,
-      name: "Nguyen Van A",
-      email: "nguyenvana@example.com",
-      age: 30,
-      phone: "0901234567",
-      image: "https://via.placeholder.com/50",
-      position: "Developer",
-      department: "IT",
-    },
-    {
-      id: 4,
-      name: "Nguyen Van A",
-      email: "nguyenvana@example.com",
-      age: 30,
-      phone: "0901234567",
-      image: "https://via.placeholder.com/50",
-      position: "Developer",
-      department: "IT",
-    },
-  ]);
-  const [form, setForm] = useState<Partial<Employee>>({});
+const EmployeeManagement = () => {
+  const [employees, setEmployees] = useState<EmployeeProps[]>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<Partial<EmployeeProps>>({});
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // Lấy dữ liệu locations từ Redux Store
+  const {
+    locations,
+    loading: locationsLoading,
+    error: locationsError,
+  } = useSelector((state: RootState) => state.location);
+
+  const {
+    data,
+    loading: fetchLoading,
+    error: fetchError,
+  } = useFetch<EmployeeProps[]>(
+    "http://localhost:8080/api/v1/employee/getAllEmployee"
+  );
+
+  useEffect(() => {
+    if (data) {
+      setEmployees(data);
+      setLoading(false);
+    }
+    if (fetchError) {
+      setError(fetchError.message || "Đã xảy ra lỗi khi tải dữ liệu");
+      setLoading(false);
+    }
+  }, [data, fetchError]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -67,81 +47,87 @@ const EmployeeManagement: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    if (editingId) {
-      setEmployees(
-        employees.map((emp) =>
-          emp.id === editingId ? ({ ...emp, ...form } as Employee) : emp
-        )
-      );
-      setEditingId(null);
-    } else {
-      setEmployees([...employees, { id: Date.now(), ...form } as Employee]);
-    }
-    setForm({});
-  };
+  // const handleSubmit = () => {
+  //   if (editingId) {
+  //     setEmployees(
+  //       employees?.map((emp) =>
+  //         emp.employeeId === editingId ? ({ ...emp, ...form } as EmployeeProps) : emp
+  //       )
+  //     );
+  //     setEditingId(null);
+  //   } else {
+  //     setEmployees([...employees, { id: Date.now(), ...form } as EmployeeProps]);
+  //   }
+  //   setForm({});
+  // };
 
-  const handleEdit = (employee: Employee) => {
-    setForm(employee);
-    setEditingId(employee.id);
-  };
-
-  const handleDelete = (id: number) => {
-    setEmployees(employees.filter((emp) => emp.id !== id));
-  };
+  // const handleEdit = (employee: EmployeeProps) => {
+  //   setForm(employee);
+  //   setEditingId(employee.employeeId);
+  // };
 
   return (
     <div className={cx("employee-container")}>
       <div className={cx("form-container")}>
-        <input
-          name="name"
-          placeholder="Tên"
-          value={form.name || ""}
-          onChange={handleInputChange}
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email || ""}
-          onChange={handleInputChange}
-        />
-        <input
-          name="age"
-          placeholder="Tuổi"
-          type="number"
-          value={form.age?.toString() || ""}
-          onChange={handleInputChange}
-        />
-        <input
-          name="phone"
-          placeholder="Điện thoại"
-          value={form.phone || ""}
-          onChange={handleInputChange}
-        />
-        <input
-          name="image"
-          placeholder="Hình ảnh URL"
-          value={form.image || ""}
-          onChange={handleInputChange}
-        />
-        <input
-          name="position"
-          placeholder="Vị trí"
-          value={form.position || ""}
-          onChange={handleInputChange}
-        />
-        <select
-          name="department"
-          value={form.department || ""}
-          onChange={handleInputChange}
-        >
-          <option value="IT">IT</option>
-          <option value="HR">HR</option>
-          <option value="Marketing">Marketing</option>
-        </select>
-        <button onClick={handleSubmit}>
-          {editingId ? "Cập nhật" : "Thêm"}
-        </button>
+        <div className={cx("form-image")}>
+          <h3>Chọn hình ảnh</h3>
+          <input
+            name="avatar"
+            placeholder="Hình ảnh URL"
+            value={form.avatar || ""}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={cx("form-input")}>
+          <h3>Nhập thông tin</h3>
+          <input
+            name="employeeName"
+            placeholder="Tên"
+            value={form.employeeName || ""}
+            onChange={handleInputChange}
+          />
+          <input
+            name="email"
+            placeholder="Email"
+            value={form.email || ""}
+            onChange={handleInputChange}
+          />
+          <input
+            name="phone"
+            placeholder="Điện thoại"
+            value={form.phone || ""}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className={cx("form-select")}>
+          <h3>Chọn thông tin</h3>
+          <select name="departmentId">
+            <option value="">Chọn phòng ban</option>
+            <option value="1">Phòng ban 1</option>
+            <option value="2">Phòng ban 2</option>
+            <option value="3">Phòng ban 3</option>
+          </select>
+          <select>
+            <option value="">Chọn chi nhánh</option>
+            {[
+              ...new Set(locations?.map((location) => location.branch) || []),
+            ].map((branch, index) => (
+              <option key={index} value={branch}>
+                {branch}
+              </option>
+            ))}
+          </select>
+          <select name="departmentId">
+            <option value="">Chọn trạng thái</option>
+            <option value="1">Còn hoạt động</option>
+            <option value="2">Đã ngừng</option>
+          </select>
+        </div>
+
+        <div className={cx("form-button")}>
+          <button>{editingId ? "Cập nhật" : "Thêm"}</button>
+        </div>
       </div>
 
       <div className={cx("table-wrapper")}>
@@ -151,32 +137,30 @@ const EmployeeManagement: React.FC = () => {
               <th>Hình ảnh</th>
               <th>Tên</th>
               <th>Email</th>
-              <th>Tuổi</th>
               <th>Điện thoại</th>
-              <th>Vị trí</th>
               <th>Phòng ban</th>
+              <th>Vị trí</th>
               <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.id}>
+            {employees?.map((emp) => (
+              <tr key={emp.employeeId}>
                 <td>
                   <img
-                    src={emp.image}
+                    src={emp.avatar}
                     alt=""
                     className={cx("employee-image")}
                   />
                 </td>
-                <td>{emp.name}</td>
+                <td>{emp.employeeName}</td>
                 <td>{emp.email}</td>
-                <td>{emp.age}</td>
                 <td>{emp.phone}</td>
-                <td>{emp.position}</td>
-                <td>{emp.department}</td>
+                <td>{emp.department.depName}</td>
+                <td>{emp.department.location.branch}</td>
                 <td>
-                  <button onClick={() => handleEdit(emp)}>✏️</button>
-                  <button onClick={() => handleDelete(emp.id)}>🗑️</button>
+                  <button>✏️</button>
+                  <button>🗑️</button>
                 </td>
               </tr>
             ))}

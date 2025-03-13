@@ -8,11 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { login } from "../../features/authSlice";
 import useFetch from "../../hooks/useFetch";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
 const Navbar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   const [searchOpen, setSearchOpen] = useState(false);
@@ -71,6 +73,11 @@ const Navbar = () => {
     setDebounceTimer(newTimer);
   };
 
+  const handleResultClick = (roomId: string) => {
+    // Điều hướng đến trang chi tiết của phòng
+    navigate(`room/detail/${roomId}`);
+  };
+
   return (
     <div className={cx("navbar-container")}>
       <div className={cx("navbar")}>
@@ -105,7 +112,11 @@ const Navbar = () => {
                   <p>Lỗi khi tìm kiếm</p>
                 ) : rooms && rooms.length > 0 ? (
                   rooms.map((room, index) => (
-                    <div key={index} className={cx("result-item")}>
+                    <div
+                      key={index}
+                      className={cx("result-item")}
+                      onClick={() => handleResultClick(room.roomId)}
+                    >
                       {room.roomName}
                     </div>
                   ))

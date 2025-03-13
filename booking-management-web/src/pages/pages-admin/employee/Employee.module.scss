@@ -1,62 +1,141 @@
 .employee-container {
   flex: 1;
-  margin: 20px auto;
   padding: 20px;
-  border-radius: 8px;
-  font-family: Arial, sans-serif;
-
 }
 
 .form-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-  background: #fff;
+  margin: 0 auto;
   padding: 20px;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  input,
-  select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s ease;
-
-    &:focus {
-      border-color: #007bff;
-    }
-  }
-
-  button {
-    grid-column: span 2;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #0056b3;
-    }
-  }
-
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
+.form-image,
+.form-input,
+.form-select {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.form-image input,
+.form-input input,
+.form-select select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-input input:focus,
+.form-select select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+.form-select select {
+  background-color: #fff;
+}
+
+.form-button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.form-button button {
+  padding: 10px 24px;
+  background-color: #4a90e2;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-button button:hover {
+  background-color: #357ab7;
+}
+
+.form-button button:focus {
+  outline: none;
+}
+
+
+// table
 .table-wrapper {
   max-height: 300px;
   overflow-y: auto;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #fff;
-  padding: 0 10px;
+  margin-top: 20px;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-scroll-track);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--bg-scroll-thumb);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-scroll-thumb-hover);
+  }
+
+  table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+    background: #fff;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #f4f4f4;
+    z-index: 10;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  .employee-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
 
   button {
     padding: 5px 10px;
@@ -86,42 +165,3 @@
     }
   }
 }
-
-// table {
-//   width: 100%;
-//   min-width: 800px;
-//   border-collapse: collapse;
-//   background: #fff;
-// }
-
-// thead {
-//   position: sticky;
-//   top: 0;
-//   background-color: #f4f4f4;
-//   z-index: 10;
-// }
-
-// th,
-// td {
-//   padding: 10px;
-//   border-bottom: 1px solid #ddd;
-//   text-align: left;
-//   white-space: nowrap;
-// }
-
-// th {
-//   background-color: #f4f4f4;
-//   font-weight: bold;
-//   text-transform: uppercase;
-// }
-
-// tr:hover {
-//   background-color: #f1f1f1;
-// }
-
-// .employee-image {
-//   width: 40px;
-//   height: 40px;
-//   border-radius: 50%;
-//   object-fit: cover;
-// }

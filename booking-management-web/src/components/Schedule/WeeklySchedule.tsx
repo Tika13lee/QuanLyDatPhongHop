@@ -81,6 +81,19 @@ const WeeklySchedule = () => {
     ).padStart(2, "0")}`;
   };
 
+  const calculateRowSpan = (
+    startTime: string,
+    endTime: string,
+    interval: number
+  ) => {
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
+
+    return Math.ceil(
+      (end.getTime() - start.getTime()) / (interval * 60 * 1000)
+    );
+  };
+
   return (
     <div className={cx("scheduleContainer")}>
       <div className={cx("header")}>
@@ -147,11 +160,13 @@ const WeeklySchedule = () => {
                       );
                     });
 
-                    const isStartTime =
-                      bookedSchedule?.timeStart.split("T")[1].split(":")[0] ===
-                        time.split(":")[0] &&
-                      bookedSchedule?.timeStart.split("T")[1].split(":")[1] ===
-                        time.split(":")[1];
+                    // const isStartTime =
+                    //   bookedSchedule?.timeStart.split("T")[1].split(":")[0] ===
+                    //     time.split(":")[0] &&
+                    //   bookedSchedule?.timeStart.split("T")[1].split(":")[1] ===
+                    //     time.split(":")[1];
+
+                    console.log(bookedSchedule?.timeStart);
 
                     return (
                       <td
@@ -159,9 +174,8 @@ const WeeklySchedule = () => {
                         className={cx("schedule-cell", {
                           booked: !!bookedSchedule,
                         })}
-                        colSpan={isStartTime ? 1 : 0}
                       >
-                        {bookedSchedule && isStartTime ? (
+                        {bookedSchedule ? (
                           <div className={cx("booked-title")}>
                             {bookedSchedule?.title}
                           </div>

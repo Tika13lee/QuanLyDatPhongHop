@@ -6,18 +6,44 @@
 }
 
 .approval-list {
-  width: 350px;
+  width: 400px;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-color);
 
   &__header {
-    padding: 10px;
+    padding: 10px 0 0;
     color: var(--text-primary);
-    font-size: 20px;
     font-weight: 500;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
+
+    p {
+      margin: 0;
+      font-size: 20px;
+    }
+  }
+}
+
+.header-actions {
+  margin-top: 20px;
+  display: flex;
+  // gap: 10px;
+
+  div {
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+  }
+
+  .active {
+    background: var(--bg-active);
+    color: var(--color-white);
   }
 }
 

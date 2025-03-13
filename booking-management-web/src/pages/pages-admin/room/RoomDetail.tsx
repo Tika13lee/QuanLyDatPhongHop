@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { setSelectedRoom } from "../../../features/roomSlice";
 import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import { RoomDeviceProps,  } from "../../../data/data";
+import { RoomDeviceProps } from "../../../data/data";
 
 const cx = classNames.bind(styles);
 
@@ -38,6 +38,7 @@ const RoomDetail = () => {
   const [isModelEditOpen, setIsModelEditOpen] = useState(false);
   const [view, setView] = useState<"week" | "month">("week");
 
+  const dispatch = useDispatch();
   const { id } = useParams();
   const {
     data: roomDetail,
@@ -46,7 +47,6 @@ const RoomDetail = () => {
   } = useFetch<any>(
     id ? `http://localhost:8080/api/v1/room/getRoomById?roomId=${id}` : ""
   );
-  const dispatch = useDispatch();
 
   // lưu room vào Redux Store
   useEffect(() => {
@@ -60,12 +60,14 @@ const RoomDetail = () => {
   // Nếu có dữ liệu từ API, sử dụng dữ liệu này
   const room = roomDetail || defaultRoom;
 
+  // Hàm chuyển đổi view
   const toggleView = () => {
     setView(view === "week" ? "month" : "week");
   };
 
   const handleOpenModal = () => {
     setIsModelEditOpen(true);
+    console.log("Edit room");
   };
 
   const handleCloseModal = () => {
@@ -115,6 +117,64 @@ const RoomDetail = () => {
               <div className={cx("btn-edit")} onClick={handleOpenModal}>
                 <IconWrapper icon={MdOutlineEdit} size={22} />
               </div>
+              {isModelEditOpen && (
+                <div className={cx("modal-overlay")} onClick={handleCloseModal}>
+                  <div
+                    className={cx("modal-content")}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <h2>Chỉnh sửa thông tin</h2>
+
+                    <div className={cx("input-group")}>
+                      <label htmlFor="room-name">Tên phòng</label>
+                      <input
+                        type="text"
+                        id="room-name"
+                        defaultValue={roomDetail.roomName}
+                      />
+                    </div>
+
+                    <div className={cx("input-group")}>
+                      <label htmlFor="room-capacity">Sức chứa</label>
+                      <input
+                        type="text"
+                        id="room-capacity"
+                        defaultValue={roomDetail.capacity}
+                      />
+                    </div>
+
+                    <div className={cx("input-group")}>
+                      <label htmlFor="room-type">Loại phòng</label>
+                      <select id="room-type" defaultValue={roomDetail.typeRoom}>
+                        <option value="Mặc định">Mặc định</option>
+                        <option value="Cao cấp">Cao cấp</option>
+                        <option value="Tiêu chuẩn">Tiêu chuẩn</option>
+                      </select>
+                    </div>
+
+                    <div className={cx("input-group")}>
+                      <label htmlFor="room-status">Trạng thái</label>
+                      <select
+                        id="room-status"
+                        defaultValue={roomDetail.statusRoom}
+                      >
+                        <option value="Có sẵn">Có sẵn</option>
+                        <option value="Đã đặt">Đã đặt</option>
+                        <option value="Chờ phê duyệt">Chờ phê duyệt</option>
+                      </select>
+                    </div>
+
+                    <button className={cx("btn-save")}>Lưu</button>
+
+                    <button
+                      className={cx("close-button")}
+                      onClick={handleCloseModal}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={cx("room-details")}>

@@ -22,7 +22,7 @@ function ListRoom() {
 
   // lấy dữ liệu lọc từ form tìm kiếm
   const [filters, setFilters] = useState({
-    // branch: "",
+    branch: "",
     capacity: "",
     price: "",
     statusRoom: "",
@@ -31,7 +31,7 @@ function ListRoom() {
   const [rooms, setRooms] = useState<RoomProps[]>([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const pageSize = 7;
+  const pageSize = 6;
 
   // Gọi API lấy danh sách phòng của trang 1
   useEffect(() => {
@@ -59,7 +59,7 @@ function ListRoom() {
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/v1/room/searchRooms?capacity=${filters.capacity}&statusRoom=${filters.statusRoom}&price=${filters.price}`
+        `http://localhost:8080/api/v1/room/searchRooms?capacity=${filters.capacity}&statusRoom=${filters.statusRoom}&price=${filters.price}&branch=${filters.branch}`
       );
       setRooms(response.data.roomDTOS);
       console.log(response)
@@ -80,7 +80,12 @@ function ListRoom() {
           <div className={cx("form-row")}>
             <div className={cx("form-group")}>
               <label>Chi nhánh:</label>
-              <select>
+              <select
+                value={filters.branch}
+                onChange={(e) => {
+                  setFilters({ ...filters, branch: e.target.value });
+                }}
+              >
                 <option value="">Chọn chi nhánh</option>
                 {[
                   ...new Set(
@@ -168,7 +173,7 @@ function ListRoom() {
                       : "Không có thông tin vị trí"}
                   </td>
                   <td>{room.capacity}</td>
-                  <td>${room.price}</td>
+                  <td>${room.price.value}</td>
                   <td>
                     {Array.isArray(room.approvers) && room.approvers.length > 0
                       ? room.approvers.map((approver) => (

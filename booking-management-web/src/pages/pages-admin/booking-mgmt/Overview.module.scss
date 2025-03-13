@@ -38,7 +38,7 @@
   border: none;
   border-radius: 5px;
   background-color: var(--btn-main);
-  color: white;
+  color: var(--color-white);
   cursor: pointer;
   transition: background 0.3s ease;
 }
@@ -89,6 +89,13 @@
     min-width: 150px;
   }
 
+  .time-column {
+    min-width: 100px;
+    width: 10 0px;
+    max-width: 120px;
+    white-space: nowrap;
+  }
+
   .cell {
     background-color: var(--color-white);
     cursor: pointer;
@@ -123,9 +130,9 @@
 .schedule-table thead th:first-child,
 .schedule-table tbody td:first-child {
   border: none !important;
-  width: auto;
-  min-width: 85px;
-  max-width: 150px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
 }
 
 .schedule-table tbody td:first-child {
@@ -133,4 +140,63 @@
   vertical-align: super;
   padding: 0;
   padding-right: 10px;
+}
+
+.booked {
+  background: rgba(255, 183, 3, 0.8);
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+  color: #fff;
+  cursor: pointer;
+}
+
+// Modal
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.2s;
+
+  &:hover {
+    color: red;
+  }
+}
+
+// Hiệu ứng mở modal
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
