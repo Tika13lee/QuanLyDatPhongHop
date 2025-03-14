@@ -11,4 +11,5 @@ public interface IEmployee {
     public void deleteEmployee(Long employeeId);
     public Employee getEmployeeByPhone(String phone);
     public List<Employee> getAllEmployee();
+
 }

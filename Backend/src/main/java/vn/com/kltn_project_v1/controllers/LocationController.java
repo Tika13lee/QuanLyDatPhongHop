@@ -14,26 +14,38 @@ import vn.com.kltn_project_v1.services.ILocation;
 public class LocationController {
     @Autowired
     private ILocation locationService;
-    private ModelMapper modelMapper = new ModelMapper();
     @GetMapping("/getAllLocation")
     public ResponseEntity<?> getAllLocation() {
         return ResponseEntity.ok(locationService.getAllLocation());
     }
     @PostMapping("/addLocation")
-    public ResponseEntity<?> addLocation(@RequestBody LocationDTO locationDTO) {
-        return ResponseEntity.ok(locationService.addLocation(new Location(locationDTO.getBranch(), locationDTO.getBuilding(), locationDTO.getFloor(), locationDTO.getNumber())));
+    public ResponseEntity<?> addLocation(@RequestParam Long buildingId, @RequestParam String floor) {
+        return ResponseEntity.ok(locationService.addLocation(buildingId, floor));
     }
-    @PutMapping("/upDateLocation")
-    public ResponseEntity<?> upDateLocation(@RequestBody LocationDTO locationDTO) {
-        return ResponseEntity.ok(locationService.upDateLocation(modelMapper.map(locationDTO, Location.class)));
+
+    @GetMapping("/getAllBranch")
+    public ResponseEntity<?> getAllBranch() {
+        return ResponseEntity.ok(locationService.getAllBranch());
     }
-    @GetMapping("/getLocationsByRoomIsNull")
-    public ResponseEntity<?> getLocationsByRoomIsNull() {
-        return ResponseEntity.ok(locationService.findLocationsByRoomIsNull());
+    @GetMapping("/getAllBuilding")
+    public ResponseEntity<?> getAllBuilding() {
+        return ResponseEntity.ok(locationService.getAllBuilding());
     }
-    @DeleteMapping("/deleteLocation")
-    public ResponseEntity<?> deleteLocation(@RequestBody LocationDTO locationDTO) {
-        locationService.DeleteLocation(modelMapper.map(locationDTO, Location.class));
-        return ResponseEntity.ok().build();
+    @GetMapping("/getLocationsByBuildingName")
+    public ResponseEntity<?> getLocationsByBuildingName(@RequestParam String buildingName) {
+        return ResponseEntity.ok(locationService.getLocationsByBuildingName(buildingName));
     }
+    @GetMapping("/getBuildingsByBranchName")
+    public ResponseEntity<?> getBuildingsByBranchName(@RequestParam String branchName) {
+        return ResponseEntity.ok(locationService.getBuildingsByBranchName(branchName));
+    }
+    @GetMapping("/getLocationsByBuildingId")
+    public ResponseEntity<?> getLocationsByBuildingId(@RequestParam Long buildingId) {
+        return ResponseEntity.ok(locationService.getLocationsByBuildingId(buildingId));
+    }
+    @GetMapping("/getLocationsByBranchName")
+    public ResponseEntity<?> getLocationsByBranchName(@RequestParam String branchName) {
+        return ResponseEntity.ok(locationService.getLocationsByBranchName(branchName));
+    }
+
 }

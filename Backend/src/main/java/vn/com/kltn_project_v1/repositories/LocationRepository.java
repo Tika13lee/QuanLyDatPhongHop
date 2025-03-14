@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
-    Optional<Location> findLocationByBranchAndBuildingAndFloorAndNumber (String branch, String building, String floor, String number);
     List<Location> findLocationsByRoomIsNull() ;
+    List<Location> findLocationsByBuilding_BuildingId(Long buildingId);
+    List<Location> findLocationsByBuildingBranchBranchName(String branchName);
+    List<Location> findLocationsByBuilding_BuildingName(String buildingName);
 }

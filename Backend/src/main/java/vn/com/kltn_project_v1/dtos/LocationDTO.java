@@ -14,7 +14,6 @@ public class LocationDTO {
     private String branch;
     private String building;
     private String floor;
-    private String number;
 
 
 }

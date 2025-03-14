@@ -14,19 +14,13 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long locationId;
-    private String branch;
-    private String building;
     private String floor;
-    private String number;
-
+    @ManyToOne
+    @JoinColumn(name = "buildingId")
+    private Building building;
     @OneToOne(mappedBy = "location",fetch = FetchType.LAZY)
     @JsonIgnore
     private Room room;
 
-    public Location(String branch, String building, String floor, String number) {
-        this.branch = branch;
-        this.building = building;
-        this.floor = floor;
-        this.number = number;
-    }
+
 }

@@ -37,7 +37,7 @@ public class RoomService implements IRoom {
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
         Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
-        Location location = locationRepository.findLocationByBranchAndBuildingAndFloorAndNumber(roomDTO.getLocation().getBranch(),roomDTO.getLocation().getBuilding(),roomDTO.getLocation().getFloor(),roomDTO.getLocation().getNumber())
+        Location location = locationRepository.findById(roomDTO.getLocation().getLocationId())
                 .orElseThrow(()->new DataNotFoundException("Location not found"));
         Room room = Room.builder()
                 .roomName(roomDTO.getRoomName())
@@ -70,21 +70,23 @@ public class RoomService implements IRoom {
     public List<Room> getRoomsByBranch( Long locationId) throws DataNotFoundException {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(()->new DataNotFoundException("Location not found"));
-        List<Room> rooms = roomRepository.findByBranch(location.getBranch());
+        List<Room> rooms = roomRepository.findByBranch(location.getBuilding().getBranch().getBranchName());
 
-        rooms.sort(Comparator.comparing((Room r) -> {
-                            boolean sameBuilding = r.getLocation().getBuilding().equals(location.getBuilding());
-                            boolean sameFloor = r.getLocation().getFloor().equals(location.getFloor());
+        rooms.sort(Comparator
+                .comparingInt((Room r) -> {
+                    boolean sameBuilding = r.getLocation().getBuilding().getBuildingName().equals(location.getBuilding().getBuildingName());
+                    boolean sameFloor = r.getLocation().getFloor().equals(location.getFloor());
 
-                            if (sameBuilding && sameFloor) return 1; // Cùng Building & Floor
-                            if (sameBuilding) return 2; // Cùng Building nhưng khác Floor
-                            if (sameFloor) return 3; // Cùng Floor nhưng khác Building
-                            return 4; // Cả Building & Floor đều khác
-                        })
-                        .thenComparing(r -> r.getLocation().getBuilding()) // Sắp xếp theo Building
-                        .thenComparing(r -> r.getLocation().getFloor()) // Sắp xếp theo Floor
-                        .thenComparing(Room::getRoomName)
+                    if (sameBuilding && sameFloor) return 1; // Cùng Building & Floor
+                    if (sameBuilding) return 2; // Cùng Building nhưng khác Floor
+                    if (sameFloor) return 3; // Cùng Floor nhưng khác Building
+                    return 4; // Cả Building & Floor đều khác
+                })
+                .thenComparing(r -> r.getLocation().getBuilding().getBuildingName()) // Sắp xếp theo Building Name
+                .thenComparing(r -> r.getLocation().getFloor()) // Sắp xếp theo Floor
+                .thenComparing(Room::getRoomName) // Cuối cùng theo Room Name
         );
+
 
         return rooms;
     }
@@ -179,11 +181,15 @@ public class RoomService implements IRoom {
             List<Room> roomsByPrice = roomRepository.findRoomsByPriceRange(minPrice, maxPrice);
             rooms.retainAll(roomsByPrice);
         }
-        
-        for (TypeRoom typeRoom : typeRooms) {
-            List<Room> roomsByTypeRoom = roomRepository.findRoomsByTypeRoom(typeRoom);
+        if(typeRooms.length!=0) {
+            List<Room> roomsByTypeRoom = new ArrayList<>();
+            for (TypeRoom typeRoom : typeRooms) {
+                List<Room> roomsByType = roomRepository.findRoomsByTypeRoom(typeRoom);
+                roomsByTypeRoom.addAll(roomsByType);
+            }
             rooms.retainAll(roomsByTypeRoom);
-        }
+        };
+
         return rooms;
 
     }
@@ -199,10 +205,9 @@ public class RoomService implements IRoom {
         roomDTO.setStatusRoom(room.getStatusRoom().name());
         roomDTO.setTypeRoom(room.getTypeRoom());
         LocationDTO locationDTO = new LocationDTO();
-        locationDTO.setBranch(room.getLocation().getBranch());
-        locationDTO.setBuilding(room.getLocation().getBuilding());
+        locationDTO.setBranch(room.getLocation().getBuilding().getBranch().getBranchName());
+        locationDTO.setBuilding(room.getLocation().getBuilding().getBuildingName());
         locationDTO.setFloor(room.getLocation().getFloor());
-        locationDTO.setNumber(room.getLocation().getNumber());
         roomDTO.setLocation(locationDTO);
 
         try {

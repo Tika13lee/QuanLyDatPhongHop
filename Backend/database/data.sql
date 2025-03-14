@@ -44,6 +44,47 @@ INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`) VALUES
 	(12, '123', b'0', '0919642921'),
 	(13, '1111', b'0', '0934707416');
 
+-- Dumping structure for table ql_datphong.branch
+CREATE TABLE IF NOT EXISTS `branch` (
+  `branch_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `branch_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`branch_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dumping data for table ql_datphong.branch: ~3 rows (approximately)
+INSERT INTO `branch` (`branch_id`, `branch_name`) VALUES
+	(1, 'TP. Hồ Chí Minh'),
+	(2, 'Hà Nội'),
+	(3, 'Đà Nẵng');
+
+-- Dumping structure for table ql_datphong.building
+CREATE TABLE IF NOT EXISTS `building` (
+  `building_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `building_name` varchar(255) DEFAULT NULL,
+  `branch_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`building_id`),
+  KEY `FKm5b5l1b9f611y750y6uegr4kx` (`branch_id`),
+  CONSTRAINT `FKm5b5l1b9f611y750y6uegr4kx` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`branch_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dumping data for table ql_datphong.building: ~15 rows (approximately)
+INSERT INTO `building` (`building_id`, `building_name`, `branch_id`) VALUES
+	(1, 'A', 1),
+	(2, 'B', 1),
+	(3, 'C', 1),
+	(4, 'D', 1),
+	(5, 'E', 1),
+	(6, 'B', 2),
+	(7, 'A', 2),
+	(8, 'C', 2),
+	(9, 'D', 2),
+	(10, 'E', 2),
+	(11, 'A', 3),
+	(12, 'B', 3),
+	(13, 'C', 3),
+	(14, 'D', 3),
+	(15, 'E', 3);
+
 -- Dumping structure for table ql_datphong.cancel_reservation
 CREATE TABLE IF NOT EXISTS `cancel_reservation` (
   `cancel_id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -130,34 +171,35 @@ INSERT INTO `employee` (`employee_id`, `avatar`, `email`, `employee_name`, `is_a
 -- Dumping structure for table ql_datphong.location
 CREATE TABLE IF NOT EXISTS `location` (
   `location_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `branch` varchar(255) DEFAULT NULL,
-  `building` varchar(255) DEFAULT NULL,
   `floor` varchar(255) DEFAULT NULL,
-  `number` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `building_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`location_id`),
+  KEY `FKc5g968pkh4pjgf69m88cwyx3q` (`building_id`),
+  CONSTRAINT `FKc5g968pkh4pjgf69m88cwyx3q` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table ql_datphong.location: ~19 rows (approximately)
-INSERT INTO `location` (`location_id`, `branch`, `building`, `floor`, `number`) VALUES
-	(1, 'Hồ Chí Minh', 'A', '1', '02'),
-	(2, 'Hà Nội', 'B', '1', '01'),
-	(3, 'Hồ Chí Minh', 'A', '2', '01'),
-	(4, 'Hồ Chí Minh', 'B', '1', '01'),
-	(5, 'Hồ Chí Minh', 'A', '1', '01'),
-	(6, 'Hồ Chí Minh', 'B', '2', '01'),
-	(7, 'Hồ Chí Minh', 'A', '2', '03'),
-	(8, 'Hồ Chí Minh', 'A', '2', '02'),
-	(9, 'Hồ Chí Minh', 'B', '1', '02'),
-	(11, 'Hồ Chí Minh', 'A', '3', '04'),
-	(12, 'Hồ Chí Minh', 'A', '3', '05'),
-	(13, 'Hồ Chí Minh', 'A', '3', '01'),
-	(14, 'Hồ Chí Minh', 'A', '3', '02'),
-	(15, 'Hồ Chí Minh', 'A', '3', '03'),
-	(16, 'Hồ Chí Minh', 'A', '3', '06'),
-	(17, 'Hồ Chí Minh', 'A', '3', '07'),
-	(18, 'Hồ Chí Minh', 'A', '3', '08'),
-	(19, 'Hồ Chí Minh', 'A', '3', '09'),
-	(20, 'Hồ Chí Minh', 'A', '3', '10');
+INSERT INTO `location` (`location_id`, `floor`, `building_id`) VALUES
+	(1, '1', 1),
+	(2, '1', 2),
+	(3, '2', 1),
+	(4, '1', 7),
+	(5, '1', 11),
+	(6, '2', 2),
+	(7, '2', 3),
+	(8, '2', 4),
+	(9, '1', 4),
+	(11, '3', 1),
+	(12, '3', 7),
+	(13, '3', 2),
+	(14, '3', 3),
+	(15, '3', 4),
+	(16, '3', 6),
+	(17, '3', 12),
+	(18, '3', 5),
+	(19, '3', 9),
+	(20, '3', 14),
+	(22, '4', 1);
 
 -- Dumping structure for table ql_datphong.log
 CREATE TABLE IF NOT EXISTS `log` (
@@ -179,9 +221,9 @@ CREATE TABLE IF NOT EXISTS `price` (
   `type` enum('DEVICE','ROOM','SERVICE') DEFAULT NULL,
   `value` int(11) NOT NULL,
   PRIMARY KEY (`price_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.price: ~29 rows (approximately)
+-- Dumping data for table ql_datphong.price: ~39 rows (approximately)
 INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 	(1, '2025-02-28 00:39:47.000000', 'ROOM', 100),
 	(2, '2025-02-28 00:39:47.000000', 'ROOM', 110),
@@ -341,9 +383,9 @@ CREATE TABLE IF NOT EXISTS `room` (
   CONSTRAINT `FKeu3mfjn8pcwbb7jh9rb6tcs32` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`),
   CONSTRAINT `FKj7m6our9ety1o5mxrmpgen6qp` FOREIGN KEY (`approver_id`) REFERENCES `employee` (`employee_id`),
   CONSTRAINT `FKrqejnp96gs9ldf7o6fciylxkt` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.room: ~16 rows (approximately)
+-- Dumping data for table ql_datphong.room: ~15 rows (approximately)
 INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_room`, `location_id`, `price_id`, `approver_id`) VALUES
 	(1, 4, 'Maria', 'AVAILABLE', 'DEFAULT', 4, 1, 1),
 	(2, 4, 'Vokka', 'AVAILABLE', 'DEFAULT', 6, 3, 1),
@@ -354,7 +396,7 @@ INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_roo
 	(9, 4, 'Phòng họp tài chính', 'AVAILABLE', 'VIP', 13, 36, NULL),
 	(10, 4, 'Phòng họp A3.02', 'AVAILABLE', 'VIP', 14, 37, NULL),
 	(11, 4, 'Matcha 1A', 'AVAILABLE', 'VIP', 15, 38, NULL),
-	(12, 4, 'Visiusss', 'AVAILABLE', 'VIP', 11, 39, NULL),
+	(12, 4, 'Visiusss', 'AVAILABLE', 'DEFAULT', 11, 39, NULL),
 	(13, 4, 'Salabeto', 'AVAILABLE', 'VIP', 12, 40, NULL),
 	(14, 4, 'Alaxender', 'AVAILABLE', 'VIP', 16, 41, NULL),
 	(15, 4, 'Napolaon', 'AVAILABLE', 'VIP', 17, 42, NULL),
@@ -373,7 +415,7 @@ CREATE TABLE IF NOT EXISTS `room_device` (
   CONSTRAINT `FKi0ck9pu6eoan6rntpybydtp29` FOREIGN KEY (`device_id`) REFERENCES `device` (`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.room_device: ~10 rows (approximately)
+-- Dumping data for table ql_datphong.room_device: ~19 rows (approximately)
 INSERT INTO `room_device` (`quantity`, `room_id`, `device_id`) VALUES
 	(1, 1, 1),
 	(1, 3, 1),
@@ -403,7 +445,7 @@ CREATE TABLE IF NOT EXISTS `room_imgs` (
   CONSTRAINT `FKrnck0q2se0qpxlgrq4e17b3mi` FOREIGN KEY (`room_room_id`) REFERENCES `room` (`room_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.room_imgs: ~5 rows (approximately)
+-- Dumping data for table ql_datphong.room_imgs: ~25 rows (approximately)
 INSERT INTO `room_imgs` (`room_room_id`, `imgs`) VALUES
 	(7, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
 	(7, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
