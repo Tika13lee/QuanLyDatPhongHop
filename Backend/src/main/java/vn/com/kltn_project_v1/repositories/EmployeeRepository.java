@@ -11,4 +11,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findEmployeeByPhone(String phone);
     @Query("select e from Employee e where e.isActived = true")
     List<Employee> findAll();
+    @Query("select e from Employee e where (e.phone like %?1%) or (e.employeeName like %?1%)")
+    List<Employee> findEmployeeByPhoneOrName(String phoneOrName);
+
+    @Query("select e from Employee e where (:depName ='' or e.department.depName = :depName) and e.isActived = :isActived and (:branchName ='' or e.department.location.building.branch.branchName = :branchName)")
+    List<Employee> findEmployeeByDepartmentOrActivedOrBranch(String depName, boolean isActived, String branchName);
 }

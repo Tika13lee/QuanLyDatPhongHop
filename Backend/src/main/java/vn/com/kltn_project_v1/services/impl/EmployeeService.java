@@ -38,11 +38,13 @@ public class EmployeeService implements IEmployee {
     }
 
     @Override
-    public void deleteEmployee(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
-        if(employee != null){
-            employee.setActived(false);
-            employeeRepository.save(employee);
+    public void deleteEmployee(List<Long> employeeIds) {
+        for(Long employeeId : employeeIds){
+            Employee employee = employeeRepository.findById(employeeId).orElse(null);
+            if(employee != null){
+                employee.setActived(false);
+                employeeRepository.save(employee);
+            }
         }
     }
 
@@ -55,6 +57,17 @@ public class EmployeeService implements IEmployee {
     public List<Employee> getAllEmployee() {
         return employeeRepository.findAll();
     }
+
+    @Override
+    public List<Employee> getEmployeeByPhoneOrName(String phoneOrName) {
+        return employeeRepository.findEmployeeByPhoneOrName(phoneOrName);
+    }
+
+    @Override
+    public List<Employee> getEmployeeByDepartmentOrActivedOrBranch(String depName, boolean isActived, String branchName) {
+        return employeeRepository.findEmployeeByDepartmentOrActivedOrBranch(depName, isActived, branchName);
+    }
+
     Employee ConvertToEntity(EmployeeDTO employeeDTO){
         Employee employee = modelMapper.map(employeeDTO, Employee.class);
         employee.setDepartment(departmentRepository.findById(employeeDTO.getDepartmentId()).orElse(null));

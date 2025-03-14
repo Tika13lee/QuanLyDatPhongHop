@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.EmployeeDTO;
 import vn.com.kltn_project_v1.services.IEmployee;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/employee")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -24,13 +26,21 @@ public class EmployeeController {
     public ResponseEntity<?> upDateEmployee(@RequestBody EmployeeDTO employeeDTO) {
         return ResponseEntity.ok(employeeService.upDateEmployee(employeeDTO));
     }
-    @DeleteMapping("/deleteEmployee")
-    public ResponseEntity<?> deleteEmployee(@RequestParam Long employeeId) {
-        employeeService.deleteEmployee(employeeId);
+    @DeleteMapping("/nonActiveEmployee")
+    public ResponseEntity<?> deleteEmployee(@RequestBody List<Long> employeeIds) {
+        employeeService.deleteEmployee(employeeIds);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/getEmployeeByPhone")
     public ResponseEntity<?> getEmployeeByPhone(@RequestParam String phone) {
         return ResponseEntity.ok(employeeService.getEmployeeByPhone(phone));
+    }
+    @GetMapping("/getEmployeeByPhoneOrName")
+    public ResponseEntity<?> getEmployeeByPhoneOrName(@RequestParam String phoneOrName) {
+        return ResponseEntity.ok(employeeService.getEmployeeByPhoneOrName(phoneOrName));
+    }
+    @GetMapping("/getEmployeeByDepartmentOrActivedOrBranch")
+    public ResponseEntity<?> getEmployeeByDepartmentOrActivedOrBranch(@RequestParam(defaultValue = "") String depName, @RequestParam(defaultValue = "true") boolean isActived, @RequestParam(defaultValue = "") String branchName) {
+        return ResponseEntity.ok(employeeService.getEmployeeByDepartmentOrActivedOrBranch(depName, isActived, branchName));
     }
 }
