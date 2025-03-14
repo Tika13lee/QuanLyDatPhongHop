@@ -18,9 +18,6 @@ public class Device {
     private String deviceName;
     @Column(columnDefinition = "NVARCHAR(255)")
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "priceId")
-    private Price price;
 
     public Device(String deviceName, String description) {
         this.deviceName = deviceName;

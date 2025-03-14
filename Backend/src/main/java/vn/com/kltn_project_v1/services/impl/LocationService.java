@@ -51,6 +51,21 @@ public class LocationService implements ILocation {
     }
 
     @Override
+    public Branch addBranch(String branchName) {
+        Branch branch = new Branch();
+        branch.setBranchName(branchName);
+        return branchRepository.save(branch);
+    }
+
+    @Override
+    public Building addBuilding(String buildingName, Long branchId) {
+        Building building = new Building();
+        building.setBuildingName(buildingName);
+        building.setBranch(branchRepository.findById(branchId).orElseThrow(()->new RuntimeException("Branch not found")));
+        return buildingRepository.save(building);
+    }
+
+    @Override
     public List<Building> getAllBuilding() {
         return buildingRepository.findAll();
     }

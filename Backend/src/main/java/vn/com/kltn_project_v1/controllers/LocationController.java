@@ -47,5 +47,12 @@ public class LocationController {
     public ResponseEntity<?> getLocationsByBranchName(@RequestParam String branchName) {
         return ResponseEntity.ok(locationService.getLocationsByBranchName(branchName));
     }
-
+    @PostMapping("/addBranch")
+    public ResponseEntity<?> addBranch(@RequestParam String branchName) {
+        return ResponseEntity.ok(locationService.addBranch(branchName));
+    }
+    @PostMapping("/addBuilding")
+    public ResponseEntity<?> addBuilding(@RequestParam String buildingName, @RequestParam Long branchId) {
+        return ResponseEntity.ok(locationService.addBuilding(buildingName, branchId));
+    }
 }

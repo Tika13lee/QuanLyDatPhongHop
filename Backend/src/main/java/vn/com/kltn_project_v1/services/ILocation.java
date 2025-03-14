@@ -13,6 +13,8 @@ public interface ILocation {
     public List<LocationDTO> findLocationsByRoomIsNull();
     public void DeleteLocation(Location location);
     public List<Branch> getAllBranch();
+    public Branch addBranch(String branchName);
+    public Building addBuilding(String buildingName, Long branchId);
     public List<Building> getAllBuilding();
     public List<LocationDTO> getLocationsByBuildingName(String buildingName);
     public List<Building> getBuildingsByBranchName(String branchName);

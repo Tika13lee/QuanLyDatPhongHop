@@ -38,14 +38,14 @@ public class DeviceService implements IDevice {
     public Device createDevice(DeviceDTO deviceDTO) {
         Price price = priceRepository.save(new Price(deviceDTO.getPrice(), new Date(), Type.DEVICE));
         Device device = modelMapper.map(deviceDTO, Device.class);
-        device.setPrice(price);
+
         return deviceRepository.save(device);
     }
 
     @Override
     public Device upDateDevice(DeviceDTO deviceDTO) {
         Device device = modelMapper.map(deviceDTO, Device.class);
-        device.setPrice(priceRepository.findById(deviceDTO.getPriceId()).orElse(null));
+
         return deviceRepository.save(device);
     }
 
