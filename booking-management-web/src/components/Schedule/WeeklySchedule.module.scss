@@ -97,6 +97,7 @@
     padding: 10px;
     height: 50px;
     min-width: 150px;
+    cursor: pointer;
   }
 
   th {
@@ -118,8 +119,10 @@
 .scheduleTable tbody td:first-child {
   border: none !important;
   width: auto;
-  min-width: 85px;
-  max-width: 150px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+  cursor: default;
 }
 
 .scheduleTable tbody td:first-child {
@@ -128,7 +131,6 @@
   padding: 0;
   padding-right: 10px;
 }
-
 
 /* Tô màu FULL */
 .booked {
@@ -162,4 +164,117 @@
   font-size: 13px;
   color: var(--color-white);
   font-weight: 400;
+}
+
+// modal
+// .modalOverlay {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background: rgba(0, 0, 0, 0.5);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// .modalContent {
+//   background: white;
+//   padding: 20px;
+//   border-radius: 10px;
+//   width: 300px;
+//   text-align: center;
+//   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+// }
+
+// .modalContent button {
+//   margin-top: 10px;
+//   padding: 8px 15px;
+//   border: none;
+//   background: #007bff;
+//   color: white;
+//   cursor: pointer;
+//   border-radius: 5px;
+// }
+
+// .modalContent button:hover {
+//   background: #0056b3;
+// }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 50%;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+
+  h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: color 0.3s;
+
+  &:hover {
+    color: var(--color-error);
+  }
+}
+
+.form-group {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.submit-btn {
+  display: flex;
+  justify-self: flex-end;
+  gap: 7px;
+  padding: 7px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-white);
+  background: var(--btn-add);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background: var(--btn-add-hover);
+  }
 }

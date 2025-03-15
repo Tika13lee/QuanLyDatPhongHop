@@ -142,23 +142,23 @@ const MainLayoutAdmin = () => {
             QL Nhân Viên
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/admin/settings"
             className={({ isActive }) =>
               cx("sidebar-item", { active: isActive })
             }
           >
             Cài Đặt Thiết Lập
-          </NavLink>
+          </NavLink> */}
 
-          <NavLink
+          {/* <NavLink
             to="/admin/statistics"
             className={({ isActive }) =>
               cx("sidebar-item", { active: isActive })
             }
           >
             Thống Kê
-          </NavLink>
+          </NavLink> */}
         </div>
 
         <Outlet />

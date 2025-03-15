@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./WeeklySchedule.module.scss";
+import { toast, ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 
@@ -16,23 +17,32 @@ const daysOfWeek = [
   "Chủ nhật",
 ];
 
-const WeeklySchedule = () => {
+const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
   const roomDetail = useSelector((state: RootState) => state.room.selectedRoom);
 
+  console.log(roomDetail);
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
 
-  // Kiểm tra dữ liệu: roomDetail và roomDetail.reservationDTOS có tồn tại và không rỗng
-  if (
-    !roomDetail ||
-    !roomDetail.reservationDTOS ||
-    roomDetail.reservationDTOS.length === 0
-  ) {
-    return <div>Không có dữ liệu đặt phòng.</div>;
-  }
+  const reservations = roomDetail?.reservationDTOS || [];
 
-  const reservations = roomDetail.reservationDTOS;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<{
+    date: string;
+    time: string;
+  } | null>(null);
+
+  const handleCellClick = (date: string, time: string) => {
+    const today = new Date().toISOString().split("T")[0];
+
+    if (date < today) {
+      toast.warning("Bạn không thể đặt lịch cho ngày trong quá khứ!");
+      return;
+    }
+    setSelectedSlot({ date, time });
+    setIsModalOpen(true);
+  };
 
   // hàm tạo mảng thời gian
   const timeSlots = Array.from({ length: 23 }, (_, i) => {
@@ -81,21 +91,9 @@ const WeeklySchedule = () => {
     ).padStart(2, "0")}`;
   };
 
-  const calculateRowSpan = (
-    startTime: string,
-    endTime: string,
-    interval: number
-  ) => {
-    const start = new Date(`2000-01-01T${startTime}`);
-    const end = new Date(`2000-01-01T${endTime}`);
-
-    return Math.ceil(
-      (end.getTime() - start.getTime()) / (interval * 60 * 1000)
-    );
-  };
-
   return (
     <div className={cx("scheduleContainer")}>
+      <ToastContainer />
       <div className={cx("header")}>
         <h2>Lịch đặt phòng theo tuần</h2>
 
@@ -160,12 +158,6 @@ const WeeklySchedule = () => {
                       );
                     });
 
-                    // const isStartTime =
-                    //   bookedSchedule?.timeStart.split("T")[1].split(":")[0] ===
-                    //     time.split(":")[0] &&
-                    //   bookedSchedule?.timeStart.split("T")[1].split(":")[1] ===
-                    //     time.split(":")[1];
-
                     console.log(bookedSchedule?.timeStart);
 
                     return (
@@ -174,6 +166,13 @@ const WeeklySchedule = () => {
                         className={cx("schedule-cell", {
                           booked: !!bookedSchedule,
                         })}
+                        onClick={() => {
+                          if (bookedSchedule) {
+                            toast.warning("Khung giờ này đã được đặt!");
+                          } else {
+                            handleCellClick(weekDates[i], time);
+                          }
+                        }}
                       >
                         {bookedSchedule ? (
                           <div className={cx("booked-title")}>
@@ -189,6 +188,120 @@ const WeeklySchedule = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Modal */}
+          {isModalOpen && selectedSlot && (
+            <div className={cx("modal-overlay")}>
+              <div className={cx("modal")}>
+                <button
+                  className={cx("close-btn")}
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  ✖
+                </button>
+                <h3>Đặt lịch phòng "{roomDetail?.roomName}"</h3>
+
+                <div className={cx("form-row")}>
+                  {/* chọn ngày */}
+                  <div className={cx("form-group")}>
+                    <label>Ngày</label>
+                    <input
+                      type="date"
+                      value={selectedSlot?.date || ""}
+                      onChange={(e) =>
+                        setSelectedSlot((prev) => ({
+                          ...prev!,
+                          date: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  {/* bắt đầu */}
+                  <div className={cx("form-group")}>
+                    <label>Giờ bắt đầu</label>
+                    <select
+                      value={selectedSlot?.time || ""}
+                      onChange={(e) =>
+                        setSelectedSlot((prev) => ({
+                          ...prev!,
+                          time: e.target.value,
+                        }))
+                      }
+                    >
+                      {timeSlots.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* kết thúc */}
+                  <div className={cx("form-group")}>
+                    <label>Giờ kết thúc</label>
+                    <select>
+                      {timeSlots.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Tiêu đề cuộc họp */}
+                <div className={cx("form-group")}>
+                  <label>Tiêu đề</label>
+                  <input type="text" placeholder="Nhập tiêu đề cuộc họp" />
+                </div>
+
+                {/* Ghi chú */}
+                <div className={cx("form-group")}>
+                  <label>Ghi chú</label>
+                  <input type="text" placeholder="Nhập ghi chú" />
+                </div>
+
+                {/* Mô tả */}
+                <div className={cx("form-group")}>
+                  <label>Mô tả</label>
+                  <input type="text" placeholder="Nhập mô tả" />
+                </div>
+
+                <div className={cx("form-row")}>
+                  {/* Chọn tần suất */}
+                  <div className={cx("form-group")}>
+                    <label>Tần suất</label>
+                    <select>
+                      <option value="none">Không lặp lại</option>
+                      <option value="daily">Mỗi ngày</option>
+                      <option value="weekly">Mỗi tuần</option>
+                    </select>
+                  </div>
+
+                  {/* Chọn dịch vụ */}
+                  <div className={cx("form-group")}>
+                    <label>Dịch vụ</label>
+                    <div className={cx("checkbox-group")}>
+                      <select>
+                        <option value="none">Không chọn</option>
+                        <option value="coffee">Cà phê</option>
+                        <option value="tea">Trà</option>
+                        <option value="water">Nước</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Người tham gia */}
+                <div className={cx("form-group")}>
+                  <label>Người tham gia</label>
+                  <input type="text" placeholder="Nhập email người tham gia" />
+                </div>
+
+                {/* Nút gửi phê duyệt */}
+                <button className={cx("submit-btn")}>Gửi phê duyệt</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

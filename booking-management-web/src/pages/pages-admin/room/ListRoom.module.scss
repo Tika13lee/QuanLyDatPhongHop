@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  padding: 10px 0;
 }
 
 .search-container {
@@ -34,30 +35,6 @@ h3 {
   text-align: left;
 }
 
-label {
-  font-size: 14px;
-  font-weight: 600;
-  display: block;
-  margin-bottom: 5px;
-  color: var(--text-primary);
-}
-
-select,
-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: var(--border-focus);
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.1);
-  }
-}
-
 /* Nút tìm kiếm nâng cao */
 .btn-row {
   display: flex;
@@ -85,7 +62,7 @@ input {
 // table-room
 .table-wrapper {
   width: 97%;
-  height: 311px;
+  height: 390px;
   overflow-y: auto;
   border-radius: 5px;
   border: 1px solid var(--border-color);

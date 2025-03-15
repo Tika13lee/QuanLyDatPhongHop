@@ -22,6 +22,8 @@
   --bg-scroll-thumb-hover: #6b9ffb;
   --item-hover: aliceblue;
   --item-active: #b8d4f8;
+  --btn-add: #33CC33;
+  --btn-add-hover: #179817;
 }
 
 * {
@@ -54,4 +56,28 @@ ul {
 
 p {
   margin-bottom: 0;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-primary);
+}
+
+select,
+input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.1);
+  }
 }

@@ -52,9 +52,6 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
             <span>Hồ sơ cá nhân</span>
           </div>
           <div className={cx("dropdown-item")}>
-            <span>Lịch sử đặt phòng</span>
-          </div>
-          <div className={cx("dropdown-item")}>
             <span>Chế độ tối</span>
           </div>
           <div className={cx("dropdown-item")}>

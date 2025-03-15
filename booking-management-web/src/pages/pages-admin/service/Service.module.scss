@@ -5,10 +5,96 @@
   padding: 0 20px;
 }
 
-.service-header {
+// tìm kiếm
+.search-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--color-white);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  width: 300px;
+
+  input {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    height: 35px;
+  }
+
+  button {
+    height: 35px;
+    padding: 0 10px;
+    background: var(--btn-add);
+    color: var(--color-white);
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: var(--btn-add-hover);
+    }
+  }
+}
+
+// chức năng
+.function-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+
+  p {
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+.function-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-white);
+  background: var(--btn-add);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background: var(--btn-add-hover);
+  }
+}
+
+// modal
+.service-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .service-info {
@@ -17,12 +103,43 @@
   background: var(--color-white);
   border-radius: 5px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
 
   h3 {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 15px;
     text-align: center;
+  }
+}
+
+// Hiệu ứng mở modal
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: color 0.3s;
+
+  &:hover {
+    color: var(--color-error);
   }
 }
 
@@ -75,35 +192,12 @@
   margin-top: 10px;
 }
 
-.submit-btn {
-  width: 130px;
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--color-white);
-  background: var(--btn-main);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-right: 10px;
-}
-
-.submit-btn:last-child {
-  background: #f39c12;
-  margin-right: 0;
-}
-
-.submit-btn:hover {
-  opacity: 0.8;
-}
-
 // service table
 .service-list {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 10px;
   overflow-y: auto;
-  max-height: 330px;
+  max-height: 540px;
   border: 1px solid var(--border-color);
 
   &::-webkit-scrollbar {
@@ -157,18 +251,4 @@
   background-color: var(--bg-active);
   color: var(--color-white);
   font-weight: 500;
-}
-
-.edit-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  margin-right: 5px;
-  cursor: pointer;
-  border-radius: 3px;
-}
-
-.edit-btn:hover {
-  background-color: #0056b3;
 }

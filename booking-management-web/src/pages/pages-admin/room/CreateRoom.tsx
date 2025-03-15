@@ -1,45 +1,35 @@
 import classNames from "classnames/bind";
 import styles from "./CreateRoom.module.scss";
-import { LocationProps, statusesRoom, typeRoom } from "../../../data/data";
+import {
+  BranchProps,
+  BuildingProps,
+  LocationProps,
+  statusesRoom,
+  typeRoom,
+} from "../../../data/data";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 import usePost from "../../../hooks/usePost";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 
 const cx = classNames.bind(styles);
 
 const CreateRoom = () => {
-  // lấy dữ liệu devices từ Redux Store
-  const {
-    devices,
-    loading: devicesLoading,
-    error: devicesError,
-  } = useSelector((state: RootState) => state.device);
-
-  const {
-    data: locations,
-    loading: locationsLoading,
-    error: locationsError,
-  } = useFetch<LocationProps[]>(
-    "http://localhost:8080/api/v1/location/getLocationsByRoomIsNull"
-  );
-
-  // Dùng usePost để gửi dữ liệu lên API
-  const { data, loading, error, postData } = usePost(
-    "http://localhost:8080/api/v1/room/create"
-  );
-
+  const [buildings, setBuildings] = useState([]);
   // State lưu thông tin phòng họp
   const [roomData, setRoomData] = useState({
     roomName: "",
     capacity: "",
     price: "",
     location: {
-      branch: "",
-      building: "",
+      building: {
+        buildingName: "",
+        branch: {
+          branchName: "",
+        },
+      },
       floor: "",
-      number: "",
     },
     typeRoom: "",
     statusRoom: "",
@@ -47,36 +37,78 @@ const CreateRoom = () => {
     imgs: [] as string[],
   });
 
+  // lấy dữ liệu devices từ Redux Store
+  const {
+    devices,
+    loading: devicesLoading,
+    error: devicesError,
+  } = useSelector((state: RootState) => state.device);
+
+  // lấy chi nhánh
+  const {
+    data: branchs,
+    loading: branchsLoading,
+    error: branchsError,
+  } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
+  );
+
+  // Lấy danh sách tòa nhà theo chi nhánh
+  useEffect(() => {
+    if (!roomData.location?.building?.branch?.branchName) return;
+
+    fetch(
+      `http://localhost:8080/api/v1/location/getBuildingsByBranchName?branchName=${roomData.location.building.branch.branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setBuildings(data);
+      })
+      .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
+  }, [roomData.location?.building?.branch?.branchName]);
+
+  // Dùng usePost để gửi dữ liệu lên API
+  const { data, loading, error, postData } = usePost(
+    "http://localhost:8080/api/v1/room/create"
+  );
+
   // Xử lý thay đổi input
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
+    console.log(e.target.name, e.target.value);
     const { name, value } = e.target;
 
     setRoomData((prev) => {
-      if (name === "location") {
-        // Kiểm tra `locations` trước khi tìm
-        const selectedLocation = locations?.find(
-          (loc) => loc.locationId && loc.locationId.toString() === value
-        );
-
-        if (selectedLocation) {
-          return {
-            ...prev,
-            location: {
-              branch: selectedLocation.branch,
-              building: selectedLocation.building,
-              floor: selectedLocation.floor,
-              number: selectedLocation.number,
+      if (name === "branch") {
+        return {
+          ...prev,
+          location: {
+            ...prev.location,
+            building: {
+              ...prev.location.building,
+              branch: {
+                branchName: value, // Cập nhật branchName
+              },
             },
-          };
-        }
+          },
+        };
       }
 
-      return {
-        ...prev,
-        [name]: value,
-      };
+      if (name === "building") {
+        return {
+          ...prev,
+          location: {
+            ...prev.location,
+            building: {
+              ...prev.location.building,
+              buildingName: value,
+            },
+          },
+        };
+      }
+
+      return { ...prev, [name]: value };
     });
   };
 
@@ -150,23 +182,36 @@ const CreateRoom = () => {
     <div className={cx("create-container")}>
       <div className={cx("room-form-container")}>
         <form className={cx("form")}>
-          <div className={cx("column-container")}>
+          <div className={cx("form-group")}>
             {/* Chọn vị trí*/}
             <div className={cx("cover")}>
               <h3>Bước 1: Chọn vị trí</h3>
               <div className={cx("form-row")}>
-                <select name="location" onChange={handleChange}>
-                  <option value="">Chọn vị trí</option>
-                  {Array.isArray(locations) && locations.length > 0 ? (
-                    locations.map((loc) => (
-                      <option key={loc.locationId} value={loc.locationId}>
-                        {loc.branch} - {loc.building} - Tầng {loc.floor} - Phòng{" "}
-                        {loc.number}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="">Không có dữ liệu</option>
-                  )}
+                <select name="branch" onChange={handleChange}>
+                  <option value="">Chọn chi nhánh</option>
+                  {branchs?.map((branch) => (
+                    <option key={branch.branchId} value={branch.branchName}>
+                      {branch.branchName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={cx("form-row")}>
+                <select name="building" onChange={handleChange}>
+                  <option value="">Chọn tòa nhà</option>
+                  {buildings.map((building: BuildingProps) => (
+                    <option
+                      key={building.buildingId}
+                      value={building.buildingId}
+                    >
+                      {building.buildingName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={cx("form-row")}>
+                <select name="floor" onChange={handleChange}>
+                  <option value="">Chọn tầng</option>
                 </select>
               </div>
             </div>
@@ -233,8 +278,7 @@ const CreateRoom = () => {
               </div>
             </div>
           </div>
-
-          <div className={cx("column-container")}>
+          <div className={cx("form-group")}>
             {/* Nhập thông tin */}
             <div className={cx("cover")}>
               <h3>Bước 2: Nhập thông tin</h3>

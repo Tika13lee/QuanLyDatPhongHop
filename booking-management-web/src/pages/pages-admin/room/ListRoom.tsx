@@ -1,13 +1,12 @@
 import classNames from "classnames/bind";
 import styles from "./ListRoom.module.scss";
-import { RoomProps, rooms, statusesRoom } from "../../../data/data";
+import { RoomProps, RoomProps2, statusesRoom } from "../../../data/data";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
-import { useEffect, useRef, useState } from "react";
-import useFetch from "../../../hooks/useFetch";
+import { useEffect, useState } from "react"
 import axios from "axios";
 
 const cx = classNames.bind(styles);
@@ -28,10 +27,10 @@ function ListRoom() {
     statusRoom: "",
   });
 
-  const [rooms, setRooms] = useState<RoomProps[]>([]);
+  const [rooms, setRooms] = useState<RoomProps2[]>([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 10;
 
   // Gọi API lấy danh sách phòng của trang 1
   useEffect(() => {
@@ -75,7 +74,7 @@ function ListRoom() {
       {/* khung tìm kiếm */}
       <div className={cx("search-container")}>
         <div className={cx("advanced-search")}>
-          <h3>Tìm kiếm nâng cao (theo nhiều chỉ tiêu)</h3>
+          {/* <h3>Tìm kiếm nâng cao (theo nhiều chỉ tiêu)</h3> */}
 
           <div className={cx("form-row")}>
             <div className={cx("form-group")}>
@@ -169,11 +168,11 @@ function ListRoom() {
                   <td>{room.roomName}</td>
                   <td>
                     {room.location
-                      ? `${room.location.branch}, ${room.location.building}, tầng ${room.location.floor}, phòng ${room.location.number}`
+                      ? `${room.location.branch}, ${room.location.building}, tầng ${room.location.floor}`
                       : "Không có thông tin vị trí"}
                   </td>
                   <td>{room.capacity}</td>
-                  <td>${room.price.value}</td>
+                  <td>${room.price}</td>
                   <td>
                     {Array.isArray(room.approvers) && room.approvers.length > 0
                       ? room.approvers.map((approver) => (

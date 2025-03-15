@@ -42,7 +42,7 @@ function ApprovalList() {
 
   // Gọi API lấy chi tiết đặt phòng dựa trên ID đã chọn
   useEffect(() => {
-    if (!selectedReservationId) return; // Không gọi API nếu chưa chọn phòng
+    if (!selectedReservationId) return;
 
     setLoadingDetail(true);
     setErrorDetail(null);
@@ -154,10 +154,9 @@ function ApprovalList() {
               </p>
               <p className="room-location">
                 <strong>Vị trí:</strong>{" "}
-                {reservationDetail.room.location.branch} -{" "}
-                {reservationDetail.room.location.building} -{" "}
-                {reservationDetail.room.location.floor} -{" "}
-                {reservationDetail.room.location.number}
+                {reservationDetail.room.location.building.branch.branchName} -{" "}
+                {reservationDetail.room.location.building.buildingName} -{" "}
+                {reservationDetail.room.location.floor}
               </p>
               <p>
                 <strong>Loại phòng:</strong> {reservationDetail.room.typeRoom}

@@ -6,62 +6,51 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import {
   IoIosArrowDown,
   IoIosArrowForward,
-  MdArrowForward,
-  MdDeselect,
 } from "../../../components/icons/icons";
 import {
+  BranchProps,
   EmployeeProps,
   LocationProps,
   RoomProps,
-  rooms,
 } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import axios from "axios";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
-import { set } from "react-datepicker/dist/date_utils";
+import DatePicker from "react-datepicker";
 
 const cx = classNames.bind(styles);
 
-const branches = [
-  "Chi nhánh 1",
-  "Chi nhánh 2",
-  "Chi nhánh 3",
-  "Chi nhánh 4",
-  "Chi nhánh 5",
-  "Chi nhánh 6",
-  "Chi nhánh 7",
-  "Chi nhánh 8",
-  "Chi nhánh 9",
-  "Chi nhánh 10",
-];
+// Tạo danh sách giờ từ 08:00 đến 17:00, mỗi bước 30 phút
+const generateTimeSlots = () => {
+  const times = [];
+  for (let hour = 8; hour < 17; hour++) {
+    times.push(`${hour}:00`, `${hour}:30`);
+  }
+  times.push("17:00");
+  return times;
+};
+
+const timeSlots = generateTimeSlots();
+const durationOptions = [30, 60, 90, 120, 150, 180, 210, 240];
 
 function Booking() {
-  // hiển thị thêm chi nhánh
-  const [showMoreBranches, setShowMoreBranches] = useState(false);
-
   const [empPhone, setEmpPhone] = useState<string>("0914653334");
   const { data, loading, error } = useFetch<EmployeeProps>(
     `http://localhost:8080/api/v1/employee/getEmployeeByPhone?phone=${empPhone}`
   );
+
   const [locID, setLocID] = useState<number | undefined>(undefined);
   const [roomsData, setRoomsData] = useState<RoomProps[] | null>(null);
-  const [roomLoading, setRoomLoading] = useState<boolean>(false);
-  const [roomError, setRoomError] = useState<Error | null>(null);
   const [roomsUseData, setRoomsUseData] = useState<RoomProps[] | null>(null);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  
-  const [minCapacity, setMinCapacity] = useState<string>();
-  const [maxCapacity, setMaxCapacity] = useState<string>();
-  const [minPrice, setMinPrice] = useState<string>();
-  const [maxPrice, setMaxPrice] = useState<string>();
 
-  const {
-    data: locations,
-    loading: locationsLoading,
-    error: locationsError,
-  } = useFetch<LocationProps[]>(
-    "http://localhost:8080/api/v1/location/getAllLocation"
+  const today = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [startTime, setStartTime] = useState(timeSlots[0]);
+  const [duration, setDuration] = useState(30);
+  const [capacity, setCapacity] = useState<number>(1);
+
+  // Lấy danh sách chi nhánh
+  const { data: branches } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
   // Chỉ cập nhật locID khi data thay đổi
@@ -75,24 +64,16 @@ function Booking() {
   useEffect(() => {
     if (!locID) return;
 
-    setRoomLoading(true);
-    setRoomError(null);
-
     axios
       .get<RoomProps[]>(
         `http://localhost:8080/api/v1/room/getRoomsByBranch?locationId=${locID}`
       )
       .then((response) => {
         setRoomsData(response.data);
-      })
-      .catch((error) => {
-        setRoomError(error);
-      })
-      .finally(() => {
-        setRoomLoading(false);
       });
   }, [locID]);
 
+  // Gọi API khi empPhone thay đổi
   useEffect(() => {
     if (!empPhone) return;
 
@@ -109,156 +90,85 @@ function Booking() {
   const [showAll1, setShowAll1] = useState(false);
   const visibleRooms1 = showAll1
     ? roomsData
-    : roomsData?.slice(0, Math.min(4, roomsData.length));
+    : roomsData?.slice(0, Math.min(5, roomsData.length));
 
-  const toggleBranches = () => {
-    setShowMoreBranches((prev) => !prev);
-  };
-
-  // hiển thị tất cả phòng có sẵn
+  // hiển thị tất cả phòng đã đặt
   const [showAll2, setShowAll2] = useState(false);
   const visibleRooms2 = showAll2
     ? roomsUseData
-    : roomsUseData?.slice(0, Math.min(4, roomsUseData.length));
-
-  // loại bỏ các phòng trùng lặp
-  const uniqueLocations = locations
-    ? locations.filter(
-        (loc, index, self) =>
-          index === self.findIndex((l) => l.branch === loc.branch)
-      )
-    : [];
-
-  // xử lý khi thay đổi checkbox
-  const handleCheckboxChange = (value: string) => {
-    setSelectedFilters((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
-  };
-
-  console.log("selectedFilters", selectedFilters);
+    : roomsUseData?.slice(0, Math.min(5, roomsUseData.length));
 
   return (
     <div className={cx("booking-container")}>
-      <div className={cx("filter-room-container")}>
-        <div className={cx("filter-room")}>
-          <div className={cx("filter-room__header")}>
-            <h3>Lọc phòng</h3>
-            <div>
-              <IconWrapper icon={MdDeselect} />
-            </div>
-          </div>
-
-          {/* Loại phòng */}
-          <div className={cx("filter-section")}>
-            <h4>Loại phòng</h4>
-            <div className={cx("filter-room__item")}>
-              <label>
-                <input
-                  type="checkbox"
-                  value="DEFAULT"
-                  checked={selectedFilters.includes("DEFAULT")}
-                  onChange={(e) => handleCheckboxChange(e.target.value)}
-                />
-                Phòng mặc định
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  value={"VIP"}
-                  checked={selectedFilters.includes("VIP")}
-                  onChange={(e) => handleCheckboxChange(e.target.value)}
-                />
-                Phòng VIP
-              </label>
-              <label>
-                <input type="checkbox" 
-                value={"CONFERENCE"}
-                checked={selectedFilters.includes("CONFERENCE")}
-                onChange={(e) => handleCheckboxChange(e.target.value)}
-                />
-                Phòng hội nghị
-              </label>
-            </div>
-          </div>
-
-          {/* Sức chứa */}
-          <div className={cx("filter-section")}>
-            <h4>Sức chứa</h4>
-            <div className={cx("filter-room__item")}>
-              <label>
-                <input type="checkbox" 
-                value={0}
-                onChange={(e) => {
-                  if (e.target.checked && minCapacity === "30") {
-                    setMinCapacity(e.target.value);
-                    setMaxCapacity("10");
-                  }
-                }}
-                />
-                Dưới 10 người
-              </label>
-              <label>
-                <input type="checkbox" 
-                onChange={(e) => {
-                  if (e.target.checked && maxCapacity === "10" ) {
-                    setMinCapacity("0");
-                    setMaxCapacity("30");
-                  } else if (e.target.checked && minCapacity === "30") {
-                    setMinCapacity("10");
-                    setMaxCapacity("30");
-                  }
-                }}
-                />
-                Từ 10-30 người
-              </label>
-              <label>
-                <input type="checkbox" />
-                Trên 30 người
-              </label>
-            </div>
-          </div>
-
-          {/* Giá */}
-          <div className={cx("filter-section")}>
-            <h4>Giá</h4>
-            <div className={cx("filter-room__item")}>
-              <label>
-                <input type="checkbox" />
-                Dưới 1 triệu
-              </label>
-              <label>
-                <input type="checkbox" />1 - 5 triệu
-              </label>
-              <label>
-                <input type="checkbox" />
-                Trên 5 triệu
-              </label>
-            </div>
-          </div>
-
-          {/* Vị trí */}
-          <div className={cx("filter-section")}>
-            <h4>Vị trí</h4>
-            <div className={cx("filter-room__item")}>
-              {uniqueLocations?.map((location) => (
-                <label key={location.locationId}>
-                  <input
-                    type="checkbox"
-                    value={location.branch}
-                    onChange={(e) => handleCheckboxChange(e.target.value)}
-                  />
-                  {location.branch}
-                </label>
+      <div className={cx("booking-header")}>
+        <div className={cx("filters")}>
+          {/* Chọn chi nhánh */}
+          <div className={cx("filter-item")}>
+            <label>Chi nhánh</label>
+            <select>
+              {branches?.map((branch) => (
+                <option key={branch.branchId} value={branch.branchId}>
+                  {branch.branchName}
+                </option>
               ))}
-            </div>
-            {/* <div className={cx("filter-room__item")}>
-              <button className={cx("view-more-btn")} onClick={toggleBranches}>
-                {showMoreBranches ? "Ẩn bớt" : "Xem thêm"}
-              </button>
-            </div> */}
+            </select>
+          </div>
+
+          {/* Chọn ngày */}
+          <div className={cx("filter-item")}>
+            <label>Ngày</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
+          </div>
+
+          {/* Dropdown chọn giờ bắt đầu */}
+          <div className={cx("filter-item")}>
+            <label>Giờ bắt đầu</label>
+            <select
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            >
+              {timeSlots.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Dropdown chọn thời gian họp */}
+          <div className={cx("filter-item")}>
+            <label>Thời gian họp</label>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+            >
+              {durationOptions.map((minutes) => (
+                <option key={minutes} value={minutes}>
+                  {minutes} phút
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* sức chứa */}
+          <div className={cx("filter-item")}>
+            <label>Sức chứa</label>
+            <input
+              type="number"
+              min="1"
+              value={capacity}
+              onChange={(e) => setCapacity(Number(e.target.value))}
+              placeholder="Nhập số người"
+            />
+          </div>
+
+          {/* Nút tìm kiếm */}
+          <div>
+            <button className={cx("search-button")}>Tìm phòng</button>
           </div>
         </div>
       </div>
@@ -280,7 +190,7 @@ function Booking() {
             </div>
           </div>
           <div className={cx("room-grid")}>
-            <CardRoom rooms={visibleRooms1} />
+            <CardRoom rooms={visibleRooms1 ?? []} />
           </div>
 
           <div className={cx("room-list-header")}>
@@ -297,7 +207,7 @@ function Booking() {
             </div>
           </div>
           <div className={cx("room-grid")}>
-            <CardRoom rooms={visibleRooms2} />
+            <CardRoom rooms={visibleRooms2 ?? []} />
           </div>
         </div>
       </div>

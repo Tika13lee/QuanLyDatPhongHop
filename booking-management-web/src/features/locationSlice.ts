@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { LocationProps } from "../data/data";
+import { LocationProps, LocationProps2 } from "../data/data";
 
 // State ban đầu
 type LocationState = {
-  locations: LocationProps[];
+  locations: LocationProps2[];
   loading: boolean;
   error: string | null;
 };
@@ -19,7 +19,7 @@ const initialState: LocationState = {
 export const fetchLocations = createAsyncThunk(
   "location/fetchLocations",
   async () => {
-    const response = await axios.get<LocationProps[]>(
+    const response = await axios.get<LocationProps2[]>(
       "http://localhost:8080/api/v1/location/getAllLocation"
     );
     return response.data;

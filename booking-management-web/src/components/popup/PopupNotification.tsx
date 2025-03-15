@@ -6,13 +6,13 @@ const cx = classNames.bind(styles);
 
 type PopupNotificationProps = {
   message: string;
-  type: "success" | "error" | "info"; // Kiểu thông báo
+  type: "success" | "error" | "info";
   isOpen: boolean;
   onClose: () => void;
 };
 
 const PopupNotification: React.FC<PopupNotificationProps> = ({ message, type, isOpen, onClose }) => {
-  if (!isOpen) return null; // Không hiển thị nếu isOpen là false
+  if (!isOpen) return null;
 
   return (
     <div className={cx("popup-overlay")}>
@@ -23,6 +23,7 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({ message, type, is
           </button>
         </div>
         <div className={cx("popup-message")}>
+          <h2>Thông báo</h2>
           <p>{message}</p>
         </div>
       </div>

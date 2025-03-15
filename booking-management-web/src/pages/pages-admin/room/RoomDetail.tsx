@@ -224,9 +224,9 @@ const RoomDetail = () => {
           </div>
         </div>
 
-        <div className={cx("room-schedule-container")}>
+        {/* <div className={cx("room-schedule-container")}>
           {view === "week" ? <WeeklySchedule /> : <MonthlySchedule />}
-        </div>
+        </div> */}
       </div>
     </div>
   );

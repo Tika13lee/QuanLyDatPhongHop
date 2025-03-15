@@ -11,15 +11,6 @@ import { cp } from "fs";
 
 const cx = classNames.bind(styles);
 
-const rooms = [
-  { roomId: 1, roomName: "Phòng A" },
-  { roomId: 2, roomName: "Phòng B" },
-  { roomId: 3, roomName: "Phòng C" },
-  { roomId: 4, roomName: "Phòng D" },
-  { roomId: 5, roomName: "Phòng E" },
-  { roomId: 6, roomName: "Phòng L" },
-];
-
 const times = Array.from({ length: 23 }, (_, i) => {
   const hour = Math.floor(i / 2) + 7;
   const minute = i % 2 === 0 ? "00" : "30";
@@ -47,7 +38,8 @@ function Overview() {
     error: locationsError,
   } = useSelector((state: RootState) => state.location);
 
-  const [selectedBranch, setSelectedBranch] = useState<string>("Hồ Chí Minh");
+  const [selectedBranch, setSelectedBranch] =
+    useState<string>("TP. Hồ Chí Minh");
 
   const getStartOfDay = (dateString: string) => {
     const date = new Date(dateString);
@@ -246,91 +238,93 @@ function Overview() {
               &times;
             </span>
             {selectedReservationId ? (
-          loadingDetail ? (
-            <p>Đang tải chi tiết...</p>
-          ) : errorDetail ? (
-            <p className={cx("error")}>Lỗi: Không thể tải chi tiết</p>
-          ) : reservationDetail ? (
-            <div className={cx("approval-detail")}>
-              <h2>{reservationDetail.title}</h2>
-              <p>
-                <strong>Người đặt:</strong>{" "}
-                {reservationDetail.booker.employeeName}
-              </p>
-              <p>
-                <strong>Số điện thoại:</strong> {reservationDetail.booker.phone}
-              </p>
-              <p>
-                <strong>Email:</strong> {reservationDetail.booker.email}
-              </p>
-              <p>
-                <strong>Thời gian đặt:</strong>{" "}
-                {formatDateTime(reservationDetail.time)}
-              </p>
-              <p>
-                <strong>Thời gian lịch: </strong>
-                {reservationDetail.timeStart
-                  .split("T")[1]
-                  .substring(0, 5)} -{" "}
-                {formatDateTime(reservationDetail.timeEnd)}
-              </p>
-              <p>
-                <strong>Phòng:</strong> {reservationDetail.room.roomName}
-              </p>
-              <p className="room-location">
-                <strong>Vị trí:</strong>{" "}
-                {reservationDetail.room.location.branch} -{" "}
-                {reservationDetail.room.location.building} -{" "}
-                {reservationDetail.room.location.floor} -{" "}
-                {reservationDetail.room.location.number}
-              </p>
-              <p>
-                <strong>Loại phòng:</strong> {reservationDetail.room.typeRoom}
-              </p>
-              <p>
-                <strong>Trạng thái phòng:</strong>
-                <span
-                  className={cx("room-status", {
-                    available:
-                      reservationDetail.room.statusRoom === "AVAILABLE",
-                    occupied: reservationDetail.room.statusRoom === "OCCUPIED",
-                    maintenance:
-                      reservationDetail.room.statusRoom === "MAINTENANCE",
-                  })}
-                >
-                  {reservationDetail.room.statusRoom}
-                </span>
-              </p>
+              loadingDetail ? (
+                <p>Đang tải chi tiết...</p>
+              ) : errorDetail ? (
+                <p className={cx("error")}>Lỗi: Không thể tải chi tiết</p>
+              ) : reservationDetail ? (
+                <div className={cx("approval-detail")}>
+                  <h2>{reservationDetail.title}</h2>
+                  <p>
+                    <strong>Người đặt:</strong>{" "}
+                    {reservationDetail.booker.employeeName}
+                  </p>
+                  <p>
+                    <strong>Số điện thoại:</strong>{" "}
+                    {reservationDetail.booker.phone}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {reservationDetail.booker.email}
+                  </p>
+                  <p>
+                    <strong>Thời gian đặt:</strong>{" "}
+                    {formatDateTime(reservationDetail.time)}
+                  </p>
+                  <p>
+                    <strong>Thời gian lịch: </strong>
+                    {reservationDetail.timeStart
+                      .split("T")[1]
+                      .substring(0, 5)}{" "}
+                    - {formatDateTime(reservationDetail.timeEnd)}
+                  </p>
+                  <p>
+                    <strong>Phòng:</strong> {reservationDetail.room.roomName}
+                  </p>
+                  <p className="room-location">
+                    <strong>Vị trí:</strong>{" "}
+                    {reservationDetail.room.location.building.branch.branchName}{" "}
+                    - {reservationDetail.room.location.building.buildingName} -{" "}
+                    {reservationDetail.room.location.floor}
+                  </p>
+                  <p>
+                    <strong>Loại phòng:</strong>{" "}
+                    {reservationDetail.room.typeRoom}
+                  </p>
+                  <p>
+                    <strong>Trạng thái phòng:</strong>
+                    <span
+                      className={cx("room-status", {
+                        available:
+                          reservationDetail.room.statusRoom === "AVAILABLE",
+                        occupied:
+                          reservationDetail.room.statusRoom === "OCCUPIED",
+                        maintenance:
+                          reservationDetail.room.statusRoom === "MAINTENANCE",
+                      })}
+                    >
+                      {reservationDetail.room.statusRoom}
+                    </span>
+                  </p>
 
-              <p>
-                <strong>Ghi chú:</strong> {reservationDetail.note}
-              </p>
-              <p>
-                <strong>Mô tả:</strong> {reservationDetail.description}
-              </p>
-              <p>
-                <strong>Trạng thái:</strong>{" "}
-                {reservationDetail.statusReservation}
-              </p>
-              <div>
-                {reservationDetail.services?.map((service) => (
-                  <div key={service.serviceId}>
-                    <span>
-                      <strong>Dịch vụ:</strong> {service.serviceName}
-                    </span>
-                    <span>
-                      <strong>Giá:</strong> {service.price.value}
-                    </span>
+                  <p>
+                    <strong>Ghi chú:</strong> {reservationDetail.note}
+                  </p>
+                  <p>
+                    <strong>Mô tả:</strong> {reservationDetail.description}
+                  </p>
+                  <p>
+                    <strong>Trạng thái:</strong>{" "}
+                    {reservationDetail.statusReservation}
+                  </p>
+                  <div>
+                    {reservationDetail.services?.map((service) => (
+                      <div key={service.serviceId}>
+                        <span>
+                          <strong>Dịch vụ:</strong> {service.serviceName}
+                        </span>
+                        <span>
+                          <strong>Giá:</strong> {service.price.value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p>Không có dữ liệu chi tiết</p>
-          )
-        ) : (
-          <p>Chọn một mục để xem chi tiết</p>
-        )}
+                </div>
+              ) : (
+                <p>Không có dữ liệu chi tiết</p>
+              )
+            ) : (
+              <p>Chọn một mục để xem chi tiết</p>
+            )}
           </div>
         </div>
       )}

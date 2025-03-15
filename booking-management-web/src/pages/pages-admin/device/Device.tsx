@@ -6,11 +6,16 @@ import usePost from "../../../hooks/usePost";
 import { useState } from "react";
 import { fetchDevices } from "../../../features/deviceSlice";
 import PopupNotification from "../../../components/popup/PopupNotification";
+import IconWrapper from "../../../components/icons/IconWrapper";
+import { FiPlus, FaPlus, MdSearch } from "../../../components/icons/icons";
+import { DeviceProps } from "../../../data/data";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
 function Device() {
   const dispatch = useDispatch<AppDispatch>();
+  const [openForm, setOpenForm] = useState(false);
 
   // Lấy dữ liệu devices từ Redux Store
   const {
@@ -20,12 +25,12 @@ function Device() {
   } = useSelector((state: RootState) => state.device);
 
   // thêm device
-  const { data, loading, error, postData } = usePost<any>(
+  const { data, loading, error, postData } = usePost<DeviceProps[]>(
     "http://localhost:8080/api/v1/device/addDevice"
   );
 
   // cập nhật device
-  const { postData: updateData } = usePost<any>(
+  const { postData: updateData } = usePost<DeviceProps[]>(
     "http://localhost:8080/api/v1/device/updateDevice"
   );
 
@@ -34,8 +39,7 @@ function Device() {
     description: "",
     price: "",
   });
-  const [isAdding, setIsAdding] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState<any>(null);
+  const [selectedDevice, setSelectedDevice] = useState<DeviceProps | null>();
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -44,6 +48,7 @@ function Device() {
     "info"
   );
 
+  // Hàm xử lý khi thay đổi input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -54,8 +59,6 @@ function Device() {
 
   // Hàm gửi dữ liệu tạo mới device
   const handleAddDevice = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
 
     const newDevice = {
       deviceName: formData.deviceName,
@@ -71,29 +74,33 @@ function Device() {
       setIsPopupOpen(true);
       dispatch(fetchDevices());
       resetForm();
+      setOpenForm(false);
     } else {
       setPopupMessage("Thêm thiết bị thất bại, vui lòng thử lại.");
       setPopupType("error");
       setIsPopupOpen(true);
     }
-    setIsAdding(false);
   };
 
   // Hàm chỉnh sửa dữ liệu device
   const handleUpdateDevice = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
 
-    const updatedDevice = {
-      deviceId: selectedDevice.deviceId,
-      deviceName: formData.deviceName,
-      description: formData.description,
-      priceId: formData.price,
-    };
+    if (selectedDevice === null) return;
+
+    const updatedDevice = selectedDevice
+      ? {
+          deviceId: selectedDevice.deviceId,
+          deviceName: formData.deviceName,
+          description: formData.description,
+          priceId: formData.price,
+        }
+      : null;
 
     console.log("Dữ liệu gửi đến backend: ", updatedDevice);
 
     const response = await updateData(updatedDevice, {}, "PUT");
+
+    console.log("Kết quả trả về từ backend: ", response);
 
     if (response) {
       setPopupMessage("Thiết bị đã được chỉnh sửa thành công!");
@@ -101,12 +108,12 @@ function Device() {
       setIsPopupOpen(true);
       dispatch(fetchDevices());
       resetForm();
+      setOpenForm(false);
     } else {
       setPopupMessage("Chỉnh sửa thiết bị thất bại, vui lòng thử lại.");
       setPopupType("error");
       setIsPopupOpen(true);
     }
-    setIsAdding(false);
   };
 
   // Reset form sau khi thêm hoặc sửa
@@ -119,8 +126,9 @@ function Device() {
     setSelectedDevice(null);
   };
 
-  // Hàm xử lý khi chọn vị trí để chỉnh sửa
+  // Hàm xử lý khi chọn thiết bị để chỉnh sửa
   const handleEditDevice = (device: any) => {
+    setOpenForm(true);
     setSelectedDevice(device);
     setFormData({
       deviceName: device.deviceName,
@@ -129,65 +137,111 @@ function Device() {
     });
   };
 
+  // Hàm đóng popup thông báo
   const handleClosePopup = () => {
     setIsPopupOpen(false);
   };
+
+  // Hàm mở form thêm mới
+  const handleOpenForm = () => {
+    setOpenForm(true);
+  };
+
+  // Hàm đóng form
+  const handleCloseForm = () => {
+    setOpenForm(false);
+    setSelectedDevice(null);
+    resetForm();
+  };
+
   return (
     <div className={cx("device-container")}>
-      <div className={cx("device-header")}>
-        <div className={cx("device-info")}>
-          <h3>Thông tin thiết bị</h3>
-
-          <form className={cx("form")}>
-            <div className={cx("form-row")}>
-              <div className={cx("form-group")}>
-                <label>Tên thiết bị:</label>
-                <input
-                  type="text"
-                  name="deviceName"
-                  placeholder="Nhập tên thiết bị..."
-                  value={formData.deviceName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className={cx("form-group")}>
-                <label>Giá:</label>
-                <input
-                  type="text"
-                  name="price"
-                  placeholder="Nhập giá..."
-                  value={formData.price}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div className={cx("form-row")}>
-              <div className={cx("form-group")}>
-                <label>Mô tả:</label>
-                <input
-                  type="text"
-                  name="description"
-                  placeholder="Nhập mô tả..."
-                  value={formData.description}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div className={cx("btn-row")}>
-              <button
-                type="button"
-                className={cx("submit-btn")}
-                onClick={selectedDevice ? handleUpdateDevice : handleAddDevice}
-                disabled={isAdding}
-              >
-                {selectedDevice ? "Chỉnh sửa" : "Thêm thiết bị"}
-              </button>
-            </div>
-          </form>
+      {/* Tìm kiếm */}
+      <div className={cx("search-container")}>
+        <div className={cx("search-box")}>
+          <input type="search" placeholder="Tìm kiếm theo tên thiết bị" />
+          <button>
+            <IconWrapper icon={MdSearch} color="#fff" size={24} />
+          </button>
         </div>
       </div>
+
+      {/* chức năng */}
+      <div className={cx("function-container")}>
+        <p>Danh sách thiết bị</p>
+        <div className={cx("function-btn")}>
+          <button
+            type="button"
+            className={cx("submit-btn")}
+            onClick={() => handleOpenForm()}
+          >
+            Thêm
+            <IconWrapper icon={FaPlus} color="#fff" size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* Form thêm mới */}
+      {openForm && (
+        <div className={cx("device-header")}>
+          <div className={cx("device-info")}>
+            <button className={cx("close-btn")} onClick={handleCloseForm}>
+              ✖
+            </button>
+            <h3>Thông tin thiết bị</h3>
+
+            <form className={cx("form")}>
+              <div className={cx("form-row")}>
+                <div className={cx("form-group")}>
+                  <label>Tên thiết bị:</label>
+                  <input
+                    type="text"
+                    name="deviceName"
+                    placeholder="Nhập tên thiết bị..."
+                    value={formData.deviceName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className={cx("form-group")}>
+                  <label>Giá:</label>
+                  <input
+                    type="text"
+                    name="price"
+                    placeholder="Nhập giá..."
+                    value={formData.price}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <div className={cx("form-row")}>
+                <div className={cx("form-group")}>
+                  <label>Mô tả:</label>
+                  <input
+                    type="text"
+                    name="description"
+                    placeholder="Nhập mô tả..."
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <div className={cx("btn-row")}>
+                <button
+                  type="button"
+                  className={cx("submit-btn")}
+                  onClick={
+                    selectedDevice ? handleUpdateDevice : handleAddDevice
+                  }
+                >
+                  {selectedDevice ? "Chỉnh sửa" : "Thêm thiết bị"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Bảng danh sách */}
       <div className={cx("device-list")}>

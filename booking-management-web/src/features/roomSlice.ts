@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RoomProps, rooms } from "../data/data";
+import { RoomProps } from "../data/data";
 
 interface RoomState {
   selectedRoom: RoomProps | null;

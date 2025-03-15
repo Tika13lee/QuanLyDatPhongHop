@@ -2,15 +2,49 @@ import classNames from "classnames/bind";
 import styles from "./Location.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../app/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { fetchLocations } from "../../../features/locationSlice";
+import useFetch from "../../../hooks/useFetch";
+import { BranchProps, BuildingProps } from "../../../data/data";
 
 const cx = classNames.bind(styles);
 
 function Location() {
   const dispatch = useDispatch<AppDispatch>();
+
+  const [openBranchModal, setOpenBranchModal] = useState(false);
+  const [openBuildingModal, setOpenBuildingModal] = useState(false);
+
+  const [branchName, setBranchName] = useState("");
+  const [buildings, setBuildings] = useState([]);
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
+
+  const [formData, setFormData] = useState({
+    building: "",
+    floor: "",
+  });
+
+  const [formBuilding, setFormBuilding] = useState({
+    branchId: "",
+    building: "",
+  });
+
+  // lấy chi nhánh
+  const {
+    data: branchs,
+    loading: branchsLoading,
+    error: branchsError,
+  } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
+  );
 
   // load danh sách location từ store
   const {
@@ -20,52 +54,87 @@ function Location() {
   } = useSelector((state: RootState) => state.location);
 
   // thêm location
-  const { data, loading, error, postData } = usePost<any>(
-    "http://localhost:8080/api/v1/location/addLocation"
+  const {
+    data,
+    loading,
+    error,
+    postData: postLocation,
+  } = usePost<any>(
+    `http://localhost:8080/api/v1/location/addLocation?buildingId=${formData.building}&floor=${formData.floor}`
   );
 
-  // cập nhật location
-  const { postData: updateData } = usePost<any>(
-    "http://localhost:8080/api/v1/location/updateLocation"
+  // thêm branch
+  const {
+    data: branchData,
+    loading: branchLoading,
+    error: branchError,
+    postData: postBranch,
+  } = usePost<any>(
+    `http://localhost:8080/api/v1/location/addBranch?branchName=${branchName}`
   );
 
-  const [formData, setFormData] = useState({
-    branch: "",
-    building: "",
-    floor: "",
-    number: "",
-  });
-  const [isAdding, setIsAdding] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<any>(null);
-
-  // popup thông báo
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
-    "info"
+  // thêm building
+  const {
+    data: buildingData,
+    loading: buildingLoading,
+    error: buildingError,
+    postData: postBuilding,
+  } = usePost<any>(
+    `http://localhost:8080/api/v1/location/addBuilding?branchId=${formBuilding.branchId}&buildingName=${formBuilding.building}`
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // xử lý khi thay đổi branch
+  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedBranch = e.target.value;
+    setBranchName(selectedBranch);
+    console.log(selectedBranch);
+    if (selectedBranch === "") {
+      setBuildings([]);
+    }
+  };
+  const handleInputBuildingChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormBuilding((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+  };
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // Hàm gửi dữ liệu tạo mới location
-  const handleAddLocation = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
+  // Lấy danh sách tòa nhà theo chi nhánh
+  useEffect(() => {
+    if (!branchName) return;
 
+    fetch(
+      `http://localhost:8080/api/v1/location/getBuildingsByBranchName?branchName=${branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setBuildings(data);
+      })
+      .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
+  }, [branchName]);
+
+  // Thêm location
+  const handleAddLocation = async () => {
     const newLocation = {
-      branch: formData.branch,
       building: formData.building,
       floor: formData.floor,
-      number: formData.number,
     };
 
-    const response = await postData(newLocation);
+    console.log(newLocation);
+
+    const response = await postLocation(newLocation);
 
     if (response) {
       setPopupMessage("Vị trí đã được thêm thành công!");
@@ -78,58 +147,74 @@ function Location() {
       setPopupType("error");
       setIsPopupOpen(true);
     }
-    setIsAdding(false);
   };
 
-  // Hàm chỉnh sửa dữ liệu location
-  const handleUpdateLocation = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
+  // Reset form sau khi thêm
+  const resetForm = () => {
+    setFormData({
+      building: "",
+      floor: "",
+    });
+  };
 
-    const updatedLocation = {
-      locationId: selectedLocation.locationId,
-      branch: formData.branch,
-      building: formData.building,
-      floor: formData.floor,
-      number: formData.number,
+  // Thêm branch
+  const handleAddBranch = async () => {
+    const newBranch = {
+      branchName: branchName,
     };
+    console.log(newBranch);
 
-    const response = await updateData(updatedLocation, {}, "PUT");
+    const response = await postBranch(newBranch);
 
     if (response) {
-      setPopupMessage("Vị trí đã được chỉnh sửa thành công!");
+      setPopupMessage("Vị trí đã được thêm thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
-      dispatch(fetchLocations());
-      resetForm();
+      setOpenBranchModal(false);
     } else {
-      setPopupMessage("Chỉnh sửa vị trí thất bại, vui lòng thử lại.");
+      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
       setPopupType("error");
       setIsPopupOpen(true);
     }
-    setIsAdding(false);
   };
 
-  // Reset form sau khi thêm hoặc sửa
-  const resetForm = () => {
-    setFormData({
-      branch: "",
-      building: "",
-      floor: "",
-      number: "",
-    });
-    setSelectedLocation(null);
+  // Thêm building
+  const handleAddBuilding = async () => {
+    const newBuilding = {
+      branchId: formBuilding.branchId,
+      buildingName: formBuilding.building,
+    };
+
+    console.log(newBuilding);
+
+    const response = await postBuilding(newBuilding);
+
+    if (response) {
+      setPopupMessage("Vị trí đã được thêm thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      setOpenBuildingModal(false);
+    } else {
+      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
   };
 
-  // Hàm xử lý khi chọn vị trí để chỉnh sửa
-  const handleEditLocation = (loc: any) => {
-    setSelectedLocation(loc);
-    setFormData({
-      branch: loc.branch,
-      building: loc.building,
-      floor: loc.floor,
-      number: loc.number,
-    });
+  const handleOpenBranchModal = () => {
+    setOpenBranchModal(true);
+  };
+
+  const handleCloseBranchModal = () => {
+    setOpenBranchModal(false);
+  };
+
+  const handleOpenBuildingModal = () => {
+    setOpenBuildingModal(true);
+  };
+
+  const handleCloseBuildingModal = () => {
+    setOpenBuildingModal(false);
   };
 
   const handleClosePopup = () => {
@@ -140,32 +225,141 @@ function Location() {
     <div className={cx("location-container")}>
       <div className={cx("location-header")}>
         <div className={cx("location-info")}>
-          <h3>Thông tin vị trí</h3>
-          <form className={cx("form")}>
+          <div className={cx("form")}>
             <div className={cx("form-row")}>
+              {/* branch */}
               <div className={cx("form-group")}>
                 <label>Chi nhánh:</label>
-                <input
-                  type="text"
-                  name="branch"
-                  placeholder="Nhập chi nhánh..."
-                  value={formData.branch}
-                  onChange={handleInputChange}
-                />
+                <div className={cx("form-select")}>
+                  <select
+                    name="branch"
+                    value={branchName}
+                    onChange={handleBranchChange}
+                  >
+                    <option value="">Chọn chi nhánh...</option>
+                    {branchs?.map((branch) => (
+                      <option key={branch.branchId} value={branch.branchName}>
+                        {branch.branchName}
+                      </option>
+                    ))}
+                  </select>
+                  <button type="button" onClick={handleOpenBranchModal}>
+                    Thêm chi nhánh
+                  </button>
+                </div>
               </div>
+
+              {/* modal branch */}
+              {openBranchModal && (
+                <div className={cx("modal")}>
+                  <div className={cx("modal-content")}>
+                    <button
+                      className={cx("close-btn")}
+                      onClick={handleCloseBranchModal}
+                    >
+                      ✖
+                    </button>
+                    <h3>Thêm chi nhánh</h3>
+                    <div className={cx("form")}>
+                      <div className={cx("form-group")}>
+                        <label>Tên chi nhánh:</label>
+                        <input
+                          type="text"
+                          name="branch"
+                          value={branchName}
+                          onChange={(e) => setBranchName(e.target.value)}
+                        />
+                      </div>
+                      <button
+                        className={cx("btn-submit")}
+                        onClick={handleAddBranch}
+                      >
+                        Thêm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* building */}
               <div className={cx("form-group")}>
                 <label>Tòa nhà:</label>
-                <input
-                  type="text"
-                  name="building"
-                  placeholder="Nhập tòa nhà..."
-                  value={formData.building}
-                  onChange={handleInputChange}
-                />
+                <div className={cx("form-select")}>
+                  <select
+                    name="building"
+                    value={formData.building}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Chọn tòa nhà...</option>
+                    {buildings.map((building: BuildingProps) => (
+                      <option
+                        key={building.buildingId}
+                        value={building.buildingId}
+                      >
+                        {building.buildingName}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenBuildingModal()}
+                  >
+                    Thêm tòa nhà
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className={cx("form-row")}>
+              {/* modal building */}
+              {openBuildingModal && (
+                <div className={cx("modal")}>
+                  <div className={cx("modal-content")}>
+                    <button
+                      className={cx("close-btn")}
+                      onClick={handleCloseBuildingModal}
+                    >
+                      ✖
+                    </button>
+                    <h3>Thêm tòa nhà</h3>
+                    <div className={cx("form")}>
+                      <div className={cx("form-group")}>
+                        <label>Chi nhánh:</label>
+                        <select
+                          name="branchId"
+                          value={formBuilding.branchId}
+                          onChange={handleInputBuildingChange}
+                        >
+                          <option value="">Chọn chi nhánh...</option>
+                          {branchs?.map((branch) => (
+                            <option
+                              key={branch.branchId}
+                              value={branch.branchId}
+                            >
+                              {branch.branchName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={cx("form-group")}>
+                        <label>Tên tòa nhà:</label>
+                        <input
+                          type="text"
+                          name="building"
+                          value={formBuilding.building}
+                          onChange={handleInputBuildingChange}
+                        />
+                      </div>
+                      <button
+                        className={cx("btn-submit")}
+                        onClick={() => handleAddBuilding()}
+                      >
+                        Thêm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* floor */}
               <div className={cx("form-group")}>
                 <label>Tầng:</label>
                 <input
@@ -176,31 +370,18 @@ function Location() {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className={cx("form-group")}>
-                <label>Số phòng:</label>
-                <input
-                  type="text"
-                  name="number"
-                  placeholder="Nhập số phòng..."
-                  value={formData.number}
-                  onChange={handleInputChange}
-                />
-              </div>
             </div>
 
             <div className={cx("btn-row")}>
               <button
                 type="button"
                 className={cx("submit-btn")}
-                onClick={
-                  selectedLocation ? handleUpdateLocation : handleAddLocation
-                }
-                disabled={isAdding}
+                onClick={handleAddLocation}
               >
-                {selectedLocation ? "Chỉnh sửa" : "Tạo vị trí"}
+                {"Tạo vị trí"}
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
 
@@ -213,7 +394,6 @@ function Location() {
               <th>Chi nhánh</th>
               <th>Tòa nhà</th>
               <th>Tầng</th>
-              <th>Số phòng</th>
             </tr>
           </thead>
           <tbody>
@@ -229,15 +409,11 @@ function Location() {
               </tr>
             ) : (
               locations.map((loc, index) => (
-                <tr
-                  key={loc.locationId}
-                  onClick={() => handleEditLocation(loc)}
-                >
+                <tr key={loc.locationId}>
                   <td>{index + 1}</td>
                   <td>{loc.branch}</td>
                   <td>{loc.building}</td>
                   <td>{loc.floor}</td>
-                  <td>{loc.number}</td>
                 </tr>
               ))
             )}
