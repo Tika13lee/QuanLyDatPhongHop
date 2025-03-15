@@ -1,80 +1,63 @@
 import classNames from "classnames/bind";
-import styles from "./Approve.module.scss";
+import styles from "./ApprovedList.module.scss";
 import { useEffect, useState } from "react";
 import { ReservationDetailProps, ReservationProps } from "../../../data/data";
-import DetailModal from "./DetailModal";
 import useFetch from "../../../hooks/useFetch";
+import DetailModal from "./DetailModal";
 
 const cx = classNames.bind(styles);
 
-const mockSchedules: ReservationProps[] = [
+const mockApprovedSchedules: ReservationProps[] = [
   {
     reservationId: 1,
-    title: "Kế hoạch truyền thông",
+    title: "Cuộc họp chiến lược",
     timeStart: "2025-03-01T08:30:00.000+07:00",
     timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
+    statusReservation: "approved",
     time: "2025-02-28T01:35:28.000+07:00",
     img: "",
-    nameBooker: "Võ Tấn Dũng",
+    nameBooker: "Nguyễn Văn A",
   },
   {
     reservationId: 2,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
+    title: "Họp dự án phần mềm",
+    timeStart: "2025-03-02T14:00:00.000+07:00",
+    timeEnd: "2025-03-02T16:00:00.000+07:00",
+    statusReservation: "approved",
+    time: "2025-02-28T09:15:00.000+07:00",
     img: "",
-    nameBooker: "Võ Tấn Dũng",
+    nameBooker: "Trần Thị B",
   },
   {
     reservationId: 3,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
+    title: "Thảo luận kế hoạch marketing",
+    timeStart: "2025-03-03T10:00:00.000+07:00",
+    timeEnd: "2025-03-03T12:00:00.000+07:00",
+    statusReservation: "approved",
+    time: "2025-02-28T15:45:00.000+07:00",
     img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-  {
-    reservationId: 5,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-  {
-    reservationId: 6,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
+    nameBooker: "Phạm Văn C",
   },
 ];
 
-function Approve() {
-  const [schedules, setSchedules] = useState<ReservationProps[]>(mockSchedules);
+function ApprovedList() {
+  const [approvedSchedules, setApprovedSchedules] = useState<
+    ReservationProps[]
+  >(mockApprovedSchedules);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservationId, setSelectedReservationId] = useState<
     number | null
   >(null);
   const [selectedReservation, setSelectedReservation] =
     useState<ReservationDetailProps | null>(null);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const { data, loading, error } = useFetch<ReservationDetailProps>(
     selectedReservationId
       ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
       : ""
   );
+
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -85,15 +68,6 @@ function Approve() {
         minute: "2-digit",
       }),
     };
-  };
-
-  // Xử lý chọn/bỏ chọn item
-  const handleCheckboxChange = (id: number) => {
-    setSelectedItems((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((item) => item !== id)
-        : [...prevSelected, id]
-    );
   };
 
   // Cập nhật state khi API trả về dữ liệu
@@ -113,40 +87,31 @@ function Approve() {
     setSelectedReservationId(null);
     setSelectedReservation(null);
   };
+
   return (
-    <div className={cx("approve")}>
+    <div className={cx("approved-list")}>
       <div className={cx("approve-search")}>
         <div className={cx("search-row")}>
-          <div className={cx("search-row")}>
-            <label>Tìm kiếm</label>
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
-              className={cx("search-input")}
-            />
-          </div>
-          <div className={cx("search-row")}>
-            <label>Thời gian gửi</label>
-            <input type="date" className={cx("search-input")} />
-          </div>
-          <button className={cx("btn-action", "details-btn")}>Tìm kiếm</button>
+          <label>Tìm kiếm</label>
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
+            className={cx("search-input")}
+          />
         </div>
-        <div className={cx("device")}></div>
-        <div className={cx("actions")}>
-          <button className={cx("btn-action", "approve-btn")}>
-            ✔ Phê Duyệt
-          </button>
-          <button className={cx("btn-action", "reject-btn")}>✖ Từ Chối</button>
+        <div className={cx("search-row")}>
+          <label>Thời gian gửi</label>
+          <input type="date" className={cx("search-input")} />
         </div>
       </div>
 
-      {Array.isArray(schedules) && schedules.length === 0 ? (
+      {Array.isArray(approvedSchedules) && approvedSchedules.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {schedules.map((schedule) => {
+          {approvedSchedules.map((schedule) => {
             const meetingStart = formatDateTime(schedule.timeStart);
             const meetingEnd = formatDateTime(schedule.timeEnd);
             const bookingTime = formatDateTime(schedule.time);
@@ -157,27 +122,13 @@ function Approve() {
                   <h3>{schedule.title}</h3>
                   <div className={cx("schedule-layout")}>
                     <div className={cx("left-info")}>
-                      {/* check */}
-                      <div className={cx("checkbox-container")}>
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(
-                            schedule.reservationId
-                          )}
-                          onChange={() =>
-                            handleCheckboxChange(schedule.reservationId)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <p>
-                          <strong>Người đặt:</strong> {schedule.nameBooker}
-                        </p>
-                        <p>
-                          <strong>Thời gian gửi:</strong>{" "}
-                          {new Date(schedule.time).toLocaleString()}
-                        </p>
-                      </div>
+                      <p>
+                        <strong>Người đặt:</strong> {schedule.nameBooker}
+                      </p>
+                      <p>
+                        <strong>Thời gian gửi:</strong>{" "}
+                        {new Date(schedule.time).toLocaleString()}
+                      </p>
                     </div>
                     <div className={cx("center-info")}>
                       <p>
@@ -216,4 +167,4 @@ function Approve() {
   );
 }
 
-export default Approve;
+export default ApprovedList;

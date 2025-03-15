@@ -15,11 +15,12 @@ const useFetch = <T>(
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-
   useEffect(() => {
     let isMounted = true;
 
     const fetchData = async () => {
+      if (!url) return;
+
       setLoading(true);
       try {
         const response = await axios.get<T>(url, options);

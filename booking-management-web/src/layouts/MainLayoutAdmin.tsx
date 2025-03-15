@@ -35,7 +35,6 @@ const MainLayoutAdmin = () => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   const [isBookingOpen, setIsBookingOpen] = useState(true);
-  const [isRoomOpen, setIsRoomOpen] = useState(true);
 
   return (
     <div className={cx("main-layout-admin")}>

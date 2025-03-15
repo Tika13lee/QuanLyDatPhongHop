@@ -18,30 +18,40 @@ const events = [
   {
     id: 1,
     title: "Họp dự án",
+    room: {
+      roomName: "Phòng họp 1",
+      location: "Tầng 2",
+    },
     timeStart: "2025-03-15T08:30:00.000+07:00",
     timeEnd: "2025-03-15T10:00:00.000+07:00",
   },
   {
     id: 2,
     title: "Họp dự án",
+    room: {
+      roomName: "Phòng họp 1",
+      location: "Tầng 2",
+    },
     timeStart: "2025-03-15T14:30:00.000+07:00",
     timeEnd: "2025-03-15T16:00:00.000+07:00",
   },
   {
     id: 3,
     title: "Họp dự án",
-    timeStart: "2025-03-15T14:30:00.000+07:00",
-    timeEnd: "2025-03-15T16:00:00.000+07:00",
-  },
-  {
-    id: 4,
-    title: "Họp dự án",
+    room: {
+      roomName: "Phòng họp 1",
+      location: "Tầng 2",
+    },
     timeStart: "2025-03-15T14:30:00.000+07:00",
     timeEnd: "2025-03-15T16:00:00.000+07:00",
   },
   {
     id: 5,
     title: "Họp dự án",
+    room: {
+      roomName: "Phòng họp 1",
+      location: "Tầng 2",
+    },
     timeStart: "2025-03-13T14:30:00.000+07:00",
     timeEnd: "2025-03-13T16:00:00.000+07:00",
   },
@@ -50,11 +60,11 @@ const events = [
 // Chuyển đổi dữ liệu sự kiện
 const formattedEvents = events.map((event) => ({
   ...event,
-  date: format(parseISO(event.timeStart), "yyyy-MM-dd"), // Lấy ngày từ timeStart
+  date: format(parseISO(event.timeStart), "yyyy-MM-dd"),
   time: `${format(parseISO(event.timeStart), "HH:mm")} - ${format(
     parseISO(event.timeEnd),
     "HH:mm"
-  )}`, // Lấy giờ bắt đầu - kết thúc
+  )}`,
 }));
 
 const Schedule = () => {
@@ -130,8 +140,10 @@ const Schedule = () => {
                 <ul className={cx("event-list")}>
                   {dayEvents.map((event) => (
                     <li key={event.id} className={cx("event-item")}>
+                      <small>{event.time}</small> <br />
                       {event.title} <br />
-                      <small>{event.time}</small>
+                      {event.room.roomName} <br />
+                      {event.room.location}
                     </li>
                   ))}
                 </ul>

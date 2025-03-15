@@ -12,7 +12,13 @@ import {
   WaitingList,
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
-import { Approve, Booking, Schedule, ViewSchedule } from "./pages/pages-user";
+import {
+  Approve,
+  ApprovedList,
+  Booking,
+  Schedule,
+  ViewSchedule,
+} from "./pages/pages-user";
 import { Home, Login } from "./pages/general";
 import { Provider } from "react-redux";
 import store from "./app/store";
@@ -41,6 +47,7 @@ function App() {
             <Route index element={<Booking />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
             <Route path="approve" element={<Approve />} />
+            <Route path="approved" element={<ApprovedList />} />
             <Route path="schedule" element={<Schedule />} />
           </Route>
         </Routes>
