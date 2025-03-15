@@ -124,7 +124,7 @@ export const typeRoom = [
 
 // giá
 export type PriceProps = {
-  priceID: number;
+  priceId: number;
   value: number;
   time: string;
   type: string;

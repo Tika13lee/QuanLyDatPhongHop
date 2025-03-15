@@ -24,6 +24,15 @@ const MainLayoutUser = () => {
               cx("sidebar-item", { active: isActive })
             }
           >
+            Tổng quan
+          </NavLink>
+
+          <NavLink
+            to="/user/booking"
+            className={({ isActive }) =>
+              cx("sidebar-item", { active: isActive })
+            }
+          >
             Đặt lịch họp
           </NavLink>
 

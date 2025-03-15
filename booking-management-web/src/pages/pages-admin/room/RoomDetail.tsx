@@ -60,11 +60,6 @@ const RoomDetail = () => {
   // Nếu có dữ liệu từ API, sử dụng dữ liệu này
   const room = roomDetail || defaultRoom;
 
-  // Hàm chuyển đổi view
-  const toggleView = () => {
-    setView(view === "week" ? "month" : "week");
-  };
-
   const handleOpenModal = () => {
     setIsModelEditOpen(true);
     console.log("Edit room");
@@ -80,21 +75,6 @@ const RoomDetail = () => {
         <div className={cx("back-button")} onClick={() => navigate(-1)}>
           <IconWrapper icon={IoIosArrowBack} />
           <span>Quay lại</span>
-        </div>
-
-        <div className={cx("switch-container")}>
-          <button
-            className={cx("switch-btn", { active: view === "week" })}
-            onClick={toggleView}
-          >
-            Tuần
-          </button>
-          <button
-            className={cx("switch-btn", { active: view === "month" })}
-            onClick={toggleView}
-          >
-            Tháng
-          </button>
         </div>
       </div>
 
@@ -113,7 +93,9 @@ const RoomDetail = () => {
 
           <div className={cx("room-info")}>
             <div className={cx("room-header")}>
-              <span className={cx("room-title")}>{room.roomName}</span>
+              <span className={cx("room-title")}>
+                Tên phòng - {room.roomName}
+              </span>
               <div className={cx("btn-edit")} onClick={handleOpenModal}>
                 <IconWrapper icon={MdOutlineEdit} size={22} />
               </div>
@@ -178,11 +160,14 @@ const RoomDetail = () => {
             </div>
 
             <div className={cx("room-details")}>
-              <p>
-                <strong>Vị trí:</strong> {room.location.branch} -{" "}
-                {room.location.building} - tầng {room.location.floor} -{" "}
-                {room.location.number}
-              </p>
+              {/* vị trí */}
+              <div className={cx("room-info-row")}>
+                <p>
+                  <strong>Vị trí:</strong> {room.location.branch} -{" "}
+                  {room.location.building} - tầng {room.location.floor}
+                </p>
+              </div>
+              {/* sức chứa, giá */}
               <div className={cx("room-info-row")}>
                 <p>
                   <strong>Sức chứa:</strong> {room.capacity} người
@@ -191,19 +176,49 @@ const RoomDetail = () => {
                   <strong>Giá:</strong> ${room.price}
                 </p>
               </div>
-              <p>
-                <strong>Loại phòng:</strong> <span>{room.typeRoom}</span>
-              </p>
-              <p>
-                <strong>Trạng thái:</strong> <span>{room.statusRoom}</span>
-              </p>
-              <p>
-                <strong>Người phê duyệt:</strong>{" "}
-                <span>{room.approver?.name}</span>
-              </p>
-              <p>
-                <strong>Danh Sách Thiết Bị</strong>
-              </p>
+              {/* loại, trạng thái */}
+              <div className={cx("room-info-row")}>
+                <p>
+                  <strong>Loại phòng:</strong>{" "}
+                  <span>
+                    {room.typeRoom === "DEFAULT"
+                      ? "Mặc định"
+                      : room.typeRoom === "VIP"
+                      ? "Phòng VIP"
+                      : "Phòng hội nghị"}
+                  </span>
+                </p>
+                <p>
+                  <strong>Trạng thái:</strong>{" "}
+                  <span>
+                    {room.statusRoom === "AVAILABLE" || room.statusRoom === "ONGOING"
+                      ? "Có sẵn"
+                      : room.statusRoom === "MAINTAIN"
+                      ? "Đang bảo trì"
+                      : "Đang sửa chữa"}
+                  </span>
+                </p>
+              </div>
+              {/* người phê duyệt */}
+              <div className={cx("room-info-row")}>
+                <p>
+                  <strong>Người phê duyệt:</strong>{" "}
+                  <span>{room.approver?.name}</span>
+                </p>
+                <p>
+                  <strong>Số điện thoại:</strong>{" "}
+                  <span>{room.approver?.phone}</span>
+                </p>
+              </div>
+              {/* ds thiết bị */}
+              <div className={cx("room-info-row")}>
+                <p>
+                  <strong>Danh Sách Thiết Bị</strong>
+                </p>
+                {/* <div className={cx("btn-edit")} onClick={handleOpenModal}>
+                  <IconWrapper icon={MdOutlineEdit} size={22} />
+                </div> */}
+              </div>
               <div className={cx("device-details")}>
                 {room.room_deviceDTOS?.length > 0 ? (
                   room.room_deviceDTOS.map(
@@ -223,10 +238,6 @@ const RoomDetail = () => {
             </div>
           </div>
         </div>
-
-        {/* <div className={cx("room-schedule-container")}>
-          {view === "week" ? <WeeklySchedule /> : <MonthlySchedule />}
-        </div> */}
       </div>
     </div>
   );

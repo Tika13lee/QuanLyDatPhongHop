@@ -3,6 +3,7 @@ import roomReducer from "../features/roomSlice";
 import authReducer from "../features/authSlice";
 import locationReducer from "../features/locationSlice";
 import deviceReducer from "../features/deviceSlice";
+import employeeReducer from "../features/employeeSlice";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     auth: authReducer,
     location: locationReducer,
     device: deviceReducer,
+    employee: employeeReducer,
   },
 });
 

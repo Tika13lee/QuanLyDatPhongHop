@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayoutAdmin from "./layouts/MainLayoutAdmin";
 import {
+  ApprovalList,
   Dashboard,
   Device,
   Employee,
@@ -16,6 +17,7 @@ import {
   Approve,
   ApprovedList,
   Booking,
+  General,
   Schedule,
   ViewSchedule,
 } from "./pages/pages-user";
@@ -34,7 +36,7 @@ function App() {
           <Route path="/admin" element={<MainLayoutAdmin />}>
             <Route index element={<Dashboard />} />
             <Route path="overview" element={<Overview />} />
-            <Route path="waiting-list" element={<WaitingList />} />
+            <Route path="waiting-list" element={<ApprovalList />} />
             <Route path="room" element={<Room />} />
             <Route path="room/detail/:id" element={<RoomDetail />} />
             <Route path="location" element={<Location />} />
@@ -45,6 +47,7 @@ function App() {
 
           <Route path="/user" element={<MainLayoutUser />}>
             <Route index element={<Booking />} />
+            <Route path="booking" element={<General />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
             <Route path="approve" element={<Approve />} />
             <Route path="approved" element={<ApprovedList />} />

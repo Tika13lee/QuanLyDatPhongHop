@@ -31,13 +31,12 @@ function Device() {
 
   // cập nhật device
   const { postData: updateData } = usePost<DeviceProps[]>(
-    "http://localhost:8080/api/v1/device/updateDevice"
+    "http://localhost:8080/api/v1/device/upDateDevice"
   );
 
   const [formData, setFormData] = useState({
     deviceName: "",
     description: "",
-    price: "",
   });
   const [selectedDevice, setSelectedDevice] = useState<DeviceProps | null>();
 
@@ -59,11 +58,9 @@ function Device() {
 
   // Hàm gửi dữ liệu tạo mới device
   const handleAddDevice = async () => {
-
     const newDevice = {
       deviceName: formData.deviceName,
       description: formData.description,
-      price: formData.price,
     };
 
     const response = await postData(newDevice);
@@ -84,7 +81,6 @@ function Device() {
 
   // Hàm chỉnh sửa dữ liệu device
   const handleUpdateDevice = async () => {
-
     if (selectedDevice === null) return;
 
     const updatedDevice = selectedDevice
@@ -92,7 +88,6 @@ function Device() {
           deviceId: selectedDevice.deviceId,
           deviceName: formData.deviceName,
           description: formData.description,
-          priceId: formData.price,
         }
       : null;
 
@@ -121,7 +116,6 @@ function Device() {
     setFormData({
       deviceName: "",
       description: "",
-      price: "",
     });
     setSelectedDevice(null);
   };
@@ -133,7 +127,6 @@ function Device() {
     setFormData({
       deviceName: device.deviceName,
       description: device.description,
-      price: device.price.value,
     });
   };
 
@@ -202,16 +195,6 @@ function Device() {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className={cx("form-group")}>
-                  <label>Giá:</label>
-                  <input
-                    type="text"
-                    name="price"
-                    placeholder="Nhập giá..."
-                    value={formData.price}
-                    onChange={handleInputChange}
-                  />
-                </div>
               </div>
 
               <div className={cx("form-row")}>
@@ -251,7 +234,6 @@ function Device() {
               <th>STT</th>
               <th>Tên thiết bị</th>
               <th>Mô tả</th>
-              <th>Giá</th>
             </tr>
           </thead>
           <tbody>
@@ -274,7 +256,6 @@ function Device() {
                   <td>{index + 1}</td>
                   <td>{device.deviceName}</td>
                   <td>{device.description}</td>
-                  <td>{device.price?.value || "N/A"}</td>
                 </tr>
               ))
             )}

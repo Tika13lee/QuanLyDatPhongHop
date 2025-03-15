@@ -7,8 +7,10 @@ import Overview from "./booking-mgmt/Overview";
 import WaitingList from "./booking-mgmt/WaitingList";
 import Device from "./device/Device";
 import Service from "./service/Serivice";
+import ApprovalList from "./booking-mgmt/ApprovalList";
 
 export {
+  ApprovalList,
   Service,
   Device,
   WaitingList,

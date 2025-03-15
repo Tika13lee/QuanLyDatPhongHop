@@ -25,6 +25,12 @@ const Room = () => {
           >
             <p>Tạo phòng họp</p>
           </div>
+          <div
+            className={cx("tab-item", { active: activeTab === "approval" })}
+            onClick={() => setActiveTab("approval")}
+          >
+            <p>Phân quyền phê duyệt</p>
+          </div>
         </div>
 
         <div className={cx("divide")}></div>

@@ -19,6 +19,7 @@ function Location() {
 
   const [branchName, setBranchName] = useState("");
   const [buildings, setBuildings] = useState([]);
+  const [isChecked, setIsChecked] = useState(false);
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -111,6 +112,11 @@ function Location() {
     }));
   };
 
+  // Hàm xử lý thay đổi của checkbox
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(e.target.checked);
+  };
+
   // Lấy danh sách tòa nhà theo chi nhánh
   useEffect(() => {
     if (!branchName) return;
@@ -155,6 +161,8 @@ function Location() {
       building: "",
       floor: "",
     });
+    setBranchName("");
+    setBuildings([]);
   };
 
   // Thêm branch
@@ -243,7 +251,11 @@ function Location() {
                       </option>
                     ))}
                   </select>
-                  <button type="button" onClick={handleOpenBranchModal}>
+                  <button
+                    type="button"
+                    onClick={handleOpenBranchModal}
+                    disabled={isChecked}
+                  >
                     Thêm chi nhánh
                   </button>
                 </div>
@@ -303,6 +315,7 @@ function Location() {
                   <button
                     type="button"
                     onClick={() => handleOpenBuildingModal()}
+                    disabled={isChecked}
                   >
                     Thêm tòa nhà
                   </button>
@@ -373,13 +386,31 @@ function Location() {
             </div>
 
             <div className={cx("btn-row")}>
-              <button
-                type="button"
-                className={cx("submit-btn")}
-                onClick={handleAddLocation}
-              >
-                {"Tạo vị trí"}
-              </button>
+              <div className={cx("search")}>
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={handleCheckboxChange}
+                />
+                <label>Chọn chức năng tìm kiếm</label>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  className={cx("submit-btn")}
+                  disabled={!isChecked}
+                >
+                  {"Tìm kiếm"}
+                </button>
+                <button
+                  type="button"
+                  className={cx("submit-btn")}
+                  onClick={handleAddLocation}
+                  disabled={isChecked}
+                >
+                  {"Tạo vị trí"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

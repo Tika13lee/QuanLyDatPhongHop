@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { LocationProps, LocationProps2 } from "../data/data";
+import { LocationProps2 } from "../data/data";
 
 // State ban đầu
 type LocationState = {

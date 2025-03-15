@@ -76,6 +76,7 @@ function ApprovalList() {
       hour12: false,
     }).format(date);
   }
+  
   return (
     <div className={cx("approval-list-container")}>
       {/* Danh sách các phòng */}

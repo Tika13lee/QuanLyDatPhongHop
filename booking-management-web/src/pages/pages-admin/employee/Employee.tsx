@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Employee.module.scss";
-import { DepartmentProps, EmployeeProps } from "../../../data/data";
+import {
+  BranchProps,
+  DepartmentProps,
+  EmployeeProps,
+} from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../app/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../app/store";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import {
   FaPlus,
@@ -12,21 +16,31 @@ import {
   MdSearch,
 } from "../../../components/icons/icons";
 import usePost from "../../../hooks/usePost";
+import PopupNotification from "../../../components/popup/PopupNotification";
+import { fetchEmployees } from "../../../features/employeeSlice";
 
 const cx = classNames.bind(styles);
 
 const EmployeeManagement = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [employees, setEmployees] = useState<EmployeeProps[]>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [openForm, setOpenForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [fileName, setFileName] = useState("");
   const [selectedEmployee, setSelectedEmployee] =
     useState<EmployeeProps | null>();
+  // const { employees, loading, error } = useSelector(
+  // (state: RootState) => state.employee
+  // );
 
-  const [isCheck, setIsCheck] = useState<any>();
+  const [employees, setEmployees] = useState<EmployeeProps[]>([]);
+  const [isCheck, setIsCheck] = useState<number[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const [filters, setFilters] = useState({
+    depName: "",
+    isActived: true,
+    branchName: "",
+  });
 
   const [formData, setFormData] = useState({
     employeeName: "",
@@ -44,14 +58,23 @@ const EmployeeManagement = () => {
     "info"
   );
 
-  // Lấy locations từ Redux Store
-  const {
-    locations,
-    loading: locationsLoading,
-    error: locationsError,
-  } = useSelector((state: RootState) => state.location);
+  // lấy ds nhân viên
+  useEffect(() => {
+    if (employees.length === 0) {
+      dispatch(fetchEmployees());
+    }
+  }, [dispatch, employees.length]);
 
-  //lấy derpartment
+  // lấy chi nhánh
+  const {
+    data: branchs,
+    loading: branchsLoading,
+    error: branchsError,
+  } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
+  );
+
+  // lấy derpartment
   const {
     data: departments,
     loading: departmentLoading,
@@ -79,16 +102,66 @@ const EmployeeManagement = () => {
     "http://localhost:8080/api/v1/employee/addEmployee"
   );
 
+  // Hàm xử lý thay đổi trong ô tìm kiếm
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Hàm xử lý thay đổi giá trị của các bộ lọc
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    filterName: string
+  ) => {
+    const { value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: filterName === "isActived" ? value === "true" : value,
+    }));
+  };
+
+  // Hàm gọi API để tìm kiếm nhân viên
+  const {
+    data: filteredEmployees,
+    loading: searchLoading,
+    error: searchError,
+  } = useFetch<EmployeeProps[]>(
+    searchQuery
+      ? `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${searchQuery}`
+      : filters.depName || filters.isActived || filters.branchName
+      ? `http://localhost:8080/api/v1/employee/getEmployeeByDepartmentOrActivedOrBranch?depName=${filters.depName}&isActived=${filters.isActived}&branchName=${filters.branchName}`
+      : "http://localhost:8080/api/v1/employee/getAllEmployee"
+  );
+
   useEffect(() => {
-    if (employeesData) {
-      setEmployees(employeesData);
-      setLoading(false);
+    if (filteredEmployees) {
+      setEmployees(filteredEmployees);
     }
-    if (fetchError) {
-      setError(fetchError.message || "Đã xảy ra lỗi khi tải dữ liệu");
-      setLoading(false);
+  }, [filteredEmployees, dispatch]);
+
+  // Xử lý khi chọn hoặc bỏ chọn một nhân viên
+  const handleCheckboxChange = (employeeId: number) => {
+    setIsCheck((prevSelected) => {
+      if (prevSelected.includes(employeeId)) {
+        return prevSelected.filter((id) => id !== employeeId);
+      } else {
+        return [...prevSelected, employeeId];
+      }
+    });
+  };
+
+  // Xử lý khi chọn tất cả nhân viên
+  const handleSelectAll = () => {
+    if (isCheck.length === employees.length) {
+      setIsCheck([]);
+    } else {
+      setIsCheck(employees.map((emp) => emp.employeeId));
     }
-  }, [employeesData, fetchError]);
+  };
+
+  // Hàm để vô hiệu hóa tài khoản
+  const handleDisableAccount = () => {
+    console.log("Vô hiệu hóa tài khoản cho các nhân viên: ", isCheck);
+  };
 
   // Hàm xử lý khi thay đổi input
   const handleInputChange = (
@@ -109,12 +182,42 @@ const EmployeeManagement = () => {
     }
   };
 
+  // Kiểm tra dữ liệu đầu vào
+  const validateData = (formData: any) => {
+    if (
+      !formData.employeeName ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.departmentId ||
+      !formData.role
+    ) {
+      return { isValid: false, message: "Vui lòng điền đầy đủ thông tin." };
+    }
+
+    // email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      return { isValid: false, message: "Định dạng email không hợp lệ." };
+    }
+
+    // số điện thoại
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      return {
+        isValid: false,
+        message: "Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số.",
+      };
+    }
+
+    // Nếu dữ liệu hợp lệ
+    return { isValid: true, message: "" };
+  };
+
   // Hàm xử lý khi chọn nhân viên để chỉnh sửa
   const handleEditEmployee = (emp: any) => {
     setOpenForm(true);
     setSelectedEmployee(emp);
     setFormData({
-      // employeeId: "",
       employeeName: emp.employeeName,
       email: emp.email,
       phone: emp.phone,
@@ -126,6 +229,15 @@ const EmployeeManagement = () => {
 
   // hàm xử lý thêm mới nhân viên
   const handleAddEmployee = async () => {
+    // Kiểm tra dữ liệu đầu vào
+    const { isValid, message } = validateData(formData);
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
     const newEmployee = {
       employeeName: formData.employeeName,
       email: formData.email,
@@ -143,7 +255,10 @@ const EmployeeManagement = () => {
       setPopupMessage("Nhân viên đã được thêm thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
-      // dispatch(fetchEmployees());
+
+      dispatch(fetchEmployees());
+
+      // Reset form và đóng form thêm
       resetForm();
       setOpenForm(false);
     } else {
@@ -184,6 +299,11 @@ const EmployeeManagement = () => {
     // resetForm();
   };
 
+  // Hàm đóng popup thông báo
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
+
   return (
     <div className={cx("employee-container")}>
       {/* tìm kiếm */}
@@ -193,6 +313,8 @@ const EmployeeManagement = () => {
             type="text"
             placeholder="Tìm kiếm nhân viên theo tên, sdt"
             className={cx("search-input")}
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
           <button>
             <IconWrapper icon={MdSearch} color="#fff" size={24} />
@@ -200,33 +322,38 @@ const EmployeeManagement = () => {
         </div>
         <div className={cx("filter-container")}>
           <p>Lọc nhân viên theo</p>
-          <select>
+          {/* branchName */}
+          <select
+            name="branchName"
+            value={filters.branchName}
+            onChange={(e) => handleFilterChange(e, "branchName")}
+          >
             <option value="">Chọn chi nhánh</option>
-            {[
-              ...new Set(
-                locations?.map(
-                  (location) => location.branch
-                ) || []
-              ),
-            ].map((branch, index) => (
-              <option key={index} value={branch}>
-                {branch}
+            {branchs?.map((branch) => (
+              <option key={branch.branchId} value={branch.branchName}>
+                {branch.branchName}
               </option>
             ))}
           </select>
-          <select name="departmentId">
+          {/* depName */}
+          <select
+            name="depName"
+            value={filters.depName}
+            onChange={(e) => handleFilterChange(e, "depName")}
+          >
             <option value="">Chọn phòng ban</option>
             {departments?.map((department) => (
-              <option
-                key={department.departmentId}
-                value={department.departmentId}
-              >
+              <option key={department.departmentId} value={department.depName}>
                 {department.depName}
               </option>
             ))}
           </select>
-          <select name="departmentId">
-            <option value="">Chọn trạng thái</option>
+          {/* isActived */}
+          <select
+            name="isActived"
+            value={filters.isActived.toString()}
+            onChange={(e) => handleFilterChange(e, "isActived")}
+          >
             <option value="true">Hoạt động</option>
             <option value="false">Không hoạt động</option>
           </select>
@@ -237,7 +364,12 @@ const EmployeeManagement = () => {
       <div className={cx("function-container")}>
         <p>Danh sách nhân viên</p>
         <div className={cx("function-btn")}>
-          <button type="button" className={cx("submit-btn", "btn-delete")}>
+          <button
+            type="button"
+            className={cx("submit-btn", "btn-delete")}
+            disabled={isCheck.length === 0}
+            onClick={handleDisableAccount}
+          >
             Vô hiệu hóa tài khoản
           </button>
           <button
@@ -332,15 +464,9 @@ const EmployeeManagement = () => {
               <label>Chọn chi nhánh</label>
               <select>
                 <option value="">Chọn chi nhánh</option>
-                {[
-                  ...new Set(
-                    locations?.map(
-                      (location) => location.branch
-                    ) || []
-                  ),
-                ].map((branch, index) => (
-                  <option key={index} value={branch}>
-                    {branch}
+                {branchs?.map((branch) => (
+                  <option key={branch.branchId} value={branch.branchName}>
+                    {branch.branchName}
                   </option>
                 ))}
               </select>
@@ -385,7 +511,13 @@ const EmployeeManagement = () => {
         <table className={cx("employee-table")}>
           <thead>
             <tr>
-              <th>Chọn</th>
+              <th>
+                <input
+                  type="checkbox"
+                  checked={isCheck.length === employees.length}
+                  onChange={handleSelectAll}
+                />
+              </th>
               <th>Hình ảnh</th>
               <th>Tên</th>
               <th>Email</th>
@@ -399,7 +531,12 @@ const EmployeeManagement = () => {
             {employees?.map((emp) => (
               <tr key={emp.employeeId}>
                 <td>
-                  <input type="checkbox" className={cx("")} />
+                  <input
+                    type="checkbox"
+                    className={cx("")}
+                    checked={isCheck.includes(emp.employeeId)}
+                    onChange={() => handleCheckboxChange(emp.employeeId)}
+                  />
                 </td>
                 <td>
                   <img
@@ -428,6 +565,13 @@ const EmployeeManagement = () => {
           </tbody>
         </table>
       </div>
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+      />
     </div>
   );
 };

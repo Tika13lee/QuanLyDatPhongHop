@@ -266,7 +266,7 @@ const CreateRoom = () => {
                                     Number(e.target.value)
                                   )
                                 }
-                                disabled={!selectedDevice}
+                                // disabled={!selectedDevice}
                               />
                             </td>
                           </tr>

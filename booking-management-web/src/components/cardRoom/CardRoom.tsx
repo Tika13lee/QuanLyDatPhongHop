@@ -47,12 +47,6 @@ function CardRoom({ rooms }: { rooms: RoomProps[] }) {
                     >
                       Xem
                     </button>
-                    <button
-                      className={cx("btn", "btn-book")}
-                      onClick={() => setSelectedRoom(room)}
-                    >
-                      Đặt ngay
-                    </button>
                   </div>
                 </div>
               </div>

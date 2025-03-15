@@ -44,7 +44,7 @@ function Service() {
     "http://localhost:8080/api/v1/service/addService"
   );
   const { postData: updateData } = usePost<ServiceProps>(
-    "http://localhost:8080/api/v1/service/updateService"
+    "http://localhost:8080/api/v1/service/upDateService"
   );
 
   useEffect(() => {
@@ -108,7 +108,7 @@ function Service() {
           serviceId: selectedService.serviceId,
           serviceName: formData.serviceName,
           description: formData.description,
-          priceId: formData.price,
+          priceId: selectedService.price?.priceId,
         }
       : null;
 
@@ -224,6 +224,7 @@ function Service() {
                     placeholder="Nhập giá..."
                     value={formData.price}
                     onChange={handleInputChange}
+                    disabled={selectedService ? true : false}
                   />
                 </div>
               </div>

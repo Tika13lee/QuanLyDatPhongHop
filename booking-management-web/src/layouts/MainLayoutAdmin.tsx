@@ -25,7 +25,7 @@ const MainLayoutAdmin = () => {
       dispatch(fetchLocations());
     }
   }, [dispatch, locations.length]);
-  
+
   useEffect(() => {
     if (devices.length === 0) {
       dispatch(fetchDevices());
@@ -81,17 +81,17 @@ const MainLayoutAdmin = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  Danh sách chờ
+                  DS phê duyệt
                 </NavLink>
 
-                <NavLink
+                {/* <NavLink
                   to="/admin/booking-mgmt/approved"
                   className={({ isActive }) =>
                     cx("dropdown-item", { active: isActive })
                   }
                 >
                   Thông tin nhận/trả
-                </NavLink>
+                </NavLink> */}
               </div>
             )}
           </div>
