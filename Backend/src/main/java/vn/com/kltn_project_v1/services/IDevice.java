@@ -15,5 +15,6 @@ public interface IDevice {
     void deleteDevice(Long id);
 
     Room_Device createRoomDevice(Long roomId,Long deviceId, int quantity);
+    Device getDeviceByName(String name);
 
 }

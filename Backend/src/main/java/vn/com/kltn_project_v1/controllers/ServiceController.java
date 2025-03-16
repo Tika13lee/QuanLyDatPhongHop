@@ -29,4 +29,8 @@ public class ServiceController {
         serviceService.deleteService(serviceDTO.getServiceId());
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/getServiceByName")
+    public ResponseEntity<?> getServiceByName(@RequestParam String name) {
+        return ResponseEntity.ok(serviceService.getServiceByName(name));
+    }
 }

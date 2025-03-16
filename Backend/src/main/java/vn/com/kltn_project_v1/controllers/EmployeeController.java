@@ -26,7 +26,7 @@ public class EmployeeController {
     public ResponseEntity<?> upDateEmployee(@RequestBody EmployeeDTO employeeDTO) {
         return ResponseEntity.ok(employeeService.upDateEmployee(employeeDTO));
     }
-    @DeleteMapping("/nonActiveEmployee")
+    @PutMapping("/nonActiveEmployee")
     public ResponseEntity<?> deleteEmployee(@RequestBody List<Long> employeeIds) {
         employeeService.deleteEmployee(employeeIds);
         return ResponseEntity.ok().build();

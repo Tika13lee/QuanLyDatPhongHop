@@ -135,8 +135,8 @@ public class RoomService implements IRoom {
     }
 
     @Override
-    public List<Room> searchRoomByName(String roomName) {
-        return roomRepository.searchRoomsByName(roomName);
+    public List<RoomDTO> searchRoomByName(String roomName) {
+        return convertRoomToRoomDTO(roomRepository.searchRoomsByName(roomName));
     }
 
     @Override
@@ -240,5 +240,4 @@ public class RoomService implements IRoom {
         roomDTO.setReservationDTOS(reservationDTOS);
         return roomDTO;
     }
-
 }

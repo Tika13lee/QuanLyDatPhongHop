@@ -10,4 +10,6 @@ public interface IService {
     Service createService(ServiceDTO serviceDTO);
     Service upDateService(ServiceDTO serviceDTO);
     void deleteService(Long id);
+    Service getServiceByName(String name);
+
 }

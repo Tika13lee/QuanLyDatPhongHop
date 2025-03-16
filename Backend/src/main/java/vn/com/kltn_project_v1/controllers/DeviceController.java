@@ -31,4 +31,8 @@ public class DeviceController {
         deviceService.deleteDevice(deviceDTO.getDeviceId());
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/getDeviceByName")
+    public ResponseEntity<?> getDeviceByName(@RequestParam String name) {
+        return ResponseEntity.ok(deviceService.getDeviceByName(name));
+    }
 }

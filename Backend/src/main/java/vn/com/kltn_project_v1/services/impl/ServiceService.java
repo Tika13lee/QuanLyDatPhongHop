@@ -44,4 +44,9 @@ public class ServiceService implements IService {
     public void deleteService(Long id) {
         serviceRepository.deleteById(id);
     }
+
+    @Override
+    public Service getServiceByName(String name) {
+        return serviceRepository.findServiceByServiceName(name);
+    }
 }

@@ -61,5 +61,10 @@ public class DeviceService implements IDevice {
         return roomDeviceRepository.save(new Room_Device(new RoomDeviceKey(room,device),quantity));
     }
 
+    @Override
+    public Device getDeviceByName(String name) {
+        return deviceRepository.findDeviceByDeviceName(name).orElse(null);
+    }
+
 
 }

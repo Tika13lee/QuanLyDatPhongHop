@@ -19,9 +19,11 @@ public interface IRoom {
     public RoomRespone getAllRooms(int page, int size, String sortBy) throws DataNotFoundException;
     public RoomRespone searchRooms(String branch, int capacity, int price, StatusRoom statusRoom, int page, int size, String sortBy) throws DataNotFoundException;
     public Room addApproverToRoom(Long roomId, String phoneApprover) throws DataNotFoundException;
-    public List<Room> searchRoomByName(String roomName);
+    public List<RoomDTO> searchRoomByName(String roomName);
     public RoomDTO getRoomById(Long roomId) throws DataNotFoundException;
     public List<RoomViewDTO> getRoomOverView(String branch, Date dayStart, Date dayEnd) throws DataNotFoundException;
     public List<Room> getRoomByEmployee(String phone) throws DataNotFoundException;
     public List<Room> searchRoomByAttribute(String[] branch, int minCapacity, int maxCapacity, int minPrice, int maxPrice, TypeRoom[] typeRoom) throws DataNotFoundException;
+    public
 }
+
