@@ -98,12 +98,13 @@ public class ReservationController {
         }
     }
     @GetMapping("/getReservationsByBookerPhone")
-    public ResponseEntity<?> getReservationsByBookerPhone(@RequestParam String phone){
+    public ResponseEntity<?> getReservationsByBookerPhone(@RequestParam String phone,@RequestParam(required = false) StatusReservation statusReservation){
         try {
-            return ResponseEntity.ok(reservationService.getReservationsByBookerPhone(phone));
+            return ResponseEntity.ok(reservationService.getReservationsByBookerPhone(phone,statusReservation));
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }
+
 
 }

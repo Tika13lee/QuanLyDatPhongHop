@@ -29,5 +29,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r WHERE (?1 is null or r.statusReservation = ?1) and r.booker.phone = ?2 and (?3 is null or r.time between ?3 and ?4) and (?5 is null or r.room.approver.employeeName like %?5%) and (?6 is null or r.title like %?6%) ")
     List<Reservation> findReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation status, String phone, Date timeStart, Date timeEnd, String approver, String title);
     List<Reservation> findReservationsByBookerPhoneOrderByTimeDesc(String phone);
+    @Query("SELECT r FROM Reservation r WHERE r.booker.phone = ?1 and(?2 is null or  r.statusReservation = ?2) order by r.time desc")
+    List<Reservation> findReservationsByBookerPhoneAndStatusReservation(String phone, StatusReservation statusReservation);
 
 }
