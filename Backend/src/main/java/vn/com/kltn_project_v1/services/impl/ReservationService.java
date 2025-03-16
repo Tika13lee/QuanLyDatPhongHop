@@ -98,11 +98,11 @@ public class ReservationService implements IReservation {
     }
 
     @Override
-    public List<ReservationViewDTO> getAllReservationByBooker(String phone, Date dayStart, Date dayEnd) {
+    public List<Reservation> getAllReservationByBooker(String phone, Date dayStart, Date dayEnd) {
         if (dayStart.getTime()>new Date().getTime()){
             dayStart=null;
         }
-        return convertApprovalReservation(reservationRepository.findReservationsByBookerPhoneAndTime(phone,dayStart,dayEnd));
+        return reservationRepository.findReservationsByBookerPhoneAndTime(phone,dayStart,dayEnd);
     }
 
     @Override
@@ -154,6 +154,8 @@ public class ReservationService implements IReservation {
             reservationViewDTO.setTimeEnd(r.getTimeEnd());
             reservationViewDTO.setTimeStart(r.getTimeStart());
             reservationViewDTO.setTitle(r.getTitle());
+            reservationViewDTO.setFrequency(r.getFrequency());
+
             reservationViewDTOS.add(reservationViewDTO);
         });
         return reservationViewDTOS;
