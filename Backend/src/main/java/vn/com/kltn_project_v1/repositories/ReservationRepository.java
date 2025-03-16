@@ -18,7 +18,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findReservationsByStatusReservationPending(Long approverId);
     @Query("select r from Reservation r where r.statusReservation = 'NO_APPROVED' and (?1=0 or r.room.approver.employeeId = ?1)")
     List<Reservation> findReservationsByStatusReservationNoApproved(Long approverId);
-    @Query("select r from Reservation r where r.statusReservation != 'PENDING' and (?1=0 or r.room.approver.employeeId = ?1)")
+    @Query("select r from Reservation r where r.statusReservation != 'PENDING' and r.statusReservation!='NO_APPROVED' and (?1=0 or r.room.approver.employeeId = ?1)")
     List<Reservation> findReservationsByStatusReservationNoPending(Long approverId);
     @Query("select r from Reservation r where r.statusReservation = 'WAITING_CANCEL'")
     List<Reservation> findReservationsByStatusReservationWaitingCancel();

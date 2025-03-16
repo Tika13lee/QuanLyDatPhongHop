@@ -24,4 +24,5 @@ public class ReservationViewDTO {
     private String nameBooker;
     private String note;
     private Frequency frequency;
+    private Date timeApprove;
 }

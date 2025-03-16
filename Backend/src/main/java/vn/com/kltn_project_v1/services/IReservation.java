@@ -13,10 +13,12 @@ public interface IReservation {
 
     List<ReservationViewDTO> getAllReservationPending(Long ApproverId);
     List<ReservationViewDTO> getAllReservationNoPending(Long ApproverId);
+    List<ReservationViewDTO> getAllReservationNoApproved(Long ApproverId);
     List<ReservationViewDTO> getAllReservationWaitingCancel();
     Reservation getReservationById(Long reservationId);
     List<Reservation> createReservation(ReservationDTO reservationDTO);
     List<Reservation> getAllReservationByBooker(String phone,Date dayStart,Date dayEnd);
     List<Reservation> approveReservation(List<Long> reservationIds);
+    List<Reservation> disApproveReservation(List<Long> reservationIds);
     List<ReservationViewDTO> getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation statusReservation, String phone, Date dayStart, Date dayEnd, String approverName, String title);
 }

@@ -56,6 +56,11 @@ public class ReservationService implements IReservation {
     }
 
     @Override
+    public List<ReservationViewDTO> getAllReservationNoApproved(Long ApproverId) {
+        return convertApprovalReservation(reservationRepository.findReservationsByStatusReservationNoApproved(ApproverId));
+    }
+
+    @Override
     public List<ReservationViewDTO> getAllReservationWaitingCancel() {
         List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationWaitingCancel();
         return convertApprovalReservation(reservations);
@@ -127,7 +132,22 @@ public class ReservationService implements IReservation {
         reservationIds.forEach(r->{
             Reservation reservation = reservationRepository.findById(r).orElse(null);
             if (reservation != null) {
+                reservation.setTimeApprove(new Date());
                 reservation.setStatusReservation(StatusReservation.WAITING_PAYMENT);
+                reservations.add(reservationRepository.save(reservation));
+            }
+        });
+        return reservations;
+    }
+
+    @Override
+    public List<Reservation> disApproveReservation(List<Long> reservationIds) {
+        List<Reservation> reservations = new ArrayList<>();
+        reservationIds.forEach(r->{
+            Reservation reservation = reservationRepository.findById(r).orElse(null);
+            if (reservation != null) {
+                reservation.setTimeApprove(new Date());
+                reservation.setStatusReservation(StatusReservation.NO_APPROVED);
                 reservations.add(reservationRepository.save(reservation));
             }
         });
@@ -178,6 +198,7 @@ public class ReservationService implements IReservation {
             reservationViewDTO.setFrequency(r.getFrequency());
             reservationViewDTO.setNote(r.getNote());
             reservationViewDTO.setStatusReservation(r.getStatusReservation());
+            reservationViewDTO.setTimeApprove(r.getTimeApprove());
             reservationViewDTOS.add(reservationViewDTO);
         });
         return reservationViewDTOS;

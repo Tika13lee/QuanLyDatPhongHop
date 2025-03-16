@@ -73,4 +73,29 @@ public class ReservationController {
             return ResponseEntity.ok(e.toString());
         }
     }
+    @PutMapping("/disApproveReservation")
+    public ResponseEntity<?> disApproveReservation(@RequestBody List<Long> reservationIds){
+        try {
+            return ResponseEntity.ok(reservationService.disApproveReservation(reservationIds));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/getReservationsNoPending")
+    public ResponseEntity<?> getReservationsNoPending(@RequestParam(defaultValue = "0") Long approverId) {
+        try {
+            return ResponseEntity.ok(reservationService.getAllReservationNoPending(approverId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/getReservationsNoApproved")
+    public ResponseEntity<?> getReservationsNoApproved(@RequestParam(defaultValue = "0") Long approverId) {
+        try {
+            return ResponseEntity.ok(reservationService.getAllReservationNoApproved(approverId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }
