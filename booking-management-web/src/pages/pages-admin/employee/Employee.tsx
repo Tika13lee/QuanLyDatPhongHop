@@ -18,6 +18,7 @@ import {
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { fetchEmployees } from "../../../features/employeeSlice";
+import { METHODS } from "http";
 
 const cx = classNames.bind(styles);
 
@@ -60,10 +61,12 @@ const EmployeeManagement = () => {
 
   // lấy ds nhân viên
   useEffect(() => {
-    if (employees.length === 0) {
-      dispatch(fetchEmployees());
-    }
-  }, [dispatch, employees.length]);
+    dispatch(fetchEmployees());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchEmployees());
+  }, [employees]);
 
   // lấy chi nhánh
   const {
@@ -98,8 +101,17 @@ const EmployeeManagement = () => {
     loading: loadingAdd,
     error: errorAdd,
     postData,
-  } = usePost<EmployeeProps[]>(
+  } = usePost<EmployeeProps>(
     "http://localhost:8080/api/v1/employee/addEmployee"
+  );
+
+  const {
+    data: deActiveEmployee,
+    loading: deActiveLoading,
+    error: deActiveError,
+    postData: deActiveData,
+  } = usePost<string[]>(
+    "http://localhost:8080/api/v1/employee/nonActiveEmployee"
   );
 
   // Hàm xử lý thay đổi trong ô tìm kiếm
@@ -149,6 +161,8 @@ const EmployeeManagement = () => {
     });
   };
 
+  console.log(isCheck);
+
   // Xử lý khi chọn tất cả nhân viên
   const handleSelectAll = () => {
     if (isCheck.length === employees.length) {
@@ -159,8 +173,23 @@ const EmployeeManagement = () => {
   };
 
   // Hàm để vô hiệu hóa tài khoản
-  const handleDisableAccount = () => {
-    console.log("Vô hiệu hóa tài khoản cho các nhân viên: ", isCheck);
+  const handleDisableAccount = async () => {
+    const resp = await deActiveData(isCheck, { method: "PUT" });
+
+    if (resp) {
+      setPopupMessage("Tài khoản đã được vô hiệu hóa!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      // dispatch(fetchEmployees());
+      setEmployees(
+        employees.filter((emp) => !isCheck.includes(emp.employeeId))
+      );
+    } else {
+      setPopupMessage("Đã xảy ra lỗi khi vô hiệu hóa tài khoản!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
   };
 
   // Hàm xử lý khi thay đổi input
@@ -256,9 +285,8 @@ const EmployeeManagement = () => {
       setPopupType("success");
       setIsPopupOpen(true);
 
-      dispatch(fetchEmployees());
+      setEmployees((prev) => [...prev, response?.data]);
 
-      // Reset form và đóng form thêm
       resetForm();
       setOpenForm(false);
     } else {

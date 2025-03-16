@@ -103,10 +103,15 @@ function General() {
               setSelectedDate(new Date().toISOString().split("T")[0])
             }
           >
-            Hiện tại
+            Hôm nay
           </button>
           <button onClick={() => changeDay("previous")}>Trở về</button>
           <button onClick={() => changeDay("next")}>Tiếp</button>
+        </div>
+
+        {/* nút đặt phòng */}
+        <div className={cx("actionButtons")}>
+          <button>Đặt phòng</button>
         </div>
       </div>
 

@@ -1,3 +1,18 @@
+export type Reservation = {
+  time: string;
+  timeStart: string;
+  timeEnd: string;
+  note: string;
+  description: string;
+  title: string;
+  frequency: string;
+  timeFinishFrequency: string;
+  bookerId: number;
+  roomId: number;
+  employeeIds: number[];
+  serviceIds: number[];
+}
+
 // building
 export type BuildingProps = {
   buildingId: number;
@@ -75,6 +90,8 @@ export type RoomProps = {
     timeEnd: string;
     title: string;
     status: string;
+    note: string;
+    frequency: string;
   }[];
 };
 export type RoomProps2 = {

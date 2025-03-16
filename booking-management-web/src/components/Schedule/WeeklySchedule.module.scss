@@ -134,7 +134,7 @@
 
 /* Tô màu FULL */
 .booked {
-  background: rgba(255, 183, 3, 0.8);
+  background: rgba(122, 204, 224, 0.8);
   font-weight: bold;
   transition: background 0.3s ease-in-out;
   color: #fff;
@@ -142,13 +142,9 @@
 
 /* Hiển thị title chỉ ở ô đầu tiên */
 .booked-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100%;
   font-size: 14px;
-  font-weight: bold;
-  text-align: center;
+  text-align: left;
 }
 
 /* Cột giờ */
@@ -167,40 +163,6 @@
 }
 
 // modal
-// .modalOverlay {
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-//   background: rgba(0, 0, 0, 0.5);
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// }
-
-// .modalContent {
-//   background: white;
-//   padding: 20px;
-//   border-radius: 10px;
-//   width: 300px;
-//   text-align: center;
-//   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-// }
-
-// .modalContent button {
-//   margin-top: 10px;
-//   padding: 8px 15px;
-//   border: none;
-//   background: #007bff;
-//   color: white;
-//   cursor: pointer;
-//   border-radius: 5px;
-// }
-
-// .modalContent button:hover {
-//   background: #0056b3;
-// }
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -211,11 +173,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .modal {
-  width: 50%;
+  width: 60%;
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -247,6 +209,22 @@
   }
 }
 
+.form {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.form-info {
+  width: 40%;
+}
+
+.devide {
+  width: 1px;
+  height: 490px;
+  background: var(--border-color);
+}
+
 .form-group {
   margin-bottom: 15px;
   width: 100%;
@@ -255,7 +233,7 @@
 .form-row {
   display: flex;
   gap: 10px;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -277,4 +255,55 @@
   &:hover {
     background: var(--btn-add-hover);
   }
+}
+
+.employee-list {
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+}
+
+.employee-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+
+  button {
+    background: var(--btn-add);
+    color: var(--color-white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    padding: 2px 5px;
+
+    &:hover {
+      background: var(--btn-add-hover);
+    }
+  }
+}
+
+.modal-employee {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.model-add {
+  width: 40%;
+  height: 40%;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
 }

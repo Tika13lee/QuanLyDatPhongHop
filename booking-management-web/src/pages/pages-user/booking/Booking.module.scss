@@ -18,12 +18,25 @@
   }
 }
 
+.search {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  transition: all 0.3s ease;
+
+  label {
+    font-size: 14px;
+    color: var(--color-white);
+  }
+}
+
 .filters {
   width: 100%;
   display: flex;
   gap: 30px;
   flex-wrap: wrap;
   align-items: center;
+  padding-top: 20px;
 }
 
 .filter-item {

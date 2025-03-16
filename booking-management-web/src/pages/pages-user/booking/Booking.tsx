@@ -37,6 +37,7 @@ function Booking() {
   const { data, loading, error } = useFetch<EmployeeProps>(
     `http://localhost:8080/api/v1/employee/getEmployeeByPhone?phone=${empPhone}`
   );
+  localStorage.setItem("currentEmployee", JSON.stringify(data));
 
   const [locID, setLocID] = useState<number | undefined>(undefined);
   const [roomsData, setRoomsData] = useState<RoomProps[] | null>(null);
@@ -101,6 +102,15 @@ function Booking() {
   return (
     <div className={cx("booking-container")}>
       <div className={cx("booking-header")}>
+        <div className={cx("search")}>
+          <label>Tìm kiếm theo tên phòng</label>
+          <div>
+            <input
+              type="text"
+              placeholder="Nhập tên phòng"
+            />
+          </div>
+        </div>
         <div className={cx("filters")}>
           {/* Chọn chi nhánh */}
           <div className={cx("filter-item")}>
