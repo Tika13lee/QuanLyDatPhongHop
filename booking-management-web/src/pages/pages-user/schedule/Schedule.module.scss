@@ -103,16 +103,15 @@
     margin: 5px 0;
     border-radius: 5px;
     border-left: 5px solid #2196f3;
-
-    h3 {
-      margin: 0;
-      font-size: 16px;
-      color: #007aff;
-    }
+    text-align: left;
 
     p {
       margin: 5px 0 0;
       color: #333;
+    }
+
+    .status{
+      color: var(--color-error);
     }
   }
 }

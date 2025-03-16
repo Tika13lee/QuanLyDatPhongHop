@@ -1,13 +1,13 @@
 import classNames from "classnames/bind";
-import styles from "./ApprovedList.module.scss";
+import styles from "./BookingList.module.scss";
 import { useEffect, useState } from "react";
 import { ReservationDetailProps, ReservationProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
-import DetailModal from "./DetailModal";
+import DetailModal from "../approve/DetailModal";
 
 const cx = classNames.bind(styles);
 
-function ApprovedList() {
+function BookingList() {
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
@@ -25,11 +25,11 @@ function ApprovedList() {
   );
 
   const {
-    data: approvedList,
-    loading: loadingApprovedList,
-    error: errorApprovedList,
+    data: bookedList,
+    loading: loadingBookedList,
+    error: errorBookedList,
   } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsNoPending?approverId=${user.employeeId}`
+    `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}`
   );
 
   // Hàm format ngày giờ
@@ -63,8 +63,8 @@ function ApprovedList() {
   };
 
   return (
-    <div className={cx("approved-list")}>
-      <div className={cx("approve-search")}>
+    <div className={cx("booking-list")}>
+      <div className={cx("booking-search")}>
         <div className={cx("search-row")}>
           <label>Tìm kiếm</label>
           <input
@@ -77,15 +77,28 @@ function ApprovedList() {
           <label>Thời gian gửi</label>
           <input type="date" className={cx("search-input")} />
         </div>
+        <div className={cx("search-row")}>
+          <label>Trạng thái</label>
+          <select className={cx("search-input")} name="status">
+            <option value="">Tất cả</option>
+            <option value="WAITING">Chờ nhận phòng</option>
+            <option value="CHECKED_IN">Đã nhận phòng</option>
+            <option value="COMPLETED">Đã hoàn thành</option>
+            <option value="WAITING_PAYMENT">Chờ thanh toán</option>
+            <option value="CANCELLED">Đã hủy</option>
+            <option value="PENDING">Đang chờ phê duyệt</option>
+            <option value="NO_APPROVED">Không được phê duyệt</option>
+            <option value="CANCELLED">Đang chờ hủy</option>
+          </select>
+        </div>
       </div>
-
-      {Array.isArray(approvedList) && approvedList.length === 0 ? (
+      {Array.isArray(bookedList) && bookedList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {approvedList?.map((schedule) => {
+          {bookedList?.map((schedule) => {
             const meetingStart = formatDateTime(schedule.timeStart);
             const meetingEnd = formatDateTime(schedule.timeEnd);
             const bookingTime = formatDateTime(schedule.time);
@@ -128,11 +141,17 @@ function ApprovedList() {
                           ? "Chờ thanh toán"
                           : schedule.statusReservation === "CANCELLED"
                           ? "Đã hủy"
+                          : schedule.statusReservation === "PENDING"
+                          ? "Đang chờ phê duyệt"
+                          : schedule.statusReservation === "NO_APPROVED"
+                          ? "Không được phê duyệt"
                           : "Đang chờ hủy"}
                       </p>
                       <p>
                         <strong>Thời gian phê duyệt:</strong>{" "}
-                        {new Date(schedule.timeApprove).toLocaleString()}
+                        {schedule.timeApprove === null
+                          ? "Chưa phê duyệt"
+                          : new Date(schedule.timeApprove).toLocaleString()}
                       </p>
                     </div>
                     <div className={cx("right-info")}>
@@ -163,4 +182,4 @@ function ApprovedList() {
   );
 }
 
-export default ApprovedList;
+export default BookingList;

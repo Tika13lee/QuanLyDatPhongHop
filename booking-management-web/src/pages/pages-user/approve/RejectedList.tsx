@@ -1,13 +1,13 @@
 import classNames from "classnames/bind";
-import styles from "./ApprovedList.module.scss";
-import { useEffect, useState } from "react";
+import styles from "./RejectedList.module.scss";
 import { ReservationDetailProps, ReservationProps } from "../../../data/data";
+import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "./DetailModal";
 
 const cx = classNames.bind(styles);
 
-function ApprovedList() {
+function RejectedList() {
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
@@ -25,11 +25,11 @@ function ApprovedList() {
   );
 
   const {
-    data: approvedList,
-    loading: loadingApprovedList,
-    error: errorApprovedList,
+    data: rejectedList,
+    loading: loadingRejectedList,
+    error: errorRejectedList,
   } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsNoPending?approverId=${user.employeeId}`
+    `http://localhost:8080/api/v1/reservation/getReservationsNoApproved?approverId=${user.employeeId}`
   );
 
   // Hàm format ngày giờ
@@ -63,8 +63,8 @@ function ApprovedList() {
   };
 
   return (
-    <div className={cx("approved-list")}>
-      <div className={cx("approve-search")}>
+    <div className={cx("rejected-list")}>
+      <div className={cx("rejected-search")}>
         <div className={cx("search-row")}>
           <label>Tìm kiếm</label>
           <input
@@ -79,13 +79,13 @@ function ApprovedList() {
         </div>
       </div>
 
-      {Array.isArray(approvedList) && approvedList.length === 0 ? (
+      {Array.isArray(rejectedList) && rejectedList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {approvedList?.map((schedule) => {
+          {rejectedList?.map((schedule) => {
             const meetingStart = formatDateTime(schedule.timeStart);
             const meetingEnd = formatDateTime(schedule.timeEnd);
             const bookingTime = formatDateTime(schedule.time);
@@ -104,7 +104,6 @@ function ApprovedList() {
                         {new Date(schedule.time).toLocaleString()}
                       </p>
                     </div>
-
                     <div className={cx("center-info")}>
                       <p>
                         <strong>Ngày:</strong> {meetingStart.date}
@@ -163,4 +162,4 @@ function ApprovedList() {
   );
 }
 
-export default ApprovedList;
+export default RejectedList;

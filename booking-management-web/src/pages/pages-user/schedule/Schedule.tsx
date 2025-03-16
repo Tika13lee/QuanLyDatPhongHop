@@ -10,64 +10,60 @@ import {
   parseISO,
 } from "date-fns";
 import { vi } from "date-fns/locale";
+import useFetch from "../../../hooks/useFetch";
+import { ReservationDetailProps } from "../../../data/data";
+import { newDate } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
-// Danh sách sự kiện mẫu
-const events = [
-  {
-    id: 1,
-    title: "Họp dự án",
-    room: {
-      roomName: "Phòng họp 1",
-      location: "Tầng 2",
-    },
-    timeStart: "2025-03-15T08:30:00.000+07:00",
-    timeEnd: "2025-03-15T10:00:00.000+07:00",
-  },
-  {
-    id: 2,
-    title: "Họp dự án",
-    room: {
-      roomName: "Phòng họp 1",
-      location: "Tầng 2",
-    },
-    timeStart: "2025-03-15T14:30:00.000+07:00",
-    timeEnd: "2025-03-15T16:00:00.000+07:00",
-  },
-  {
-    id: 3,
-    title: "Họp dự án",
-    room: {
-      roomName: "Phòng họp 1",
-      location: "Tầng 2",
-    },
-    timeStart: "2025-03-15T14:30:00.000+07:00",
-    timeEnd: "2025-03-15T16:00:00.000+07:00",
-  },
-  {
-    id: 5,
-    title: "Họp dự án",
-    room: {
-      roomName: "Phòng họp 1",
-      location: "Tầng 2",
-    },
-    timeStart: "2025-03-13T14:30:00.000+07:00",
-    timeEnd: "2025-03-13T16:00:00.000+07:00",
-  },
-];
-
-// Chuyển đổi dữ liệu sự kiện
-const formattedEvents = events.map((event) => ({
-  ...event,
-  date: format(parseISO(event.timeStart), "yyyy-MM-dd"),
-  time: `${format(parseISO(event.timeStart), "HH:mm")} - ${format(
-    parseISO(event.timeEnd),
-    "HH:mm"
-  )}`,
-}));
+// // Danh sách sự kiện mẫu
+// const events = [
+//   {
+//     id: 1,
+//     title: "Họp dự án",
+//     room: {
+//       roomName: "Phòng họp 1",
+//       location: "Tầng 2",
+//     },
+//     timeStart: "2025-03-15T08:30:00.000+07:00",
+//     timeEnd: "2025-03-15T10:00:00.000+07:00",
+//   },
+//   {
+//     id: 2,
+//     title: "Họp dự án",
+//     room: {
+//       roomName: "Phòng họp 1",
+//       location: "Tầng 2",
+//     },
+//     timeStart: "2025-03-15T14:30:00.000+07:00",
+//     timeEnd: "2025-03-15T16:00:00.000+07:00",
+//   },
+//   {
+//     id: 3,
+//     title: "Họp dự án",
+//     room: {
+//       roomName: "Phòng họp 1",
+//       location: "Tầng 2",
+//     },
+//     timeStart: "2025-03-15T14:30:00.000+07:00",
+//     timeEnd: "2025-03-15T16:00:00.000+07:00",
+//   },
+//   {
+//     id: 5,
+//     title: "Họp dự án",
+//     room: {
+//       roomName: "Phòng họp 1",
+//       location: "Tầng 2",
+//     },
+//     timeStart: "2025-03-13T14:30:00.000+07:00",
+//     timeEnd: "2025-03-13T16:00:00.000+07:00",
+//   },
+// ];
 
 const Schedule = () => {
+  const userCurrent = localStorage.getItem("currentEmployee");
+  const user = JSON.parse(userCurrent || "{}");
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekStart, setWeekStart] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -75,6 +71,30 @@ const Schedule = () => {
 
   // Cập nhật danh sách ngày trong tuần
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+
+  const {
+    data: reservations,
+    loading,
+    error,
+  } = useFetch<ReservationDetailProps[]>(
+    `http://localhost:8080/api/v1/reservation/getAllReservationByBooker?phone=${
+      user.phone
+    }&dayStart=${new Date(daysOfWeek[0]).toISOString()}&dayEnd=${new Date(
+      daysOfWeek[6]
+    ).toISOString()}`
+  );
+
+  // Chuyển đổi dữ liệu sự kiện
+  const formattedEvents = reservations?.map((event) => ({
+    ...event,
+    date: format(parseISO(event.timeStart), "yyyy-MM-dd"),
+    time: `${format(parseISO(event.timeStart), "HH:mm")} - ${format(
+      parseISO(event.timeEnd),
+      "HH:mm"
+    )}`,
+  }));
+
+  console.log(reservations);
 
   // Chuyển tuần
   const changeWeek = (direction: "prev" | "current" | "next") => {
@@ -115,8 +135,8 @@ const Schedule = () => {
         </div>
         {/* Nút chuyển tuần */}
         <div className={cx("week-navigation")}>
-          <button onClick={() => changeWeek("prev")}>Tuần trước</button>
           <button onClick={() => changeWeek("current")}>Hiện tại</button>
+          <button onClick={() => changeWeek("prev")}>Tuần trước</button>
           <button onClick={() => changeWeek("next")}>Tuần sau</button>
         </div>
       </div>
@@ -126,8 +146,10 @@ const Schedule = () => {
         {daysOfWeek.map((day, index) => {
           const dayFormatted = format(day, "yyyy-MM-dd");
 
+          const events = formattedEvents ?? [];
+
           // Lọc và sắp xếp sự kiện theo ngày
-          const dayEvents = formattedEvents
+          const dayEvents = events
             .filter((event) => event.date === dayFormatted)
             .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
 
@@ -139,11 +161,23 @@ const Schedule = () => {
               {dayEvents.length > 0 && (
                 <ul className={cx("event-list")}>
                   {dayEvents.map((event) => (
-                    <li key={event.id} className={cx("event-item")}>
+                    <li key={event.reservationId} className={cx("event-item")}>
                       <small>{event.time}</small> <br />
                       {event.title} <br />
-                      {event.room.roomName} <br />
-                      {event.room.location}
+                      <small>
+                        Phòng {event.room.roomName} -
+                        Tầng {event.room.location.floor} - Tòa{" "}
+                        {event.room.location.building.buildingName} -{" "}
+                        {event.room.location.building.branch.branchName}
+                      </small> <br />
+                      <small className={cx("status")}>
+                        {event.statusReservation === "PENDING" && "Đang chờ phê duyệt"}
+                        {event.statusReservation === "CHECKED_IN" && "Đã nhận phòng"}
+                        {event.statusReservation === "COMPLETED" && "Hoàn thành"}
+                        {event.statusReservation === "WAITING_CANCEL" && "Đang chờ hủy"}
+                        {event.statusReservation === "WAITING_PAYMENT" && "Đang chờ thanh toán"}
+                        
+                      </small>
                     </li>
                   ))}
                 </ul>

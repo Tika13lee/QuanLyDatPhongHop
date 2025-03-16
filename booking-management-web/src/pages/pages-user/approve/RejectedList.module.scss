@@ -1,4 +1,4 @@
-.approve-list {
+.rejected-list {
   margin: 0 auto;
 }
 
@@ -10,14 +10,13 @@
 }
 
 // search
-.approve-search {
+.rejected-search {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   gap: 50px;
   padding: 10px 20px;
   background: #353231;
-
 
   position: -webkit-sticky;
   position: sticky;
@@ -93,14 +92,8 @@
   flex: 1;
 }
 
-.left-info {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
 .center-info {
-  text-align: center;
+  text-align: left;
   font-weight: bold;
 }
 

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 import useFetch from "../../../hooks/useFetch";
-import { ReservationDetailProps, RoomViewProps } from "../../../data/data";
+import {
+  BranchProps,
+  ReservationDetailProps,
+  RoomViewProps,
+} from "../../../data/data";
 import { set } from "react-datepicker/dist/date_utils";
 import axios from "axios";
 import { cp } from "fs";
@@ -31,6 +35,15 @@ function Overview() {
     useState<ReservationDetailProps | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
+
+  // lấy chi nhánh
+  const {
+    data: branchs,
+    loading: branchsLoading,
+    error: branchsError,
+  } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
+  );
 
   // Lấy dữ liệu locations từ Redux Store
   const {
@@ -127,13 +140,8 @@ function Overview() {
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
           >
-            {/* <option value="">Chọn chi nhánh</option> */}
-            {[
-              ...new Set(locations?.map((location) => location.branch) || []),
-            ].map((branch, index) => (
-              <option key={index} value={branch}>
-                {branch}
-              </option>
+            {branchs?.map((branch) => (
+              <option key={branch.branchId}>{branch.branchName}</option>
             ))}
           </select>
         </div>
@@ -200,21 +208,51 @@ function Overview() {
                         return startTime <= time && time < endTime;
                       }
                     );
+
+                    const editBackground: { [key: string]: string } = {
+                      normal: "normal",
+                      pending: "pending",
+                      waiting_payment: "waiting_payment",
+                      waiting: "waiting",
+                      checked_in: "checked_in",
+                      completed: "completed",
+                      waiting_cancel: "waiting_cancel",
+                    };
+                    let statusKey =
+                      reservations[0]?.statusReservation.toLocaleLowerCase() ||
+                      "normal";
+
                     return (
                       <td
                         key={`${room.roomId}-${time}`}
-                        className={cx({ booked: reservations.length > 0 })}
+                        className={cx({
+                          booked: reservations.length > 0,
+                          [editBackground[statusKey]]:
+                            editBackground[statusKey],
+                        })}
                       >
                         {/* Hiển thị tất cả đặt phòng trùng với `time` */}
                         {reservations.map((res) => (
                           <div
+                            className={cx("booked-title")}
                             onClick={() => handleOpenModal(res.reservationId)}
                           >
-                            <div key={res.reservationId}>{res.title}</div>
-                            <div key={res.reservationId}>{res.nameBooker}</div>
-                            <div key={res.reservationId}>
-                              Trạng thái: {res.statusReservation}
-                            </div>
+                            <p>{res?.title}</p>
+                            <p className={cx("status")}>
+                              {res.statusReservation === "PENDING"
+                                ? "Chờ phê duyệt"
+                                : res.statusReservation === "WAITING_PAYMENT"
+                                ? "Chờ thanh toán"
+                                : res.statusReservation === "WAITING"
+                                ? "Chờ nhận phòng"
+                                : res.statusReservation === "CHECKED_IN"
+                                ? "Đã nhận phòng"
+                                : res.statusReservation === "COMPLETED"
+                                ? "Đã hoàn thành"
+                                : res.statusReservation === "WAITING_CANCEL"
+                                ? "Chờ hủy"
+                                : ""}
+                            </p>
                           </div>
                         ))}
                       </td>

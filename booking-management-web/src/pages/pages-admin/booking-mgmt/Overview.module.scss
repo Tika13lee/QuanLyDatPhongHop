@@ -142,13 +142,50 @@
   padding-right: 10px;
 }
 
+// màu lịch
 .booked {
-  background: rgba(255, 183, 3, 0.8);
+  background-color: rgba(169, 222, 235, 0.8);
   font-weight: bold;
   transition: background 0.3s ease-in-out;
   color: #fff;
-  cursor: pointer;
 }
+
+.booked-title {
+  height: 100%;
+  font-size: 14px;
+  text-align: left;
+
+  .status {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-error);
+  }
+}
+
+.waiting {
+  background-color: rgb(231, 171, 239);
+}
+
+.completed {
+  background-color: rgb(160, 244, 156);
+}
+
+.pending {
+  background-color: rgb(232, 213, 87);
+}
+
+.waiting_payment {
+  background-color: rgb(237, 176, 124);
+}
+
+.checked_in {
+  background-color: rgb(131, 211, 211);
+}
+
+.waiting_cancel {
+  background-color: rgb(243, 156, 156);
+}
+
 
 // Modal
 .modal {

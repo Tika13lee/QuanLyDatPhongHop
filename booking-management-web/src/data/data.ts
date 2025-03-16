@@ -89,7 +89,7 @@ export type RoomProps = {
     timeStart: string;
     timeEnd: string;
     title: string;
-    status: string;
+    statusReservation: string;
     note: string;
     frequency: string;
   }[];
@@ -173,6 +173,9 @@ export type ReservationProps = {
   img: string;
   nameBooker: string;
   statusReservation: string;
+  note: string;
+  frequency: string;
+  timeApprove: string;
 };
 
 export type ReservationDetailProps = {

@@ -1,4 +1,4 @@
-.approve-list {
+.booking-list {
   margin: 0 auto;
 }
 
@@ -10,14 +10,13 @@
 }
 
 // search
-.approve-search {
+.booking-search {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   gap: 50px;
   padding: 10px 20px;
   background: #353231;
-
 
   position: -webkit-sticky;
   position: sticky;
@@ -67,11 +66,25 @@
   position: relative;
 }
 
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
 .card-content {
   h3 {
     font-size: 18px;
     font-weight: bold;
-    color: #222;
+    color: var(--text-primary);
     margin-bottom: 10px;
   }
   p {
@@ -93,14 +106,8 @@
   flex: 1;
 }
 
-.left-info {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
 .center-info {
-  text-align: center;
+  text-align: left;
   font-weight: bold;
 }
 
@@ -122,21 +129,6 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
-}
-
-.approve-btn {
-  background-color: var(--btn-add);
-
-  &:hover {
-    background-color: var(--btn-add-hover);
-  }
-}
-
-.reject-btn {
-  background-color: #dc3545;
-  &:hover {
-    background-color: #c82333;
-  }
 }
 
 .details-btn {

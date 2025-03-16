@@ -4,5 +4,16 @@ import Approve from "./approve/Approve";
 import ApprovedList from "./approve/ApprovedList";
 import ViewSchedule from "./booking/ViewSchedule";
 import General from "./booking/General";
+import BookingList from "./booking-list/BookingList";
+import RejectedList from "./approve/RejectedList";
 
-export { General, ApprovedList, Booking, Schedule, Approve, ViewSchedule };
+export {
+  RejectedList,
+  BookingList,
+  General,
+  ApprovedList,
+  Booking,
+  Schedule,
+  Approve,
+  ViewSchedule,
+};

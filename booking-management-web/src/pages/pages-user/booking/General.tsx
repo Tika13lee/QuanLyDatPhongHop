@@ -24,6 +24,7 @@ function General() {
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // lấy chi nhánh
   const {
@@ -47,6 +48,13 @@ function General() {
     const date = new Date(dateString);
     date.setUTCHours(23, 59, 59, 999);
     return date.toISOString();
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(true);
   };
 
   // Fetch danh sách đặt phòng theo ngày của 1 chi nhánh
@@ -138,7 +146,7 @@ function General() {
                   <td className={cx("time-column")}>{time}</td>
 
                   {/* Duyệt qua từng phòng */}
-                  {rooms.map((room) => {
+                  {rooms.map((room, index) => {
                     // Tìm tất cả đặt phòng phù hợp với `time`
                     const reservations = room.reservationViewDTOS.filter(
                       (res) => {
@@ -153,19 +161,48 @@ function General() {
                         return startTime <= time && time < endTime;
                       }
                     );
+
+                    const editBackground: { [key: string]: string } = {
+                      normal: "normal",
+                      pending: "pending",
+                      waiting_payment: "waiting_payment",
+                      waiting: "waiting",
+                      checked_in: "checked_in",
+                      completed: "completed",
+                      waiting_cancel: "waiting_cancel",
+                    };
+                    let statusKey =
+                      reservations[0]?.statusReservation.toLocaleLowerCase() ||
+                      "normal";
+
                     return (
                       <td
                         key={`${room.roomId}-${time}`}
-                        className={cx({ booked: reservations.length > 0 })}
+                        className={cx({
+                          booked: reservations.length > 0,
+                          [editBackground[statusKey]]:
+                            editBackground[statusKey],
+                        })}
                       >
                         {/* Hiển thị tất cả đặt phòng trùng với `time` */}
                         {reservations.map((res) => (
-                          <div>
-                            <div key={res.reservationId}>{res.title}</div>
-                            <div key={res.reservationId}>{res.nameBooker}</div>
-                            <div key={res.reservationId}>
-                              Trạng thái: {res.statusReservation}
-                            </div>
+                          <div className={cx("booked-title")}>
+                            <p>{res?.title}</p>
+                            <p className={cx("status")}>
+                              {res.statusReservation === "PENDING"
+                                ? "Chờ phê duyệt"
+                                : res.statusReservation === "WAITING_PAYMENT"
+                                ? "Chờ thanh toán"
+                                : res.statusReservation === "WAITING"
+                                ? "Chờ nhận phòng"
+                                : res.statusReservation === "CHECKED_IN"
+                                ? "Đã nhận phòng"
+                                : res.statusReservation === "COMPLETED"
+                                ? "Đã hoàn thành"
+                                : res.statusReservation === "WAITING_CANCELED"
+                                ? "Chờ hủy"
+                                : ""}
+                            </p>
                           </div>
                         ))}
                       </td>
@@ -181,6 +218,8 @@ function General() {
           </p>
         )}
       </div>
+
+      {/* Modal */}
     </div>
   );
 }

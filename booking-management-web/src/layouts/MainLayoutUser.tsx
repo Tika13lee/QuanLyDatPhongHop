@@ -36,6 +36,15 @@ const MainLayoutUser = () => {
             Đặt lịch họp
           </NavLink>
 
+          <NavLink
+            to="/user/booking-list"
+            className={({ isActive }) =>
+              cx("sidebar-item", { active: isActive })
+            }
+          >
+            DS lịch đã đặt
+          </NavLink>
+
           <div className={cx("dropdown")}>
             <div
               className={cx("dropdown-header")}
@@ -66,7 +75,16 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  DS đã phê duyệt
+                  DS lịch đã phê duyệt
+                </NavLink>
+
+                <NavLink
+                  to="/user/rejected"
+                  className={({ isActive }) =>
+                    cx("dropdown-item", { active: isActive })
+                  }
+                >
+                  DS lịch đã từ chối
                 </NavLink>
               </div>
             )}

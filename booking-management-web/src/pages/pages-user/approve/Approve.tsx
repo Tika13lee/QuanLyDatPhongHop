@@ -4,64 +4,15 @@ import { useEffect, useState } from "react";
 import { ReservationDetailProps, ReservationProps } from "../../../data/data";
 import DetailModal from "./DetailModal";
 import useFetch from "../../../hooks/useFetch";
+import usePost from "../../../hooks/usePost";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
-const mockSchedules: ReservationProps[] = [
-  {
-    reservationId: 1,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-  {
-    reservationId: 2,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-  {
-    reservationId: 3,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-  {
-    reservationId: 5,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-  {
-    reservationId: 6,
-    title: "Kế hoạch truyền thông",
-    timeStart: "2025-03-01T08:30:00.000+07:00",
-    timeEnd: "2025-03-01T10:00:00.000+07:00",
-    statusReservation: "pending",
-    time: "2025-02-28T01:35:28.000+07:00",
-    img: "",
-    nameBooker: "Võ Tấn Dũng",
-  },
-];
-
 function Approve() {
-  const [schedules, setSchedules] = useState<ReservationProps[]>(mockSchedules);
+  const userCurrent = localStorage.getItem("currentEmployee");
+  const user = JSON.parse(userCurrent || "{}");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservationId, setSelectedReservationId] = useState<
     number | null
@@ -70,11 +21,126 @@ function Approve() {
     useState<ReservationDetailProps | null>(null);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
-  const { data, loading, error } = useFetch<ReservationDetailProps>(
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
+
+  const {
+    data: reservationDetail,
+    loading,
+    error,
+  } = useFetch<ReservationDetailProps>(
     selectedReservationId
       ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
       : ""
   );
+
+  let {
+    data: reservation,
+    loading: loadingReservation,
+    error: errorReservation,
+  } = useFetch<ReservationProps[]>(
+    `http://localhost:8080/api/v1/reservation/getReservationsPending?approverId=${user.employeeId}`
+  );
+
+  const [schedulesApprove, setSchedulesApprove] = useState<ReservationProps[]>(
+    reservation ?? []
+  );
+
+  console.log(schedulesApprove);
+
+  const {
+    data: deActiveDataRes,
+    loading: deActiveLoading,
+    error: deActiveError,
+    postData: deActiveData,
+  } = usePost<string[]>(
+    "http://localhost:8080/api/v1/reservation/approveReservation"
+  );
+
+  const {
+    data: nonActiveDataRes,
+    loading: nonActiveLoading,
+    error: nonActiveError,
+    postData: nonActiveData,
+  } = usePost<string[]>(
+    "http://localhost:8080/api/v1/reservation/disApproveReservation"
+  );
+
+  console.log(reservation);
+
+  useEffect(() => {
+    setSchedulesApprove(reservation ?? []);
+
+    fetch(
+      `http://localhost:8080/api/v1/reservation/getReservationsPending?approverId=${user.employeeId}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setSchedulesApprove(data);
+      });
+  }, [reservation]);
+
+  // Xử lý chọn/bỏ chọn item
+  const handleCheckboxChange = (id: number) => {
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((item) => item !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  // Hàm phê duyệt
+  const handleApprove = async () => {
+    console.log(selectedItems);
+    const resp = await deActiveData(selectedItems, { method: "PUT" });
+
+    if (resp) {
+      setPopupMessage("Lịch đã được phê duyệt!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      setSchedulesApprove(
+        schedulesApprove.filter(
+          (res) => !selectedItems.includes(res.reservationId)
+        )
+      );
+
+      reservation = [];
+    } else {
+      setPopupMessage("Phê duyệt thất bại!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
+  // Hàm từ chối
+  const handleRejected = async () => {
+    console.log(selectedItems);
+    const resp = await nonActiveData(selectedItems, { method: "PUT" });
+
+    if (resp) {
+      setPopupMessage("Lịch đã bị từ chối!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      setSchedulesApprove(
+        schedulesApprove.filter(
+          (res) => !selectedItems.includes(res.reservationId)
+        )
+      );
+
+      reservation = [];
+    } else {
+      setPopupMessage("Từ chối thất bại!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -87,22 +153,13 @@ function Approve() {
     };
   };
 
-  // Xử lý chọn/bỏ chọn item
-  const handleCheckboxChange = (id: number) => {
-    setSelectedItems((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((item) => item !== id)
-        : [...prevSelected, id]
-    );
-  };
-
   // Cập nhật state khi API trả về dữ liệu
   useEffect(() => {
-    if (data) {
-      setSelectedReservation(data);
+    if (reservationDetail) {
+      setSelectedReservation(reservationDetail);
       setIsModalOpen(true);
     }
-  }, [data]);
+  }, [reservationDetail]);
 
   const handleShowDetails = (reservationId: number) => {
     setSelectedReservationId(reservationId);
@@ -113,6 +170,7 @@ function Approve() {
     setSelectedReservationId(null);
     setSelectedReservation(null);
   };
+
   return (
     <div className={cx("approve")}>
       <div className={cx("approve-search")}>
@@ -131,22 +189,31 @@ function Approve() {
           </div>
           <button className={cx("btn-action", "details-btn")}>Tìm kiếm</button>
         </div>
+
         <div className={cx("device")}></div>
         <div className={cx("actions")}>
-          <button className={cx("btn-action", "approve-btn")}>
+          <button
+            className={cx("btn-action", "approve-btn")}
+            onClick={handleApprove}
+          >
             ✔ Phê Duyệt
           </button>
-          <button className={cx("btn-action", "reject-btn")}>✖ Từ Chối</button>
+          <button
+            className={cx("btn-action", "reject-btn")}
+            onClick={handleRejected}
+          >
+            ✖ Từ Chối
+          </button>
         </div>
       </div>
 
-      {Array.isArray(schedules) && schedules.length === 0 ? (
+      {Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {schedules.map((schedule) => {
+          {schedulesApprove?.map((schedule) => {
             const meetingStart = formatDateTime(schedule.timeStart);
             const meetingEnd = formatDateTime(schedule.timeEnd);
             const bookingTime = formatDateTime(schedule.time);

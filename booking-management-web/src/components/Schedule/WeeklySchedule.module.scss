@@ -132,21 +132,6 @@
   padding-right: 10px;
 }
 
-/* Tô màu FULL */
-.booked {
-  background: rgba(122, 204, 224, 0.8);
-  font-weight: bold;
-  transition: background 0.3s ease-in-out;
-  color: #fff;
-}
-
-/* Hiển thị title chỉ ở ô đầu tiên */
-.booked-title {
-  height: 100%;
-  font-size: 14px;
-  text-align: left;
-}
-
 /* Cột giờ */
 .timeColumn {
   font-weight: 600;
@@ -161,6 +146,55 @@
   color: var(--color-white);
   font-weight: 400;
 }
+
+
+
+/* Tô màu FULL */
+.booked {
+  background-color: rgba(122, 204, 224, 0.8);
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+  color: #fff;
+}
+
+.booked-title {
+  height: 100%;
+  font-size: 14px;
+  text-align: left;
+  color: var(--text-primary);
+
+  .status {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-error);
+  }
+}
+
+.waiting {
+  background-color: rgb(231, 171, 239);
+}
+
+.completed {
+  background-color: rgb(160, 244, 156);
+}
+
+.pending {
+  background-color: rgb(232, 213, 87);
+}
+
+.checkedIn {
+  background-color: rgb(139, 217, 217);
+}
+
+.waitingCanceled {
+  background-color: rgb(243, 156, 156);
+}
+
+
+
+
+
+
 
 // modal
 .modal-overlay {

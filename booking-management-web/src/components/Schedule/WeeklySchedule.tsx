@@ -335,11 +335,25 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                       );
                     });
 
+                    console.log(bookedSchedule);
+                    const editBackground: { [key: string]: string } = {
+                      "normal": "normal",
+                      "pending": "pending",
+                      "waiting": "waiting",
+                      "checked_in": "checked_in",
+                      "completed": "completed",
+                      "waitingCanceled": "waitingCanceled",
+                    }
+                    const statusKey = bookedSchedule?.statusReservation.toLocaleLowerCase() || "normal";
+
+                    console.log(editBackground[statusKey]);
+                    
                     return (
                       <td
                         key={i}
                         className={cx("schedule-cell", {
-                          booked: !!bookedSchedule,
+                          booked: bookedSchedule,
+                          [editBackground[statusKey]]: editBackground[statusKey]
                         })}
                         onClick={() => {
                           if (bookedSchedule) {
@@ -350,25 +364,27 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                         }}
                       >
                         {bookedSchedule ? (
-                          <div
-                            className={cx("booked-title", {
-                              approved: bookedSchedule.status === "APPROVED",
-                              completed: bookedSchedule.status === "COMPLETED",
-                              pending:
-                                bookedSchedule.status !== "APPROVED" &&
-                                bookedSchedule.status !== "COMPLETED",
-                            })}
-                          >
+                          <div className={cx("booked-title")}>
                             <p>{bookedSchedule?.title}</p>
-                            <br />
-                            <p>
-                              {bookedSchedule.status === "APPROVED"
-                                ? "Đã phê duyệt"
-                                : bookedSchedule.status === "COMPLETED"
+                            <p className={cx("status")}>
+                              {bookedSchedule.statusReservation === "PENDING"
+                                ? "Chờ phê duyệt"
+                                : bookedSchedule.statusReservation ===
+                                  "WAITING_PAYMENT"
+                                ? "Chờ thanh toán"
+                                : bookedSchedule.statusReservation === "WAITING"
+                                ? "Chờ nhận phòng"
+                                : bookedSchedule.statusReservation ===
+                                  "CHECKED_IN"
+                                ? "Đã nhận phòng"
+                                : bookedSchedule.statusReservation ===
+                                  "COMPLETED"
                                 ? "Đã hoàn thành"
-                                : "Chờ phê duyệt"}
+                                : bookedSchedule.statusReservation ===
+                                  "WAITING_CANCELED"
+                                ? "Chờ hủy"
+                                : ""}
                             </p>
-                            <p>Note: {}</p>
                           </div>
                         ) : (
                           ""

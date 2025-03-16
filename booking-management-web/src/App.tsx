@@ -17,7 +17,9 @@ import {
   Approve,
   ApprovedList,
   Booking,
+  BookingList,
   General,
+  RejectedList,
   Schedule,
   ViewSchedule,
 } from "./pages/pages-user";
@@ -48,9 +50,11 @@ function App() {
           <Route path="/user" element={<MainLayoutUser />}>
             <Route index element={<Booking />} />
             <Route path="booking" element={<General />} />
+            <Route path="booking-list" element={<BookingList />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
             <Route path="approve" element={<Approve />} />
             <Route path="approved" element={<ApprovedList />} />
+            <Route path="rejected" element={<RejectedList />} />
             <Route path="schedule" element={<Schedule />} />
           </Route>
         </Routes>
