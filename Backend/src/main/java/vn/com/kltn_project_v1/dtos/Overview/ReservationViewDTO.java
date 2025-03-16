@@ -2,6 +2,7 @@ package vn.com.kltn_project_v1.dtos.Overview;
 
 import jakarta.persistence.Entity;
 import lombok.*;
+import vn.com.kltn_project_v1.model.Frequency;
 import vn.com.kltn_project_v1.model.StatusReservation;
 
 import java.util.Date;
@@ -21,4 +22,6 @@ public class ReservationViewDTO {
     private Date time;
     private String img;
     private String nameBooker;
+    private String note;
+    private Frequency frequency;
 }

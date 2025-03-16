@@ -10,7 +10,7 @@ import java.util.List;
 public interface IReservation {
     List<ReservationViewDTO> getAllReservationInRoom(long roomId,Date  dayStart, Date dayEnd);
 
-    List<ReservationViewDTO> getAllReservationPending();
+    List<ReservationViewDTO> getAllReservationPending(Long bookerId);
     List<ReservationViewDTO> getAllReservationWaitingCancel();
     Reservation getReservationById(Long reservationId);
     List<Reservation> createReservation(ReservationDTO reservationDTO);

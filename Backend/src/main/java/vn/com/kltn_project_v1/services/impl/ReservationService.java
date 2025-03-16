@@ -36,14 +36,16 @@ public class ReservationService implements IReservation {
             reservationViewDTO.setTimeEnd(r.getTimeEnd());
             reservationViewDTO.setTimeStart(r.getTimeStart());
             reservationViewDTO.setTitle(r.getTitle());
+            reservationViewDTO.setFrequency(r.getFrequency());
+            reservationViewDTO.setNote(r.getNote());
             reservationViewDTOS.add(reservationViewDTO);
         });
         return reservationViewDTOS;
     }
 
     @Override
-    public List<ReservationViewDTO> getAllReservationPending() {
-        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationPending();
+    public List<ReservationViewDTO> getAllReservationPending(Long bookerId) {
+        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationPending(bookerId);
         return convertApprovalReservation(reservations);
     }
 

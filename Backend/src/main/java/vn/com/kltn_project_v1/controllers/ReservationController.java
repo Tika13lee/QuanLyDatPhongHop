@@ -17,9 +17,9 @@ public class ReservationController {
     @Autowired
     private IReservation reservationService;
     @GetMapping("/getReservationsPending")
-    public ResponseEntity<?> getReservationsPending() {
+    public ResponseEntity<?> getReservationsPending(@RequestParam(defaultValue = "0") Long bookerId) {
         try {
-            return ResponseEntity.ok(reservationService.getAllReservationPending());
+            return ResponseEntity.ok(reservationService.getAllReservationPending(bookerId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

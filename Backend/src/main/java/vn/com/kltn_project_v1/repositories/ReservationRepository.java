@@ -13,8 +13,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findReservationsByRoomRoomId(Long roomId);
     @Query("select r from Reservation r where r.room.roomId = ?1 and r.timeStart between ?2 and ?3")
     List<Reservation> findReservationsByRoomRoomIdAndTime(Long roomId, Date timeStart, Date timeEnd);
-    @Query("select r from Reservation r where r.statusReservation = 'PENDING'")
-    List<Reservation> findReservationsByStatusReservationPending();
+    @Query("select r from Reservation r where r.statusReservation = 'PENDING' and (?1=0 or r.booker.employeeId = ?1)")
+    List<Reservation> findReservationsByStatusReservationPending(Long bookerId);
     @Query("select r from Reservation r where r.statusReservation = 'WAITING_CANCEL'")
     List<Reservation> findReservationsByStatusReservationWaitingCancel();
     @Query("SELECT DISTINCT r.room FROM Reservation r WHERE r.booker.phone = ?1")
