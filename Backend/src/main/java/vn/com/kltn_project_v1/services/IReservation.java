@@ -21,4 +21,5 @@ public interface IReservation {
     List<Reservation> approveReservation(List<Long> reservationIds);
     List<Reservation> disApproveReservation(List<Long> reservationIds);
     List<ReservationViewDTO> getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation statusReservation, String phone, Date dayStart, Date dayEnd, String approverName, String title);
+    List<ReservationViewDTO> getReservationsByBookerPhone(String phone);
 }

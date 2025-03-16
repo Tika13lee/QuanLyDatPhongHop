@@ -159,6 +159,11 @@ public class ReservationService implements IReservation {
         return convertApprovalReservation(reservationRepository.findReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(statusReservation, phone, dayStart, dayEnd, approverName, title));
     }
 
+    @Override
+    public List<ReservationViewDTO> getReservationsByBookerPhone(String phone) {
+        return convertApprovalReservation(reservationRepository.findReservationsByBookerPhoneOrderByTimeDesc(phone));
+    }
+
     private Reservation convertReservationToCreate(ReservationDTO reservationDTO) {
 
         Reservation reservation = new Reservation();

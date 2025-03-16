@@ -97,5 +97,13 @@ public class ReservationController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/getReservationsByBookerPhone")
+    public ResponseEntity<?> getReservationsByBookerPhone(@RequestParam String phone){
+        try {
+            return ResponseEntity.ok(reservationService.getReservationsByBookerPhone(phone));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }
