@@ -15,4 +15,5 @@ public interface IReservation {
     Reservation getReservationById(Long reservationId);
     List<Reservation> createReservation(ReservationDTO reservationDTO);
     List<ReservationViewDTO> getAllReservationByBooker(String phone,Date dayStart,Date dayEnd);
+    List<Reservation> approveReservation(List<Long> reservationIds);
 }

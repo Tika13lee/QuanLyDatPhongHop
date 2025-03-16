@@ -8,6 +8,7 @@ import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.services.IReservation;
 
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reservation")
@@ -51,6 +52,14 @@ public class ReservationController {
     public ResponseEntity<?> getAllReservationByBooker(@RequestParam String phone, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayEnd){
         try {
             return ResponseEntity.ok(reservationService.getAllReservationByBooker(phone,dayStart,dayEnd));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PutMapping("/approveReservation")
+    public ResponseEntity<?> approveReservation(@RequestBody List<Long> reservationIds){
+        try {
+            return ResponseEntity.ok(reservationService.approveReservation(reservationIds));
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
