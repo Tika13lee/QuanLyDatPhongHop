@@ -22,9 +22,11 @@ public class ReservationDTO {
     private String title;
     private int total;
     private Frequency frequency;
+    private Date timeFinishFrequency;
     private long bookerId;
     private long roomId;
     private List<Long> employeeIds;
     private List<Long> serviceIds;
     private StatusReservation statusReservation;
+    private List<String> filePaths;
 }

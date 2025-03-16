@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.services.IReservation;
 
 import java.util.Date;
@@ -35,6 +36,22 @@ public class ReservationController {
         try {
             return ResponseEntity.ok(reservationService.getReservationById(reservationId));
         } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PostMapping("/createReservation")
+    public ResponseEntity<?> createReservation(@RequestBody ReservationDTO reservationDTO) {
+        try {
+            return ResponseEntity.ok(reservationService.createReservation(reservationDTO));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @GetMapping("/getAllReservationByBooker")
+    public ResponseEntity<?> getAllReservationByBooker(@RequestParam String phone, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayEnd){
+        try {
+            return ResponseEntity.ok(reservationService.getAllReservationByBooker(phone,dayStart,dayEnd));
+        }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }
