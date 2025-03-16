@@ -22,6 +22,10 @@ public class Reservation {
     private Date timeEnd;
     private Date timeCheckIn;
     private Date timeCheckOut;
+    private Date timeApprove;
+    private Date timeCancel;
+    private Date timePayment;
+
     private String note;
     @ElementCollection
     private List<String> filePaths;

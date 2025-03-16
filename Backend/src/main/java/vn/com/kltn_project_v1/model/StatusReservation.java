@@ -8,4 +8,5 @@ public enum StatusReservation {
     CANCELED,
     COMPLETED,
     WAITING_CANCEL,
+    NO_APPROVED
 }

@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
+import vn.com.kltn_project_v1.model.StatusReservation;
 import vn.com.kltn_project_v1.services.IReservation;
 
 import java.util.Date;
@@ -17,9 +18,9 @@ public class ReservationController {
     @Autowired
     private IReservation reservationService;
     @GetMapping("/getReservationsPending")
-    public ResponseEntity<?> getReservationsPending(@RequestParam(defaultValue = "0") Long bookerId) {
+    public ResponseEntity<?> getReservationsPending(@RequestParam(defaultValue = "0") Long approverId) {
         try {
-            return ResponseEntity.ok(reservationService.getAllReservationPending(bookerId));
+            return ResponseEntity.ok(reservationService.getAllReservationPending(approverId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -62,6 +63,14 @@ public class ReservationController {
             return ResponseEntity.ok(reservationService.approveReservation(reservationIds));
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle")
+    public ResponseEntity<?> getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(@RequestParam(required = false) StatusReservation statusReservation, @RequestParam String phone, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayEnd, @RequestParam(required = false) String approverName, @RequestParam(required = false) String title){
+        try {
+            return ResponseEntity.ok(reservationService.getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(statusReservation,phone,dayStart,dayEnd,approverName,title));
+        }catch (Exception e){
+            return ResponseEntity.ok(e.toString());
         }
     }
 }
