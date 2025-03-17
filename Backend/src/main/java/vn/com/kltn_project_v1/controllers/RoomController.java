@@ -113,21 +113,11 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         }
     }
     @GetMapping("/searchRoomByAttribute")
-    public ResponseEntity<?> searchRoomByAttribute(@RequestParam String[] branchs, @RequestParam(defaultValue = "0") int minCapacity, @RequestParam(defaultValue = "0") int maxCapacity, @RequestParam(defaultValue = "0") int minPrice, @RequestParam(defaultValue = "0") int maxPrice, @RequestParam TypeRoom[] typeRooms){
+    public ResponseEntity<?> searchRoomByAttribute(@RequestParam(required = false) String branch, @RequestParam(defaultValue = "0") int capacity, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeStart, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeEnd, @RequestParam(defaultValue = "0") int price){
         try {
-
-            System.out.println(minCapacity);
-            System.out.println(maxCapacity);
-            System.out.println(minPrice);
-            System.out.println(maxPrice);
-            for (TypeRoom typeRoom : typeRooms) {
-                System.out.println(typeRoom);
-
-            }
-
-            return ResponseEntity.ok(roomService.searchRoomByAttribute(branchs, minCapacity, maxCapacity, minPrice, maxPrice, typeRooms));
+            return ResponseEntity.ok(roomService.searchRoomByAttribute(branch, capacity, timeStart, timeEnd, price));
         }catch (Exception e){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(e.toString());
         }
     }
 

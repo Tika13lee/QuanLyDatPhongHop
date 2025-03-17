@@ -23,6 +23,6 @@ public interface IRoom {
     public RoomDTO getRoomById(Long roomId) throws DataNotFoundException;
     public List<RoomViewDTO> getRoomOverView(String branch, Date dayStart, Date dayEnd) throws DataNotFoundException;
     public List<Room> getRoomByEmployee(String phone) throws DataNotFoundException;
-    public List<Room> searchRoomByAttribute(String[] branch, int minCapacity, int maxCapacity, int minPrice, int maxPrice, TypeRoom[] typeRoom) throws DataNotFoundException;
+    public List<Room> searchRoomByAttribute(String branch, int capacity, Date timeStart, Date timeEnd, int price) throws DataNotFoundException;
 }
 

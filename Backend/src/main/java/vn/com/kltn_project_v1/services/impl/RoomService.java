@@ -17,6 +17,10 @@ import vn.com.kltn_project_v1.services.IReservation;
 import vn.com.kltn_project_v1.services.IRoom;
 
 import java.awt.print.Pageable;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -165,34 +169,12 @@ public class RoomService implements IRoom {
     }
 
     @Override
-    public List<Room> searchRoomByAttribute(String[] branchs, int minCapacity, int maxCapacity, int minPrice, int maxPrice, TypeRoom[] typeRooms) throws DataNotFoundException {
-        ArrayList<Room> rooms = new ArrayList<>();
-        for (String branch : branchs) {
-            List<Room> roomsByBranch = roomRepository.findByBranch(branch);
-            rooms.addAll(roomsByBranch);
-        }
-
-
-        if (maxCapacity!=0){
-            List<Room> roomsByCapacity = roomRepository.findRoomsByCapacityRange(minCapacity, maxCapacity);
-            rooms.retainAll(roomsByCapacity);
-        }
-        if (maxPrice!=0){
-            List<Room> roomsByPrice = roomRepository.findRoomsByPriceRange(minPrice, maxPrice);
-            rooms.retainAll(roomsByPrice);
-        }
-        if(typeRooms.length!=0) {
-            List<Room> roomsByTypeRoom = new ArrayList<>();
-            for (TypeRoom typeRoom : typeRooms) {
-                List<Room> roomsByType = roomRepository.findRoomsByTypeRoom(typeRoom);
-                roomsByTypeRoom.addAll(roomsByType);
-            }
-            rooms.retainAll(roomsByTypeRoom);
-        };
-
+    public List<Room> searchRoomByAttribute(String branch, int capacity, Date timeStart, Date timeEnd, int price) throws DataNotFoundException {
+        List<Room> rooms = roomRepository.findRoomsForReservation(branch, capacity, price);
+        rooms.removeAll(reservationRepository.findRoomsByTime(timeStart, timeEnd));
         return rooms;
-
     }
+
 
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         return rooms.stream().map(this::convertRoomToDTO).toList();
