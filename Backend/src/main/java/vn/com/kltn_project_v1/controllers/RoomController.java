@@ -113,7 +113,7 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         }
     }
     @GetMapping("/searchRoomByAttribute")
-    public ResponseEntity<?> searchRoomByAttribute(@RequestParam(required = false) String branch, @RequestParam(defaultValue = "0") int capacity, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeStart, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeEnd, @RequestParam(defaultValue = "0") int price){
+    public ResponseEntity<?> searchRoomByAttribute(@RequestParam(required = false) String branch, @RequestParam(defaultValue = "0") int capacity, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeStart, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeEnd, @RequestParam(defaultValue = "0",required = false) int price){
         try {
             return ResponseEntity.ok(roomService.searchRoomByAttribute(branch, capacity, timeStart, timeEnd, price));
         }catch (Exception e){
