@@ -18,6 +18,8 @@ function BookingList() {
   const [selectedReservation, setSelectedReservation] =
     useState<ReservationDetailProps | null>(null);
 
+  const [status, setStatus] = useState<string>("");
+
   const { data, loading, error } = useFetch<ReservationDetailProps>(
     selectedReservationId
       ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
@@ -29,7 +31,9 @@ function BookingList() {
     loading: loadingBookedList,
     error: errorBookedList,
   } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}`
+    status
+      ? `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}&statusReservation=${status}`
+      : `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}`
   );
 
   // Hàm format ngày giờ
@@ -62,6 +66,8 @@ function BookingList() {
     setSelectedReservation(null);
   };
 
+  console.log(status);
+
   return (
     <div className={cx("booking-list")}>
       <div className={cx("booking-search")}>
@@ -79,16 +85,21 @@ function BookingList() {
         </div>
         <div className={cx("search-row")}>
           <label>Trạng thái</label>
-          <select className={cx("search-input")} name="status">
+          <select
+            className={cx("search-input")}
+            name="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
             <option value="">Tất cả</option>
             <option value="WAITING">Chờ nhận phòng</option>
             <option value="CHECKED_IN">Đã nhận phòng</option>
             <option value="COMPLETED">Đã hoàn thành</option>
             <option value="WAITING_PAYMENT">Chờ thanh toán</option>
-            <option value="CANCELLED">Đã hủy</option>
+            <option value="CANCELED">Đã hủy</option>
             <option value="PENDING">Đang chờ phê duyệt</option>
             <option value="NO_APPROVED">Không được phê duyệt</option>
-            <option value="CANCELLED">Đang chờ hủy</option>
+            <option value="WAITING_CANCEL">Đang chờ hủy</option>
           </select>
         </div>
       </div>

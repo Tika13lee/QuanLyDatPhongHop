@@ -105,6 +105,7 @@ const EmployeeManagement = () => {
     "http://localhost:8080/api/v1/employee/addEmployee"
   );
 
+  // vô hiệu hóa nhân viên
   const {
     data: deActiveEmployee,
     loading: deActiveLoading,

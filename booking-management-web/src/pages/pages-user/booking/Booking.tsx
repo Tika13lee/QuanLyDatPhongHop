@@ -22,10 +22,10 @@ const cx = classNames.bind(styles);
 // Tạo danh sách giờ từ 08:00 đến 17:00, mỗi bước 30 phút
 const generateTimeSlots = () => {
   const times = [];
-  for (let hour = 8; hour < 17; hour++) {
-    times.push(`${hour}:00`, `${hour}:30`);
+  for (let hour = 7; hour < 18; hour++) {
+    times.push(`${hour}:30`, `${hour}:00`);
   }
-  times.push("17:00");
+  times.push("18:00");
   return times;
 };
 
@@ -48,6 +48,7 @@ function Booking() {
   const [startTime, setStartTime] = useState(timeSlots[0]);
   const [duration, setDuration] = useState(30);
   const [capacity, setCapacity] = useState<number>(1);
+  const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
 
   // Lấy danh sách chi nhánh
   const { data: branches } = useFetch<BranchProps[]>(
@@ -99,25 +100,62 @@ function Booking() {
     ? roomsUseData
     : roomsUseData?.slice(0, Math.min(5, roomsUseData.length));
 
+  // Hàm tính toán thời gian kết thúc
+  const calculateEndTime = (
+    startTime: string,
+    duration: number,
+    selectedDate: string
+  ) => {
+    const startDate = new Date(`${selectedDate}T${startTime}`);
+
+    startDate.setMinutes(startDate.getMinutes() + duration);
+
+    const endHour = startDate.getHours().toString().padStart(2, "0"); 
+    const endMinute = startDate.getMinutes().toString().padStart(2, "0");
+
+    return `${endHour}:${endMinute}`;
+  };
+
+  // xử lý filter
+  const handleFilter = () => {
+    const [hour, minute] = startTime.split(":");
+    const normalizedStartTime = `${hour.padStart(2, "0")}:${minute}`;
+    const endTime = calculateEndTime(normalizedStartTime, duration, selectedDate);
+    const timeStart = new Date(
+      `${selectedDate}T${normalizedStartTime}`
+    ).toISOString();
+
+    const timeEnd = new Date(`${selectedDate}T${endTime}`).toISOString();
+
+    console.log(
+      branchName,
+      new Date(selectedDate).toISOString(),
+      timeStart,
+      timeEnd,
+      capacity
+    );
+  };
+
   return (
     <div className={cx("booking-container")}>
       <div className={cx("booking-header")}>
         <div className={cx("search")}>
           <label>Tìm kiếm theo tên phòng</label>
           <div>
-            <input
-              type="text"
-              placeholder="Nhập tên phòng"
-            />
+            <input type="text" placeholder="Nhập tên phòng" />
           </div>
         </div>
         <div className={cx("filters")}>
           {/* Chọn chi nhánh */}
           <div className={cx("filter-item")}>
             <label>Chi nhánh</label>
-            <select>
+            <select
+              name="branch"
+              value={branchName}
+              onChange={(e) => setBranchName(e.target.value)}
+            >
               {branches?.map((branch) => (
-                <option key={branch.branchId} value={branch.branchId}>
+                <option key={branch.branchId} value={branch.branchName}>
                   {branch.branchName}
                 </option>
               ))}
@@ -178,7 +216,9 @@ function Booking() {
 
           {/* Nút tìm kiếm */}
           <div>
-            <button className={cx("search-button")}>Tìm phòng</button>
+            <button className={cx("search-button")} onClick={handleFilter}>
+              Tìm phòng
+            </button>
           </div>
         </div>
       </div>
