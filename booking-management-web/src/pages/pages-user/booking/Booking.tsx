@@ -49,6 +49,7 @@ function Booking() {
   const [duration, setDuration] = useState(30);
   const [capacity, setCapacity] = useState<number>(1);
   const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
+  const [filterData, setFilterData] = useState<RoomProps[] | null>(null);
 
   // Lấy danh sách chi nhánh
   const { data: branches } = useFetch<BranchProps[]>(
@@ -110,7 +111,7 @@ function Booking() {
 
     startDate.setMinutes(startDate.getMinutes() + duration);
 
-    const endHour = startDate.getHours().toString().padStart(2, "0"); 
+    const endHour = startDate.getHours().toString().padStart(2, "0");
     const endMinute = startDate.getMinutes().toString().padStart(2, "0");
 
     return `${endHour}:${endMinute}`;
@@ -120,7 +121,11 @@ function Booking() {
   const handleFilter = () => {
     const [hour, minute] = startTime.split(":");
     const normalizedStartTime = `${hour.padStart(2, "0")}:${minute}`;
-    const endTime = calculateEndTime(normalizedStartTime, duration, selectedDate);
+    const endTime = calculateEndTime(
+      normalizedStartTime,
+      duration,
+      selectedDate
+    );
     const timeStart = new Date(
       `${selectedDate}T${normalizedStartTime}`
     ).toISOString();
@@ -134,6 +139,18 @@ function Booking() {
       timeEnd,
       capacity
     );
+
+    fetch(
+      `http://localhost:8080/api/v1/room/searchRoomByAttribute?capacity=${capacity}&timeStart=${timeStart}&timeEnd=${timeEnd}&branch=${branchName}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("API response:", data);
+        setFilterData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   };
 
   return (
@@ -226,6 +243,17 @@ function Booking() {
       {/* Danh sách phòng */}
       <div className={cx("room-list")}>
         <div className={cx("room-list-content")}>
+          {filterData && filterData.length > 0 ? (
+            <div className={cx("")}>
+              <div className={cx("room-list-header")}>
+                <h3>Danh sách phòng phù hợp</h3>
+              </div>
+              <div className={cx("room-grid")}>
+                <CardRoom rooms={filterData ?? []} />
+              </div>
+            </div>
+          ) : null}
+
           <div className={cx("room-list-header")}>
             <h3>Danh sách phòng có sẵn</h3>
             <div

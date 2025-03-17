@@ -12,11 +12,15 @@ import { RootState } from "../../../app/store";
 import usePost from "../../../hooks/usePost";
 import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
 const CreateRoom = () => {
-  const [buildings, setBuildings] = useState([]);
+  const [buildings, setBuildings] = useState<BuildingProps[]>([]);
+  const [buildingId, setBuildingId] = useState<string | null>(null);
+  const [floors, setFloors] = useState<LocationProps[]>([]);
+
   // State lưu thông tin phòng họp
   const [roomData, setRoomData] = useState({
     roomName: "",
@@ -66,6 +70,41 @@ const CreateRoom = () => {
       })
       .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
   }, [roomData.location?.building?.branch?.branchName]);
+
+  // lấy danh sách tòa nhà theo buildingId
+  useEffect(() => {
+    if (!roomData.location?.building?.buildingName) return;
+    if (!buildings) return;
+
+    fetch(
+      `http://localhost:8080/api/v1/location/getLocationsByBuildingId?buildingId=${buildingId}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+
+        setFloors(data);
+      })
+      .catch((error) => console.error("Lỗi khi lấy danh sách tầng:", error));
+  }, [buildingId]);
+
+  const handleBuildingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const buildingId = e.target.value;
+
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    const buildingName = selectedOption?.text;
+
+    setBuildingId(buildingId);
+    setRoomData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        building: {
+          ...prev.location.building,
+          buildingName: buildingName,
+        },
+      },
+    }));
+  };
 
   // Dùng usePost để gửi dữ liệu lên API
   const { data, loading, error, postData } = usePost(
@@ -197,12 +236,17 @@ const CreateRoom = () => {
                 </select>
               </div>
               <div className={cx("form-row")}>
-                <select name="building" onChange={handleChange}>
+                <select
+                  name="building"
+                  value={roomData.location.building.buildingName}
+                  onChange={handleBuildingChange}
+                >
                   <option value="">Chọn tòa nhà</option>
                   {buildings.map((building: BuildingProps) => (
                     <option
                       key={building.buildingId}
                       value={building.buildingId}
+                      id={building.buildingName}
                     >
                       {building.buildingName}
                     </option>
@@ -212,6 +256,11 @@ const CreateRoom = () => {
               <div className={cx("form-row")}>
                 <select name="floor" onChange={handleChange}>
                   <option value="">Chọn tầng</option>
+                  {floors.map((floor) => (
+                    <option key={floor.locationId} value={floor.floor}>
+                      {floor.floor}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
