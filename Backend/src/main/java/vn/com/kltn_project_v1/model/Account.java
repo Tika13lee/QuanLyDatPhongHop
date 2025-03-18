@@ -19,10 +19,13 @@ import java.util.List;
 public class Account implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private long accountId;
     @Column(columnDefinition = "")
+    @JsonIgnore
     private String userName;
     @Column(columnDefinition = "")
+    @JsonIgnore
     private String password;
     @Column(columnDefinition = "boolean default false")
     private boolean role; // true: admin, false: user
@@ -40,36 +43,43 @@ public class Account implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     // roleEntity -> roleImpl
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of((GrantedAuthority) () -> "ROLE_" + (role ? "ADMIN" : "USER"));
     }
     @Override
+    @JsonIgnore
     public String getPassword() {
         return "";
     }
 
     @Override
+    @JsonIgnore
     public String getUsername() {
         return userName;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
