@@ -40,9 +40,15 @@ public class EmployeeService implements IEmployee {
     public Employee upDateEmployee(EmployeeDTO employeeDTO) {
         Employee employee1 = employeeRepository.findEmployeeByPhone(employeeDTO.getPhone()).orElse(null);
         Employee employee2 = employeeRepository.findById(employeeDTO.getEmployeeId()).orElse(null);
-        if(employee1 != null && employee1.getEmployeeId() != employee2.getEmployeeId()){
-            return null;
+        if(employee1 != null) {
+            assert employee2 != null;
+            System.out.println(employee1.getEmployeeId() + " " + employee2.getEmployeeId()  );
+            if (employee1.getEmployeeId() != employee2.getEmployeeId()) {
+                return null;
+            }
         }
+        employee2.getAccount().setUserName(employeeDTO.getPhone());
+        employeeRepository.save(employee2);
         Employee employee = ConvertToEntity(employeeDTO);
 
         return employeeRepository.save(employee);

@@ -25,16 +25,17 @@ public class EmployeeController {
         if (employee == null) {
             return ResponseEntity.badRequest().body("Đã có nhân viên có số điện thoại này");
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(employee);
 
     }
     @PutMapping("/upDateEmployee")
     public ResponseEntity<?> upDateEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        Employee employee = employeeService.createEmployee(employeeDTO);
+        Employee employee = employeeService.upDateEmployee(employeeDTO);
+        System.out.println(employee.getEmployeeId());
         if (employee == null) {
             return ResponseEntity.badRequest().body("Đã có nhân viên có số điện thoại này");
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(employee);
     }
     @PutMapping("/nonActiveEmployee")
     public ResponseEntity<?> deleteEmployee(@RequestBody List<Long> employeeIds) {
