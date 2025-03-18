@@ -29,4 +29,8 @@ public class DepartmentController {
         departmentService.deleteDepartment(departmentId);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/getDepartmentByBranchName")
+    public ResponseEntity<?> getDepartmentByBranchName(@RequestParam String branchName) {
+        return ResponseEntity.ok(departmentService.getDepartmentByBranchName(branchName));
+    }
 }

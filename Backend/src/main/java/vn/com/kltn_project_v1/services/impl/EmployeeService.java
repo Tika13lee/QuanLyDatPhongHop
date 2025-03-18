@@ -26,14 +26,24 @@ public class EmployeeService implements IEmployee {
     private DepartmentRepository departmentRepository;
     @Override
     public Employee createEmployee(EmployeeDTO employeeDTO) {
+        Employee employee1 = employeeRepository.findEmployeeByPhone(employeeDTO.getPhone()).orElse(null);
+        if(employee1 != null){
+            return null;
+        }
         accountRepository.save(accountRepository.save(new Account(employeeDTO.getPhone(),"1111",false)));
         Employee employee = ConvertToEntity(employeeDTO);
+
         return employeeRepository.save(employee);
     }
 
     @Override
     public Employee upDateEmployee(EmployeeDTO employeeDTO) {
+        Employee employee1 = employeeRepository.findEmployeeByPhone(employeeDTO.getPhone()).orElse(null);
+        if(employee1 != null){
+            return null;
+        }
         Employee employee = ConvertToEntity(employeeDTO);
+
         return employeeRepository.save(employee);
     }
 
@@ -73,6 +83,7 @@ public class EmployeeService implements IEmployee {
         employee.setDepartment(departmentRepository.findById(employeeDTO.getDepartmentId()).orElse(null));
         employee.setActived(true);
         employee.setAccount(accountRepository.findAccountByUserName(employeeDTO.getPhone()).orElse(null));
+        employee.getAccount().setRole(employeeDTO.getRole());
         return employee;
     }
 }

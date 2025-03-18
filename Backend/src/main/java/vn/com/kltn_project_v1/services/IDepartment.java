@@ -10,4 +10,5 @@ public interface IDepartment {
     Department upDateDepartment(DepartmentDTO departmentDTO);
     void deleteDepartment(Long departmentId);
     List<Department> getAllDepartment();
+    List<Department> getDepartmentByBranchName(String branchName);
 }

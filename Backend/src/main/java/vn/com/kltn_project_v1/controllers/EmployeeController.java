@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.EmployeeDTO;
+import vn.com.kltn_project_v1.model.Employee;
 import vn.com.kltn_project_v1.services.IEmployee;
 
 import java.util.List;
@@ -20,11 +21,20 @@ public class EmployeeController {
     }
     @PostMapping("/addEmployee")
     public ResponseEntity<?> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        return ResponseEntity.ok(employeeService.createEmployee(employeeDTO));
+        Employee employee = employeeService.createEmployee(employeeDTO);
+        if (employee == null) {
+            return ResponseEntity.badRequest().body("Đã có nhân viên có số điện thoại này");
+        }
+        return ResponseEntity.ok().build();
+
     }
     @PutMapping("/upDateEmployee")
     public ResponseEntity<?> upDateEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        return ResponseEntity.ok(employeeService.upDateEmployee(employeeDTO));
+        Employee employee = employeeService.createEmployee(employeeDTO);
+        if (employee == null) {
+            return ResponseEntity.badRequest().body("Đã có nhân viên có số điện thoại này");
+        }
+        return ResponseEntity.ok().build();
     }
     @PutMapping("/nonActiveEmployee")
     public ResponseEntity<?> deleteEmployee(@RequestBody List<Long> employeeIds) {

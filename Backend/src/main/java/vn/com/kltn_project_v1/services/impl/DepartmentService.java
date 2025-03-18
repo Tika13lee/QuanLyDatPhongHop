@@ -42,4 +42,9 @@ public class DepartmentService implements IDepartment {
     public List<Department> getAllDepartment() {
         return departmentRepository.findAll();
     }
+
+    @Override
+    public List<Department> getDepartmentByBranchName(String branchName) {
+        return departmentRepository.findDepartmentsByBranchName(branchName);
+    }
 }
