@@ -39,7 +39,8 @@ public class EmployeeService implements IEmployee {
     @Override
     public Employee upDateEmployee(EmployeeDTO employeeDTO) {
         Employee employee1 = employeeRepository.findEmployeeByPhone(employeeDTO.getPhone()).orElse(null);
-        if(employee1 != null){
+        Employee employee2 = employeeRepository.findById(employeeDTO.getEmployeeId()).orElse(null);
+        if(employee1 != null && employee1.getEmployeeId() != employee2.getEmployeeId()){
             return null;
         }
         Employee employee = ConvertToEntity(employeeDTO);
