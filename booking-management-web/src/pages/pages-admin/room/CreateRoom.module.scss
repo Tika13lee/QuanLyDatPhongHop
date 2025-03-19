@@ -25,7 +25,7 @@
 .form {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   justify-content: space-between;
   width: 100%;
   gap: 20px;
@@ -41,6 +41,7 @@
 
 .cover {
   width: 100%;
+  height: fit-content;
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 5px;
@@ -49,8 +50,6 @@
 
 .form-row {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   gap: 15px;
   width: 100%;
   padding: 10px;
@@ -61,7 +60,7 @@
   width: 100%;
   display: flex;
   text-align: left;
-  align-items: center;
+  flex-direction: column;
   gap: 15px;
 
   label {
@@ -74,8 +73,6 @@
 
   select,
   input {
-    // width: 100%;
-    // padding: 10px;
     font-size: 14px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
@@ -105,7 +102,7 @@
 }
 
 .device-table-container {
-  max-height: 175px;
+  max-height: 450px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;

@@ -4,16 +4,24 @@ import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 type PostResult<T> = {
   data: T | null;
   loading: boolean;
-  error: Error | null;
-  postData: (body: any, config?: AxiosRequestConfig, method?: "POST" | "PUT") => Promise<AxiosResponse<T> | null>;
+  error: string | null;
+  postData: (
+    body: any,
+    config?: AxiosRequestConfig,
+    method?: "POST" | "PUT"
+  ) => Promise<AxiosResponse<T> | null>;
 };
 
 const usePost = <T>(url: string): PostResult<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const postData = async (body: any, config?: AxiosRequestConfig, method: "POST" | "PUT" = "POST") => {
+  const postData = async (
+    body: any,
+    config?: AxiosRequestConfig,
+    method: "POST" | "PUT" = "POST"
+  ) => {
     setLoading(true);
     setError(null);
 
@@ -27,7 +35,11 @@ const usePost = <T>(url: string): PostResult<T> => {
       setData(response.data);
       return response;
     } catch (err) {
-      setError(err as Error);
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data || "Có lỗi xảy ra, vui lòng thử lại!");
+      } else {
+        setError("Có lỗi xảy ra, vui lòng thử lại!");
+      }
       return null;
     } finally {
       setLoading(false);

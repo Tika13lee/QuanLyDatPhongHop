@@ -47,6 +47,20 @@ function Location() {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
+  // Lấy danh sách tòa nhà theo chi nhánh
+  useEffect(() => {
+    if (!branchName) return;
+
+    fetch(
+      `http://localhost:8080/api/v1/location/getBuildingsByBranchName?branchName=${branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setBuildings(data);
+      })
+      .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
+  }, [branchName]);
+
   // load danh sách location từ store
   const {
     locations,
@@ -54,15 +68,16 @@ function Location() {
     error: locationsError,
   } = useSelector((state: RootState) => state.location);
 
-  // thêm location
-  const {
-    data,
-    loading,
-    error,
-    postData: postLocation,
-  } = usePost<any>(
-    `http://localhost:8080/api/v1/location/addLocation?buildingId=${formData.building}&floor=${formData.floor}`
-  );
+  // mở modal thêm branch
+  const handleOpenBranchModal = () => {
+    setOpenBranchModal(true);
+  };
+
+  // đóng modal thêm branch
+  const handleCloseBranchModal = () => {
+    setOpenBranchModal(false);
+    setBranchName("");
+  };
 
   // thêm branch
   const {
@@ -74,6 +89,48 @@ function Location() {
     `http://localhost:8080/api/v1/location/addBranch?branchName=${branchName}`
   );
 
+  // xử lý thêm branch
+  const handleAddBranch = async () => {
+    if (!branchName) {
+      setPopupMessage("Vui lòng nhập tên chi nhánh!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const newBranch = {
+      branchName: branchName,
+    };
+    console.log(newBranch);
+
+    const response = await postBranch(newBranch);
+
+    if (response) {
+      setPopupMessage("Vị trí đã được thêm thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      handleCloseBranchModal();
+    } else {
+      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
+  // mở modal thêm building
+  const handleOpenBuildingModal = () => {
+    setOpenBuildingModal(true);
+  };
+
+  // đóng modal thêm building
+  const handleCloseBuildingModal = () => {
+    setOpenBuildingModal(false);
+    setFormBuilding({
+      branchId: "",
+      building: "",
+    });
+  };
+
   // thêm building
   const {
     data: buildingData,
@@ -83,6 +140,101 @@ function Location() {
   } = usePost<any>(
     `http://localhost:8080/api/v1/location/addBuilding?branchId=${formBuilding.branchId}&buildingName=${formBuilding.building}`
   );
+
+  // xử lý thêm building
+  const handleAddBuilding = async () => {
+    if (!formBuilding.branchId) {
+      setPopupMessage("Vui lòng chọn chi nhánh!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    if (!formBuilding.building) {
+      setPopupMessage("Vui lòng nhập tên tòa nhà!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const newBuilding = {
+      branchId: formBuilding.branchId,
+      buildingName: formBuilding.building,
+    };
+
+    console.log(newBuilding);
+
+    const response = await postBuilding(newBuilding);
+
+    if (response) {
+      setPopupMessage("Vị trí đã được thêm thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      handleCloseBuildingModal();
+    } else {
+      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
+  // thêm location
+  const {
+    data,
+    loading,
+    error,
+    postData: postLocation,
+  } = usePost<any>(
+    `http://localhost:8080/api/v1/location/addLocation?buildingId=${formData.building}&floor=${formData.floor}`
+  );
+
+  // xử lý thêm location
+  const handleAddLocation = async () => {
+    if (!formData.building) {
+      setPopupMessage("Vui lòng chọn chi nhánh và tòa nhà!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    if (!formData.floor) {
+      setPopupMessage("Vui lòng nhập tầng!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const newLocation = {
+      building: formData.building,
+      floor: formData.floor,
+    };
+
+    console.log(newLocation);
+
+    const response = await postLocation(newLocation);
+
+    if (response) {
+      setPopupMessage("Vị trí đã được thêm thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      dispatch(fetchLocations());
+      resetForm();
+    } else {
+      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
+  // Reset form sau khi thêm
+  const resetForm = () => {
+    setFormData({
+      building: "",
+      floor: "",
+    });
+    setBranchName("");
+    setBuildings([]);
+  };
 
   // xử lý khi thay đổi branch
   const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -117,114 +269,7 @@ function Location() {
     setIsChecked(e.target.checked);
   };
 
-  // Lấy danh sách tòa nhà theo chi nhánh
-  useEffect(() => {
-    if (!branchName) return;
-
-    fetch(
-      `http://localhost:8080/api/v1/location/getBuildingsByBranchName?branchName=${branchName}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setBuildings(data);
-      })
-      .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
-  }, [branchName]);
-
-  // Thêm location
-  const handleAddLocation = async () => {
-    const newLocation = {
-      building: formData.building,
-      floor: formData.floor,
-    };
-
-    console.log(newLocation);
-
-    const response = await postLocation(newLocation);
-
-    if (response) {
-      setPopupMessage("Vị trí đã được thêm thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
-      dispatch(fetchLocations());
-      resetForm();
-    } else {
-      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
-  };
-
-  // Reset form sau khi thêm
-  const resetForm = () => {
-    setFormData({
-      building: "",
-      floor: "",
-    });
-    setBranchName("");
-    setBuildings([]);
-  };
-
-  // Thêm branch
-  const handleAddBranch = async () => {
-    const newBranch = {
-      branchName: branchName,
-    };
-    console.log(newBranch);
-
-    const response = await postBranch(newBranch);
-
-    if (response) {
-      setPopupMessage("Vị trí đã được thêm thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
-      setOpenBranchModal(false);
-    } else {
-      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
-  };
-
-  // Thêm building
-  const handleAddBuilding = async () => {
-    const newBuilding = {
-      branchId: formBuilding.branchId,
-      buildingName: formBuilding.building,
-    };
-
-    console.log(newBuilding);
-
-    const response = await postBuilding(newBuilding);
-
-    if (response) {
-      setPopupMessage("Vị trí đã được thêm thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
-      setOpenBuildingModal(false);
-    } else {
-      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
-  };
-
-  const handleOpenBranchModal = () => {
-    setOpenBranchModal(true);
-  };
-
-  const handleCloseBranchModal = () => {
-    setOpenBranchModal(false);
-  };
-
-  const handleOpenBuildingModal = () => {
-    setOpenBuildingModal(true);
-  };
-
-  const handleCloseBuildingModal = () => {
-    setOpenBuildingModal(false);
-  };
-
+  // đóng popup
   const handleClosePopup = () => {
     setIsPopupOpen(false);
   };
@@ -421,7 +466,7 @@ function Location() {
         <table className={cx("location-table")}>
           <thead>
             <tr>
-              <th>STT</th>
+              <th style={{ width: "70px" }}>STT</th>
               <th>Chi nhánh</th>
               <th>Tòa nhà</th>
               <th>Tầng</th>

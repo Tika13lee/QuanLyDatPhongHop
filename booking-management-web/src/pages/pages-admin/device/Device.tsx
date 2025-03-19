@@ -7,9 +7,8 @@ import { useState } from "react";
 import { fetchDevices } from "../../../features/deviceSlice";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { FiPlus, FaPlus, MdSearch } from "../../../components/icons/icons";
+import { FaPlus, MdSearch } from "../../../components/icons/icons";
 import { DeviceProps } from "../../../data/data";
-import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -56,8 +55,28 @@ function Device() {
     });
   };
 
-  // Hàm gửi dữ liệu tạo mới device
+  const validateForm = () => {
+    if (!formData.deviceName) {
+      return { isValid: false, message: "Vui lòng nhập tên thiết bị!" };
+    }
+
+    if (!formData.description) {
+      return { isValid: false, message: "Vui lòng nhập mô tả!" };
+    }
+
+    return { isValid: true, message: "" };
+  };
+
+  // thêm device
   const handleAddDevice = async () => {
+    const { isValid, message } = validateForm();
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
     const newDevice = {
       deviceName: formData.deviceName,
       description: formData.description,
@@ -79,7 +98,17 @@ function Device() {
     }
   };
 
-  // Hàm chỉnh sửa dữ liệu device
+  // Hàm xử lý khi chọn thiết bị để chỉnh sửa
+  const handleEditDevice = (device: any) => {
+    setOpenForm(true);
+    setSelectedDevice(device);
+    setFormData({
+      deviceName: device.deviceName,
+      description: device.description,
+    });
+  };
+
+  // Chỉnh sửa device
   const handleUpdateDevice = async () => {
     if (selectedDevice === null) return;
 
@@ -120,21 +149,6 @@ function Device() {
     setSelectedDevice(null);
   };
 
-  // Hàm xử lý khi chọn thiết bị để chỉnh sửa
-  const handleEditDevice = (device: any) => {
-    setOpenForm(true);
-    setSelectedDevice(device);
-    setFormData({
-      deviceName: device.deviceName,
-      description: device.description,
-    });
-  };
-
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-  };
-
   // Hàm mở form thêm mới
   const handleOpenForm = () => {
     setOpenForm(true);
@@ -145,6 +159,11 @@ function Device() {
     setOpenForm(false);
     setSelectedDevice(null);
     resetForm();
+  };
+
+  // Hàm đóng popup thông báo
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
   };
 
   return (
@@ -231,8 +250,8 @@ function Device() {
         <table className={cx("device-table")}>
           <thead>
             <tr>
-              <th>STT</th>
-              <th>Tên thiết bị</th>
+              <th style={{ width: "70px" }}>STT</th>
+              <th style={{ width: "300px" }}>Tên thiết bị</th>
               <th>Mô tả</th>
             </tr>
           </thead>

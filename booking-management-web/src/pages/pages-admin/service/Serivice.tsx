@@ -12,6 +12,14 @@ const cx = classNames.bind(styles);
 
 function Service() {
   const [openForm, setOpenForm] = useState(false);
+  const [selectedService, setSelectedService] = useState<ServiceProps | null>();
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   const {
     data: services,
@@ -30,23 +38,8 @@ function Service() {
     description: "",
     price: "",
   });
-  const [isAdding, setIsAdding] = useState(false);
-  const [selectedService, setSelectedService] = useState<ServiceProps | null>();
 
-  // popup thông báo
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
-    "info"
-  );
-
-  const { postData: addData } = usePost<ServiceProps[]>(
-    "http://localhost:8080/api/v1/service/addService"
-  );
-  const { postData: updateData } = usePost<ServiceProps>(
-    "http://localhost:8080/api/v1/service/upDateService"
-  );
-
+  // render lại danh sách dịch vụ khi có thay đổi
   useEffect(() => {
     if (services) {
       setServiceList(services);
@@ -62,10 +55,40 @@ function Service() {
     });
   };
 
-  // Hàm thêm dịch vụ
+  // Hàm kiểm tra dữ liệu nhập vào form
+  const validateForm = (formData: any) => {
+    if (!formData.serviceName) {
+      return { isValid: false, message: "Vui lòng nhập tên dịch vụ!" };
+    }
+
+    if (!formData.price) {
+      return { isValid: false, message: "Vui lòng nhập giá dịch vụ!" };
+    } else if (isNaN(Number(formData.price))) {
+      return { isValid: false, message: "Giá dịch vụ phải là số!" };
+    } else if (Number(formData.price) <= 0) {
+      return { isValid: false, message: "Giá dịch vụ phải lớn hơn 0!" };
+    }
+
+    if (!formData.description) {
+      return { isValid: false, message: "Vui lòng nhập mô tả dịch vụ!" };
+    }
+
+    return { isValid: true, message: "" };
+  };
+
+  const { postData: addData } = usePost<ServiceProps[]>(
+    "http://localhost:8080/api/v1/service/addService"
+  );
+
+  // Xử lý thêm dịch vụ
   const handleAddService = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
+    const { isValid, message } = validateForm(formData);
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
 
     const newService = {
       serviceName: formData.serviceName,
@@ -87,21 +110,38 @@ function Service() {
         return [...prevServiceList, ...newData];
       });
 
-      resetForm();
-      setOpenForm(false);
+      handleCloseForm();
     } else {
       setPopupMessage("Thêm dịch vụ thất bại, vui lòng thử lại.");
       setPopupType("error");
       setIsPopupOpen(true);
     }
-
-    setIsAdding(false);
   };
 
-  // Hàm chỉnh sửa dịch vụ
+  // Hàm chọn dịch vụ để chỉnh sửa
+  const handleEditService = (service: any) => {
+    setOpenForm(true);
+    setSelectedService(service);
+    setFormData({
+      serviceName: service.serviceName,
+      description: service.description,
+      price: service.price.value,
+    });
+  };
+
+  const { postData: updateData } = usePost<ServiceProps>(
+    "http://localhost:8080/api/v1/service/upDateService"
+  );
+
+  // Xử lý chỉnh sửa dịch vụ
   const handleUpdateService = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
+    const { isValid, message } = validateForm(formData);
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
 
     const updatedService = selectedService
       ? {
@@ -118,6 +158,7 @@ function Service() {
       setPopupMessage("Dịch vụ đã được chỉnh sửa thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
+
       // Cập nhật lại danh sách dịch vụ sau khi chỉnh sửa
       setServiceList(
         serviceList.map((service) =>
@@ -126,14 +167,13 @@ function Service() {
             : service
         )
       );
-      resetForm();
-      setOpenForm(false);
+      handleCloseForm();
     } else {
       setPopupMessage("Chỉnh sửa dịch vụ thất bại, vui lòng thử lại.");
       setPopupType("error");
       setIsPopupOpen(true);
     }
-    setIsAdding(false);
+    // setIsAdding(false);
   };
 
   // Reset form sau khi thêm hoặc sửa
@@ -144,17 +184,6 @@ function Service() {
       price: "",
     });
     setSelectedService(null);
-  };
-
-  // Hàm chọn dịch vụ để chỉnh sửa
-  const handleEditService = (service: any) => {
-    setOpenForm(true);
-    setSelectedService(service);
-    setFormData({
-      serviceName: service.serviceName,
-      description: service.description,
-      price: service.price.value,
-    });
   };
 
   // Hàm mở form thêm mới
@@ -219,12 +248,13 @@ function Service() {
                 <div className={cx("form-group")}>
                   <label>Giá:</label>
                   <input
-                    type="text"
+                    type="number"
                     name="price"
                     placeholder="Nhập giá..."
                     value={formData.price}
                     onChange={handleInputChange}
                     disabled={selectedService ? true : false}
+                    min="1"
                   />
                 </div>
               </div>
@@ -249,7 +279,6 @@ function Service() {
                   onClick={
                     selectedService ? handleUpdateService : handleAddService
                   }
-                  disabled={isAdding}
                 >
                   {selectedService ? "Chỉnh sửa" : "Thêm dịch vụ"}
                 </button>
@@ -264,10 +293,10 @@ function Service() {
         <table className={cx("service-table")}>
           <thead>
             <tr>
-              <th>STT</th>
-              <th>Tên dịch vụ</th>
-              <th>Mô tả</th>
-              <th>Giá</th>
+              <th style={{ width: "50px" }}>STT</th>
+              <th style={{ width: "200px" }}>Tên dịch vụ</th>
+              <th style={{ width: "300px" }}>Mô tả</th>
+              <th style={{ width: "100px" }}>Giá</th>
             </tr>
           </thead>
           <tbody>

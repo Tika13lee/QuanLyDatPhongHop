@@ -75,23 +75,14 @@ const MainLayoutAdmin = () => {
                   Tổng quát
                 </NavLink>
 
-                {/* <NavLink
+                <NavLink
                   to="/admin/waiting-list"
                   className={({ isActive }) =>
                     cx("dropdown-item", { active: isActive })
                   }
                 >
                   DS phê duyệt
-                </NavLink> */}
-
-                {/* <NavLink
-                  to="/admin/booking-mgmt/approved"
-                  className={({ isActive }) =>
-                    cx("dropdown-item", { active: isActive })
-                  }
-                >
-                  Thông tin nhận/trả
-                </NavLink> */}
+                </NavLink>
               </div>
             )}
           </div>

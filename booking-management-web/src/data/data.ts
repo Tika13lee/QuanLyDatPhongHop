@@ -66,6 +66,9 @@ export type EmployeeProps = {
     depName: string;
     location: LocationProps;
   };
+  account: {
+    role: boolean
+  }
 };
 
 // phòng

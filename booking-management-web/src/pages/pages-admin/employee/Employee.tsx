@@ -18,24 +18,21 @@ import {
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { fetchEmployees } from "../../../features/employeeSlice";
-import { METHODS } from "http";
+import { uploadImageToCloudinary } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
-const EmployeeManagement = () => {
+const Employee = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [openForm, setOpenForm] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [fileName, setFileName] = useState("");
   const [selectedEmployee, setSelectedEmployee] =
     useState<EmployeeProps | null>();
-  // const { employees, loading, error } = useSelector(
-  // (state: RootState) => state.employee
-  // );
 
   const [employees, setEmployees] = useState<EmployeeProps[]>([]);
   const [isCheck, setIsCheck] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [branchName, setBranchName] = useState<string>("");
+  const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 
   const [filters, setFilters] = useState({
     depName: "",
@@ -61,6 +58,7 @@ const EmployeeManagement = () => {
 
   // lấy ds nhân viên
   useEffect(() => {
+    console.log("load employees");
     dispatch(fetchEmployees());
   }, [dispatch]);
 
@@ -77,33 +75,22 @@ const EmployeeManagement = () => {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
-  // lấy derpartment
   const {
-    data: departments,
-    loading: departmentLoading,
-    error: departmentError,
+    data: departmentsOfBranch,
+    loading: departmentsLoading,
+    error: departmentsError,
   } = useFetch<DepartmentProps[]>(
-    "http://localhost:8080/api/v1/department/getAllDepartments"
+    "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
-  // ds nhân viên
-  const {
-    data: employeesData,
-    loading: fetchLoading,
-    error: fetchError,
-  } = useFetch<EmployeeProps[]>(
-    "http://localhost:8080/api/v1/employee/getAllEmployee"
-  );
-
-  // thêm nhân viên
-  const {
-    data,
-    loading: loadingAdd,
-    error: errorAdd,
-    postData,
-  } = usePost<EmployeeProps>(
-    "http://localhost:8080/api/v1/employee/addEmployee"
-  );
+  // lấy derpartment
+  // const {
+  //   data: departments,
+  //   loading: departmentLoading,
+  //   error: departmentError,
+  // } = useFetch<DepartmentProps[]>(
+  //   "http://localhost:8080/api/v1/department/getAllDepartments"
+  // );
 
   // vô hiệu hóa nhân viên
   const {
@@ -120,18 +107,6 @@ const EmployeeManagement = () => {
     setSearchQuery(e.target.value);
   };
 
-  // Hàm xử lý thay đổi giá trị của các bộ lọc
-  const handleFilterChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    filterName: string
-  ) => {
-    const { value } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterName]: filterName === "isActived" ? value === "true" : value,
-    }));
-  };
-
   // Hàm gọi API để tìm kiếm nhân viên
   const {
     data: filteredEmployees,
@@ -145,11 +120,262 @@ const EmployeeManagement = () => {
       : "http://localhost:8080/api/v1/employee/getAllEmployee"
   );
 
+  // lọc nhân viên
   useEffect(() => {
     if (filteredEmployees) {
       setEmployees(filteredEmployees);
     }
   }, [filteredEmployees, dispatch]);
+
+  // Hàm xử lý thay đổi giá trị của các bộ lọc
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    filterName: string
+  ) => {
+    const { value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: value,
+    }));
+  };
+
+
+
+  // xử lý url ảnh
+  const handleFilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      const resp = await uploadImageToCloudinary(file);
+      setFormData((prev) => ({ ...prev, avatar: resp }));
+    }
+  };
+
+  // Hàm xử lý khi thay đổi input
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target as HTMLInputElement;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Lấy danh sách phòng ban theo chi nhánh
+  useEffect(() => {
+    if (!branchName) return;
+
+    fetch(
+      `http://localhost:8080/api/v1/department/getDepartmentByBranchName?branchName=${branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setDepartments(data);
+      })
+      .catch((error) =>
+        console.error("Lỗi khi lấy danh sách phòng ban:", error)
+      );
+  }, [branchName]);
+
+  // Kiểm tra dữ liệu đầu vào
+  const validateData = (formData: any) => {
+    if (!formData.employeeName) {
+      return { isValid: false, message: "Vui lòng nhập tên nhân viên" };
+    }
+
+    if (!formData.avatar) {
+      return { isValid: false, message: "Vui lòng chọn ảnh đại diện" };
+    }
+
+    if (!formData.email) {
+      return { isValid: false, message: "Vui lòng nhập email" };
+    }
+
+    if (!formData.phone) {
+      return { isValid: false, message: "Vui lòng nhập số điện thoại" };
+    }
+
+    if (!formData.role) {
+      return { isValid: false, message: "Vui lòng chọn vai trò" };
+    }
+
+    if (!formData.departmentId) {
+      return { isValid: false, message: "Vui lòng chọn phòng ban" };
+    }
+
+    // email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      return { isValid: false, message: "Định dạng email không hợp lệ." };
+    }
+
+    // số điện thoại
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      return {
+        isValid: false,
+        message: "Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số.",
+      };
+    }
+
+    // Nếu dữ liệu hợp lệ
+    return { isValid: true, message: "" };
+  };
+
+  // thêm nhân viên
+  const {
+    data,
+    loading: loadingAdd,
+    error: errorAdd,
+    postData,
+  } = usePost<EmployeeProps>(
+    "http://localhost:8080/api/v1/employee/addEmployee"
+  );
+
+  // hàm xử lý thêm mới nhân viên
+  const handleAddEmployee = async () => {
+    // Kiểm tra dữ liệu đầu vào
+    const { isValid, message } = validateData(formData);
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const newEmployee = {
+      employeeName: formData.employeeName,
+      email: formData.email,
+      phone: formData.phone,
+      departmentId: formData.departmentId,
+      avatar: formData.avatar,
+      role: formData.role,
+    };
+
+    console.log("Thêm nhân viên", newEmployee);
+
+    const response = await postData(newEmployee);
+
+    if (response) {
+      setPopupMessage("Nhân viên đã được thêm thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      setEmployees((prev) => [...prev, response?.data]);
+
+      handleCloseForm();
+    } else {
+      setPopupMessage(
+        "Thất bại: " + errorAdd || "Đã xảy ra lỗi khi thêm nhân viên!"
+      );
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
+  // Chọn nhân viên để chỉnh sửa
+  const handleEditEmployee = (emp: any) => {
+    setOpenForm(true);
+    setBranchName(
+      emp.department?.location?.building?.branch?.branchName || "N/A"
+    );
+    setSelectedEmployee(emp);
+    setFormData({
+      employeeName: emp.employeeName,
+      email: emp.email,
+      phone: emp.phone,
+      departmentId: emp.department.departmentId,
+      avatar: emp.avatar,
+      role: emp.account.role,
+    });
+  };
+
+  console.log("selectedEmployee", selectedEmployee);
+
+  const { postData: updateData } = usePost<EmployeeProps>(
+    "http://localhost:8080/api/v1/employee/upDateEmployee"
+  );
+
+  // hàm xử lý cập nhật nhân viên
+  const handleUpdateEmployee = async () => {
+    const { isValid, message } = validateData(formData);
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const updatedEmployee = {
+      employeeId: `${selectedEmployee?.employeeId}`,
+      employeeName: formData.employeeName,
+      email: formData.email,
+      phone: formData.phone,
+      departmentId: formData.departmentId,
+      avatar: formData.avatar,
+      role: `${formData.role}`,
+    };
+
+    console.log("Chỉnh sửa nhân viên: ", updatedEmployee);
+
+    const response = await updateData(updatedEmployee, { method: "PUT" });
+
+    if (response) {
+      setPopupMessage("Nhân viên đã được cập nhật thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      setEmployees(
+        employees.map((emp) =>
+          emp.employeeId === selectedEmployee?.employeeId
+            ? {
+                ...emp,
+                employeeId: response?.data.employeeId,
+                employeeName: response?.data.employeeName,
+                email: response?.data.email,
+                phone: response?.data.phone,
+                department: {
+                  ...emp.department,
+                  departmentId: response?.data.department.departmentId,
+                  depName: response?.data.department.depName,
+                },
+                avatar: response?.data.avatar,
+              }
+            : emp
+        )
+      );
+
+      handleCloseForm();
+    } else {
+      setPopupMessage("Thất bại: Số điện thoại đã tồn tại!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
+  // Hàm reset form
+  const resetForm = () => {
+    setFormData({
+      employeeName: "",
+      email: "",
+      phone: "",
+      departmentId: "",
+      avatar: "",
+      role: "true",
+    });
+    setBranchName("");
+  };
+
+  // Mở form thêm mới
+  const handleOpenForm = () => {
+    setOpenForm(true);
+  };
+
+  // Đóng form
+  const handleCloseForm = () => {
+    setOpenForm(() => {
+      setSelectedEmployee(null);
+      return false;
+    });
+    resetForm();
+  };
 
   // Xử lý khi chọn hoặc bỏ chọn một nhân viên
   const handleCheckboxChange = (employeeId: number) => {
@@ -161,8 +387,6 @@ const EmployeeManagement = () => {
       }
     });
   };
-
-  console.log(isCheck);
 
   // Xử lý khi chọn tất cả nhân viên
   const handleSelectAll = () => {
@@ -193,141 +417,6 @@ const EmployeeManagement = () => {
     }
   };
 
-  // Hàm xử lý khi thay đổi input
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, type, value, files } = e.target as HTMLInputElement;
-
-    if (type === "file" && files?.[0]) {
-      const file = files[0];
-      setFormData((prev) => ({
-        ...prev,
-        [name]: URL.createObjectURL(file),
-      }));
-      setFileName(file.name);
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      setFileName("");
-    }
-  };
-
-  // Kiểm tra dữ liệu đầu vào
-  const validateData = (formData: any) => {
-    if (
-      !formData.employeeName ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.departmentId ||
-      !formData.role
-    ) {
-      return { isValid: false, message: "Vui lòng điền đầy đủ thông tin." };
-    }
-
-    // email
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(formData.email)) {
-      return { isValid: false, message: "Định dạng email không hợp lệ." };
-    }
-
-    // số điện thoại
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(formData.phone)) {
-      return {
-        isValid: false,
-        message: "Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số.",
-      };
-    }
-
-    // Nếu dữ liệu hợp lệ
-    return { isValid: true, message: "" };
-  };
-
-  // Hàm xử lý khi chọn nhân viên để chỉnh sửa
-  const handleEditEmployee = (emp: any) => {
-    setOpenForm(true);
-    setSelectedEmployee(emp);
-    setFormData({
-      employeeName: emp.employeeName,
-      email: emp.email,
-      phone: emp.phone,
-      departmentId: "",
-      avatar: "",
-      role: "",
-    });
-  };
-
-  // hàm xử lý thêm mới nhân viên
-  const handleAddEmployee = async () => {
-    // Kiểm tra dữ liệu đầu vào
-    const { isValid, message } = validateData(formData);
-    if (!isValid) {
-      setPopupMessage(message);
-      setPopupType("error");
-      setIsPopupOpen(true);
-      return;
-    }
-
-    const newEmployee = {
-      employeeName: formData.employeeName,
-      email: formData.email,
-      phone: formData.phone,
-      departmentId: formData.departmentId,
-      avatar: formData.avatar,
-      role: formData.role,
-    };
-
-    console.log(newEmployee);
-
-    const response = await postData(newEmployee);
-
-    if (response) {
-      setPopupMessage("Nhân viên đã được thêm thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
-
-      setEmployees((prev) => [...prev, response?.data]);
-
-      resetForm();
-      setOpenForm(false);
-    } else {
-      setPopupMessage("Đã xảy ra lỗi khi thêm nhân viên!");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
-  };
-
-  // hàm xử lý cập nhật nhân viên
-  const handleUpdateEmployee = async () => {
-    console.log("Dữ liệu gửi đến backend: ", formData);
-  };
-
-  // Hàm reset form
-  const resetForm = () => {
-    setFormData({
-      // employeeId: "",
-      employeeName: "",
-      email: "",
-      phone: "",
-      departmentId: "",
-      avatar: "",
-      role: "",
-    });
-    setFileName("");
-    setEditingId(null);
-  };
-
-  // Hàm mở form thêm mới
-  const handleOpenForm = () => {
-    setOpenForm(true);
-  };
-
-  // Hàm đóng form
-  const handleCloseForm = () => {
-    setOpenForm(false);
-    // resetForm();
-  };
-
   // Hàm đóng popup thông báo
   const handleClosePopup = () => {
     setIsPopupOpen(false);
@@ -337,6 +426,7 @@ const EmployeeManagement = () => {
     <div className={cx("employee-container")}>
       {/* tìm kiếm */}
       <div className={cx("search-container")}>
+        {/* tên, sđt */}
         <div className={cx("search-box")}>
           <input
             type="text"
@@ -349,6 +439,7 @@ const EmployeeManagement = () => {
             <IconWrapper icon={MdSearch} color="#fff" size={24} />
           </button>
         </div>
+
         <div className={cx("filter-container")}>
           <p>Lọc nhân viên theo</p>
           {/* branchName */}
@@ -357,12 +448,20 @@ const EmployeeManagement = () => {
             value={filters.branchName}
             onChange={(e) => handleFilterChange(e, "branchName")}
           >
-            <option value="">Chọn chi nhánh</option>
-            {branchs?.map((branch) => (
-              <option key={branch.branchId} value={branch.branchName}>
-                {branch.branchName}
-              </option>
-            ))}
+            {branchsLoading ? (
+              <option>Đang tải chi nhánh...</option>
+            ) : branchsError ? (
+              <option>Lỗi khi tải chi nhánh</option>
+            ) : (
+              <>
+                <option value="">Chọn chi nhánh</option>
+                {branchs?.map((branch) => (
+                  <option key={branch.branchId} value={branch.branchName}>
+                    {branch.branchName}
+                  </option>
+                ))}
+              </>
+            )}
           </select>
           {/* depName */}
           <select
@@ -383,6 +482,9 @@ const EmployeeManagement = () => {
             value={filters.isActived.toString()}
             onChange={(e) => handleFilterChange(e, "isActived")}
           >
+            <option value="" disabled>
+              Chọn trạng thái
+            </option>
             <option value="true">Hoạt động</option>
             <option value="false">Không hoạt động</option>
           </select>
@@ -430,6 +532,7 @@ const EmployeeManagement = () => {
                 placeholder="Nhập tên"
                 value={formData.employeeName || ""}
                 onChange={handleInputChange}
+                disabled={selectedEmployee ? true : false}
               />
             </div>
 
@@ -439,16 +542,9 @@ const EmployeeManagement = () => {
               <div className={cx("form-row")}>
                 <input
                   name="avatar"
-                  placeholder="Nhập URL"
-                  value={formData.avatar || ""}
-                  onChange={handleInputChange}
-                />
-                hoặc
-                <input
-                  name="avatar"
                   type="file"
                   accept="image/*"
-                  onChange={handleInputChange}
+                  onChange={handleFilePicture}
                 />
               </div>
             </div>
@@ -475,7 +571,7 @@ const EmployeeManagement = () => {
               />
             </div>
 
-            {/* vai trò */}
+            {/* vai trò: chờ lấy role từ be */}
             <div className={cx("form-group")}>
               <label>Chọn vai trò</label>
               <select
@@ -491,7 +587,10 @@ const EmployeeManagement = () => {
             {/* chi nhánh */}
             <div className={cx("form-group")}>
               <label>Chọn chi nhánh</label>
-              <select>
+              <select
+                value={branchName}
+                onChange={(e) => setBranchName(e.target.value)}
+              >
                 <option value="">Chọn chi nhánh</option>
                 {branchs?.map((branch) => (
                   <option key={branch.branchId} value={branch.branchName}>
@@ -594,6 +693,7 @@ const EmployeeManagement = () => {
           </tbody>
         </table>
       </div>
+
       {/* Hiển thị thông báo popup */}
       <PopupNotification
         message={popupMessage}
@@ -605,4 +705,4 @@ const EmployeeManagement = () => {
   );
 };
 
-export default EmployeeManagement;
+export default Employee;

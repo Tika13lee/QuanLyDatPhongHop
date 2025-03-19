@@ -6,7 +6,7 @@ const cx = classNames.bind(styles);
 
 type PopupNotificationProps = {
   message: string;
-  type: "success" | "error" | "info";
+  type: "success" | "error" | "info" | "warning";
   isOpen: boolean;
   onClose: () => void;
 };
@@ -23,7 +23,7 @@ const PopupNotification: React.FC<PopupNotificationProps> = ({ message, type, is
           </button>
         </div>
         <div className={cx("popup-message")}>
-          <h2>Thông báo</h2>
+          <h3>Thông báo</h3>
           <p>{message}</p>
         </div>
       </div>

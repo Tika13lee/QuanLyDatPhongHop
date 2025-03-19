@@ -3,23 +3,37 @@ import styles from "./CreateRoom.module.scss";
 import {
   BranchProps,
   BuildingProps,
+  DeviceProps,
   LocationProps,
   statusesRoom,
   typeRoom,
 } from "../../../data/data";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
 import usePost from "../../../hooks/usePost";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
+import PopupNotification from "../../../components/popup/PopupNotification";
 import { set } from "react-datepicker/dist/date_utils";
+import { uploadImageToCloudinary } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
 const CreateRoom = () => {
   const [buildings, setBuildings] = useState<BuildingProps[]>([]);
-  const [buildingId, setBuildingId] = useState<string | null>(null);
   const [floors, setFloors] = useState<LocationProps[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<string>();
+  const [selectedBuilding, setSelectedBuilding] = useState<string>();
+  const [selectedFloor, setSelectedFloor] = useState<string>();
+  const roomNameRef = useRef<HTMLInputElement>(null);
+  const capacityRef = useRef<HTMLInputElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const [filesImage, setFilesImage] = useState<File[]>([]);
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   // State lưu thông tin phòng họp
   const [roomData, setRoomData] = useState({
@@ -41,12 +55,14 @@ const CreateRoom = () => {
     imgs: [] as string[],
   });
 
-  // lấy dữ liệu devices từ Redux Store
+  // lấy thiết bị
   const {
-    devices,
+    data: devices,
     loading: devicesLoading,
     error: devicesError,
-  } = useSelector((state: RootState) => state.device);
+  } = useFetch<DeviceProps[]>(
+    "http://localhost:8080/api/v1/device/getAllDevices"
+  );
 
   // lấy chi nhánh
   const {
@@ -57,43 +73,51 @@ const CreateRoom = () => {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
-  // Lấy danh sách tòa nhà theo chi nhánh
+  // lấy ds tòa nhà theo chi nhánh
   useEffect(() => {
-    if (!roomData.location?.building?.branch?.branchName) return;
-
     fetch(
-      `http://localhost:8080/api/v1/location/getBuildingsByBranchName?branchName=${roomData.location.building.branch.branchName}`
+      `http://localhost:8080/api/v1/location/getBuildingsByBranchName?branchName=${selectedBranch}`
     )
       .then((res) => res.json())
       .then((data) => {
         setBuildings(data);
+        setSelectedBuilding(" ");
       })
       .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
-  }, [roomData.location?.building?.branch?.branchName]);
+  }, [selectedBranch]);
 
-  // lấy danh sách tòa nhà theo buildingId
+  // lấy ds tầng theo tòa nhà
   useEffect(() => {
-    if (!roomData.location?.building?.buildingName) return;
-    if (!buildings) return;
+    if (
+      selectedBuilding !== " " &&
+      selectedBuilding !== undefined &&
+      selectedBuilding !== null
+    ) {
+      console.log("Vào");
+      fetch(
+        `http://localhost:8080/api/v1/location/getLocationsByBuildingId?buildingId=${selectedBuilding}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setFloors(data || []);
+          setSelectedFloor(" ");
+        })
+        .catch((error) => console.error("Lỗi khi lấy danh sách tầng:", error));
+    }
+  }, [selectedBuilding]);
 
-    fetch(
-      `http://localhost:8080/api/v1/location/getLocationsByBuildingId?buildingId=${buildingId}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-
-        setFloors(data);
-      })
-      .catch((error) => console.error("Lỗi khi lấy danh sách tầng:", error));
-  }, [buildingId]);
-
+  // Xử lý thay đổi tòa nhà
   const handleBuildingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const buildingId = e.target.value;
 
-    const selectedOption = e.target.options[e.target.selectedIndex];
-    const buildingName = selectedOption?.text;
+    const selectedOption = e.target.selectedOptions[0]; // Lấy option được chọn
+    const buildingName =
+      selectedOption.getAttribute("data-buildingname")?.toString() || "";
 
-    setBuildingId(buildingId);
+    console.log("Building ID:", buildingId);
+    console.log("Building Name:", buildingName);
+
+    setSelectedBuilding(buildingId);
     setRoomData((prev) => ({
       ...prev,
       location: {
@@ -106,61 +130,49 @@ const CreateRoom = () => {
     }));
   };
 
-  // Dùng usePost để gửi dữ liệu lên API
-  const { data, loading, error, postData } = usePost(
-    "http://localhost:8080/api/v1/room/create"
-  );
-
-  // Xử lý thay đổi input
-  const handleChange = (
+  // Xử lý thay đổi input branch
+  const handleBranchChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
-    console.log(e.target.name, e.target.value);
-    const { name, value } = e.target;
+    setSelectedBranch(e.target.value);
 
-    setRoomData((prev) => {
-      if (name === "branch") {
-        return {
-          ...prev,
-          location: {
-            ...prev.location,
-            building: {
-              ...prev.location.building,
-              branch: {
-                branchName: value, // Cập nhật branchName
-              },
-            },
+    setRoomData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        building: {
+          ...prev.location.building,
+          branch: {
+            ...prev.location.building.branch,
+            branchName: e.target.value || "",
           },
-        };
-      }
-
-      if (name === "building") {
-        return {
-          ...prev,
-          location: {
-            ...prev.location,
-            building: {
-              ...prev.location.building,
-              buildingName: value,
-            },
-          },
-        };
-      }
-
-      return { ...prev, [name]: value };
-    });
+        },
+      },
+    }));
   };
 
-  // Xử lý chọn ảnh
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const fileNames = Array.from(e.target.files).map((file) => file.name);
+  // Xử lý thay đổi input floor
+  const handleFloorChange = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+  ) => {
+    setSelectedFloor(e.target.value);
+    setRoomData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        floor: e.target.value,
+      },
+    }));
+  };
 
-      setRoomData((prev) => ({
-        ...prev,
-        imgs: [...prev.imgs, ...fileNames],
-      }));
-    }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setRoomData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Xử lý thay đổi thiết bị
@@ -187,35 +199,126 @@ const CreateRoom = () => {
         );
       }
 
-      return { ...prev, room_deviceDTOS: updatedDevices }; // ⬅ Sửa đúng key
+      return { ...prev, room_deviceDTOS: updatedDevices };
     });
   };
 
-  // Gửi dữ liệu lên API khi tạo phòng
+  useEffect(() => {
+    console.log("Files:", filesImage);
+  }, [filesImage]);
+  // Xử lý chọn ảnh
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files !== null) {
+      const fileNames = Array.from(e.target.files).map((file) => file.name);
+      const filesOutput = Array.from(e.target.files).map((file) => file);
+      setFilesImage(prev => ([...prev, ...filesOutput]));
+      
+      setRoomData((prev) => ({
+        ...prev,
+        imgs: [...prev.imgs, ...fileNames],
+      }));
+    }
+  };
+
+  // thêm phòng
+  const { data, loading, error, postData } = usePost(
+    "http://localhost:8080/api/v1/room/create"
+  );
+
+  const validateForm = () => {
+    if (!roomData.location.building.branch.branchName) {
+      return { isValid: false, message: "Vui lòng chọn chi nhánh!" };
+    }
+
+    if (!roomData.location.building.buildingName) {
+      return { isValid: false, message: "Vui lòng chọn tòa nhà!" };
+    }
+
+    if (!roomData.location.floor) {
+      return { isValid: false, message: "Vui lòng chọn tầng!" };
+    }
+
+    if (!roomData.roomName) {
+      return { isValid: false, message: "Vui lòng nhập tên phòng!" };
+    }
+
+    if (!roomData.capacity) {
+      return { isValid: false, message: "Vui lòng nhập sức chứa!" };
+    }
+
+    if (!roomData.price) {
+      return { isValid: false, message: "Vui lòng nhập giá!" };
+    }
+
+    if (!roomData.typeRoom) {
+      return { isValid: false, message: "Vui lòng chọn loại phòng!" };
+    }
+
+    if (!roomData.statusRoom) {
+      return { isValid: false, message: "Vui lòng chọn trạng thái!" };
+    }
+
+    if (roomData.imgs.length === 0) {
+      return { isValid: false, message: "Vui lòng chọn ảnh!" };
+    }
+
+    if (roomData.room_deviceDTOS.length === 0) {
+      return { isValid: false, message: "Vui lòng chọn thiết bị!" };
+    }
+
+    return { isValid: true, message: "" };
+  };
+
+  // xử lý thêm phòng
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Dữ liệu trước khi gửi:", roomData);
+    const { isValid, message } = validateForm();
+    if (!isValid) {
+      setPopupMessage(message);
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    
+     const responsePictureCLoudinary = await Promise.all(
+      filesImage.map((img) => uploadImageToCloudinary(img)))
+
+      console.log(responsePictureCLoudinary);
 
     const requestData = {
       ...roomData,
-      images: JSON.stringify(roomData.imgs),
+      imgs: responsePictureCLoudinary,
     };
-
+    console.log("Dữ liệu trước khi gửi:", requestData);
     const response = await postData(requestData, {
       headers: { "Content-Type": "application/json" },
     });
 
     if (response) {
       if (response.status === 200 || response.status === 201) {
-        alert("Tạo phòng thành công!");
+        setPopupMessage("Phòng đã được tạo thành công!");
+        setPopupType("success");
+        setIsPopupOpen(true);
       } else {
-        alert(`Có lỗi xảy ra: ${response.statusText}`);
+        setPopupMessage("Lỗi khi gửi dữ liệu! Vui lòng thử lại.");
+        setPopupType("error");
+        setIsPopupOpen(true);
       }
     } else {
-      alert("Lỗi khi gửi dữ liệu! Vui lòng thử lại.");
+      setPopupMessage("Lỗi khi gửi dữ liệu! Vui lòng thử lại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
     }
   };
+
+  // Hàm đóng popup thông báo
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
+
+  console.log("Room Data:", roomData);
 
   return (
     <div className={cx("create-container")}>
@@ -226,7 +329,7 @@ const CreateRoom = () => {
             <div className={cx("cover")}>
               <h3>Bước 1: Chọn vị trí</h3>
               <div className={cx("form-row")}>
-                <select name="branch" onChange={handleChange}>
+                <select name="branch" onChange={handleBranchChange}>
                   <option value="">Chọn chi nhánh</option>
                   {branchs?.map((branch) => (
                     <option key={branch.branchId} value={branch.branchName}>
@@ -237,16 +340,19 @@ const CreateRoom = () => {
               </div>
               <div className={cx("form-row")}>
                 <select
+                  defaultValue={""}
                   name="building"
-                  value={roomData.location.building.buildingName}
                   onChange={handleBuildingChange}
                 >
-                  <option value="">Chọn tòa nhà</option>
+                  <option value="" selected={"" === selectedBuilding}>
+                    Chọn tòa nhà
+                  </option>
                   {buildings.map((building: BuildingProps) => (
                     <option
                       key={building.buildingId}
                       value={building.buildingId}
-                      id={building.buildingName}
+                      data-buildingname={building.buildingName}
+                      selected={building.buildingName === selectedBuilding}
                     >
                       {building.buildingName}
                     </option>
@@ -254,10 +360,21 @@ const CreateRoom = () => {
                 </select>
               </div>
               <div className={cx("form-row")}>
-                <select name="floor" onChange={handleChange}>
-                  <option value="">Chọn tầng</option>
+                <select
+                  defaultValue={""}
+                  name="floor"
+                  onChange={handleFloorChange}
+                  value={roomData.location.floor}
+                >
+                  <option value="" selected={"" === selectedFloor}>
+                    Chọn tầng
+                  </option>
                   {floors.map((floor) => (
-                    <option key={floor.locationId} value={floor.floor}>
+                    <option
+                      key={floor.locationId}
+                      value={floor.floor}
+                      selected={floor.floor === selectedFloor}
+                    >
                       {floor.floor}
                     </option>
                   ))}
@@ -265,9 +382,125 @@ const CreateRoom = () => {
               </div>
             </div>
 
+            {/* Nhập thông tin */}
+            <div className={cx("cover")}>
+              <h3>Bước 2: Nhập thông tin</h3>
+              <div className={cx("form-row")}>
+                <div className={cx("form-input")}>
+                  <label>Tên phòng:</label>
+                  <input
+                    ref={roomNameRef}
+                    type="text"
+                    placeholder="Nhập tên phòng..."
+                    name="roomName"
+                    value={roomData.roomName}
+                    onChange={handleChange}
+                    onBlur={(e) => {
+                      if (e.target.value === "") {
+                        setPopupMessage("Vui lòng nhập tên phòng");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        roomNameRef.current?.focus();
+                      }
+                    }}
+                  />
+                </div>
+                <div className={cx("form-input")}>
+                  <label>Sức chứa:</label>
+                  <input
+                    ref={capacityRef}
+                    type="number"
+                    placeholder="Nhập sức chứa..."
+                    name="capacity"
+                    value={roomData.capacity}
+                    onChange={handleChange}
+                    min={1}
+                    onBlur={(e) => {
+                      if (e.target.value === "") {
+                        setPopupMessage("Vui lòng nhập sức chứa");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        capacityRef.current?.focus();
+                      } else if (Number(e.target.value) < 1) {
+                        setPopupMessage("Sức chứa phải lớn hơn 0");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        capacityRef.current?.focus();
+                      }
+                    }}
+                  />
+                </div>
+                <div className={cx("form-input")}>
+                  <label>Giá:</label>
+                  <input
+                    ref={priceRef}
+                    type="number"
+                    placeholder="Nhập giá..."
+                    name="price"
+                    value={roomData.price}
+                    onChange={handleChange}
+                    min={1}
+                    onBlur={(e) => {
+                      if (e.target.value === "") {
+                        setPopupMessage("Vui lòng nhập giá");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        priceRef.current?.focus();
+                      } else if (Number(e.target.value) < 1) {
+                        setPopupMessage("Giá phải lớn hơn 0");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        priceRef.current?.focus();
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Chọn thiết lập*/}
+            <div className={cx("cover")}>
+              <h3>Bước 3: Chọn thiết lập</h3>
+              <div className={cx("form-row")}>
+                <select
+                  name="typeRoom"
+                  value={roomData.typeRoom}
+                  onChange={handleChange}
+                >
+                  <option value="">Chọn loại phòng...</option>
+                  {typeRoom.map((type, index) => (
+                    <option key={index} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="statusRoom"
+                  value={roomData.statusRoom}
+                  onChange={handleChange}
+                >
+                  <option value="">Chọn trạng thái...</option>
+                  {statusesRoom.map((status, index) => (
+                    <option key={index} value={status.value}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={cx("form-row")}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  multiple
+                />
+              </div>
+            </div>
+          </div>
+          <div className={cx("form-group")}>
             {/* Chọn thiết bị */}
             <div className={cx("cover")}>
-              <h3>Bước 3: Chọn thiết bị</h3>
+              <h3>Bước 4: Chọn thiết bị</h3>
               <div className={cx("device-group")}>
                 <div className={cx("device-table-container")}>
                   <table className={cx("device-table")}>
@@ -279,7 +512,7 @@ const CreateRoom = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {devices.map((device, index) => {
+                      {devices?.map((device, index) => {
                         const selectedDevice = roomData.room_deviceDTOS.find(
                           (d) => d.deviceName === device.deviceName
                         );
@@ -315,7 +548,6 @@ const CreateRoom = () => {
                                     Number(e.target.value)
                                   )
                                 }
-                                // disabled={!selectedDevice}
                               />
                             </td>
                           </tr>
@@ -324,80 +556,6 @@ const CreateRoom = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className={cx("form-group")}>
-            {/* Nhập thông tin */}
-            <div className={cx("cover")}>
-              <h3>Bước 2: Nhập thông tin</h3>
-              <div className={cx("form-row")}>
-                <div className={cx("form-group")}>
-                  <label>Tên phòng:</label>
-                  <input
-                    type="text"
-                    placeholder="Nhập tên phòng..."
-                    name="roomName"
-                    value={roomData.roomName}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className={cx("form-group")}>
-                  <label>Sức chứa:</label>
-                  <input
-                    type="number"
-                    placeholder="Nhập sức chứa..."
-                    name="capacity"
-                    value={roomData.capacity}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className={cx("form-group")}>
-                  <label>Giá:</label>
-                  <input
-                    type="number"
-                    placeholder="Nhập giá..."
-                    name="price"
-                    value={roomData.price}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-            {/* Chọn thiết lập*/}
-            <div className={cx("cover")}>
-              <h3>Bước 4: Chọn thiết lập</h3>
-              <div className={cx("form-row")}>
-                <select
-                  name="typeRoom"
-                  value={roomData.typeRoom}
-                  onChange={handleChange}
-                >
-                  <option value="">Chọn loại phòng...</option>
-                  {typeRoom.map((type, index) => (
-                    <option key={index} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  name="statusRoom"
-                  value={roomData.statusRoom}
-                  onChange={handleChange}
-                >
-                  <option value="">Chọn trạng thái...</option>
-                  {statusesRoom.map((status, index) => (
-                    <option key={index} value={status.value}>
-                      {status.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  multiple
-                />
               </div>
             </div>
           </div>
@@ -413,6 +571,14 @@ const CreateRoom = () => {
           </button>
         </div>
       </div>
+
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+      />
     </div>
   );
 };
