@@ -124,6 +124,15 @@ const MainLayoutAdmin = () => {
           </NavLink>
 
           <NavLink
+            to="/admin/price"
+            className={({ isActive }) =>
+              cx("sidebar-item", { active: isActive })
+            }
+          >
+            QL Giá
+          </NavLink>
+
+          <NavLink
             to="/admin/employee"
             className={({ isActive }) =>
               cx("sidebar-item", { active: isActive })

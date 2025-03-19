@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import useFetch from "../../../hooks/useFetch";
 import { Link } from "react-router-dom";
+import PopupNotification from "../../../components/popup/PopupNotification";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +22,14 @@ function ListRoom() {
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+  const [isSearching, setIsSearching] = useState(false);
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<
+    "success" | "error" | "info" | "warning"
+  >("info");
 
   const [formData, setFormData] = useState({
     roomName: "",
@@ -67,7 +77,26 @@ function ListRoom() {
   };
 
   // Gọi API khi tìm kiếm
-  const handleSearch = async () => {
+  const handleSearch = async (pageNumber: number) => {
+    if (Number(filters.capacity) < 0 || Number(filters.price) < 0) {
+      setPopupMessage("Sức chứa và giá phải lớn hơn hoặc bằng 0");
+      setPopupType("warning");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    if (
+      !Number.isInteger(Number(filters.capacity)) ||
+      !Number.isInteger(Number(filters.price))
+    ) {
+      setPopupMessage("Sức chứa và giá phải là số nguyên");
+      setPopupType("warning");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    setIsSearching(true);
+    // setPage(1);
     try {
       const searchParams = new URLSearchParams();
 
@@ -77,6 +106,9 @@ function ListRoom() {
         searchParams.append("statusRoom", filters.statusRoom);
       if (filters.price) searchParams.append("price", filters.price);
       if (filters.branch) searchParams.append("branch", filters.branch);
+
+      searchParams.append("page", (pageNumber - 1).toString());
+      searchParams.append("size", pageSize.toString());
 
       const searchUrl = `http://localhost:8080/api/v1/room/searchRooms?${searchParams.toString()}`;
 
@@ -97,7 +129,7 @@ function ListRoom() {
       setRooms(response.data);
       console.log(response.data);
       setTotalPage(response.data.totalPage);
-      setPage(1); 
+      setPage(1);
     } catch (error) {
       console.error("Lỗi khi tìm kiếm phòng theo tên:", error);
     }
@@ -120,6 +152,22 @@ function ListRoom() {
       }
     }, 500);
     setDebounceTimeout(newTimeout);
+  };
+
+  // Kiểm tra xem đang tìm kiếm hay không
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+
+    if (isSearching) {
+      handleSearch(newPage);
+    } else {
+      fetchRooms(newPage);
+    }
+  };
+
+  // Hàm đóng popup thông báo
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
   };
 
   return (
@@ -159,6 +207,7 @@ function ListRoom() {
                 type="number"
                 placeholder="Nhập sức chứa..."
                 value={filters.capacity}
+                min={0}
                 onChange={(e) => {
                   setFilters({ ...filters, capacity: e.target.value });
                 }}
@@ -170,6 +219,7 @@ function ListRoom() {
                 type="number"
                 placeholder="Nhập giá..."
                 value={filters.price}
+                min={0}
                 onChange={(e) => {
                   setFilters({ ...filters, price: e.target.value });
                 }}
@@ -189,7 +239,10 @@ function ListRoom() {
               </select>
             </div>
 
-            <button className={cx("search-btn")} onClick={() => handleSearch()}>
+            <button
+              className={cx("search-btn")}
+              onClick={() => handleSearch(page)}
+            >
               Tìm kiếm
             </button>
           </div>
@@ -250,13 +303,14 @@ function ListRoom() {
         {/* Nút "Trước" */}
         <button
           className={cx("page-btn")}
-          onClick={() => {
-            setPage((prev) => {
-              const newPage = Math.max(prev - 1, 1);
-              fetchRooms(newPage);
-              return newPage;
-            });
-          }}
+          // onClick={() => {
+          //   setPage((prev) => {
+          //     const newPage = Math.max(prev - 1, 1);
+          //     fetchRooms(newPage);
+          //     return newPage;
+          //   });
+          // }}
+          onClick={() => handlePageChange(Math.max(page - 1, 1))}
           disabled={page === 1}
         >
           {"<"} Trước
@@ -267,11 +321,12 @@ function ListRoom() {
           <button
             key={index}
             className={cx("page-btn", { active: page === index + 1 })}
-            onClick={() => {
-              const newPage = index + 1;
-              setPage(newPage);
-              fetchRooms(newPage);
-            }}
+            // onClick={() => {
+            //   const newPage = index + 1;
+            //   setPage(newPage);
+            //   fetchRooms(newPage);
+            // }}
+            onClick={() => handlePageChange(index + 1)}
           >
             {index + 1}
           </button>
@@ -280,18 +335,27 @@ function ListRoom() {
         {/* Nút "Sau" */}
         <button
           className={cx("page-btn")}
-          onClick={() => {
-            setPage((prev) => {
-              const newPage = Math.min(prev + 1, totalPage);
-              fetchRooms(newPage);
-              return newPage;
-            });
-          }}
+          // onClick={() => {
+          //   setPage((prev) => {
+          //     const newPage = Math.min(prev + 1, totalPage);
+          //     fetchRooms(newPage);
+          //     return newPage;
+          //   });
+          // }}
+          onClick={() => handlePageChange(Math.min(page + 1, totalPage))}
           disabled={page >= totalPage || totalPage === 1}
         >
           Sau {">"}
         </button>
       </div>
+
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+      />
     </div>
   );
 }

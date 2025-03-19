@@ -7,7 +7,7 @@ import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { fetchLocations } from "../../../features/locationSlice";
 import useFetch from "../../../hooks/useFetch";
-import { BranchProps, BuildingProps } from "../../../data/data";
+import { BranchProps, BuildingProps, LocationProps } from "../../../data/data";
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +20,9 @@ function Location() {
   const [branchName, setBranchName] = useState("");
   const [buildings, setBuildings] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState<string>();
+  const [maxFloor, setMaxFloor] = useState(1);
+  const [floor, setFloor] = useState(maxFloor);
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -57,6 +60,7 @@ function Location() {
       .then((res) => res.json())
       .then((data) => {
         setBuildings(data);
+        setSelectedBuilding(" ");
       })
       .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
   }, [branchName]);
@@ -67,6 +71,39 @@ function Location() {
     loading: locationsLoading,
     error: locationsError,
   } = useSelector((state: RootState) => state.location);
+
+  // lấy ds tầng theo tòa nhà
+  useEffect(() => {
+    if (
+      selectedBuilding !== " " &&
+      selectedBuilding !== undefined &&
+      selectedBuilding !== null
+    ) {
+      fetch(
+        `http://localhost:8080/api/v1/location/getLocationsByBuildingId?buildingId=${selectedBuilding}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.length > 0) {
+            const max = Math.max.apply(
+              Math,
+              data.map((loc: LocationProps) => loc.floor)
+            );
+            setMaxFloor(max + 1);
+            setFloor(max + 1);
+            setFormData((prev) => ({
+              ...prev,
+              floor: (max + 1).toString(),
+            }));
+          } else {
+            setMaxFloor(1);
+          }
+        })
+        .catch((error) => console.error("Lỗi khi lấy danh sách tầng:", error));
+    }
+  }, [selectedBuilding]);
+
+  console.log(maxFloor);
 
   // mở modal thêm branch
   const handleOpenBranchModal = () => {
@@ -197,13 +234,6 @@ function Location() {
       return;
     }
 
-    if (!formData.floor) {
-      setPopupMessage("Vui lòng nhập tầng!");
-      setPopupType("error");
-      setIsPopupOpen(true);
-      return;
-    }
-
     const newLocation = {
       building: formData.building,
       floor: formData.floor,
@@ -211,19 +241,19 @@ function Location() {
 
     console.log(newLocation);
 
-    const response = await postLocation(newLocation);
+    // const response = await postLocation(newLocation);
 
-    if (response) {
-      setPopupMessage("Vị trí đã được thêm thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
-      dispatch(fetchLocations());
-      resetForm();
-    } else {
-      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
+    // if (response) {
+    //   setPopupMessage("Vị trí đã được thêm thành công!");
+    //   setPopupType("success");
+    //   setIsPopupOpen(true);
+    //   dispatch(fetchLocations());
+    //   resetForm();
+    // } else {
+    //   setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
+    //   setPopupType("error");
+    //   setIsPopupOpen(true);
+    // }
   };
 
   // Reset form sau khi thêm
@@ -245,6 +275,8 @@ function Location() {
       setBuildings([]);
     }
   };
+
+  // xử lý khi thay đổi building
   const handleInputBuildingChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -254,14 +286,29 @@ function Location() {
       [name]: value,
     }));
   };
+
+  // Hàm thay đổi của select tòa nhà
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    setSelectedBuilding(value);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Hàm xử lý thay đổi floor
+  const handleFloorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    if (value >= maxFloor) {
+      setFloor(value);
+      setFormData((prev) => ({
+        ...prev,
+        floor: value.toString(),
+      }));
+    }
   };
 
   // Hàm xử lý thay đổi của checkbox
@@ -421,11 +468,12 @@ function Location() {
               <div className={cx("form-group")}>
                 <label>Tầng:</label>
                 <input
-                  type="text"
+                  type="number"
                   name="floor"
+                  min={maxFloor}
                   placeholder="Nhập tầng..."
-                  value={formData.floor}
-                  onChange={handleInputChange}
+                  value={floor}
+                  onChange={handleFloorChange}
                 />
               </div>
             </div>

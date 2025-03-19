@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./WeeklySchedule.module.scss";
 import { toast, ToastContainer } from "react-toastify";
@@ -6,8 +6,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { EmployeeProps, ServiceProps } from "../../data/data";
 import useFetch from "../../hooks/useFetch";
-import { time } from "console";
-import { set } from "react-datepicker/dist/date_utils";
 import usePost from "../../hooks/usePost";
 import PopupNotification from "../popup/PopupNotification";
 
@@ -58,7 +56,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
   } | null>(null);
 
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
-  const [inputValues, setInputValues] = useState<{ [key: string]: string }>({});
+
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
@@ -90,7 +88,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     filePaths: [] as string[],
   });
 
-  // lấy dv
+  // lấy dịch vụ
   const {
     data: services,
     loading: serviceLoading,
@@ -99,6 +97,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     "http://localhost:8080/api/v1/service/getAllServices"
   );
 
+  // lấy nhân viên
   const {
     data: employees,
     loading: employeesLoading,
@@ -107,6 +106,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${phone}`
   );
 
+  // đặt lịch
   const {
     data,
     loading: roomLoading,
@@ -337,23 +337,24 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
 
                     console.log(bookedSchedule);
                     const editBackground: { [key: string]: string } = {
-                      "normal": "normal",
-                      "pending": "pending",
-                      "waiting": "waiting",
-                      "checked_in": "checked_in",
-                      "completed": "completed",
-                      "waitingCanceled": "waitingCanceled",
-                    }
-                    const statusKey = bookedSchedule?.statusReservation.toLocaleLowerCase() || "normal";
+                      normal: "normal",
+                      pending: "pending",
+                      waiting: "waiting",
+                      checked_in: "checked_in",
+                      completed: "completed",
+                      waitingCanceled: "waitingCanceled",
+                    };
+                    const statusKey =
+                      bookedSchedule?.statusReservation.toLocaleLowerCase() ||
+                      "normal";
 
-                    console.log(editBackground[statusKey]);
-                    
                     return (
                       <td
                         key={i}
                         className={cx("schedule-cell", {
                           booked: bookedSchedule,
-                          [editBackground[statusKey]]: editBackground[statusKey]
+                          [editBackground[statusKey]]:
+                            editBackground[statusKey],
                         })}
                         onClick={() => {
                           if (bookedSchedule) {

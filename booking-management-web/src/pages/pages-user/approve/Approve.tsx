@@ -5,7 +5,8 @@ import { ReservationDetailProps, ReservationProps } from "../../../data/data";
 import DetailModal from "./DetailModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
-import { set } from "react-datepicker/dist/date_utils";
+import IconWrapper from "../../../components/icons/IconWrapper";
+import { MdOutlineInfo } from "../../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
@@ -28,6 +29,7 @@ function Approve() {
     "info"
   );
 
+  // Lấy chi tiết lịch đặt phòng
   const {
     data: reservationDetail,
     loading,
@@ -38,6 +40,7 @@ function Approve() {
       : ""
   );
 
+  // Lấy danh sách lịch đặt phòng cần phê duyệt
   let {
     data: reservation,
     loading: loadingReservation,
@@ -49,28 +52,6 @@ function Approve() {
   const [schedulesApprove, setSchedulesApprove] = useState<ReservationProps[]>(
     reservation ?? []
   );
-
-  console.log(schedulesApprove);
-
-  const {
-    data: deActiveDataRes,
-    loading: deActiveLoading,
-    error: deActiveError,
-    postData: deActiveData,
-  } = usePost<string[]>(
-    "http://localhost:8080/api/v1/reservation/approveReservation"
-  );
-
-  const {
-    data: nonActiveDataRes,
-    loading: nonActiveLoading,
-    error: nonActiveError,
-    postData: nonActiveData,
-  } = usePost<string[]>(
-    "http://localhost:8080/api/v1/reservation/disApproveReservation"
-  );
-
-  console.log(reservation);
 
   useEffect(() => {
     setSchedulesApprove(reservation ?? []);
@@ -92,6 +73,16 @@ function Approve() {
         : [...prevSelected, id]
     );
   };
+
+  // Phê duyệt
+  const {
+    data: deActiveDataRes,
+    loading: deActiveLoading,
+    error: deActiveError,
+    postData: deActiveData,
+  } = usePost<string[]>(
+    "http://localhost:8080/api/v1/reservation/approveReservation"
+  );
 
   // Hàm phê duyệt
   const handleApprove = async () => {
@@ -117,6 +108,16 @@ function Approve() {
     }
   };
 
+  // Từ chối
+  const {
+    data: nonActiveDataRes,
+    loading: nonActiveLoading,
+    error: nonActiveError,
+    postData: nonActiveData,
+  } = usePost<string[]>(
+    "http://localhost:8080/api/v1/reservation/disApproveReservation"
+  );
+
   // Hàm từ chối
   const handleRejected = async () => {
     console.log(selectedItems);
@@ -141,18 +142,6 @@ function Approve() {
     }
   };
 
-  // Hàm format ngày giờ
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toLocaleDateString("vi-VN"),
-      time: date.toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
-
   // Cập nhật state khi API trả về dữ liệu
   useEffect(() => {
     if (reservationDetail) {
@@ -163,6 +152,18 @@ function Approve() {
 
   const handleShowDetails = (reservationId: number) => {
     setSelectedReservationId(reservationId);
+  };
+
+  // Hàm format ngày giờ
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString("vi-VN"),
+      time: date.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
   };
 
   const handleCloseModal = () => {
@@ -184,7 +185,7 @@ function Approve() {
             />
           </div>
           <div className={cx("search-row")}>
-            <label>Thời gian gửi</label>
+            <label>Ngày gửi</label>
             <input type="date" className={cx("search-input")} />
           </div>
           <button className={cx("btn-action", "details-btn")}>Tìm kiếm</button>
@@ -221,50 +222,47 @@ function Approve() {
             return (
               <div key={schedule.reservationId} className={cx("schedule-card")}>
                 <div className={cx("card-content")}>
-                  <h3>{schedule.title}</h3>
                   <div className={cx("schedule-layout")}>
-                    <div className={cx("left-info")}>
+                    <div className={cx("checkbox-container")}>
                       {/* check */}
-                      <div className={cx("checkbox-container")}>
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(
-                            schedule.reservationId
-                          )}
-                          onChange={() =>
-                            handleCheckboxChange(schedule.reservationId)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <p>
-                          <strong>Người đặt:</strong> {schedule.nameBooker}
-                        </p>
-                        <p>
-                          <strong>Thời gian gửi:</strong>{" "}
-                          {new Date(schedule.time).toLocaleString()}
-                        </p>
-                      </div>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(schedule.reservationId)}
+                        onChange={() =>
+                          handleCheckboxChange(schedule.reservationId)
+                        }
+                      />
+                      <h3>{schedule.title}</h3>
                     </div>
-                    <div className={cx("center-info")}>
+                    <div className={cx("left-info")}>
                       <p>
                         <strong>Ngày:</strong> {meetingStart.date}
                       </p>
                       <p>
-                        <strong>Thời gian:</strong> {meetingStart.time} -{" "}
-                        {meetingEnd.time}
+                        từ {meetingStart.time} - {meetingEnd.time}
                       </p>
                     </div>
+                    <div className={cx("center-info")}>
+                      <p>
+                        <strong>Người đặt:</strong> {schedule.nameBooker}
+                      </p>
+                    </div>
+                    <div className={cx("center-info")}>
+                      <p>
+                        <strong>Thời gian gửi:</strong>{" "}
+                        {new Date(schedule.time).toLocaleString()}
+                      </p>
+                    </div>
+
                     <div className={cx("right-info")}>
-                      <div className={cx("actions")}>
-                        <button
-                          className={cx("btn-action", "details-btn")}
-                          onClick={() =>
-                            handleShowDetails(schedule.reservationId)
-                          }
-                        >
-                          Xem Chi Tiết
-                        </button>
+                      <div
+                        className={cx("actions")}
+                        onClick={() =>
+                          handleShowDetails(schedule.reservationId)
+                        }
+                      >
+                        <label>Chi tiết</label>
+                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
                     </div>
                   </div>

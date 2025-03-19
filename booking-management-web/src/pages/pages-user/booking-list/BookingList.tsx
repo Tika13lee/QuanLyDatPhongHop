@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { ReservationDetailProps, ReservationProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../approve/DetailModal";
+import IconWrapper from "../../../components/icons/IconWrapper";
+import { MdOutlineInfo } from "../../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
@@ -26,16 +28,6 @@ function BookingList() {
       : ""
   );
 
-  const {
-    data: bookedList,
-    loading: loadingBookedList,
-    error: errorBookedList,
-  } = useFetch<ReservationProps[]>(
-    status
-      ? `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}&statusReservation=${status}`
-      : `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}`
-  );
-
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -48,6 +40,17 @@ function BookingList() {
     };
   };
 
+  // Lấy danh sách lịch đặt phòng
+  const {
+    data: bookedList,
+    loading: loadingBookedList,
+    error: errorBookedList,
+  } = useFetch<ReservationProps[]>(
+    status
+      ? `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}&statusReservation=${status}`
+      : `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}`
+  );
+
   // Cập nhật state khi API trả về dữ liệu
   useEffect(() => {
     if (data) {
@@ -56,17 +59,17 @@ function BookingList() {
     }
   }, [data]);
 
+  // Mở modal
   const handleShowDetails = (reservationId: number) => {
     setSelectedReservationId(reservationId);
   };
 
+  // Đóng modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedReservationId(null);
     setSelectedReservation(null);
   };
-
-  console.log(status);
 
   return (
     <div className={cx("booking-list")}>
@@ -80,7 +83,7 @@ function BookingList() {
           />
         </div>
         <div className={cx("search-row")}>
-          <label>Thời gian gửi</label>
+          <label>Ngày gửi</label>
           <input type="date" className={cx("search-input")} />
         </div>
         <div className={cx("search-row")}>
@@ -103,9 +106,10 @@ function BookingList() {
           </select>
         </div>
       </div>
+
       {Array.isArray(bookedList) && bookedList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
-          Bạn không có lịch cần phê duyệt
+          Bạn không có lịch đặt phòng nào
         </p>
       ) : (
         <div className={cx("schedule-list")}>
@@ -117,29 +121,19 @@ function BookingList() {
             return (
               <div key={schedule.reservationId} className={cx("schedule-card")}>
                 <div className={cx("card-content")}>
-                  <h3>{schedule.title}</h3>
                   <div className={cx("schedule-layout")}>
                     <div className={cx("left-info")}>
+                      <h3>{schedule.title}</h3>
+                    </div>
+
+                    <div className={cx("left-info")}>
                       <p>
-                        <strong>Người đặt:</strong> {schedule.nameBooker}
-                      </p>
-                      <p>
-                        <strong>Thời gian gửi:</strong>{" "}
-                        {new Date(schedule.time).toLocaleString()}
+                        <strong>Ngày:</strong> {meetingStart.date} từ {""}
+                        {meetingStart.time} - {meetingEnd.time}
                       </p>
                     </div>
 
                     <div className={cx("center-info")}>
-                      <p>
-                        <strong>Ngày:</strong> {meetingStart.date}
-                      </p>
-                      <p>
-                        <strong>Thời gian:</strong> {meetingStart.time} -{" "}
-                        {meetingEnd.time}
-                      </p>
-                    </div>
-
-                    <div className={cx("left-info")}>
                       <p>
                         <strong>Trạng thái:</strong>{" "}
                         {schedule.statusReservation === "CHECKED_IN"
@@ -158,23 +152,30 @@ function BookingList() {
                           ? "Không được phê duyệt"
                           : "Đang chờ hủy"}
                       </p>
-                      <p>
+                      {/* <p>
                         <strong>Thời gian phê duyệt:</strong>{" "}
                         {schedule.timeApprove === null
                           ? "Chưa phê duyệt"
                           : new Date(schedule.timeApprove).toLocaleString()}
+                      </p> */}
+                    </div>
+
+                    <div className={cx("center-info")}>
+                      <p>
+                        <strong>Thời gian gửi:</strong>{" "}
+                        {new Date(schedule.time).toLocaleString()}
                       </p>
                     </div>
+
                     <div className={cx("right-info")}>
-                      <div className={cx("actions")}>
-                        <button
-                          className={cx("btn-action", "details-btn")}
-                          onClick={() =>
-                            handleShowDetails(schedule.reservationId)
-                          }
-                        >
-                          Xem Chi Tiết
-                        </button>
+                      <div
+                        className={cx("actions")}
+                        onClick={() =>
+                          handleShowDetails(schedule.reservationId)
+                        }
+                      >
+                        <label>Chi tiết</label>
+                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
                     </div>
                   </div>

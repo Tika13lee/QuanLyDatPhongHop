@@ -18,7 +18,6 @@
   padding: 10px 20px;
   background: #353231;
 
-
   position: -webkit-sticky;
   position: sticky;
   top: 0;
@@ -52,31 +51,28 @@
 
 // ds lịch
 .schedule-list {
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1px;
 }
 
 .schedule-card {
   background: var(--color-white);
-  border-radius: 5px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 7px 10px;
+  border: 1px solid var(--border-color);
   transition: transform 0.2s ease-in-out;
   position: relative;
 }
 
 .card-content {
   h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
-    color: #222;
-    margin-bottom: 10px;
+    color: var(--text-primary);
   }
   p {
     font-size: 14px;
-    margin: 5px 0;
     color: var(--text-secondary);
   }
 }
@@ -85,34 +81,53 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 500;
 }
 
+.checkbox-container,
 .left-info,
 .center-info,
 .right-info {
   flex: 1;
 }
 
-.left-info {
+.checkbox-container {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 5px;
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    width: fit-content;
+  }
 }
 
 .center-info {
-  text-align: center;
-  font-weight: bold;
+  text-align: left;
+}
+
+.left-info {
+  display: flex;
+  gap: 5px;
+  text-align: left;
 }
 
 .right-info {
   text-align: right;
 }
 
+// button
 .actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+
+  label {
+    margin: 0;
+    color: var(--text-secondary);
+  }
 }
 
 .btn-action {

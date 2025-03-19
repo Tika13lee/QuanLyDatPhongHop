@@ -7,18 +7,18 @@ import {
   Employee,
   Location,
   Overview,
+  Price,
   Room,
   RoomDetail,
   Service,
-  WaitingList,
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
 import {
   Approve,
   ApprovedList,
-  Booking,
   BookingList,
-  General,
+  BookingSearch,
+  Booking,
   RejectedList,
   Schedule,
   ViewSchedule,
@@ -44,12 +44,13 @@ function App() {
             <Route path="location" element={<Location />} />
             <Route path="device" element={<Device />} />
             <Route path="service" element={<Service />} />
+            <Route path="price" element={<Price />} />
             <Route path="employee" element={<Employee />} />
           </Route>
 
           <Route path="/user" element={<MainLayoutUser />}>
-            <Route index element={<Booking />} />
-            <Route path="booking" element={<General />} />
+            <Route index element={<BookingSearch />} />
+            <Route path="booking" element={<Booking />} />
             <Route path="booking-list" element={<BookingList />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
             <Route path="approve" element={<Approve />} />

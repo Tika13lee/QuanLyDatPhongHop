@@ -1,0 +1,252 @@
+.price-container {
+  flex: 1;
+  margin: 20px auto;
+  background: var(--color-white);
+  padding: 0 20px;
+}
+
+// tìm kiếm
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-white);
+}
+
+.search-date {
+  display: flex;
+  align-items: center;
+  // gap: 10px;
+
+  label {
+    width: 350px;
+    margin: 0;
+  }
+}
+
+// chức năng
+.function-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+
+  p {
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+.function-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-white);
+  background: var(--btn-add);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background: var(--btn-add-hover);
+  }
+
+  &:disabled {
+    background-color: #e0e0e0;
+    color: #b0b0b0;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// price table
+.price-list {
+  width: 100%;
+  margin-top: 10px;
+  overflow-y: auto;
+  max-height: 540px;
+  border: 1px solid var(--border-color);
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-scroll-track);
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--bg-scroll-thumb);
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-scroll-thumb-hover);
+  }
+}
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  thead {
+    position: sticky;
+    top: 0;
+    background: var(--bg-active);
+    z-index: 10;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+  }
+
+  tr:hover {
+    background-color: var(--bg-primary);
+  }
+
+  th {
+    background-color: var(--bg-active);
+    color: var(--color-white);
+    font-weight: 500;
+  }
+
+  .checkbox {
+    display: flex;
+    justify-self: center;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+
+  .icon-info {
+    cursor: pointer;
+    text-align: center;
+  }
+}
+
+.price-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.price-info {
+  width: 45%;
+  padding: 20px;
+  background: var(--color-white);
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
+
+  h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+}
+
+// Hiệu ứng mở modal
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: color 0.3s;
+
+  &:hover {
+    color: var(--color-error);
+  }
+}
+
+.price-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.table-container {
+  max-width: 100%;
+  overflow-y: auto;
+  height: 500px;
+  border-radius: 5px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  thead {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+
+  thead th {
+    border-bottom: 2px solid #ddd;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.2s;
+  }
+
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  td,
+  th {
+    padding: 7px 10px;
+  }
+
+  td:nth-child(2) {
+    text-align: right;
+  }
+}

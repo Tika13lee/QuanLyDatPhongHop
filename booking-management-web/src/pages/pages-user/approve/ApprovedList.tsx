@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { ReservationDetailProps, ReservationProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "./DetailModal";
+import IconWrapper from "../../../components/icons/IconWrapper";
+import { MdOutlineInfo } from "../../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
@@ -18,20 +20,6 @@ function ApprovedList() {
   const [selectedReservation, setSelectedReservation] =
     useState<ReservationDetailProps | null>(null);
 
-  const { data, loading, error } = useFetch<ReservationDetailProps>(
-    selectedReservationId
-      ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
-      : ""
-  );
-
-  const {
-    data: approvedList,
-    loading: loadingApprovedList,
-    error: errorApprovedList,
-  } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsNoPending?approverId=${user.employeeId}`
-  );
-
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -44,6 +32,22 @@ function ApprovedList() {
     };
   };
 
+  // Lấy chi tiết lịch đặt phòng
+  const { data, loading, error } = useFetch<ReservationDetailProps>(
+    selectedReservationId
+      ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
+      : ""
+  );
+
+  // Lấy danh sách lịch đặt phòng đã phê duyệt
+  const {
+    data: approvedList,
+    loading: loadingApprovedList,
+    error: errorApprovedList,
+  } = useFetch<ReservationProps[]>(
+    `http://localhost:8080/api/v1/reservation/getReservationsNoPending?approverId=${user.employeeId}`
+  );
+
   // Cập nhật state khi API trả về dữ liệu
   useEffect(() => {
     if (data) {
@@ -52,10 +56,12 @@ function ApprovedList() {
     }
   }, [data]);
 
+  // Mở modal
   const handleShowDetails = (reservationId: number) => {
     setSelectedReservationId(reservationId);
   };
 
+  // Đóng modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedReservationId(null);
@@ -74,7 +80,7 @@ function ApprovedList() {
           />
         </div>
         <div className={cx("search-row")}>
-          <label>Thời gian gửi</label>
+          <label>Ngày gửi</label>
           <input type="date" className={cx("search-input")} />
         </div>
       </div>
@@ -93,8 +99,15 @@ function ApprovedList() {
             return (
               <div key={schedule.reservationId} className={cx("schedule-card")}>
                 <div className={cx("card-content")}>
-                  <h3>{schedule.title}</h3>
                   <div className={cx("schedule-layout")}>
+                    <div className={cx("left-info")}>
+                      <h3>{schedule.title}</h3>
+                      <p>
+                        <strong>Ngày:</strong> {meetingStart.date} từ{" "}
+                        {meetingStart.time} - {meetingEnd.time}
+                      </p>
+                    </div>
+
                     <div className={cx("left-info")}>
                       <p>
                         <strong>Người đặt:</strong> {schedule.nameBooker}
@@ -102,16 +115,6 @@ function ApprovedList() {
                       <p>
                         <strong>Thời gian gửi:</strong>{" "}
                         {new Date(schedule.time).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className={cx("center-info")}>
-                      <p>
-                        <strong>Ngày:</strong> {meetingStart.date}
-                      </p>
-                      <p>
-                        <strong>Thời gian:</strong> {meetingStart.time} -{" "}
-                        {meetingEnd.time}
                       </p>
                     </div>
 
@@ -135,16 +138,16 @@ function ApprovedList() {
                         {new Date(schedule.timeApprove).toLocaleString()}
                       </p>
                     </div>
+
                     <div className={cx("right-info")}>
-                      <div className={cx("actions")}>
-                        <button
-                          className={cx("btn-action", "details-btn")}
-                          onClick={() =>
-                            handleShowDetails(schedule.reservationId)
-                          }
-                        >
-                          Xem Chi Tiết
-                        </button>
+                      <div
+                        className={cx("actions")}
+                        onClick={() =>
+                          handleShowDetails(schedule.reservationId)
+                        }
+                      >
+                        <label>Chi tiết</label>
+                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
                     </div>
                   </div>

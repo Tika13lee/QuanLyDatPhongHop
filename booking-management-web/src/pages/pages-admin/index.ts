@@ -8,8 +8,10 @@ import WaitingList from "./booking-mgmt/WaitingList";
 import Device from "./device/Device";
 import Service from "./service/Serivice";
 import ApprovalList from "./booking-mgmt/ApprovalList";
+import Price from "./price/Price";
 
 export {
+  Price,
   ApprovalList,
   Service,
   Device,

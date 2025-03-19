@@ -76,6 +76,7 @@ function Service() {
     return { isValid: true, message: "" };
   };
 
+  // thêm dịch vụ
   const { postData: addData } = usePost<ServiceProps[]>(
     "http://localhost:8080/api/v1/service/addService"
   );

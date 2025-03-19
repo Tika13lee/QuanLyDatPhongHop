@@ -1,0 +1,128 @@
+.booking-container {
+  margin: 0 auto;
+}
+
+// search
+.booking-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #353231;
+  padding: 15px 25px;
+  width: 100%;
+  transition: all 0.3s ease;
+
+  h3 {
+    margin-bottom: 12px;
+    color: var(--color-dark);
+  }
+}
+
+.search {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  transition: all 0.3s ease;
+
+  label {
+    font-size: 14px;
+    color: var(--color-white);
+  }
+}
+
+.filters {
+  width: 100%;
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.filter-item {
+  flex: 1; 
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 14px;
+    color: var(--color-white);
+  }
+
+  input, select {
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+  }
+}
+
+.search-button {
+  width: 100px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-white);
+  background: var(--btn-main);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-right: 10px;
+
+  &:disabled {
+    background-color: #bdbdbd;
+    color: #757575;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// room list
+.room-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+  padding: 10px 25px;
+}
+
+.room-list-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.room-list-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    font-size: 22px; 
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.view-all {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--bg-active);
+  }
+}

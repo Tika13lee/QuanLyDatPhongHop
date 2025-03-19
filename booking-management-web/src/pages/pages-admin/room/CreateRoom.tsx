@@ -41,13 +41,7 @@ const CreateRoom = () => {
     capacity: "",
     price: "",
     location: {
-      building: {
-        buildingName: "",
-        branch: {
-          branchName: "",
-        },
-      },
-      floor: "",
+      locationId: "",
     },
     typeRoom: "",
     statusRoom: "",
@@ -110,24 +104,21 @@ const CreateRoom = () => {
   const handleBuildingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const buildingId = e.target.value;
 
-    const selectedOption = e.target.selectedOptions[0]; // Lấy option được chọn
+    const selectedOption = e.target.selectedOptions[0];
     const buildingName =
       selectedOption.getAttribute("data-buildingname")?.toString() || "";
 
-    console.log("Building ID:", buildingId);
-    console.log("Building Name:", buildingName);
-
     setSelectedBuilding(buildingId);
-    setRoomData((prev) => ({
-      ...prev,
-      location: {
-        ...prev.location,
-        building: {
-          ...prev.location.building,
-          buildingName: buildingName,
-        },
-      },
-    }));
+    // setRoomData((prev) => ({
+    //   ...prev,
+    //   location: {
+    //     ...prev.location,
+    //     building: {
+    //       ...prev.location.building,
+    //       buildingName: buildingName,
+    //     },
+    //   },
+    // }));
   };
 
   // Xử lý thay đổi input branch
@@ -136,19 +127,19 @@ const CreateRoom = () => {
   ) => {
     setSelectedBranch(e.target.value);
 
-    setRoomData((prev) => ({
-      ...prev,
-      location: {
-        ...prev.location,
-        building: {
-          ...prev.location.building,
-          branch: {
-            ...prev.location.building.branch,
-            branchName: e.target.value || "",
-          },
-        },
-      },
-    }));
+    // setRoomData((prev) => ({
+    //   ...prev,
+    //   location: {
+    //     ...prev.location,
+    //     building: {
+    //       ...prev.location.building,
+    //       branch: {
+    //         ...prev.location.building.branch,
+    //         branchName: e.target.value || "",
+    //       },
+    //     },
+    //   },
+    // }));
   };
 
   // Xử lý thay đổi input floor
@@ -160,7 +151,7 @@ const CreateRoom = () => {
       ...prev,
       location: {
         ...prev.location,
-        floor: e.target.value,
+        locationId: e.target.value || "",
       },
     }));
   };
@@ -206,13 +197,14 @@ const CreateRoom = () => {
   useEffect(() => {
     console.log("Files:", filesImage);
   }, [filesImage]);
+
   // Xử lý chọn ảnh
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files !== null) {
       const fileNames = Array.from(e.target.files).map((file) => file.name);
       const filesOutput = Array.from(e.target.files).map((file) => file);
-      setFilesImage(prev => ([...prev, ...filesOutput]));
-      
+      setFilesImage((prev) => [...prev, ...filesOutput]);
+
       setRoomData((prev) => ({
         ...prev,
         imgs: [...prev.imgs, ...fileNames],
@@ -226,17 +218,17 @@ const CreateRoom = () => {
   );
 
   const validateForm = () => {
-    if (!roomData.location.building.branch.branchName) {
-      return { isValid: false, message: "Vui lòng chọn chi nhánh!" };
-    }
+    // if (!roomData.location.building.branch.branchName) {
+    //   return { isValid: false, message: "Vui lòng chọn chi nhánh!" };
+    // }
 
-    if (!roomData.location.building.buildingName) {
-      return { isValid: false, message: "Vui lòng chọn tòa nhà!" };
-    }
+    // if (!roomData.location.building.buildingName) {
+    //   return { isValid: false, message: "Vui lòng chọn tòa nhà!" };
+    // }
 
-    if (!roomData.location.floor) {
-      return { isValid: false, message: "Vui lòng chọn tầng!" };
-    }
+    // if (!roomData.location.floor) {
+    //   return { isValid: false, message: "Vui lòng chọn tầng!" };
+    // }
 
     if (!roomData.roomName) {
       return { isValid: false, message: "Vui lòng nhập tên phòng!" };
@@ -271,7 +263,7 @@ const CreateRoom = () => {
 
   // xử lý thêm phòng
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    // e.preventDefault();
 
     const { isValid, message } = validateForm();
     if (!isValid) {
@@ -281,11 +273,11 @@ const CreateRoom = () => {
       return;
     }
 
-    
-     const responsePictureCLoudinary = await Promise.all(
-      filesImage.map((img) => uploadImageToCloudinary(img)))
+    const responsePictureCLoudinary = await Promise.all(
+      filesImage.map((img) => uploadImageToCloudinary(img))
+    );
 
-      console.log(responsePictureCLoudinary);
+    console.log(responsePictureCLoudinary);
 
     const requestData = {
       ...roomData,
@@ -364,7 +356,7 @@ const CreateRoom = () => {
                   defaultValue={""}
                   name="floor"
                   onChange={handleFloorChange}
-                  value={roomData.location.floor}
+                  value={roomData.location.locationId}
                 >
                   <option value="" selected={"" === selectedFloor}>
                     Chọn tầng
@@ -372,7 +364,7 @@ const CreateRoom = () => {
                   {floors.map((floor) => (
                     <option
                       key={floor.locationId}
-                      value={floor.floor}
+                      value={floor.locationId}
                       selected={floor.floor === selectedFloor}
                     >
                       {floor.floor}
@@ -426,6 +418,13 @@ const CreateRoom = () => {
                         setPopupType("error");
                         setIsPopupOpen(true);
                         capacityRef.current?.focus();
+                      } else if (
+                        Number.isInteger(Number(e.target.value)) === false
+                      ) {
+                        setPopupMessage("Sức chứa phải là số nguyên");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        capacityRef.current?.focus();
                       }
                     }}
                   />
@@ -448,6 +447,13 @@ const CreateRoom = () => {
                         priceRef.current?.focus();
                       } else if (Number(e.target.value) < 1) {
                         setPopupMessage("Giá phải lớn hơn 0");
+                        setPopupType("error");
+                        setIsPopupOpen(true);
+                        priceRef.current?.focus();
+                      } else if (
+                        Number.isInteger(Number(e.target.value)) === false
+                      ) {
+                        setPopupMessage("Giá phải là số nguyên");
                         setPopupType("error");
                         setIsPopupOpen(true);
                         priceRef.current?.focus();
