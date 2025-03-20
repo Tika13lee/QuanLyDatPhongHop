@@ -45,28 +45,6 @@ public class ReservationService implements IReservation {
         return reservationViewDTOS;
     }
 
-    @Override
-    public List<ReservationViewDTO> getAllReservationPending(Long approverId) {
-        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationPending(approverId);
-        return convertApprovalReservation(reservations);
-    }
-
-    @Override
-    public List<ReservationViewDTO> getAllReservationNoPending(Long ApproverId) {
-        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationNoPending(ApproverId);
-        return convertApprovalReservation(reservations);
-    }
-
-    @Override
-    public List<ReservationViewDTO> getAllReservationNoApproved(Long ApproverId) {
-        return convertApprovalReservation(reservationRepository.findReservationsByStatusReservationNoApproved(ApproverId));
-    }
-
-    @Override
-    public List<ReservationViewDTO> getAllReservationWaitingCancel() {
-        List<Reservation> reservations = reservationRepository.findReservationsByStatusReservationWaitingCancel();
-        return convertApprovalReservation(reservations);
-    }
 
     @Override
     public Reservation getReservationById(Long reservationId) {

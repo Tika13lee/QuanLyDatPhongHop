@@ -17,22 +17,8 @@ import java.util.List;
 public class ReservationController {
     @Autowired
     private IReservation reservationService;
-    @GetMapping("/getReservationsPending")
-    public ResponseEntity<?> getReservationsPending(@RequestParam(defaultValue = "0") Long approverId) {
-        try {
-            return ResponseEntity.ok(reservationService.getAllReservationPending(approverId));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    @GetMapping("/getReservationsWaitingCancel")
-    public ResponseEntity<?> getReservationsWaitingCancel() {
-        try {
-            return ResponseEntity.ok(reservationService.getAllReservationWaitingCancel());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
+
     @GetMapping("/getReservationById")
     public ResponseEntity<?> getReservationById(@RequestParam Long reservationId) {
         try {
@@ -65,22 +51,7 @@ public class ReservationController {
             return ResponseEntity.ok(e.toString());
         }
     }
-    @GetMapping("/getReservationsNoPending")
-    public ResponseEntity<?> getReservationsNoPending(@RequestParam(defaultValue = "0") Long approverId) {
-        try {
-            return ResponseEntity.ok(reservationService.getAllReservationNoPending(approverId));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    @GetMapping("/getReservationsNoApproved")
-    public ResponseEntity<?> getReservationsNoApproved(@RequestParam(defaultValue = "0") Long approverId) {
-        try {
-            return ResponseEntity.ok(reservationService.getAllReservationNoApproved(approverId));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
     @GetMapping("/getReservationsByBookerPhone")
     public ResponseEntity<?> getReservationsByBookerPhone(@RequestParam String phone,@RequestParam(required = false) StatusReservation statusReservation){
         try {

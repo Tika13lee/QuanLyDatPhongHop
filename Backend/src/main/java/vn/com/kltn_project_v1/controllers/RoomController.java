@@ -101,7 +101,7 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
         try {
             return ResponseEntity.ok(roomService.getRoomOverView(branch,dayStart,dayEnd));
         }catch (Exception e){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(e.toString());
         }
     }
     @GetMapping("/getRoomByEmployee")
