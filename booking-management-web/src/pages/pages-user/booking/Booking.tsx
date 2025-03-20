@@ -106,9 +106,11 @@ function Booking() {
     setRooms(data);
   };
 
+  console.log(rooms);
+
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [selectedBranch, selectedDate]);
 
   // lấy danh sách mới sau khi đã phê duyệt thành công
   useEffect(() => {
@@ -324,8 +326,6 @@ function Booking() {
                                 ? "Đã nhận phòng"
                                 : res.statusReservation === "COMPLETED"
                                 ? "Đã hoàn thành"
-                                : res.statusReservation === "WAITING_CANCELED"
-                                ? "Chờ hủy"
                                 : ""}
                             </p>
                           </div>

@@ -9,7 +9,6 @@ import {
   ReservationDetailProps,
   RoomViewProps,
 } from "../../../data/data";
-import { set } from "react-datepicker/dist/date_utils";
 import axios from "axios";
 import { cp } from "fs";
 
@@ -129,6 +128,8 @@ function Overview() {
     }).format(date);
   }
 
+  console.log(rooms);
+
   return (
     <div className={cx("overview-container")}>
       <div className={cx("header-container")}>
@@ -175,7 +176,7 @@ function Overview() {
         {loading ? (
           <p>Đang tải danh sách phòng...</p>
         ) : error ? (
-          <p className={cx("error")}>{error.message}</p>
+          <p className={cx("error")}></p>
         ) : rooms && rooms.length > 0 ? (
           <table className={cx("schedule-table")}>
             <thead>

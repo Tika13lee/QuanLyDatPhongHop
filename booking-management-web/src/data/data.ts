@@ -166,6 +166,33 @@ export type ServiceProps = {
   price?: PriceProps;
 };
 
+
+// form yêu cầu
+export type RequestFormProps = {
+  requestFormId: number;
+  timeRequest: string;
+  timeResponse: string;
+  statusRequestForm: string;
+  reasonReject: string;
+  typeRequestForm: string;
+  reservations: ReservationDetailProps[];
+  requestReservation: {
+    requestReservationId: number;
+    time: string;
+    timeStart: string;
+    timeEnd: string;
+    note: string;
+    description: string;
+    title: string;
+    frequency: string;
+    timeFinishFrequency: string[];
+    bookerId: number;
+    roomId: number;
+    employeeIds: number[];
+    serviceIds: number[];
+  }
+}
+
 // đặt phòng
 export type ReservationProps = {
   reservationId: number;
@@ -178,8 +205,14 @@ export type ReservationProps = {
   statusReservation: string;
   note: string;
   frequency: string;
-  timeApprove: string;
 };
+
+// tần suất
+export const frequency = [
+  { value: "ONE_TIME", label: "Một lần" },
+  { value: "DAILY", label: "Mỗi ngày" },
+  { value: "WEEKLY", label: "Mỗi tuần" },
+];
 
 export type ReservationDetailProps = {
   reservationId: number;
@@ -188,6 +221,7 @@ export type ReservationDetailProps = {
   timeEnd: string;
   timeCheckIn: string;
   timeCheckOut: string;
+  timeCancel?: string;
   note: string;
   filePaths: string[];
   description: string;
@@ -197,7 +231,6 @@ export type ReservationDetailProps = {
   statusReservation: string;
 
   booker: EmployeeProps;
-
   attendants: EmployeeProps[];
 
   services?: {

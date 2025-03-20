@@ -1,7 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./BookingList.module.scss";
 import { useEffect, useState } from "react";
-import { ReservationDetailProps, ReservationProps } from "../../../data/data";
+import {
+  RequestFormProps,
+  ReservationDetailProps,
+  ReservationProps,
+} from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../approve/DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -14,19 +18,12 @@ function BookingList() {
   const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState<
-    number | null
-  >(null);
+  const [selectedRequestForm, setSelectedRequestForm] =
+    useState<RequestFormProps | null>(null);
   const [selectedReservation, setSelectedReservation] =
     useState<ReservationDetailProps | null>(null);
 
-  const [status, setStatus] = useState<string>("");
-
-  const { data, loading, error } = useFetch<ReservationDetailProps>(
-    selectedReservationId
-      ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
-      : ""
-  );
+  const [statusRequestForm, setStatusRequestForm] = useState<string>("");
 
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
@@ -42,33 +39,35 @@ function BookingList() {
 
   // Lấy danh sách lịch đặt phòng
   const {
-    data: bookedList,
-    loading: loadingBookedList,
-    error: errorBookedList,
-  } = useFetch<ReservationProps[]>(
-    status
-      ? `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}&statusReservation=${status}`
-      : `http://localhost:8080/api/v1/reservation/getReservationsByBookerPhone?phone=${user.phone}`
+    data: requestList,
+    loading: loadingRequestList,
+    error: errorRequestList,
+  } = useFetch<RequestFormProps[]>(
+    statusRequestForm
+      ? `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}&statusRequestForm=${statusRequestForm}`
+      : `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}`
   );
 
+  console.log("requestList", requestList);
+
   // Cập nhật state khi API trả về dữ liệu
-  useEffect(() => {
-    if (data) {
-      setSelectedReservation(data);
-      setIsModalOpen(true);
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) {
+  //     setSelectedReservation(data);
+  //     setIsModalOpen(true);
+  //   }
+  // }, [data]);
 
   // Mở modal
-  const handleShowDetails = (reservationId: number) => {
-    setSelectedReservationId(reservationId);
+  const handleShowDetails = (requestFormDetail: RequestFormProps) => {
+    setSelectedRequestForm(requestFormDetail);
+    setIsModalOpen(true);
   };
 
   // Đóng modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedReservationId(null);
-    setSelectedReservation(null);
+    selectedRequestForm && setSelectedRequestForm(null);
   };
 
   return (
@@ -91,26 +90,19 @@ function BookingList() {
           <select
             className={cx("search-input")}
             name="status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            value={statusRequestForm}
+            onChange={(e) => setStatusRequestForm(e.target.value)}
           >
             <option value="">Tất cả</option>
-            <option value="WAITING">Chờ nhận phòng</option>
-            <option value="CHECKED_IN">Đã nhận phòng</option>
-            <option value="COMPLETED">Đã hoàn thành</option>
-            <option value="WAITING_PAYMENT">Chờ thanh toán</option>
-            <option value="CANCELED">Đã hủy</option>
+            <option value="APPROVED">Đã phê duyệt</option>
             <option value="PENDING">Đang chờ phê duyệt</option>
-            <option value="NO_APPROVED">Không được phê duyệt</option>
-            <option value="WAITING_CANCEL">Đang chờ hủy</option>
+            <option value="REJECTED">Từ chối phê duyệt</option>
           </select>
         </div>
       </div>
 
-      {Array.isArray(bookedList) && bookedList.length === 0 ? (
-        <p className={cx("no-schedule-message")}>
-          Bạn không có lịch đặt phòng nào
-        </p>
+      {Array.isArray(requestList) && requestList.length === 0 ? (
+        <p className={cx("no-schedule-message")}>Không có form yêu cầu nào</p>
       ) : (
         <div className={cx("schedule-list")}>
           <table className={cx("schedule-table")}>
@@ -125,27 +117,29 @@ function BookingList() {
               </tr>
             </thead>
             <tbody>
-              {bookedList?.map((schedule) => {
-                const meetingStart = formatDateTime(schedule.timeStart);
-                const meetingEnd = formatDateTime(schedule.timeEnd);
-                const statusText = getStatusText(schedule.statusReservation);
+              {requestList?.map((schedule) => {
+                const meetingStart = formatDateTime(
+                  schedule.requestReservation.timeStart
+                );
+                const meetingEnd = formatDateTime(
+                  schedule.requestReservation.timeEnd
+                );
+                const statusText = getStatusText(schedule.statusRequestForm);
 
                 return (
-                  <tr key={schedule.reservationId}>
-                    <td>{schedule.title}</td>
+                  <tr key={schedule.requestFormId}>
+                    <td>{schedule.requestReservation.title}</td>
                     <td>{meetingStart.date}</td>
                     <td>
                       {meetingStart.time} - {meetingEnd.time}
                     </td>
 
                     <td>{statusText}</td>
-                    <td>{new Date(schedule.time).toLocaleString()}</td>
+                    <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
                     <td>
                       <div
                         className={cx("actions")}
-                        onClick={() =>
-                          handleShowDetails(schedule.reservationId)
-                        }
+                        onClick={() => handleShowDetails(schedule)}
                       >
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
@@ -160,7 +154,7 @@ function BookingList() {
       <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        reservation={selectedReservation}
+        requestForm={selectedRequestForm}
       />
     </div>
   );
@@ -168,20 +162,12 @@ function BookingList() {
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case "CHECKED_IN":
-      return "Đã nhận phòng";
-    case "COMPLETED":
-      return "Đã hoàn thành";
-    case "WAITING":
-      return "Chờ nhận phòng";
-    case "CANCELLED":
-      return "Đã hủy";
-    case "PENDING":
-      return "Đang chờ phê duyệt";
-    case "NO_APPROVED":
-      return "Không được phê duyệt";
+    case "APPROVED":
+      return "Đã phê duyệt";
+    case "REJECTED":
+      return "Từ chối phê duyệt";
     default:
-      return "Đang chờ hủy";
+      return "Đang chờ phê duyệt";
   }
 };
 

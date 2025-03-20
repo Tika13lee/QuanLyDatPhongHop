@@ -1,20 +1,20 @@
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./DetailModal.module.scss";
-import { ReservationDetailProps } from "../../../data/data";
+import { RequestFormProps, ReservationDetailProps } from "../../../data/data";
 
 const cx = classNames.bind(styles);
 
 type DetailModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  reservation: ReservationDetailProps | null;
+  requestForm: RequestFormProps | null;
 };
 
 const DetailModal: React.FC<DetailModalProps> = ({
   isOpen,
   onClose,
-  reservation,
+  requestForm,
 }) => {
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
@@ -27,11 +27,11 @@ const DetailModal: React.FC<DetailModalProps> = ({
       }),
     };
   };
-  if (!isOpen || !reservation) return null;
+  if (!isOpen || !requestForm) return null;
 
-  const meetingStart = formatDateTime(reservation.timeStart);
-  const meetingEnd = formatDateTime(reservation.timeEnd);
-  const bookingTime = formatDateTime(reservation.time);
+  const meetingStart = formatDateTime(requestForm.requestReservation.timeStart);
+  const meetingEnd = formatDateTime(requestForm.requestReservation.timeEnd);
+  const requestTime = formatDateTime(requestForm.requestReservation.time);
 
   return (
     <div className={cx("modal-overlay")} onClick={onClose}>
@@ -44,7 +44,8 @@ const DetailModal: React.FC<DetailModalProps> = ({
           <div className={cx("modal-info")}>
             <div className={cx("left-column")}>
               <p>
-                <strong>Tiêu đề cuộc họp:</strong> {reservation.title}
+                <strong>Tiêu đề cuộc họp:</strong>{" "}
+                {requestForm.requestReservation.title}
               </p>
               <p>
                 <strong>Ngày họp:</strong> {meetingStart.date}
@@ -53,32 +54,32 @@ const DetailModal: React.FC<DetailModalProps> = ({
                 <strong>Thời gian:</strong> {meetingStart.time} -{" "}
                 {meetingEnd.time}
               </p>
-              <p>
-                <strong>Phòng:</strong> {reservation.room.roomName}
+              {/* <p>
+                <strong>Phòng:</strong> {requestForm.reservations}
               </p>
               <p>
                 <strong>Địa điểm:</strong>{" "}
-                {reservation.room.location.building.branch.branchName} - tòa nhà{" "}
-                {reservation.room.location.building.buildingName} - tầng{" "}
-                {reservation.room.location.floor}
+                {requestForm.room.location.building.branch.branchName} - tòa nhà{" "}
+                {requestForm.room.location.building.buildingName} - tầng{" "}
+                {requestForm.room.location.floor}
               </p>
               <p>
-                <strong>Tổng chi phí:</strong> {reservation.total} VNĐ
-              </p>
+                <strong>Tổng chi phí:</strong> {requestForm.total} VNĐ
+              </p> */}
             </div>
 
-            <div className={cx("right-column")}>
+            {/* <div className={cx("right-column")}>
               <p>
-                <strong>Người đặt:</strong> {reservation.booker.employeeName}
+                <strong>Người đặt:</strong> {requestForm.booker.employeeName}
               </p>
               <p>
                 <strong>Mô tả:</strong>{" "}
-                {reservation.description || "Không có mô tả"}
+                {requestForm.description || "Không có mô tả"}
               </p>
               <div>
                 <strong>Người tham gia:</strong>
                 <ul>
-                  {reservation.attendants?.map((attendant: any) => (
+                  {requestForm.attendants?.map((attendant: any) => (
                     <li key={attendant.employeeId}>{attendant.employeeName}</li>
                   ))}
                 </ul>
@@ -86,7 +87,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
               <div>
                 <strong>Tài liệu cuộc họp:</strong>
                 <ul>
-                  {reservation.filePaths?.map((file: string, index: number) => (
+                  {requestForm.filePaths?.map((file: string, index: number) => (
                     <li key={index}>
                       <a href={file} target="_blank" rel="noopener noreferrer">
                         {file}
@@ -95,9 +96,8 @@ const DetailModal: React.FC<DetailModalProps> = ({
                   ))}
                 </ul>
               </div>
-            </div>
+            </div> */}
           </div>
-
         </div>
       </div>
     </div>

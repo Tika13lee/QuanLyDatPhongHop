@@ -11,14 +11,12 @@ import {
   IoIosArrowDown,
 } from "react-icons/io";
 import { FaRegBell } from "react-icons/fa";
-import { FiPlus } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 
 export {
   IoSettingsOutline,
   FaPlus,
-  FiPlus,
   MdOutlineEdit,
   FaRegBell,
   IoIosArrowDown,

@@ -6,11 +6,18 @@ import { formatDateDate, formatDateString, times } from "../../utilities";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useFetch from "../../hooks/useFetch";
-import { EmployeeProps, ServiceProps } from "../../data/data";
+import {
+  EmployeeProps,
+  frequency,
+  Reservation,
+  ReservationProps,
+  ServiceProps,
+} from "../../data/data";
 import IconWrapper from "../icons/IconWrapper";
 import { IoSettingsOutline } from "../../components/icons/icons";
+import { FaPlus } from "../../components/icons/icons";
+import usePost from "../../hooks/usePost";
 import { set } from "react-datepicker/dist/date_utils";
-import { original } from "@reduxjs/toolkit";
 
 const cx = classNames.bind(styles);
 
@@ -56,15 +63,27 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [openModalParticipant, setOpenModalParticipant] =
     useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
-  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeProps[]>([]);
+  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeProps[]>([
+    user,
+  ]);
   const [modalSetting, setModalSetting] = useState<boolean>(false);
   const [dates, setDates] = useState<Date[]>([]);
   const [isClickedSelect, setIsClickedSelect] = useState(false);
   const [checkRemoveDays, setCheckRemoveDays] = useState<string[]>();
   const [dayOriginal, setDayOriginal] = useState<Date[]>([]);
   const [checkRemoveDates, setCheckRemoveDates] = useState<number[]>([]);
+  const [TypeRequestForm, setTypeRequestForm] = useState<string>(
+    "RESERVATION_ONETIME"
+  );
 
-  // lấy ngày
+  console.log(timeStart);
+  console.log(
+    new Date(
+      `${dateSelected ?? new Date().toString()}T${timeStart}`
+    ).toISOString()
+  );
+
+  // lấy ngày trong khoảng thời gian
   const getDatesBetween = (startDate: Date, endDate: Date) => {
     const dates = [];
     let currentDate = startDate;
@@ -77,37 +96,49 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
   // form data
   const [formData, setFormData] = useState({
-    time: new Date().toISOString(),
-    timeStart: timeStart
-      ? new Date(
-          `${dateSelected ?? new Date().toString()}T${timeStart}`
-        ).toISOString()
-      : new Date(
-          `${dateSelected ?? new Date().toString()}T${times[0]}`
-        ).toISOString(),
-    timeEnd: timeEnd
-      ? new Date(
-          `${dateSelected ?? new Date().toString()}T${timeEnd}`
-        ).toISOString()
-      : new Date(
-          `${dateSelected ?? new Date().toString()}T${times[1]}`
-        ).toISOString(),
-    note: "",
-    description: "",
-    title: "",
-    frequency: valueFrequency,
-    timeFinishFrequency: selectedDateEndOfFrequency
-      ? getDatesBetween(
-          dateSelected ? new Date(dateSelected) : new Date(),
-          selectedDateEndOfFrequency
-        ).map((date) => date.toISOString())
-      : [],
-    bookerId: user?.employeeId ?? "",
-    roomId: roomInfo?.roomId ?? "",
-    employeeIds: [] as string[],
-    serviceIds: [] as string[],
-    filePaths: [] as string[],
+    timeRequest: new Date().toISOString(),
+    TypeRequestForm: TypeRequestForm,
+    reservationDTO: {
+      time: new Date().toISOString(),
+      timeStart: timeStart
+        ? new Date(
+            `${dateSelected ?? new Date().toString()}T${timeStart}`
+          ).toISOString()
+        : new Date(
+            `${dateSelected ?? new Date().toString()}T${times[0]}`
+          ).toISOString(),
+      timeEnd: timeEnd
+        ? new Date(
+            `${dateSelected ?? new Date().toString()}T${timeEnd}`
+          ).toISOString()
+        : new Date(
+            `${dateSelected ?? new Date().toString()}T${times[1]}`
+          ).toISOString(),
+      note: "",
+      description: "",
+      title: "",
+      frequency: valueFrequency,
+      timeFinishFrequency: selectedDateEndOfFrequency
+        ? getDatesBetween(
+            dateSelected ? new Date(dateSelected) : new Date(),
+            selectedDateEndOfFrequency
+          ).map((date) => date.toISOString())
+        : [],
+      bookerId: user?.employeeId ?? "",
+      roomId: roomInfo?.roomId ?? "",
+      employeeIds: [] as string[],
+      serviceIds: [] as string[],
+      filePaths: [] as string[],
+    },
   });
+
+  useEffect(() => {
+    if (valueFrequency === "ONE_TIME") {
+      setTypeRequestForm("RESERVATION_ONETIME");
+    } else {
+      setTypeRequestForm("RESERVATION_RECURRING");
+    }
+  }, [valueFrequency]);
 
   // loại bỏ ngày
   const handleRemoveDate = () => {
@@ -121,42 +152,57 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       });
       setFormData((prev) => ({
         ...prev,
-        timeFinishFrequency: data.map((date) => date.toISOString()),
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeFinishFrequency: data.map((date) => date.toISOString()),
+        },
       }));
     } else if (checkRemoveDates.length === 0) {
       setDates(dayOriginal);
       setFormData((prev) => ({
         ...prev,
-        timeFinishFrequency: dayOriginal.map((date) => date.toISOString()),
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeFinishFrequency: dayOriginal.map((date) => date.toISOString()),
+        },
       }));
     }
 
     if (checkRemoveDays != undefined && checkRemoveDays.length > 0) {
+      // setFormData((prev) => ({
+      //   ...prev,
+      //   timeFinishFrequency: removeDate(
+      //     prev.timeFinishFrequency.map((date) => new Date(date)),
+      //     checkRemoveDays ?? []
+      //   ).map((date) => date.toISOString()),
+      // }));
       setFormData((prev) => ({
         ...prev,
-        timeFinishFrequency: removeDate(
-          prev.timeFinishFrequency.map((date) => new Date(date)),
-          checkRemoveDays ?? []
-        ).map((date) => date.toISOString()),
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeFinishFrequency: removeDate(
+            prev.reservationDTO.timeFinishFrequency.map(
+              (date) => new Date(date)
+            ),
+            checkRemoveDays ?? []
+          ).map((date) => date.toISOString()),
+        },
       }));
     } else if (checkRemoveDays != undefined && checkRemoveDays.length === 0) {
       setDates(dayOriginal);
       setFormData((prev) => ({
         ...prev,
-        timeFinishFrequency: removeDate(
-          prev.timeFinishFrequency.map((date) => new Date(date)),
-          checkRemoveDays ?? []
-        ).map((date) => date.toISOString()),
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeFinishFrequency: removeDate(
+            prev.reservationDTO.timeFinishFrequency.map(
+              (date) => new Date(date)
+            ),
+            checkRemoveDays ?? []
+          ).map((date) => date.toISOString()),
+        },
       }));
     }
-
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   timeFinishFrequency: removeDate(
-    //     prev.timeFinishFrequency.map((date) => new Date(date)),
-    //     checkRemoveDays ?? []
-    //   ).map((date) => date.toISOString()),
-    // }));
   };
 
   // lấy ngày trong tuần không được chọn
@@ -173,13 +219,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   useEffect(() => {
     console.log(removeDate(dates, checkRemoveDays ?? []));
     setDates(removeDate(dayOriginal, checkRemoveDays ?? []));
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   timeFinishFrequency: removeDate(
-    //     prev.timeFinishFrequency.map((date) => new Date(date)),
-    //     checkRemoveDays ?? []
-    //   ).map((date) => date.toISOString()),
-    // }));
   }, [checkRemoveDays]);
 
   // ngày kết thúc tần suất thay đổi
@@ -202,12 +241,15 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     );
     setFormData((prev) => ({
       ...prev,
-      timeFinishFrequency: selectedDateEndOfFrequency
-        ? getDatesBetween(
-            dateSelected ? new Date(dateSelected) : new Date(),
-            selectedDateEndOfFrequency
-          ).map((date) => date.toISOString())
-        : [],
+      reservationDTO: {
+        ...prev.reservationDTO,
+        timeFinishFrequency: selectedDateEndOfFrequency
+          ? getDatesBetween(
+              dateSelected ? new Date(dateSelected) : new Date(),
+              selectedDateEndOfFrequency
+            ).map((date) => date.toISOString())
+          : [],
+      },
     }));
   }, [selectedDateEndOfFrequency]);
 
@@ -225,7 +267,10 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     setSelectedEmployee((prev) => [...prev, emp]);
     setFormData((prev) => ({
       ...prev,
-      employeeIds: [...prev.employeeIds, emp.employeeId + ""],
+      reservationDTO: {
+        ...prev.reservationDTO,
+        employeeIds: [...prev.reservationDTO.employeeIds, emp.employeeId + ""],
+      },
     }));
     setPhone("");
     setOpenModalParticipant(false);
@@ -238,21 +283,24 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     );
     setFormData((prev) => ({
       ...prev,
-      employeeIds: prev.employeeIds.filter(
-        (employeeId) => employeeId !== emp.employeeId + ""
-      ),
+      reservationDTO: {
+        ...prev.reservationDTO,
+        employeeIds: prev.reservationDTO.employeeIds.filter(
+          (employeeId) => employeeId !== emp.employeeId + ""
+        ),
+      },
     }));
   };
 
   // lấy service name render select option
   useEffect(() => {
     const arrServiceName = services?.filter((service) =>
-      formData.serviceIds.includes(service.serviceId + "")
+      formData.reservationDTO.serviceIds.includes(service.serviceId + "")
     );
     setServiceNames(
       arrServiceName?.map((service) => service.serviceName) ?? []
     );
-  }, [formData.serviceIds]);
+  }, [formData.reservationDTO.serviceIds]);
 
   // Hàm xử lý sự thay đổi khi người dùng nhập vào input
   const handleInputChange = (
@@ -267,37 +315,63 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
         console.log("Vào");
         setFormData((prev) => ({
           ...prev,
-          filePaths: [...prev.filePaths, value],
+          reservationDTO: {
+            ...prev.reservationDTO,
+            filePaths: [...prev.reservationDTO.filePaths, value],
+          },
         }));
         break;
       }
       case "timeStart": {
         setFormData((prev) => ({
           ...prev,
-          timeStart: new Date(
-            `${dateSelected ?? new Date().toString()}T${value}`
-          ).toISOString(),
+          reservationDTO: {
+            ...prev.reservationDTO,
+            timeStart: new Date(
+              `${dateSelected ?? new Date().toString()}T${value}`
+            ).toISOString(),
+          },
         }));
         break;
       }
       case "timeEnd": {
         setFormData((prev) => ({
           ...prev,
-          timeEnd: new Date(
-            `${dateSelected ?? new Date().toString()}T${value}`
-          ).toISOString(),
+          reservationDTO: {
+            ...prev.reservationDTO,
+            timeEnd: new Date(
+              `${dateSelected ?? new Date().toString()}T${value}`
+            ).toISOString(),
+          },
         }));
         break;
       }
       case "serviceIds": {
         setFormData((prev) => ({
           ...prev,
-          serviceIds: [...prev.serviceIds, value],
+          reservationDTO: {
+            ...prev.reservationDTO,
+            serviceIds: [...prev.reservationDTO.serviceIds, value],
+          },
+        }));
+        break;
+      }
+      case "frequency": {
+        setValueFrequency(value);
+        setFormData((prev) => ({
+          ...prev,
+          reservationDTO: {
+            ...prev.reservationDTO,
+            frequency: value,
+          },
         }));
         break;
       }
       default: {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({
+          ...prev,
+          reservationDTO: { ...prev.reservationDTO, [name]: value },
+        }));
         break;
       }
     }
@@ -310,18 +384,24 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       setTimeEndSchedule(times.slice(index + 1, times.length));
       setFormData((prev) => ({
         ...prev,
-        timeEnd: new Date(
-          `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
-        ).toISOString(),
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeEnd: new Date(
+            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
+          ).toISOString(),
+        },
       }));
     } else {
       const index = times.findIndex((time) => time === selectedStartTime);
       setTimeEndSchedule(times.slice(index + 1, times.length));
       setFormData((prev) => ({
         ...prev,
-        timeEnd: new Date(
-          `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
-        ).toISOString(),
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeEnd: new Date(
+            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
+          ).toISOString(),
+        },
       }));
     }
   }, [selectedStartTime]);
@@ -335,20 +415,55 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     "http://localhost:8080/api/v1/service/getAllServices"
   );
 
+  useEffect(() => {});
+
+  // đặt lịch
+  const {
+    data,
+    loading: roomLoading,
+    error: roomError,
+    postData,
+  } = usePost<FormData>(
+    "http://localhost:8080/api/v1/requestForm/createRequestForm"
+  );
+
+  useEffect(() => {
+    if (roomError) {
+      console.log("Error updated:", roomError);
+      let data = [] as string[];
+      roomError?.map((res: ReservationProps) => {
+        data.push(res.timeStart.substring(8, 10));
+      });
+      console.log(data);
+      setIsPopupOpen &&
+        setIsPopupOpen(
+          "Bạn hoặc phòng này có lịch trùng vào ngày " + data.join(", "),
+          "error",
+          true
+        );
+    }
+  }, [roomError]);
+
   // Xử lý khi nhấn nút gửi phê duyệt
   const handleSubmit = async () => {
-    console.log(formData);
+    const updatedFormData = {
+      ...formData,
+      TypeRequestForm: TypeRequestForm,
+      timeRequest: new Date().toISOString(),
+    };
 
-    // const response = await postData(formData);
+    console.log(updatedFormData);
 
-    // if (response) {
-    //   console.log(response);
-    //   setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
-    //   setIsModalClose();
-    // } else {
-    //   setIsPopupOpen &&
-    //     setIsPopupOpen("Đặt lịch không thành công!", "error", true);
-    // }
+    const response = await postData(updatedFormData, { method: "POST" });
+
+    console.log(roomError);
+    if (response) {
+      console.log(response);
+      setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
+      setIsModalClose();
+    } else {
+      console.log(roomError);
+    }
   };
 
   const handleOpenModalSetting = () => {
@@ -400,7 +515,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                     type="text"
                     placeholder="Nhập tiêu đề cuộc họp"
                     name="title"
-                    value={formData.title}
+                    value={formData.reservationDTO.title}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -479,7 +594,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                     type="text"
                     placeholder="Nhập ghi chú"
                     name="note"
-                    value={formData.note}
+                    value={formData.reservationDTO.note}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -491,7 +606,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                     type="text"
                     placeholder="Nhập mô tả"
                     name="description"
-                    value={formData.description}
+                    value={formData.reservationDTO.description}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -503,9 +618,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                     <select
                       name="frequency"
                       value={valueFrequency}
-                      onChange={(e) => {
-                        setValueFrequency(e.target.value);
-                      }}
+                      onChange={handleInputChange}
                     >
                       <option value="ONE_TIME">Một lần</option>
                       <option value="DAILY">Mỗi ngày</option>
@@ -638,7 +751,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                 </div>
 
                 <select className={cx("form-group")}>
-                  {formData.filePaths.map((file) => (
+                  {formData.reservationDTO.filePaths.map((file) => (
                     <option value={file}>{file}</option>
                   ))}
                 </select>
@@ -693,7 +806,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                       setOpenModalParticipant(true);
                     }}
                   >
-                    Thêm
+                    <IconWrapper icon={FaPlus} size={14} color="#fff" />
                   </button>
                 </div>
 
@@ -726,7 +839,11 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                                 {emp.employeeName} - {emp.phone}
                               </div>
                               <button onClick={() => handleAddEmployee(emp)}>
-                                Thêm
+                                <IconWrapper
+                                  icon={FaPlus}
+                                  size={14}
+                                  color="#fff"
+                                />
                               </button>
                             </div>
                           ))}

@@ -1,7 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovedList.module.scss";
 import { useEffect, useState } from "react";
-import { ReservationDetailProps, ReservationProps } from "../../../data/data";
+import {
+  RequestFormProps,
+  ReservationDetailProps,
+  ReservationProps,
+} from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "./DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -44,8 +48,8 @@ function ApprovedList() {
     data: approvedList,
     loading: loadingApprovedList,
     error: errorApprovedList,
-  } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsNoPending?approverId=${user.employeeId}`
+  } = useFetch<RequestFormProps[]>(
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=APPROVED`
   );
 
   // Cập nhật state khi API trả về dữ liệu
@@ -98,36 +102,34 @@ function ApprovedList() {
                 <th>Ngày</th>
                 <th>Người đặt</th>
                 <th>Thời gian gửi</th>
-                <th>Trạng thái</th>
                 <th>Thời gian phê duyệt</th>
                 <th>Chi tiết</th>
               </tr>
             </thead>
             <tbody>
               {approvedList?.map((schedule) => {
-                const meetingStart = formatDateTime(schedule.timeStart);
-                const meetingEnd = formatDateTime(schedule.timeEnd);
-                const statusText = getStatusText(schedule.statusReservation);
-                const approvedTime = schedule.timeApprove
-                  ? new Date(schedule.timeApprove).toLocaleString()
-                  : "Chưa phê duyệt";
+                const meetingStart = formatDateTime(
+                  schedule.requestReservation.timeStart
+                );
+                const meetingEnd = formatDateTime(
+                  schedule.requestReservation.timeEnd
+                );
 
                 return (
-                  <tr key={schedule.reservationId}>
-                    <td>{schedule.title}</td>
+                  <tr key={schedule.requestFormId}>
+                    <td>{schedule.requestReservation.title}</td>
                     <td>
                       {meetingStart.date} từ {meetingStart.time} -{" "}
                       {meetingEnd.time}
                     </td>
-                    <td>{schedule.nameBooker}</td>
-                    <td>{new Date(schedule.time).toLocaleString()}</td>
-                    <td>{statusText}</td>
-                    <td>{approvedTime}</td>
+                    <td>{schedule.reservations[0].booker.employeeName}</td>
+                    <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
+                    <td>{new Date(schedule.timeResponse).toLocaleString()}</td>
                     <td>
                       <div
                         className={cx("actions")}
                         onClick={() =>
-                          handleShowDetails(schedule.reservationId)
+                          handleShowDetails(schedule.requestFormId)
                         }
                       >
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
@@ -140,11 +142,11 @@ function ApprovedList() {
           </table>
         </div>
       )}
-      <DetailModal
+      {/* <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         reservation={selectedReservation}
-      />
+      /> */}
     </div>
   );
 }

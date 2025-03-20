@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 
 type PostResult<T> = {
   data: T | null;
   loading: boolean;
-  error: string | null;
+  error: any;
   postData: (
     body: any,
     config?: AxiosRequestConfig,
@@ -15,7 +15,7 @@ type PostResult<T> = {
 const usePost = <T>(url: string): PostResult<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
 
   const postData = async (
     body: any,
@@ -36,15 +36,22 @@ const usePost = <T>(url: string): PostResult<T> => {
       return response;
     } catch (err) {
       if (axios.isAxiosError(err)) {
+        console.log(err.response?.data);
         setError(err.response?.data || "Có lỗi xảy ra, vui lòng thử lại!");
       } else {
         setError("Có lỗi xảy ra, vui lòng thử lại!");
       }
-      return null;
+      return error;
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      console.log("Error updated:", error); // Log error when it's updated
+    }
+  }, [error]);
 
   return { data, loading, error, postData };
 };

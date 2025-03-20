@@ -1,6 +1,10 @@
 import classNames from "classnames/bind";
 import styles from "./RejectedList.module.scss";
-import { ReservationDetailProps, ReservationProps } from "../../../data/data";
+import {
+  RequestFormProps,
+  ReservationDetailProps,
+  ReservationProps,
+} from "../../../data/data";
 import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "./DetailModal";
@@ -44,8 +48,8 @@ function RejectedList() {
     data: rejectedList,
     loading: loadingRejectedList,
     error: errorRejectedList,
-  } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsNoApproved?approverId=${user.employeeId}`
+  } = useFetch<RequestFormProps[]>(
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=REJECTED`
   );
 
   // Cập nhật state khi API trả về dữ liệu
@@ -98,39 +102,38 @@ function RejectedList() {
                 <th>Ngày</th>
                 <th>Người đặt</th>
                 <th>Thời gian gửi</th>
-                <th>Trạng thái</th>
                 <th>Thời gian phê duyệt</th>
                 <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
               {rejectedList?.map((schedule) => {
-                const meetingStart = formatDateTime(schedule.timeStart);
-                const meetingEnd = formatDateTime(schedule.timeEnd);
-                const bookingTime = formatDateTime(schedule.time);
-                const statusText = getStatusText(schedule.statusReservation);
-                const approvedTime = schedule.timeApprove
-                  ? new Date(schedule.timeApprove).toLocaleString()
-                  : "Chưa phê duyệt";
+                const meetingStart = formatDateTime(
+                  schedule.requestReservation.timeStart
+                );
+                const meetingEnd = formatDateTime(
+                  schedule.requestReservation.timeEnd
+                );
+                const bookingTime = formatDateTime(
+                  schedule.timeRequest
+                );
 
                 return (
-                  <tr key={schedule.reservationId}>
-                    <td>{schedule.title}</td>
+                  <tr key={schedule.requestFormId}>
+                    <td>{schedule.requestReservation.title}</td>
                     <td>
                       {meetingStart.date} từ {meetingStart.time} -{" "}
                       {meetingEnd.time}
                     </td>
-                    <td>{schedule.nameBooker}</td>
+                    <td>{schedule.reservations[0].booker.employeeName}</td>
                     <td>
                       {bookingTime.date} - {bookingTime.time}
                     </td>
-                    <td>{statusText}</td>
-                    <td>{approvedTime}</td>
                     <td>
                       <div
                         className={cx("actions")}
                         onClick={() =>
-                          handleShowDetails(schedule.reservationId)
+                          handleShowDetails(schedule.requestFormId)
                         }
                       >
                         <label>Chi tiết</label>
@@ -144,32 +147,13 @@ function RejectedList() {
           </table>
         </div>
       )}
-      <DetailModal
+      {/* <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         reservation={selectedReservation}
-      />
+      /> */}
     </div>
   );
 }
-
-const getStatusText = (status: string) => {
-  switch (status) {
-    case "CHECKED_IN":
-      return "Đã nhận phòng";
-    case "COMPLETED":
-      return "Đã hoàn thành";
-    case "WAITING":
-      return "Chờ nhận phòng";
-    case "CANCELLED":
-      return "Đã hủy";
-    case "PENDING":
-      return "Đang chờ phê duyệt";
-    case "NO_APPROVED":
-      return "Không được phê duyệt";
-    default:
-      return "Đang chờ hủy";
-  }
-};
 
 export default RejectedList;

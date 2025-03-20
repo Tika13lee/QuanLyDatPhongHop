@@ -42,7 +42,7 @@ const MainLayoutUser = () => {
               cx("sidebar-item", { active: isActive })
             }
           >
-            DS lịch đã đặt
+            DS gửi yêu cầu
           </NavLink>
 
           <div className={cx("dropdown")}>

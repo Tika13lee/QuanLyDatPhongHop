@@ -1,7 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./Approve.module.scss";
 import { useEffect, useState } from "react";
-import { ReservationDetailProps, ReservationProps } from "../../../data/data";
+import {
+  RequestFormProps,
+  ReservationDetailProps,
+  ReservationProps,
+} from "../../../data/data";
 import DetailModal from "./DetailModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
@@ -45,19 +49,18 @@ function Approve() {
     data: reservation,
     loading: loadingReservation,
     error: errorReservation,
-  } = useFetch<ReservationProps[]>(
-    `http://localhost:8080/api/v1/reservation/getReservationsPending?approverId=${user.employeeId}`
+  } = useFetch<RequestFormProps[]>(
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=PENDING`
   );
 
-  const [schedulesApprove, setSchedulesApprove] = useState<ReservationProps[]>(
+  const [schedulesApprove, setSchedulesApprove] = useState<RequestFormProps[]>(
     reservation ?? []
   );
 
   useEffect(() => {
     setSchedulesApprove(reservation ?? []);
-
     fetch(
-      `http://localhost:8080/api/v1/reservation/getReservationsPending?approverId=${user.employeeId}`
+      `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -96,7 +99,7 @@ function Approve() {
 
       setSchedulesApprove(
         schedulesApprove.filter(
-          (res) => !selectedItems.includes(res.reservationId)
+          (res) => !selectedItems.includes(res.requestFormId)
         )
       );
 
@@ -130,7 +133,7 @@ function Approve() {
 
       setSchedulesApprove(
         schedulesApprove.filter(
-          (res) => !selectedItems.includes(res.reservationId)
+          (res) => !selectedItems.includes(res.requestFormId)
         )
       );
 
@@ -228,33 +231,37 @@ function Approve() {
             </thead>
             <tbody>
               {schedulesApprove?.map((schedule) => {
-                const meetingStart = formatDateTime(schedule.timeStart);
-                const meetingEnd = formatDateTime(schedule.timeEnd);
+                const meetingStart = formatDateTime(
+                  schedule.requestReservation.timeStart
+                );
+                const meetingEnd = formatDateTime(
+                  schedule.requestReservation.timeEnd
+                );
 
                 return (
-                  <tr key={schedule.reservationId}>
+                  <tr key={schedule.requestFormId}>
                     <td className={cx("checkbox")}>
                       <input
                         type="checkbox"
-                        checked={selectedItems.includes(schedule.reservationId)}
+                        checked={selectedItems.includes(schedule.requestFormId)}
                         onChange={() =>
-                          handleCheckboxChange(schedule.reservationId)
+                          handleCheckboxChange(schedule.requestFormId)
                         }
                       />
                     </td>
-                    <td>{schedule.title}</td>
+                    <td>{schedule.requestReservation.title}</td>
                     <td>{meetingStart.date}</td>
                     <td>
                       {meetingStart.time} - {meetingEnd.time}
                     </td>
-                    <td>{schedule.nameBooker}</td>
-                    <td>{new Date(schedule.time).toLocaleString()}</td>
+                    <td>{schedule.reservations[0]?.booker.employeeName}</td>
+                    <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
                     <td>
                       <div
                         className={cx("actions")}
-                        onClick={() =>
-                          handleShowDetails(schedule.reservationId)
-                        }
+                        // onClick={() =>
+                        //   handleShowDetails(schedule.reservationId)
+                        // }
                       >
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
@@ -266,11 +273,11 @@ function Approve() {
           </table>
         </div>
       )}
-      <DetailModal
+      {/* <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         reservation={selectedReservation}
-      />
+      /> */}
     </div>
   );
 }
