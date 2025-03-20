@@ -8,6 +8,7 @@ import { EmployeeProps, ServiceProps } from "../../data/data";
 import useFetch from "../../hooks/useFetch";
 import usePost from "../../hooks/usePost";
 import PopupNotification from "../popup/PopupNotification";
+import { times } from "../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -216,13 +217,6 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     }
   };
 
-  // hàm tạo mảng thời gian
-  const timeSlots = Array.from({ length: 23 }, (_, i) => {
-    const hour = Math.floor(i / 2) + 7;
-    const minute = i % 2 === 0 ? "00" : "30";
-    return `${String(hour).padStart(2, "0")}:${minute}`;
-  });
-
   // Hàm chuyển đổi tuần
   const changeWeek = (direction: "previous" | "next") => {
     const currentDate = new Date(selectedDate);
@@ -318,7 +312,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
             </thead>
 
             <tbody>
-              {timeSlots.map((time, index) => (
+              {times.map((time, index) => (
                 <tr key={index}>
                   <td className={cx("timeColumn")}>{time}</td>
                   {daysOfWeek.map((day, i) => {
@@ -453,7 +447,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                             }))
                           }
                         >
-                          {timeSlots.map((time) => (
+                          {times.map((time) => (
                             <option key={time} value={time}>
                               {time}
                             </option>
@@ -467,7 +461,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                           value={timeEnd}
                           onChange={(e) => setTimeEnd(e.target.value)}
                         >
-                          {timeSlots.map((time) => (
+                          {times.map((time) => (
                             <option key={time} value={time}>
                               {time}
                             </option>

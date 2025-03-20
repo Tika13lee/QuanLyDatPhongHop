@@ -7,29 +7,23 @@ import {
   IoIosArrowDown,
   IoIosArrowForward,
 } from "../../../components/icons/icons";
-import {
-  BranchProps,
-  EmployeeProps,
-  RoomProps,
-} from "../../../data/data";
+import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import axios from "axios";
 import DatePicker from "react-datepicker";
+import { times } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
-// Tạo danh sách giờ từ 08:00 đến 17:00, mỗi bước 30 phút
-const generateTimeSlots = () => {
-  const times = [];
-  for (let hour = 7; hour < 18; hour++) {
-    times.push(`${hour}:30`, `${hour}:00`);
-  }
-  times.push("18:00");
-  return times;
-};
-
-const timeSlots = generateTimeSlots();
+const timeSlots = times;
 const durationOptions = [30, 60, 90, 120, 150, 180, 210, 240];
+
+type DataSearch = {
+  branch: string;
+  date: string;
+  timeStart: string;
+  timeEnd: string;
+};
 
 function BookingSearch() {
   const [empPhone, setEmpPhone] = useState<string>("0914653334");
@@ -49,6 +43,12 @@ function BookingSearch() {
   const [capacity, setCapacity] = useState<number>(1);
   const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
   const [filterData, setFilterData] = useState<RoomProps[] | null>(null);
+  const [dataSearch, setDataSearch] = useState<DataSearch>({
+    branch: "",
+    date: "",
+    timeStart: "",
+    timeEnd: "",
+  });
 
   // Lấy danh sách chi nhánh
   const { data: branches } = useFetch<BranchProps[]>(
@@ -146,6 +146,12 @@ function BookingSearch() {
       .then((data) => {
         console.log("API response:", data);
         setFilterData(data);
+        setDataSearch({
+          branch: branchName,
+          date: selectedDate,
+          timeStart: startTime,
+          timeEnd: endTime,
+        });
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -248,12 +254,12 @@ function BookingSearch() {
                 <h3>Danh sách phòng phù hợp</h3>
               </div>
               <div className={cx("room-grid")}>
-                <CardRoom rooms={filterData ?? []} />
+                <CardRoom rooms={filterData ?? []} dataSearch={dataSearch} />
               </div>
             </div>
           ) : null}
 
-          <div className={cx("room-list-header")}>
+          {/* <div className={cx("room-list-header")}>
             <h3>Danh sách phòng có sẵn</h3>
             <div
               className={cx("view-all")}
@@ -285,7 +291,7 @@ function BookingSearch() {
           </div>
           <div className={cx("room-grid")}>
             <CardRoom rooms={visibleRooms2 ?? []} />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

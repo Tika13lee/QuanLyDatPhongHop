@@ -5,13 +5,28 @@ import { BranchProps, RoomViewProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import ModalBooking from "../../../components/Modal/ModalBooking";
 import { times } from "../../../utilities";
+import PopupNotification from "../../../components/popup/PopupNotification";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
-type InfoCellRoom = {
+type RoomInfo = {
   roomName: string;
+  roomId: string;
+};
+
+type InfoCellRoom = {
+  roomInfo: RoomInfo;
   timeStart: string;
-  listRoomName: string[];
+  listRoomInfo: RoomInfo[];
+};
+
+type typeMessage = "error" | "success" | "info" | "warning";
+
+type typeInfoPopup = {
+  message: string;
+  type: typeMessage;
+  close: boolean;
 };
 
 function General() {
@@ -23,10 +38,29 @@ function General() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState<boolean>(false);
   const [infoCellRoom, setInfoCellRoom] = useState<InfoCellRoom>({
-    roomName: "",
+    roomInfo: {
+      roomName: "",
+      roomId: "",
+    },
     timeStart: "",
-    listRoomName: [],
+    listRoomInfo: [],
   });
+  const [listRoom, setListRoom] = useState<RoomViewProps[]>([]);
+
+  const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
+    message: "",
+    type: "success",
+    close: false,
+  });
+
+  // xử lý mở popup
+  const handleOpenPopup = (
+    message: string,
+    type: typeMessage,
+    close: boolean
+  ) => {
+    setInfoPopup({ message, type, close: true });
+  };
 
   // lấy chi nhánh
   const {
@@ -71,11 +105,43 @@ function General() {
     )}&dayEnd=${getEndOfDay(selectedDate)}`
   );
 
+  console.log(rooms)
+
+  // lấy danh sách mới sau khi đã phê duyệt thành công
+  useEffect(() => {
+    if (infoPopup.close == true) {
+      // fetch(
+      //   `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
+      //     selectedDate
+      //   )}&dayEnd=${getEndOfDay(selectedDate)}`
+      // )
+      //   .then((response) => response.json())
+      //   .then((data) => {
+      //     setListRoom(data);
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });
+      setListRoom(rooms || []);
+    }
+  }, [infoPopup.close]);
+
   // đổ lại dữ liệu listroom lên modal khi chọn đặt phòng
   useEffect(() => {
     if (selectedCell == false) {
-      const roomNames = rooms?.map((room) => room.roomName) || [];
-      setInfoCellRoom({ roomName: "", timeStart: "", listRoomName: roomNames });
+      const roomInfos =
+        rooms?.map((room) => ({
+          roomId: room.roomId + "",
+          roomName: room.roomName,
+        })) || [];
+      setInfoCellRoom({
+        roomInfo: {
+          roomName: "",
+          roomId: "",
+        },
+        timeStart: "",
+        listRoomInfo: roomInfos,
+      });
     }
   }, [selectedCell]);
 
@@ -83,24 +149,52 @@ function General() {
   const handleOpenModal = () => {
     // kiểm tra ngày đã chọn có hợp lệ hay không
     // hợp lê thì chạy đoạn dưới
-    const roomNames = rooms?.map((room) => room.roomName) || [];
-    console.log(roomNames);
-    setInfoCellRoom({ roomName: "", timeStart: "", listRoomName: roomNames });
+    const roomInfos =
+      rooms?.map((room) => ({
+        roomId: room.roomId + "",
+        roomName: room.roomName,
+      })) || [];
+    setInfoCellRoom({
+      roomInfo: {
+        roomName: "",
+        roomId: "",
+      },
+      timeStart: "",
+      listRoomInfo: roomInfos,
+    });
     setIsModalOpen(true);
     // không hợp lệ thì thông báo
   };
 
   // đóng modal
   const handleCloseModal = () => {
-    setInfoCellRoom({ roomName: "", timeStart: "", listRoomName: [] });
+    setInfoCellRoom({
+      roomInfo: {
+        roomName: "",
+        roomId: "",
+      },
+      timeStart: "",
+      listRoomInfo: [],
+    });
     setSelectedCell(false);
     setIsModalOpen(false);
   };
 
   // xử lý khi click vào ô
-  const handleCellClick = (roomName: string, timeStart: string) => {
+  const handleCellClick = (
+    roomId: string,
+    roomName: string,
+    timeStart: string
+  ) => {
     setSelectedCell(() => {
-      setInfoCellRoom({ roomName, timeStart, listRoomName: [] });
+      setInfoCellRoom({
+        roomInfo: {
+          roomName: roomName,
+          roomId: roomId,
+        },
+        timeStart,
+        listRoomInfo: [],
+      });
       return true;
     });
     setIsModalOpen(true);
@@ -213,7 +307,9 @@ function General() {
                           [editBackground[statusKey]]:
                             editBackground[statusKey],
                         })}
-                        onClick={() => handleCellClick(room.roomName, time)}
+                        onClick={() =>
+                          handleCellClick(room.roomId + "", room.roomName, time)
+                        }
                       >
                         {/* Hiển thị tất cả đặt phòng trùng với `time` */}
                         {reservations.map((res) => (
@@ -255,13 +351,28 @@ function General() {
         <ModalBooking
           isModalOpen={isModalOpen}
           setIsModalClose={handleCloseModal}
-          roomName={isModalOpen == true ? infoCellRoom.roomName : ""}
+          roomInfo={
+            isModalOpen == true
+              ? infoCellRoom.roomInfo
+              : { roomName: "", roomId: "" }
+          }
           dateSelected={selectedDate}
           timeStart={isModalOpen == true ? infoCellRoom.timeStart : ""}
           dataRoomByBranch={
             isModalOpen == true && selectedCell == false
-              ? infoCellRoom.listRoomName
+              ? infoCellRoom.listRoomInfo
               : []
+          }
+          setIsPopupOpen={handleOpenPopup}
+        />
+      )}
+      {infoPopup.close && (
+        <PopupNotification
+          message={infoPopup.message}
+          type={infoPopup.type}
+          isOpen={infoPopup.close}
+          onClose={() =>
+            setInfoPopup({ message: "", type: "success", close: false })
           }
         />
       )}

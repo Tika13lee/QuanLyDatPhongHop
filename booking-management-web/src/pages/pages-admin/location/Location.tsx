@@ -5,7 +5,6 @@ import { AppDispatch, RootState } from "../../../app/store";
 import { useEffect, useState } from "react";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
-import { fetchLocations } from "../../../features/locationSlice";
 import useFetch from "../../../hooks/useFetch";
 import { BranchProps, BuildingProps, LocationProps } from "../../../data/data";
 
