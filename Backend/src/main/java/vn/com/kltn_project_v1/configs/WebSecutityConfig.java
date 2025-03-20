@@ -16,8 +16,7 @@ public class WebSecutityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
            http.csrf(AbstractHttpConfigurer::disable)
                   .authorizeHttpRequests(requests -> {
-                        requests.requestMatchers("**")
-                                .permitAll();
+                      requests.anyRequest().permitAll();
                   })
                   ;
                   return http.build();

@@ -22,10 +22,7 @@ public class Reservation {
     private Date timeEnd;
     private Date timeCheckIn;
     private Date timeCheckOut;
-    private Date timeApprove;
     private Date timeCancel;
-    private Date timePayment;
-
     private String note;
     @ElementCollection
     private List<String> filePaths;
@@ -63,7 +60,7 @@ public class Reservation {
     @JoinColumn(name = "roomId")
     private Room room;
 
-    public Reservation(Date time, Date timeStart, Date timeEnd, Date timeCheckIn, Date timeCheckOut, String note, List<String> filePaths, String description, String title, int total, Frequency frequency, StatusReservation statusReservation, Employee booker, List<Employee> attendants, List<Service> services, CancelReservation cancelReservation, Room room) {
+    public Reservation(Date time, Date timeStart, Date timeEnd, Date timeCheckIn, Date timeCheckOut, String note, List<String> filePaths, String description, String title, Frequency frequency, StatusReservation statusReservation, Employee booker, List<Employee> attendants, List<Service> services, CancelReservation cancelReservation, Room room) {
         this.time = time;
         this.timeStart = timeStart;
         this.timeEnd = timeEnd;
@@ -73,7 +70,6 @@ public class Reservation {
         this.filePaths = filePaths;
         this.description = description;
         this.title = title;
-        this.total = total;
         this.frequency = frequency;
         this.statusReservation = statusReservation;
         this.booker = booker;

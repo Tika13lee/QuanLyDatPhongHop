@@ -30,6 +30,7 @@ public class Account implements UserDetails {
     @Column(columnDefinition = "boolean default false")
     private boolean role; // true: admin, false: user
     @JsonIgnore
+    @ToString.Exclude
     @OneToOne(mappedBy = "account")
     private Employee employee;
 

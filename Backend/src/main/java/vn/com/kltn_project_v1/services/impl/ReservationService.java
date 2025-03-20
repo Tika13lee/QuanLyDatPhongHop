@@ -5,7 +5,6 @@ import org.modelmapper.ModelMapper;
 
 import vn.com.kltn_project_v1.dtos.Overview.ReservationViewDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
-import vn.com.kltn_project_v1.entityRespones.RoomRespone;
 import vn.com.kltn_project_v1.model.*;
 import vn.com.kltn_project_v1.repositories.EmployeeRepository;
 import vn.com.kltn_project_v1.repositories.ReservationRepository;
@@ -75,45 +74,22 @@ public class ReservationService implements IReservation {
     public List<Reservation> createReservation(ReservationDTO reservationDTO) {
         List<Reservation> reservations = new ArrayList<>();
         if (!reservationDTO.getFrequency().equals(Frequency.ONE_TIME)) {
-            Date timeStart = reservationDTO.getTimeStart();
-            Date timeEnd = reservationDTO.getTimeEnd();
-            int dayStart = timeStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth();
-            int dayFinish = reservationDTO.getTimeFinishFrequency().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth();
-            int monthStart = timeStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue();
-            int monthFinish = reservationDTO.getTimeFinishFrequency().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue();
+            for (Date date : reservationDTO.getTimeFinishFrequency()) {
+                String hourStart = reservationDTO.getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString().substring(10);
+                String dayStart = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString().substring(0,10);
+                System.out.println("hourStart: "+hourStart+" dayStart: "+dayStart);
+                Reservation reservation = convertReservationToCreate(reservationDTO);
 
-            if (reservationDTO.getFrequency().equals(Frequency.DAILY)) {
-                while (monthStart <=monthFinish && dayStart <= dayFinish) {
-
-                    Reservation reservation = convertReservationToCreate(reservationDTO);
-                    reservation.setTimeStart(timeStart);
-                    reservation.setTimeEnd(timeEnd);
-                    reservationRepository.save(reservation);
-                    reservations.add(reservation);
-                    timeStart = new Date(timeStart.getTime() + 86400000);
-                    timeEnd = new Date(timeEnd.getTime() + 86400000);
-                    dayStart = timeStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth();
-                    monthStart = timeStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue();
-                }
-            } else {
-                while (monthStart <=monthFinish && dayStart <= dayFinish) {
-                    Reservation reservation = convertReservationToCreate(reservationDTO);
-                    reservation.setTimeStart(timeStart);
-                    reservation.setTimeEnd(timeEnd);
-                    reservationRepository.save(reservation);
-                    reservations.add(reservation);
-                    timeStart = new Date(timeStart.getTime() + 604800000);
-                    timeEnd = new Date(timeEnd.getTime() + 604800000);
-                    dayStart = timeStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth();
-                    monthStart = timeStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue();
-                }
+                reservation.setTime(date);
+                reservations.add(reservation);
+                reservationRepository.save(reservation);
             }
             return reservations;
         }else {
             Reservation reservation = convertReservationToCreate(reservationDTO);
             reservationRepository.save(reservation);
 
-            return List.of(reservation);
+            return new ArrayList<>(List.of(reservation));
         }
 
     }
@@ -126,33 +102,6 @@ public class ReservationService implements IReservation {
         return reservationRepository.findReservationsByBookerPhoneAndTime(phone,dayStart,dayEnd);
     }
 
-    @Override
-    public List<Reservation> approveReservation(List<Long> reservationIds) {
-        List<Reservation> reservations = new ArrayList<>();
-        reservationIds.forEach(r->{
-            Reservation reservation = reservationRepository.findById(r).orElse(null);
-            if (reservation != null) {
-                reservation.setTimeApprove(new Date());
-                reservation.setStatusReservation(StatusReservation.WAITING_PAYMENT);
-                reservations.add(reservationRepository.save(reservation));
-            }
-        });
-        return reservations;
-    }
-
-    @Override
-    public List<Reservation> disApproveReservation(List<Long> reservationIds) {
-        List<Reservation> reservations = new ArrayList<>();
-        reservationIds.forEach(r->{
-            Reservation reservation = reservationRepository.findById(r).orElse(null);
-            if (reservation != null) {
-                reservation.setTimeApprove(new Date());
-                reservation.setStatusReservation(StatusReservation.NO_APPROVED);
-                reservations.add(reservationRepository.save(reservation));
-            }
-        });
-        return reservations;
-    }
 
     @Override
     public List<ReservationViewDTO> getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation statusReservation, String phone, Date dayStart, Date dayEnd, String approverName, String title) {
@@ -176,14 +125,14 @@ public class ReservationService implements IReservation {
         reservation.setTimeStart(reservationDTO.getTimeStart());
         reservation.setTimeEnd(reservationDTO.getTimeEnd());
         reservation.setTitle(reservationDTO.getTitle());
-
         reservation.setTotal(totalMoney(reservationDTO.getServiceIds(), reservationDTO.getRoomId(), reservationDTO.getTimeStart(), reservationDTO.getTimeEnd()));
-        reservation.setStatusReservation(StatusReservation.PENDING);
+        reservation.setStatusReservation(StatusReservation.WAITING);
         reservation.setBooker(employeeRepository.findById(reservationDTO.getBookerId()).orElse(null));
         reservation.setRoom(roomRepository.findById(reservationDTO.getRoomId()).orElse(null));
         List<Service> services = new ArrayList<>();
         reservationDTO.getServiceIds().forEach(s -> services.add(serviceRepository.findById(s).orElse(null)));
         reservation.setServices(services);
+
         List<Employee> employees = new ArrayList<>();
         reservationDTO.getEmployeeIds().forEach(e -> employees.add(employeeRepository.findById(e).orElse(null)));
         reservation.setAttendants(employees);
@@ -204,7 +153,6 @@ public class ReservationService implements IReservation {
             reservationViewDTO.setFrequency(r.getFrequency());
             reservationViewDTO.setNote(r.getNote());
             reservationViewDTO.setStatusReservation(r.getStatusReservation());
-            reservationViewDTO.setTimeApprove(r.getTimeApprove());
             reservationViewDTOS.add(reservationViewDTO);
         });
         return reservationViewDTOS;

@@ -1,0 +1,49 @@
+package vn.com.kltn_project_v1.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import vn.com.kltn_project_v1.dtos.RequestFormDTO;
+import vn.com.kltn_project_v1.services.IRequestForm;
+
+@RestController
+@RequestMapping("/api/v1/requestForm")
+public class RequestFormController {
+    @Autowired
+    private IRequestForm requestFormService;
+    @PostMapping("/createRequestForm")
+    public ResponseEntity<?> createRequestForm(@RequestBody RequestFormDTO requestFormDTO) {
+        try {
+            System.out.println("1");
+            return ResponseEntity.ok(requestFormService.createRequestForm(requestFormDTO));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+
+    }
+    @GetMapping("/getRequestFormById")
+    public ResponseEntity<?> getRequestFormById(@RequestParam Long requestFormId) {
+        try {
+            return ResponseEntity.ok(requestFormService.getRequestFormById(requestFormId));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @GetMapping("/getAllRequestForm")
+    public ResponseEntity<?> getAllRequestForm() {
+        try {
+            return ResponseEntity.ok(requestFormService.getAllRequestForm());
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @PostMapping("/approveRequestForm")
+    public ResponseEntity<?> approveRequestForm(@RequestParam Long requestFormId) {
+        try {
+            return ResponseEntity.ok(requestFormService.approveRequestForm(requestFormId));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+}

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Builder
 @Getter
@@ -18,9 +20,9 @@ public class Location {
     @ManyToOne
     @JoinColumn(name = "buildingId")
     private Building building;
-    @OneToOne(mappedBy = "location",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "location",fetch = FetchType.LAZY)
     @JsonIgnore
-    private Room room;
+    private List<Room> room;
 
 
 }

@@ -1,19 +1,22 @@
-package vn.com.kltn_project_v1.dtos;
+package vn.com.kltn_project_v1.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import vn.com.kltn_project_v1.model.Frequency;
-import vn.com.kltn_project_v1.model.StatusReservation;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
+
+@Entity
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationDTO {
+@ToString
+public class RequestReservation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long requestReservationId;
     private Date time;
     private Date timeStart;
     private Date timeEnd;
@@ -21,12 +24,14 @@ public class ReservationDTO {
     private String description;
     private String title;
     private Frequency frequency;
+    @ElementCollection
     private List<Date> timeFinishFrequency;
     private long bookerId;
     private long roomId;
+    @ElementCollection
     private List<Long> employeeIds;
+    @ElementCollection
     private List<Long> serviceIds;
-    private StatusReservation statusReservation;
+    @ElementCollection
     private List<String> filePaths;
-
 }

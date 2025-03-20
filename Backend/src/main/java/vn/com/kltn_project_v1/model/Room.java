@@ -22,7 +22,7 @@ public class Room {
     private StatusRoom statusRoom;
     @Enumerated(EnumType.STRING)
     private TypeRoom typeRoom;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "locationId")
     private Location location;
     @ManyToOne

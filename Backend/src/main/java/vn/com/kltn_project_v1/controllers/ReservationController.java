@@ -57,28 +57,12 @@ public class ReservationController {
             return ResponseEntity.badRequest().build();
         }
     }
-    @PutMapping("/approveReservation")
-    public ResponseEntity<?> approveReservation(@RequestBody List<Long> reservationIds){
-        try {
-            return ResponseEntity.ok(reservationService.approveReservation(reservationIds));
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
-    }
     @GetMapping("/getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle")
     public ResponseEntity<?> getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(@RequestParam(required = false) StatusReservation statusReservation, @RequestParam String phone, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayEnd, @RequestParam(required = false) String approverName, @RequestParam(required = false) String title){
         try {
             return ResponseEntity.ok(reservationService.getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(statusReservation,phone,dayStart,dayEnd,approverName,title));
         }catch (Exception e){
             return ResponseEntity.ok(e.toString());
-        }
-    }
-    @PutMapping("/disApproveReservation")
-    public ResponseEntity<?> disApproveReservation(@RequestBody List<Long> reservationIds){
-        try {
-            return ResponseEntity.ok(reservationService.disApproveReservation(reservationIds));
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
         }
     }
     @GetMapping("/getReservationsNoPending")
