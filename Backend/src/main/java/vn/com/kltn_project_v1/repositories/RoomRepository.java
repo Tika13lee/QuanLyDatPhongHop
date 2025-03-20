@@ -28,5 +28,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         List<Room> findRoomsByTypeRoom(TypeRoom typeRoom);
         @Query("select r from Room r where (:branch is null or r.location.building.branch.branchName = :branch)  and ( :capacity=0 or r.capacity >= :capacity) and ( :price=0 or r.price.value = :price )")
         List<Room> findRoomsForReservation(@Param("branch")String branch, @Param("capacity") int capacity,@Param("price") int price_value);
-
+        @Query("select r from Room r where r.approver.employeeId = :approverId")
+        List<Room> findRoomsByApproverId(@Param("approverId") Long approverId);
 }

@@ -53,7 +53,7 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
 
             return ResponseEntity.ok(roomService.getAllRooms(page, size, sortBy));
         }catch (Exception e){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(e.toString());
         }
     }
     @GetMapping("/searchRooms")

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RequestFormDTO;
+import vn.com.kltn_project_v1.model.StatusRequestForm;
 import vn.com.kltn_project_v1.services.IRequestForm;
 
 @RestController
@@ -50,6 +51,30 @@ public class RequestFormController {
     public ResponseEntity<?> rejectRequestForm(@RequestParam Long requestFormId, @RequestParam String reasonReject) {
         try {
             return ResponseEntity.ok(requestFormService.rejectRequestForm(requestFormId, reasonReject));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @GetMapping("/getRequestFormByBookerId")
+    public ResponseEntity<?> getRequestFormByBookerId(@RequestParam Long bookerId, @RequestParam(required = false) StatusRequestForm statusRequestForm) {
+        try {
+            return ResponseEntity.ok(requestFormService.getRequestFormByBookerId(bookerId, statusRequestForm));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @GetMapping("/getRequestFormByApproverId")
+    public ResponseEntity<?> getRequestFormByApproverId(@RequestParam Long approverId, @RequestParam(required = false) StatusRequestForm statusRequestForm) {
+        try {
+            return ResponseEntity.ok(requestFormService.getRequestFormByApproverId(approverId, statusRequestForm));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @GetMapping("/getRequestFormByStatus")
+    public ResponseEntity<?> getRequestFormByStatusPending(@RequestParam(required = false) StatusRequestForm statusRequestForm) {
+        try {
+            return ResponseEntity.ok(requestFormService.getRequestFormByStatus(statusRequestForm));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }

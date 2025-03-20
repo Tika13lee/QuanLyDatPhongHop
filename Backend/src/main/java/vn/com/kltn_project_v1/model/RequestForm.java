@@ -19,11 +19,8 @@ public class RequestForm {
     private long requestFormId;
     private Date timeRequest;
     private Date timeResponse;
-    private String note;
-
     @Enumerated(EnumType.STRING)
     private StatusRequestForm statusRequestForm;
-    private String title;
     private String reasonReject;
     @Enumerated(EnumType.STRING)
     private TypeRequestForm typeRequestForm;

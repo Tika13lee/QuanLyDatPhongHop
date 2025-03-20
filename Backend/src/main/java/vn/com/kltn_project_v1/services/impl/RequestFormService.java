@@ -12,6 +12,7 @@ import vn.com.kltn_project_v1.model.StatusRequestForm;
 import vn.com.kltn_project_v1.repositories.RequestFormRepository;
 import vn.com.kltn_project_v1.repositories.RequestReservationRepository;
 import vn.com.kltn_project_v1.repositories.ReservationRepository;
+import vn.com.kltn_project_v1.repositories.RoomRepository;
 import vn.com.kltn_project_v1.services.IRequestForm;
 import vn.com.kltn_project_v1.services.IReservation;
 
@@ -26,6 +27,7 @@ public class RequestFormService implements IRequestForm {
     private final ReservationRepository reservationRepository;
     private final IReservation reservationService;
     private final ModelMapper modelMapper;
+    private final RoomRepository roomRepository;
     @Override
     public RequestForm createRequestForm(RequestFormDTO requestFormDTO) {
         RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
@@ -68,5 +70,24 @@ public class RequestFormService implements IRequestForm {
             return requestFormRepository.save(requestForm);
         }
         return null;
+    }
+
+    @Override
+    public List<RequestForm> getRequestFormByBookerId(Long bookerId, StatusRequestForm statusRequestForm) {
+        return requestFormRepository.findRequestFormByBookerId(bookerId, statusRequestForm);
+    }
+
+    @Override
+    public List<RequestForm> getRequestFormByApproverId(Long approverId, StatusRequestForm statusRequestForm) {
+        ArrayList<RequestForm> requestForms = new ArrayList<>();
+        roomRepository.findRoomsByApproverId(approverId).forEach(room -> {
+            requestForms.addAll(requestFormRepository.findRequestFormByRoomId(room.getRoomId(), statusRequestForm));
+        });
+        return requestForms;
+    }
+
+    @Override
+    public List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm) {
+        return requestFormRepository.findRequestFormByStatusPending(statusRequestForm);
     }
 }
