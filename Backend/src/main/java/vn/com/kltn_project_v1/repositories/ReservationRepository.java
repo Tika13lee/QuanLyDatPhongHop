@@ -18,10 +18,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Room> findDistinctRoomsByBookerPhone(String phone);
     @Query("SELECT r FROM Reservation r WHERE r.booker.phone = ?1 and r.statusReservation != 'CANCELED'  and (:timeStart is null or (r.timeStart between ?2 and ?3))")
     List<Reservation> findReservationsByBookerPhoneAndTime(String phone, Date timeStart, Date timeEnd);
-    @Query("SELECT r FROM Reservation r WHERE (?1 is null or r.statusReservation = ?1) and r.booker.phone = ?2 and (?3 is null or r.time between ?3 and ?4) and (?5 is null or r.room.approver.employeeName like %?5%) and (?6 is null or r.title like %?6%) ")
+    @Query("SELECT r FROM Reservation r join r.attendants a WHERE (?1 is null or r.statusReservation = ?1) and a.phone = ?2 and (?3 is null or r.time between ?3 and ?4) and (?5 is null or r.room.approver.employeeName like %?5%) and (?6 is null or r.title like %?6%) ")
     List<Reservation> findReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation status, String phone, Date timeStart, Date timeEnd, String approver, String title);
-    @Query("SELECT r FROM Reservation r WHERE r.booker.phone = ?1 and(?2 is null or  r.statusReservation = ?2) order by r.time desc")
+    @Query("SELECT r FROM Reservation r JOIN r.attendants a WHERE a.phone = ?1 AND (?2 IS NULL OR r.statusReservation = ?2) ORDER BY r.time DESC")
     List<Reservation> findReservationsByBookerPhoneAndStatusReservation(String phone, StatusReservation statusReservation);
     @Query("select r.room from Reservation r where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2)")
     List<Room> findRoomsByTime(Date timeStart, Date timeEnd);
+    @Query("select r from Reservation r join r.attendants a where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2) or a.employeeId = ?3")
+    List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId);
 }

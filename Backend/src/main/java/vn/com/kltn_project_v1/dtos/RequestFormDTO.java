@@ -14,9 +14,7 @@ import java.util.Date;
 public class RequestFormDTO {
     private Date timeRequest;
     private Date timeResponse;
-    private String note;
     private StatusRequestForm statusRequestForm;
-    private String title;
     private String reasonReject;
     private TypeRequestForm typeRequestForm;
     private ReservationDTO reservationDTO;

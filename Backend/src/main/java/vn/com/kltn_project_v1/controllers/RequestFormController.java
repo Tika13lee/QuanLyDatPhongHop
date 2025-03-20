@@ -5,8 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RequestFormDTO;
+import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.StatusRequestForm;
 import vn.com.kltn_project_v1.services.IRequestForm;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/requestForm")
@@ -16,7 +20,10 @@ public class RequestFormController {
     @PostMapping("/createRequestForm")
     public ResponseEntity<?> createRequestForm(@RequestBody RequestFormDTO requestFormDTO) {
         try {
-            System.out.println("1");
+            List<Reservation> reservations = requestFormService.checkDayRequestForm(requestFormDTO);
+            if (!reservations.isEmpty()) {
+                return ResponseEntity.badRequest().body(reservations);
+            }
             return ResponseEntity.ok(requestFormService.createRequestForm(requestFormDTO));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());

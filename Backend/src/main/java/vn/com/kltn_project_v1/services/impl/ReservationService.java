@@ -110,7 +110,7 @@ public class ReservationService implements IReservation {
         reservation.setTimeEnd(reservationDTO.getTimeEnd());
         reservation.setTitle(reservationDTO.getTitle());
         reservation.setTotal(totalMoney(reservationDTO.getServiceIds(), reservationDTO.getRoomId(), reservationDTO.getTimeStart(), reservationDTO.getTimeEnd()));
-        reservation.setStatusReservation(StatusReservation.WAITING);
+        reservation.setStatusReservation(StatusReservation.PENDING);
         reservation.setBooker(employeeRepository.findById(reservationDTO.getBookerId()).orElse(null));
         reservation.setRoom(roomRepository.findById(reservationDTO.getRoomId()).orElse(null));
         List<Service> services = new ArrayList<>();
