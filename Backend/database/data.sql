@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   PRIMARY KEY (`account_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
 
--- Dumping data for table ql_datphong.account: ~28 rows (approximately)
+-- Dumping data for table ql_datphong.account: ~15 rows (approximately)
 INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`) VALUES
 	(1, '123', b'0', '0724653334'),
 	(3, '1234', b'1', '0914653332'),
@@ -334,26 +334,24 @@ INSERT INTO `price` (`price_id`, `time_apply`, `type`, `value`) VALUES
 -- Dumping structure for table ql_datphong.request_form
 CREATE TABLE IF NOT EXISTS `request_form` (
   `request_form_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `reason_reject` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status_request_form` enum('APPROVED','PENDING','REJECTED') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `time_request` datetime(6) DEFAULT NULL,
   `time_response` datetime(6) DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type_request_form` enum('RESERVATION_ONETIME','RESERVATION_RECURRING','UPDATE_RESERVATION') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `request_reservation_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`request_form_id`),
   UNIQUE KEY `UK4wvvelb7ftp0dinjvshie3bqh` (`request_reservation_id`),
   CONSTRAINT `FKgmwfeoqaw7utlpwec164wlu52` FOREIGN KEY (`request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_form: ~4 rows (approximately)
-INSERT INTO `request_form` (`request_form_id`, `note`, `reason_reject`, `status_request_form`, `time_request`, `time_response`, `title`, `type_request_form`, `request_reservation_id`) VALUES
-	(1, 'yeu cau dat phong', NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, 'yeu cau dat phong', 'RESERVATION_ONETIME', 1),
-	(2, 'yeu cau dat phong', NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, 'yeu cau dat phong', NULL, 2),
-	(3, 'yeu cau dat phong', NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, 'yeu cau dat phong', NULL, 3),
-	(4, 'yeu cau dat phong', NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, 'yeu cau dat phong', NULL, 4),
-	(5, 'yeu cau dat phong', NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, 'yeu cau dat phong', NULL, 5);
+-- Dumping data for table ql_datphong.request_form: ~5 rows (approximately)
+INSERT INTO `request_form` (`request_form_id`, `reason_reject`, `status_request_form`, `time_request`, `time_response`, `type_request_form`, `request_reservation_id`) VALUES
+	(1, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, 'RESERVATION_ONETIME', 1),
+	(2, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, NULL, 2),
+	(3, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, NULL, 3),
+	(4, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, NULL, 4),
+	(5, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', NULL, NULL, 5);
 
 -- Dumping structure for table ql_datphong.request_form_reservations
 CREATE TABLE IF NOT EXISTS `request_form_reservations` (
@@ -365,11 +363,14 @@ CREATE TABLE IF NOT EXISTS `request_form_reservations` (
   CONSTRAINT `FKgqum23i5l7ebxfmd03ox86knc` FOREIGN KEY (`request_form_id`) REFERENCES `request_form` (`request_form_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_form_reservations: ~1 rows (approximately)
+-- Dumping data for table ql_datphong.request_form_reservations: ~6 rows (approximately)
 INSERT INTO `request_form_reservations` (`request_form_id`, `reservation_id`) VALUES
 	(4, 39),
 	(5, 40),
-	(5, 41);
+	(5, 41),
+	(1, 36),
+	(2, 37),
+	(3, 38);
 
 -- Dumping structure for table ql_datphong.request_reservation
 CREATE TABLE IF NOT EXISTS `request_reservation` (
@@ -384,9 +385,9 @@ CREATE TABLE IF NOT EXISTS `request_reservation` (
   `time_start` datetime(6) DEFAULT NULL,
   `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`request_reservation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation: ~4 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation: ~5 rows (approximately)
 INSERT INTO `request_reservation` (`request_reservation_id`, `booker_id`, `description`, `frequency`, `note`, `room_id`, `time`, `time_end`, `time_start`, `title`) VALUES
 	(1, 1, 'kho khan cua hoc', 0, 'mang theo tai lieu tuan truoc', 1, '2025-03-20 15:00:00.000000', '2025-03-22 21:00:00.000000', '2025-03-21 20:00:00.000000', 'gioi thieu ve AI'),
 	(2, 1, 'kho khan cua hoc', 0, 'mang theo tai lieu tuan truoc', 1, '2025-03-22 15:00:00.000000', '2025-03-22 21:00:00.000000', '2025-03-23 20:00:00.000000', 'gioi thieu ve AI'),
@@ -402,7 +403,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_employee_ids` (
   CONSTRAINT `FK6mg0270i3c0kisbagweokgy2w` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_employee_ids: ~12 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_employee_ids: ~0 rows (approximately)
 INSERT INTO `request_reservation_employee_ids` (`request_reservation_request_reservation_id`, `employee_ids`) VALUES
 	(1, 4),
 	(1, 2),
@@ -428,7 +429,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_file_paths` (
   CONSTRAINT `FK24et6fkmono2ad04j18nv1o75` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_file_paths: ~8 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_file_paths: ~0 rows (approximately)
 INSERT INTO `request_reservation_file_paths` (`request_reservation_request_reservation_id`, `file_paths`) VALUES
 	(1, 'file1'),
 	(1, 'file2'),
@@ -449,7 +450,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_service_ids` (
   CONSTRAINT `FKh8f65v65tge9ikupt91pa2hy8` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_service_ids: ~8 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_service_ids: ~0 rows (approximately)
 INSERT INTO `request_reservation_service_ids` (`request_reservation_request_reservation_id`, `service_ids`) VALUES
 	(1, 1),
 	(1, 2),
@@ -470,7 +471,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_time_finish_frequency` (
   CONSTRAINT `FKa0p9flnsdheg6oxuu4c7njldx` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_time_finish_frequency: ~4 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_time_finish_frequency: ~0 rows (approximately)
 INSERT INTO `request_reservation_time_finish_frequency` (`request_reservation_request_reservation_id`, `time_finish_frequency`) VALUES
 	(1, '2025-03-22 21:00:00.000000'),
 	(2, '2025-03-22 21:00:00.000000'),
@@ -484,8 +485,8 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   `reservation_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `frequency` enum('DAILY','MONTHLY','ONE_TIME','WEEKLY') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status_reservation` enum('CANCELED','CHECKED_IN','COMPLETED','PENDING','WAITING','WAITING_PAYMENT','WAITING_CANCEL','NO_APPROVED') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status_reservation` enum('CANCELED','CHECKED_IN','COMPLETED','WAITING') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `time` datetime(6) DEFAULT NULL,
   `time_check_in` datetime(6) DEFAULT NULL,
   `time_check_out` datetime(6) DEFAULT NULL,
@@ -506,30 +507,30 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   CONSTRAINT `FK6p46jda7n10vl4kr1n0c6et6v` FOREIGN KEY (`booker_id`) REFERENCES `employee` (`employee_id`),
   CONSTRAINT `FKlqrdx9b1dwg69ldb480uok3w2` FOREIGN KEY (`cancle_reservation_id`) REFERENCES `cancel_reservation` (`cancel_id`),
   CONSTRAINT `FKm8xumi0g23038cw32oiva2ymw` FOREIGN KEY (`room_id`) REFERENCES `room` (`room_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.reservation: ~41 rows (approximately)
+-- Dumping data for table ql_datphong.reservation: ~35 rows (approximately)
 INSERT INTO `reservation` (`reservation_id`, `description`, `frequency`, `note`, `status_reservation`, `time`, `time_check_in`, `time_check_out`, `time_end`, `time_start`, `title`, `total`, `booker_id`, `cancle_reservation_id`, `room_id`, `time_approve`, `time_cancel`, `time_payment`) VALUES
-	(1, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-02-28 08:30:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 08:30:00.000000', 'Nghiên cứu khoa học', 400, 1, NULL, 1, '2025-03-17 10:06:10.456000', NULL, NULL),
-	(2, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-01 08:30:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 08:30:00.000000', 'Kế hoạch truyền thông', 300, 2, NULL, 1, '2025-03-17 10:06:10.548000', NULL, NULL),
-	(3, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-02 08:30:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 08:30:00.000000', 'Báo cáo hệ thống', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(4, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-03 08:30:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 08:30:00.000000', 'Báo cáo tuần ', 400, 3, NULL, 4, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(5, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-04 08:30:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 08:30:00.000000', 'Báo cáo quý', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(6, ' ', 'ONE_TIME', ' ', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-05 08:30:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 08:30:00.000000', 'Tổng kết quý', 400, 1, NULL, 2, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(7, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-06 08:30:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 08:30:00.000000', 'Lên kế hoạch tổng thu', 400, 4, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(8, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-07 08:30:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 08:30:00.000000', 'Chốt vấn đề cần thiết', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(9, ' ', 'ONE_TIME', ' ', 'CHECKED_IN', '2025-02-28 01:35:28.000000', '2025-03-08 08:30:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 08:30:00.000000', 'Khó khăn về việc học', 400, 1, NULL, 3, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(10, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-09 08:30:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 08:30:00.000000', 'Cách tận dụng AI', 400, 1, NULL, 3, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(11, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-10 08:30:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 08:30:00.000000', 'Sự mơ hồ trong công việc', 400, 5, NULL, 3, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(12, ' ', 'ONE_TIME', ' ', 'WAITING_CANCEL', '2025-02-28 01:35:28.000000', '2025-03-11 08:30:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 08:30:00.000000', 'Cách khai thác IDE', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(13, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-12 08:30:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 08:30:00.000000', 'Tổng kết cả năm', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(14, ' ', 'ONE_TIME', ' ', 'WAITING_PAYMENT', '2025-02-28 01:35:28.000000', '2025-03-12 10:30:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 10:30:00.000000', 'Thường tuần', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(15, ' ', 'ONE_TIME', ' ', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 14:30:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 14:30:00.000000', 'Lên kế hoạch thu chi', 400, 2, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
-	(16, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING_PAYMENT', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-16 17:00:00.000000', '2025-03-16 16:00:00.000000', 'Kế hoạch triển khai', 6125, 1, NULL, 1, '2025-03-16 15:06:00.000000', NULL, NULL),
-	(17, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING_PAYMENT', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-17 17:00:00.000000', '2025-03-17 16:00:00.000000', 'Kế hoạch kinh doanh', 6125, 1, NULL, 1, '2025-03-16 15:06:00.000000', NULL, NULL),
-	(18, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING_PAYMENT', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-18 17:00:00.000000', '2025-03-18 16:00:00.000000', 'Tổng kết cả năm', 6125, 1, NULL, 1, '2025-03-16 15:06:00.000000', NULL, NULL),
-	(19, 'phan bo tai chinh', 'DAILY', NULL, 'NO_APPROVED', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-19 17:00:00.000000', '2025-03-19 16:00:00.000000', 'Kế hoạch kinh doanh', 6125, 1, NULL, 1, '2025-03-17 06:10:26.145000', NULL, NULL),
-	(20, 'tốt', 'ONE_TIME', NULL, 'WAITING_PAYMENT', '2025-03-16 16:52:12.395000', NULL, NULL, '2025-03-19 09:00:00.000000', '2025-03-19 07:30:00.000000', 'Tính chi thu', 92025, 1, NULL, 12, '2025-03-16 16:53:12.395000', NULL, NULL),
+	(1, ' ', 'ONE_TIME', '1', 'WAITING', '2025-02-28 01:35:28.000000', '2025-02-28 08:30:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 08:30:00.000000', 'Nghiên cứu khoa học', 400, 1, NULL, 1, '2025-03-17 10:06:10.456000', NULL, NULL),
+	(2, ' ', 'ONE_TIME', 'a', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-01 08:30:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 08:30:00.000000', 'Kế hoạch truyền thông', 300, 2, NULL, 1, '2025-03-17 10:06:10.548000', NULL, NULL),
+	(3, ' ', 'ONE_TIME', 'a', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-02 08:30:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 10:00:00.000000', '2025-03-02 08:30:00.000000', 'Báo cáo hệ thống', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(4, ' ', 'ONE_TIME', 'a', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-03 08:30:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 10:00:00.000000', '2025-03-03 08:30:00.000000', 'Báo cáo tuần ', 400, 3, NULL, 4, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(5, ' ', 'ONE_TIME', 'a', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-04 08:30:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 10:00:00.000000', '2025-03-04 08:30:00.000000', 'Báo cáo quý', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(6, ' ', 'ONE_TIME', 'a', 'CANCELED', '2025-02-28 01:35:28.000000', '2025-03-05 08:30:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 10:00:00.000000', '2025-03-05 08:30:00.000000', 'Tổng kết quý', 400, 1, NULL, 2, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(7, ' ', 'ONE_TIME', '1', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-06 08:30:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 10:00:00.000000', '2025-03-06 08:30:00.000000', 'Lên kế hoạch tổng thu', 400, 4, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(8, ' ', 'ONE_TIME', '1', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-07 08:30:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 10:00:00.000000', '2025-03-07 08:30:00.000000', 'Chốt vấn đề cần thiết', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(9, ' ', 'ONE_TIME', '11', 'CHECKED_IN', '2025-02-28 01:35:28.000000', '2025-03-08 08:30:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 10:00:00.000000', '2025-03-08 08:30:00.000000', 'Khó khăn về việc học', 400, 1, NULL, 3, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(10, ' ', 'ONE_TIME', '1', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-09 08:30:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 10:00:00.000000', '2025-03-09 08:30:00.000000', 'Cách tận dụng AI', 400, 1, NULL, 3, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(11, ' ', 'ONE_TIME', '1', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-10 08:30:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 10:00:00.000000', '2025-03-10 08:30:00.000000', 'Sự mơ hồ trong công việc', 400, 5, NULL, 3, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(12, ' ', 'ONE_TIME', '1', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-11 08:30:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 10:00:00.000000', '2025-03-11 08:30:00.000000', 'Cách khai thác IDE', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(13, ' ', 'ONE_TIME', '1', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-12 08:30:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 10:00:00.000000', '2025-03-12 08:30:00.000000', 'Tổng kết cả năm', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(14, ' ', 'ONE_TIME', '1', 'WAITING', '2025-02-28 01:35:28.000000', '2025-03-12 10:30:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 11:00:00.000000', '2025-03-12 10:30:00.000000', 'Thường tuần', 400, 1, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(15, ' ', 'ONE_TIME', '1', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-12 14:30:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 16:00:00.000000', '2025-03-12 14:30:00.000000', 'Lên kế hoạch thu chi', 400, 2, NULL, 1, '2025-02-28 01:39:28.000000', NULL, NULL),
+	(16, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-16 17:00:00.000000', '2025-03-16 16:00:00.000000', 'Kế hoạch triển khai', 6125, 1, NULL, 1, '2025-03-16 15:06:00.000000', NULL, NULL),
+	(17, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-17 17:00:00.000000', '2025-03-17 16:00:00.000000', 'Kế hoạch kinh doanh', 6125, 1, NULL, 1, '2025-03-16 15:06:00.000000', NULL, NULL),
+	(18, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-18 17:00:00.000000', '2025-03-18 16:00:00.000000', 'Tổng kết cả năm', 6125, 1, NULL, 1, '2025-03-16 15:06:00.000000', NULL, NULL),
+	(19, 'phan bo tai chinh', 'DAILY', NULL, 'WAITING', '2025-03-16 15:00:00.000000', NULL, NULL, '2025-03-19 17:00:00.000000', '2025-03-19 16:00:00.000000', 'Kế hoạch kinh doanh', 6125, 1, NULL, 1, '2025-03-17 06:10:26.145000', NULL, NULL),
+	(20, 'tốt', 'ONE_TIME', NULL, 'WAITING', '2025-03-16 16:52:12.395000', NULL, NULL, '2025-03-19 09:00:00.000000', '2025-03-19 07:30:00.000000', 'Tính chi thu', 92025, 1, NULL, 12, '2025-03-16 16:53:12.395000', NULL, NULL),
 	(21, 'tốt', 'ONE_TIME', NULL, 'WAITING', '2025-03-16 16:55:39.204000', NULL, NULL, '2025-03-16 14:00:00.000000', '2025-03-16 07:00:00.000000', 'Họp hội đồng', 420100, 1, NULL, 12, '2025-03-16 16:56:12.395000', NULL, NULL),
 	(22, '', 'DAILY', NULL, 'WAITING', '2025-03-17 01:35:44.442000', NULL, NULL, '2025-03-18 17:30:00.000000', '2025-03-18 14:30:00.000000', 'Khảo sát', 182000, 1, NULL, 12, NULL, NULL, NULL),
 	(23, '', 'DAILY', NULL, 'WAITING', '2025-03-17 01:35:44.442000', NULL, NULL, '2025-03-19 17:30:00.000000', '2025-03-19 14:30:00.000000', 'Môi trường', 182000, 1, NULL, 12, NULL, NULL, NULL),
@@ -562,7 +563,7 @@ CREATE TABLE IF NOT EXISTS `reservation_employee` (
   CONSTRAINT `FKmc5vf42lypo9yrgftkonn2bvh` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.reservation_employee: ~60 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_employee: ~48 rows (approximately)
 INSERT INTO `reservation_employee` (`reservation_id`, `employee_id`) VALUES
 	(1, 8),
 	(4, 11),
@@ -639,7 +640,7 @@ CREATE TABLE IF NOT EXISTS `reservation_file_paths` (
   CONSTRAINT `FKchwrit7lhcf142bui6a74ypv2` FOREIGN KEY (`reservation_reservation_id`) REFERENCES `reservation` (`reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table ql_datphong.reservation_file_paths: ~32 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_file_paths: ~24 rows (approximately)
 INSERT INTO `reservation_file_paths` (`reservation_reservation_id`, `file_paths`) VALUES
 	(16, 'file1'),
 	(16, 'file2'),
@@ -688,7 +689,7 @@ CREATE TABLE IF NOT EXISTS `reservation_service` (
   CONSTRAINT `FKky2gr8jk9fw121e8rxogc8ccm` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table ql_datphong.reservation_service: ~40 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_service: ~0 rows (approximately)
 INSERT INTO `reservation_service` (`reservation_id`, `service_id`) VALUES
 	(1, 1),
 	(2, 3),
@@ -754,7 +755,7 @@ CREATE TABLE IF NOT EXISTS `room` (
   CONSTRAINT `FKrqejnp96gs9ldf7o6fciylxkt` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.room: ~20 rows (approximately)
+-- Dumping data for table ql_datphong.room: ~0 rows (approximately)
 INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_room`, `location_id`, `price_id`, `approver_id`) VALUES
 	(1, 10, 'Maria', 'AVAILABLE', 'DEFAULT', 4, 1, 1),
 	(2, 20, 'Vokka', 'AVAILABLE', 'DEFAULT', 6, 3, 1),
