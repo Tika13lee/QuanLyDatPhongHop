@@ -188,7 +188,7 @@ function Approve() {
             <label>Ngày gửi</label>
             <input type="date" className={cx("search-input")} />
           </div>
-          <button className={cx("btn-action", "details-btn")}>Tìm kiếm</button>
+          <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
         </div>
 
         <div className={cx("device")}></div>
@@ -214,17 +214,26 @@ function Approve() {
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {schedulesApprove?.map((schedule) => {
-            const meetingStart = formatDateTime(schedule.timeStart);
-            const meetingEnd = formatDateTime(schedule.timeEnd);
-            const bookingTime = formatDateTime(schedule.time);
+          <table className={cx("schedule-table")}>
+            <thead>
+              <tr>
+                <th>Chọn</th>
+                <th>Tiêu đề</th>
+                <th>Ngày</th>
+                <th>Giờ bắt đầu - Kết thúc</th>
+                <th>Người đặt</th>
+                <th>Thời gian gửi</th>
+                <th>Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedulesApprove?.map((schedule) => {
+                const meetingStart = formatDateTime(schedule.timeStart);
+                const meetingEnd = formatDateTime(schedule.timeEnd);
 
-            return (
-              <div key={schedule.reservationId} className={cx("schedule-card")}>
-                <div className={cx("card-content")}>
-                  <div className={cx("schedule-layout")}>
-                    <div className={cx("checkbox-container")}>
-                      {/* check */}
+                return (
+                  <tr key={schedule.reservationId}>
+                    <td className={cx("checkbox")}>
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(schedule.reservationId)}
@@ -232,44 +241,29 @@ function Approve() {
                           handleCheckboxChange(schedule.reservationId)
                         }
                       />
-                      <h3>{schedule.title}</h3>
-                    </div>
-                    <div className={cx("left-info")}>
-                      <p>
-                        <strong>Ngày:</strong> {meetingStart.date}
-                      </p>
-                      <p>
-                        từ {meetingStart.time} - {meetingEnd.time}
-                      </p>
-                    </div>
-                    <div className={cx("center-info")}>
-                      <p>
-                        <strong>Người đặt:</strong> {schedule.nameBooker}
-                      </p>
-                    </div>
-                    <div className={cx("center-info")}>
-                      <p>
-                        <strong>Thời gian gửi:</strong>{" "}
-                        {new Date(schedule.time).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className={cx("right-info")}>
+                    </td>
+                    <td>{schedule.title}</td>
+                    <td>{meetingStart.date}</td>
+                    <td>
+                      {meetingStart.time} - {meetingEnd.time}
+                    </td>
+                    <td>{schedule.nameBooker}</td>
+                    <td>{new Date(schedule.time).toLocaleString()}</td>
+                    <td>
                       <div
                         className={cx("actions")}
                         onClick={() =>
                           handleShowDetails(schedule.reservationId)
                         }
                       >
-                        <label>Chi tiết</label>
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
       <DetailModal

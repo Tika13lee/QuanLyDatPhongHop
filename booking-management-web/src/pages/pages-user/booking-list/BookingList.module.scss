@@ -51,63 +51,54 @@
 
 // ds lịch
 .schedule-list {
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  max-height: 600px; 
+  overflow-y: auto;
+  border: 1px solid #ccc;
 }
 
-.schedule-card {
-  background: var(--color-white);
-  padding: 7px 10px;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s ease-in-out;
-  position: relative;
-}
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
 
-.card-content {
-  h3 {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--text-primary);
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
   }
-  p {
-    font-size: 14px;
-    color: var(--text-secondary);
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
   }
 }
 
-.schedule-layout {
+.schedule-table th {
+  background-color: #a7a2a2;
+  font-weight: bold;
+  text-align: center;
+}
+
+.schedule-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.schedule-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+.actions {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-weight: 450;
-}
-
-.left-info,
-.center-info {
-  flex: 1;
-}
-
-.left-info {
-  text-align: left;
-  display: flex;
-  gap: 5px;
-}
-
-.center-info {
-  text-align: left;
-}
-
-.right-info {
-  text-align: right;
+  cursor: pointer;
 }
 
 // button
 .actions {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   cursor: pointer;
 

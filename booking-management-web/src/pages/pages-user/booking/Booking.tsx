@@ -7,6 +7,7 @@ import ModalBooking from "../../../components/Modal/ModalBooking";
 import { times } from "../../../utilities";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { set } from "react-datepicker/dist/date_utils";
+import { toast, ToastContainer } from "react-toastify";
 
 const cx = classNames.bind(styles);
 
@@ -45,7 +46,7 @@ function General() {
     timeStart: "",
     listRoomInfo: [],
   });
-  const [listRoom, setListRoom] = useState<RoomViewProps[]>([]);
+  const [rooms, setRooms] = useState<RoomViewProps[]>([]);
 
   const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
     message: "",
@@ -95,34 +96,36 @@ function General() {
   };
 
   // lấy danh sách đặt phòng theo ngày và chi nhánh
-  const {
-    data: rooms,
-    loading,
-    error,
-  } = useFetch<RoomViewProps[]>(
-    `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
-      selectedDate
-    )}&dayEnd=${getEndOfDay(selectedDate)}`
-  );
+  // const {
+  //   data: rooms,
+  //   loading,
+  //   error,
+  // } = useFetch<RoomViewProps[]>(
+  //   `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
+  //     selectedDate
+  //   )}&dayEnd=${getEndOfDay(selectedDate)}`
+  // );
 
-  console.log(rooms)
+  console.log(rooms);
+
+  const fetchRooms = async () => {
+    const res = await fetch(
+      `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
+        selectedDate
+      )}&dayEnd=${getEndOfDay(selectedDate)}`
+    );
+    const data = await res.json();
+    setRooms(data);
+  };
+
+  useEffect(() => {
+    fetchRooms();
+  }, []);
 
   // lấy danh sách mới sau khi đã phê duyệt thành công
   useEffect(() => {
     if (infoPopup.close == true) {
-      // fetch(
-      //   `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
-      //     selectedDate
-      //   )}&dayEnd=${getEndOfDay(selectedDate)}`
-      // )
-      //   .then((response) => response.json())
-      //   .then((data) => {
-      //     setListRoom(data);
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });
-      setListRoom(rooms || []);
+      fetchRooms();
     }
   }, [infoPopup.close]);
 
@@ -202,6 +205,7 @@ function General() {
 
   return (
     <div className={cx("overview-container")}>
+      <ToastContainer />
       <div className={cx("header-container")}>
         {/* Chọn chi nhánh */}
         <div className={cx("")}>
@@ -250,10 +254,8 @@ function General() {
 
       {/* Bảng lịch */}
       <div className={cx("schedule-container")}>
-        {loading ? (
+        {rooms.length == 0 ? (
           <p>Đang tải danh sách phòng...</p>
-        ) : error ? (
-          <p className={cx("error")}>{error.message}</p>
         ) : rooms && rooms.length > 0 ? (
           <table className={cx("schedule-table")}>
             <thead>
@@ -307,9 +309,19 @@ function General() {
                           [editBackground[statusKey]]:
                             editBackground[statusKey],
                         })}
-                        onClick={() =>
-                          handleCellClick(room.roomId + "", room.roomName, time)
-                        }
+                        onClick={() => {
+                          if (reservations[0]) {
+                            toast.warning("Khung giờ này đã được đặt!", {
+                              autoClose: 2000,
+                            });
+                          } else {
+                            handleCellClick(
+                              room.roomId + "",
+                              room.roomName,
+                              time
+                            );
+                          }
+                        }}
                       >
                         {/* Hiển thị tất cả đặt phòng trùng với `time` */}
                         {reservations.map((res) => (

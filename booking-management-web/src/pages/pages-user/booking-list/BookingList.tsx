@@ -113,76 +113,48 @@ function BookingList() {
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {bookedList?.map((schedule) => {
-            const meetingStart = formatDateTime(schedule.timeStart);
-            const meetingEnd = formatDateTime(schedule.timeEnd);
-            const bookingTime = formatDateTime(schedule.time);
+          <table className={cx("schedule-table")}>
+            <thead>
+              <tr>
+                <th>Tiêu đề</th>
+                <th>Ngày</th>
+                <th>Giờ bắt đầu - kết thúc</th>
+                <th>Trạng thái</th>
+                <th>Thời gian gửi</th>
+                <th>Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookedList?.map((schedule) => {
+                const meetingStart = formatDateTime(schedule.timeStart);
+                const meetingEnd = formatDateTime(schedule.timeEnd);
+                const statusText = getStatusText(schedule.statusReservation);
 
-            return (
-              <div key={schedule.reservationId} className={cx("schedule-card")}>
-                <div className={cx("card-content")}>
-                  <div className={cx("schedule-layout")}>
-                    <div className={cx("left-info")}>
-                      <h3>{schedule.title}</h3>
-                    </div>
+                return (
+                  <tr key={schedule.reservationId}>
+                    <td>{schedule.title}</td>
+                    <td>{meetingStart.date}</td>
+                    <td>
+                      {meetingStart.time} - {meetingEnd.time}
+                    </td>
 
-                    <div className={cx("left-info")}>
-                      <p>
-                        <strong>Ngày:</strong> {meetingStart.date} từ {""}
-                        {meetingStart.time} - {meetingEnd.time}
-                      </p>
-                    </div>
-
-                    <div className={cx("center-info")}>
-                      <p>
-                        <strong>Trạng thái:</strong>{" "}
-                        {schedule.statusReservation === "CHECKED_IN"
-                          ? "Đã nhận phòng"
-                          : schedule.statusReservation === "COMPLETED"
-                          ? "Đã hoàn thành"
-                          : schedule.statusReservation === "WAITING"
-                          ? "Chờ nhận phòng"
-                          : schedule.statusReservation === "WAITING_PAYMENT"
-                          ? "Chờ thanh toán"
-                          : schedule.statusReservation === "CANCELLED"
-                          ? "Đã hủy"
-                          : schedule.statusReservation === "PENDING"
-                          ? "Đang chờ phê duyệt"
-                          : schedule.statusReservation === "NO_APPROVED"
-                          ? "Không được phê duyệt"
-                          : "Đang chờ hủy"}
-                      </p>
-                      {/* <p>
-                        <strong>Thời gian phê duyệt:</strong>{" "}
-                        {schedule.timeApprove === null
-                          ? "Chưa phê duyệt"
-                          : new Date(schedule.timeApprove).toLocaleString()}
-                      </p> */}
-                    </div>
-
-                    <div className={cx("center-info")}>
-                      <p>
-                        <strong>Thời gian gửi:</strong>{" "}
-                        {new Date(schedule.time).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className={cx("right-info")}>
+                    <td>{statusText}</td>
+                    <td>{new Date(schedule.time).toLocaleString()}</td>
+                    <td>
                       <div
                         className={cx("actions")}
                         onClick={() =>
                           handleShowDetails(schedule.reservationId)
                         }
                       >
-                        <label>Chi tiết</label>
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
       <DetailModal
@@ -193,5 +165,24 @@ function BookingList() {
     </div>
   );
 }
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case "CHECKED_IN":
+      return "Đã nhận phòng";
+    case "COMPLETED":
+      return "Đã hoàn thành";
+    case "WAITING":
+      return "Chờ nhận phòng";
+    case "CANCELLED":
+      return "Đã hủy";
+    case "PENDING":
+      return "Đang chờ phê duyệt";
+    case "NO_APPROVED":
+      return "Không được phê duyệt";
+    default:
+      return "Đang chờ hủy";
+  }
+};
 
 export default BookingList;

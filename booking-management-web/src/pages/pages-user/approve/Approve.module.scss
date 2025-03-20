@@ -51,75 +51,60 @@
 
 // ds lịch
 .schedule-list {
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  max-height: 570px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  // height: 570px;
 }
 
-.schedule-card {
-  background: var(--color-white);
-  padding: 7px 10px;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s ease-in-out;
-  position: relative;
-}
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
 
-.card-content {
-  h3 {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--text-primary);
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
   }
-  p {
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-}
 
-.schedule-layout {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 500;
-}
-
-.checkbox-container,
-.left-info,
-.center-info,
-.right-info {
-  flex: 1;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-
-  input[type="checkbox"] {
-    cursor: pointer;
-    width: fit-content;
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
   }
 }
 
-.center-info {
-  text-align: left;
+.schedule-table th {
+  background-color: #a7a2a2;
+  font-weight: bold;
+  text-align: center;
 }
 
-.left-info {
-  display: flex;
-  gap: 5px;
-  text-align: left;
+.schedule-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-.right-info {
-  text-align: right;
+.schedule-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+.schedule-table td:first-child {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.checkbox input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
 }
 
 // button
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   gap: 10px;
   cursor: pointer;
@@ -154,7 +139,7 @@
   }
 }
 
-.details-btn {
+.search-btn {
   background-color: var(--btn-main);
   &:hover {
     background-color: #0056b3;

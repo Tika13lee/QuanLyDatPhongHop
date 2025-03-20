@@ -91,56 +91,42 @@ function RejectedList() {
         </p>
       ) : (
         <div className={cx("schedule-list")}>
-          {rejectedList?.map((schedule) => {
-            const meetingStart = formatDateTime(schedule.timeStart);
-            const meetingEnd = formatDateTime(schedule.timeEnd);
-            const bookingTime = formatDateTime(schedule.time);
+          <table className={cx("schedule-table")}>
+            <thead>
+              <tr>
+                <th>Tiêu đề</th>
+                <th>Ngày</th>
+                <th>Người đặt</th>
+                <th>Thời gian gửi</th>
+                <th>Trạng thái</th>
+                <th>Thời gian phê duyệt</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rejectedList?.map((schedule) => {
+                const meetingStart = formatDateTime(schedule.timeStart);
+                const meetingEnd = formatDateTime(schedule.timeEnd);
+                const bookingTime = formatDateTime(schedule.time);
+                const statusText = getStatusText(schedule.statusReservation);
+                const approvedTime = schedule.timeApprove
+                  ? new Date(schedule.timeApprove).toLocaleString()
+                  : "Chưa phê duyệt";
 
-            return (
-              <div key={schedule.reservationId} className={cx("schedule-card")}>
-                <div className={cx("card-content")}>
-                  <div className={cx("schedule-layout")}>
-                    <div className={cx("left-info")}>
-                      <h3>{schedule.title}</h3>
-                      <p>
-                        <strong>Ngày:</strong> {meetingStart.date} từ{" "}
-                        {meetingStart.time} - {meetingEnd.time}
-                      </p>
-                    </div>
-
-                    <div className={cx("left-info")}>
-                      <p>
-                        <strong>Người đặt:</strong> {schedule.nameBooker}
-                      </p>
-                      <p>
-                        <strong>Thời gian gửi:</strong> {bookingTime.date} -{" "}
-                        {""}
-                        {bookingTime.time}
-                      </p>
-                    </div>
-
-                    <div className={cx("left-info")}>
-                      <p>
-                        <strong>Trạng thái:</strong>{" "}
-                        {schedule.statusReservation === "CHECKED_IN"
-                          ? "Đã nhận phòng"
-                          : schedule.statusReservation === "COMPLETED"
-                          ? "Đã hoàn thành"
-                          : schedule.statusReservation === "WAITING"
-                          ? "Chờ nhận phòng"
-                          : schedule.statusReservation === "WAITING_PAYMENT"
-                          ? "Chờ thanh toán"
-                          : schedule.statusReservation === "CANCELLED"
-                          ? "Đã hủy"
-                          : "Đang chờ hủy"}
-                      </p>
-                      <p>
-                        <strong>Thời gian phê duyệt:</strong>{" "}
-                        {new Date(schedule.timeApprove).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className={cx("right-info")}>
+                return (
+                  <tr key={schedule.reservationId}>
+                    <td>{schedule.title}</td>
+                    <td>
+                      {meetingStart.date} từ {meetingStart.time} -{" "}
+                      {meetingEnd.time}
+                    </td>
+                    <td>{schedule.nameBooker}</td>
+                    <td>
+                      {bookingTime.date} - {bookingTime.time}
+                    </td>
+                    <td>{statusText}</td>
+                    <td>{approvedTime}</td>
+                    <td>
                       <div
                         className={cx("actions")}
                         onClick={() =>
@@ -150,12 +136,12 @@ function RejectedList() {
                         <label>Chi tiết</label>
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
       <DetailModal
@@ -166,5 +152,24 @@ function RejectedList() {
     </div>
   );
 }
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case "CHECKED_IN":
+      return "Đã nhận phòng";
+    case "COMPLETED":
+      return "Đã hoàn thành";
+    case "WAITING":
+      return "Chờ nhận phòng";
+    case "CANCELLED":
+      return "Đã hủy";
+    case "PENDING":
+      return "Đang chờ phê duyệt";
+    case "NO_APPROVED":
+      return "Không được phê duyệt";
+    default:
+      return "Đang chờ hủy";
+  }
+};
 
 export default RejectedList;

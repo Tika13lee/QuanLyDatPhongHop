@@ -1,5 +1,5 @@
 import { Fragment } from "react/jsx-runtime";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import classNames from "classnames/bind";
 import styles from "./ModalBooking.module.scss";
 import { times } from "../../utilities";
@@ -7,8 +7,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useFetch from "../../hooks/useFetch";
 import { EmployeeProps, ServiceProps } from "../../data/data";
-import usePost from "../../hooks/usePost";
-import PopupNotification from "../popup/PopupNotification";
+import IconWrapper from "../icons/IconWrapper";
+import { IoSettingsOutline } from "../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +29,8 @@ type ModalBookingProps = {
   dataRoomByBranch?: RoomInfo[];
   setIsPopupOpen?: (message: string, type: typeMessage, close: boolean) => void;
 };
+
+const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const ModalBooking: React.FC<ModalBookingProps> = ({
   isModalOpen,
@@ -53,8 +55,22 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeProps[]>([]);
+  const [modalSetting, setModalSetting] = useState<boolean>(false);
+  const [dates, setDates] = useState<Date[]>([]);
+  const [isClickedSelect, setIsClickedSelect] = useState(false);
+  const [checkRemoveDays, setCheckRemoveDays] = useState<string[]>();
+  const [dayOriginal, setDayOriginal] = useState<Date[]>([]);
 
-  
+  // lấy ngày
+  const getDatesBetween = (startDate: Date, endDate: Date) => {
+    const dates = [];
+    let currentDate = startDate;
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  };
 
   const [formData, setFormData] = useState({
     time: new Date().toISOString(),
@@ -76,13 +92,68 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     description: "",
     title: "",
     frequency: valueFrequency,
-    timeFinishFrequency: selectedDateEndOfFrequency?.toISOString() ?? "",
+    timeFinishFrequency: selectedDateEndOfFrequency
+      ? getDatesBetween(
+          dateSelected ? new Date(dateSelected) : new Date(),
+          selectedDateEndOfFrequency
+        ).map((date) => date.toISOString())
+      : [],
     bookerId: user?.employeeId ?? "",
     roomId: roomInfo?.roomId ?? "",
     employeeIds: [] as string[],
     serviceIds: [] as string[],
     filePaths: [] as string[],
   });
+
+  const removeDate = (dates: Date[], weekOfDates: string[]) => {
+  
+    const dataExsist = dates.filter((date) => {
+      console.log(date.toString().split(" ")[0]);
+      return !weekOfDates.includes(date.toString().split(" ")[0]);
+    });
+    console.log(dataExsist);
+    return dataExsist;
+  };
+
+  // lọc thứ  không được chọn trong danh sách ngày
+  useEffect(() => {
+    console.log(removeDate(dates, checkRemoveDays ?? []));
+    setDates(removeDate(dayOriginal, checkRemoveDays ?? []));
+    setFormData((prev) => ({
+      ...prev,
+      timeFinishFrequency: removeDate(
+        prev.timeFinishFrequency.map((date) => new Date(date)),
+        checkRemoveDays ?? []
+      ).map((date) => date.toISOString()),
+    }));
+  }, [checkRemoveDays]);
+
+  // ngày kết thúc tần suất thay đổi
+  useEffect(() => {
+    setDates(
+      selectedDateEndOfFrequency
+        ? getDatesBetween(
+            dateSelected ? new Date(dateSelected) : new Date(),
+            selectedDateEndOfFrequency
+          )
+        : []
+    );
+    setDayOriginal(selectedDateEndOfFrequency
+    ? getDatesBetween(
+        dateSelected ? new Date(dateSelected) : new Date(),
+        selectedDateEndOfFrequency
+      )
+    : [])
+    setFormData((prev) => ({
+      ...prev,
+      timeFinishFrequency: selectedDateEndOfFrequency
+        ? getDatesBetween(
+            dateSelected ? new Date(dateSelected) : new Date(),
+            selectedDateEndOfFrequency
+          ).map((date) => date.toISOString())
+        : [],
+    }));
+  }, [selectedDateEndOfFrequency]);
 
   // lấy nhân viên
   const {
@@ -93,6 +164,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${phone}`
   );
 
+  // thêm thành viên
   const handleAddEmployee = (emp: EmployeeProps) => {
     setSelectedEmployee((prev) => [...prev, emp]);
     setFormData((prev) => ({
@@ -103,6 +175,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     setOpenModalParticipant(false);
   };
 
+  // loại bỏ thành viên
   const handleRemoveEmployee = (emp: EmployeeProps) => {
     setSelectedEmployee((prev) =>
       prev.filter((employee) => employee.employeeId !== emp.employeeId)
@@ -114,7 +187,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       ),
     }));
   };
-
 
   // lấy service name render select option
   useEffect(() => {
@@ -207,36 +279,29 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     "http://localhost:8080/api/v1/service/getAllServices"
   );
 
-  // đặt lịch
-  const {
-    data,
-    loading: roomLoading,
-    error: roomError,
-    postData,
-  } = usePost<FormData>(
-    "http://localhost:8080/api/v1/reservation/createReservation"
-  );
-
   // Xử lý khi nhấn nút gửi phê duyệt
   const handleSubmit = async () => {
     console.log(formData);
 
-    const response = await postData(formData);
+    // const response = await postData(formData);
 
-    if (response) {
-      console.log(response);
-      // setIsPopupOpen((prev) => !prev);
-      setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
-      setIsModalClose();
-    } else {
-      setIsPopupOpen && setIsPopupOpen("Đặt lịch không thành công!", "error", true);
-    }
+    // if (response) {
+    //   console.log(response);
+    //   setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
+    //   setIsModalClose();
+    // } else {
+    //   setIsPopupOpen &&
+    //     setIsPopupOpen("Đặt lịch không thành công!", "error", true);
+    // }
   };
 
-  // Hàm đóng popup thông báo
-  // const handleClosePopup = () => {
-  //   setIsPopupOpen(false);
-  // };
+  const handleOpenModalSetting = () => {
+    setModalSetting(true);
+  };
+
+  const handleCloseModalSetting = () => {
+    setModalSetting(false);
+  };
 
   return (
     <Fragment>
@@ -399,8 +464,73 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                       minDate={new Date()}
                       dateFormat="dd/MM/yyyy"
                       disabled={valueFrequency === "ONE_TIME"}
+                      maxDate={
+                        new Date(new Date().setMonth(new Date().getMonth() + 3))
+                      }
                     />
                   </div>
+
+                  <div
+                    className={cx("setting-btn")}
+                    onClick={handleOpenModalSetting}
+                  >
+                    <IconWrapper icon={IoSettingsOutline} />
+                  </div>
+
+                  {/* modal setting */}
+                  {modalSetting && (
+                    <div className={cx("modal-setting")}>
+                      <div className={cx("modal-content")}>
+                        <div className={cx("modal-header")}>
+                          <h4>Cài đặt </h4>
+                          <button onClick={handleCloseModalSetting}>✖</button>
+                        </div>
+                        <div className={cx("modal-body")}>
+                          <div className={cx("setting-left")}>
+                            <label>Loại bỏ thứ</label>
+                            {daysOfWeek.map((day) => (
+                              <div className={cx("checkbox-group")}>
+                                <input
+                                  style={{ width: "15px", height: "15px" }}
+                                  type="checkbox"
+                                  onChange={(e) => {
+                                    if(e.target.checked) {
+                                    setCheckRemoveDays((prev) =>
+                                      prev ? [...prev, day] : [day]
+                                    );
+                                  }else {
+                                    setCheckRemoveDays((prev) => prev?.filter((d) => d !== day));
+                                  }
+                                  }}
+                                />
+                                <span>{day}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className={cx("setting-left")}>
+                            <label>Loại bỏ ngày</label>
+                            <table>
+                              <tr>
+                                <th>Chọn</th>
+                                <th>Ngày</th>
+                              </tr>
+                              {dates.map((date) => (
+                                <tr>
+                                  <td>
+                                    <input
+                                      style={{ width: "15px", height: "15px" }}
+                                      type="checkbox"
+                                    />
+                                  </td>
+                                  <td>{date.toISOString().split("T")[0]}</td>
+                                </tr>
+                              ))}
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -446,9 +576,18 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                 </div>
 
                 <div className={cx("form-group")}>
-                  <select>
+                  <select
+                    onClick={() => setIsClickedSelect(true)}
+                    onBlur={() => setIsClickedSelect(false)}
+                  >
+                    {!isClickedSelect && (
+                      <option value="" disabled selected>
+                        {serviceNames.join(", ")}
+                      </option>
+                    )}
+
                     {serviceNames.map((serviceName, index) => (
-                      <option key={index} value={serviceName}>
+                      <option key={index} value={serviceName} disabled>
                         {serviceName}
                       </option>
                     ))}
@@ -519,7 +658,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       ) : (
         <></>
       )}
-      
     </Fragment>
   );
 };
