@@ -46,4 +46,12 @@ public class RequestFormController {
             return ResponseEntity.ok(e.toString());
         }
     }
+    @PostMapping("/rejectRequestForm")
+    public ResponseEntity<?> rejectRequestForm(@RequestParam Long requestFormId, @RequestParam String reasonReject) {
+        try {
+            return ResponseEntity.ok(requestFormService.rejectRequestForm(requestFormId, reasonReject));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
 }

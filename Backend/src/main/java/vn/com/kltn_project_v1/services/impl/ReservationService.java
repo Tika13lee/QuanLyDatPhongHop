@@ -12,6 +12,9 @@ import vn.com.kltn_project_v1.repositories.RoomRepository;
 import vn.com.kltn_project_v1.repositories.ServiceRepository;
 import vn.com.kltn_project_v1.services.IReservation;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,12 +78,16 @@ public class ReservationService implements IReservation {
         List<Reservation> reservations = new ArrayList<>();
         if (!reservationDTO.getFrequency().equals(Frequency.ONE_TIME)) {
             for (Date date : reservationDTO.getTimeFinishFrequency()) {
-                String hourStart = reservationDTO.getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString().substring(10);
-                String dayStart = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString().substring(0,10);
-                System.out.println("hourStart: "+hourStart+" dayStart: "+dayStart);
+                LocalDate day = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalTime hourStart = reservationDTO.getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+                LocalTime hourEnd = reservationDTO.getTimeEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+                LocalDateTime timeStart = LocalDateTime.of(day, hourStart);
+                LocalDateTime timeEnd = LocalDateTime.of(day, hourEnd);
+                Date dateEnd = Date.from(timeEnd.atZone(ZoneId.systemDefault()).toInstant());
+                Date dateStart = Date.from(timeStart.atZone(ZoneId.systemDefault()).toInstant());
                 Reservation reservation = convertReservationToCreate(reservationDTO);
-
-                reservation.setTime(date);
+                reservation.setTimeStart(dateStart);
+                reservation.setTimeEnd(dateEnd);
                 reservations.add(reservation);
                 reservationRepository.save(reservation);
             }
@@ -115,7 +122,6 @@ public class ReservationService implements IReservation {
 
 
     private Reservation convertReservationToCreate(ReservationDTO reservationDTO) {
-
         Reservation reservation = new Reservation();
         reservation.setDescription(reservationDTO.getDescription());
         reservation.setFilePaths(reservationDTO.getFilePaths());

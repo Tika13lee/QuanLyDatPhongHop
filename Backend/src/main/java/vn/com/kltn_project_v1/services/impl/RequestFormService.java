@@ -61,6 +61,12 @@ public class RequestFormService implements IRequestForm {
 
     @Override
     public RequestForm rejectRequestForm(Long requestFormId, String reasonReject) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
+        if (requestForm != null) {
+            requestForm.setStatusRequestForm(StatusRequestForm.REJECTED);
+            requestForm.setReasonReject(reasonReject);
+            return requestFormRepository.save(requestForm);
+        }
         return null;
     }
 }
