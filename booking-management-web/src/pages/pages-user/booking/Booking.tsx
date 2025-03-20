@@ -30,7 +30,7 @@ type typeInfoPopup = {
   close: boolean;
 };
 
-function General() {
+function Booking() {
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -95,19 +95,7 @@ function General() {
     return date.toISOString();
   };
 
-  // lấy danh sách đặt phòng theo ngày và chi nhánh
-  // const {
-  //   data: rooms,
-  //   loading,
-  //   error,
-  // } = useFetch<RoomViewProps[]>(
-  //   `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
-  //     selectedDate
-  //   )}&dayEnd=${getEndOfDay(selectedDate)}`
-  // );
-
-  console.log(rooms);
-
+  // lấy danh sách phòng
   const fetchRooms = async () => {
     const res = await fetch(
       `http://localhost:8080/api/v1/room/getRoomOverView?branch=${selectedBranch}&dayStart=${getStartOfDay(
@@ -330,8 +318,6 @@ function General() {
                             <p className={cx("status")}>
                               {res.statusReservation === "PENDING"
                                 ? "Chờ phê duyệt"
-                                : res.statusReservation === "WAITING_PAYMENT"
-                                ? "Chờ thanh toán"
                                 : res.statusReservation === "WAITING"
                                 ? "Chờ nhận phòng"
                                 : res.statusReservation === "CHECKED_IN"
@@ -392,4 +378,4 @@ function General() {
   );
 }
 
-export default General;
+export default Booking;

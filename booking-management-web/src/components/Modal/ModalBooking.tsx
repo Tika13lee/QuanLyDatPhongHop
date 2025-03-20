@@ -1,14 +1,16 @@
 import { Fragment } from "react/jsx-runtime";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./ModalBooking.module.scss";
-import { times } from "../../utilities";
+import { formatDateDate, formatDateString, times } from "../../utilities";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useFetch from "../../hooks/useFetch";
 import { EmployeeProps, ServiceProps } from "../../data/data";
 import IconWrapper from "../icons/IconWrapper";
 import { IoSettingsOutline } from "../../components/icons/icons";
+import { set } from "react-datepicker/dist/date_utils";
+import { original } from "@reduxjs/toolkit";
 
 const cx = classNames.bind(styles);
 
@@ -60,6 +62,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [isClickedSelect, setIsClickedSelect] = useState(false);
   const [checkRemoveDays, setCheckRemoveDays] = useState<string[]>();
   const [dayOriginal, setDayOriginal] = useState<Date[]>([]);
+  const [checkRemoveDates, setCheckRemoveDates] = useState<number[]>([]);
 
   // lấy ngày
   const getDatesBetween = (startDate: Date, endDate: Date) => {
@@ -72,6 +75,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     return dates;
   };
 
+  // form data
   const [formData, setFormData] = useState({
     time: new Date().toISOString(),
     timeStart: timeStart
@@ -105,27 +109,77 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     filePaths: [] as string[],
   });
 
+  // loại bỏ ngày
+  const handleRemoveDate = () => {
+    let data = [] as Date[];
+    setModalSetting(false);
+
+    if (checkRemoveDates.length > 0) {
+      setDates((prev) => {
+        data = prev.filter((date, index) => !checkRemoveDates.includes(index));
+        return data;
+      });
+      setFormData((prev) => ({
+        ...prev,
+        timeFinishFrequency: data.map((date) => date.toISOString()),
+      }));
+    } else if (checkRemoveDates.length === 0) {
+      setDates(dayOriginal);
+      setFormData((prev) => ({
+        ...prev,
+        timeFinishFrequency: dayOriginal.map((date) => date.toISOString()),
+      }));
+    }
+
+    if (checkRemoveDays != undefined && checkRemoveDays.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        timeFinishFrequency: removeDate(
+          prev.timeFinishFrequency.map((date) => new Date(date)),
+          checkRemoveDays ?? []
+        ).map((date) => date.toISOString()),
+      }));
+    } else if (checkRemoveDays != undefined && checkRemoveDays.length === 0) {
+      setDates(dayOriginal);
+      setFormData((prev) => ({
+        ...prev,
+        timeFinishFrequency: removeDate(
+          prev.timeFinishFrequency.map((date) => new Date(date)),
+          checkRemoveDays ?? []
+        ).map((date) => date.toISOString()),
+      }));
+    }
+
+    // setFormData((prev) => ({
+    //   ...prev,
+    //   timeFinishFrequency: removeDate(
+    //     prev.timeFinishFrequency.map((date) => new Date(date)),
+    //     checkRemoveDays ?? []
+    //   ).map((date) => date.toISOString()),
+    // }));
+  };
+
+  // lấy ngày trong tuần không được chọn
   const removeDate = (dates: Date[], weekOfDates: string[]) => {
-  
-    const dataExsist = dates.filter((date) => {
+    const dataExist = dates.filter((date) => {
       console.log(date.toString().split(" ")[0]);
       return !weekOfDates.includes(date.toString().split(" ")[0]);
     });
-    console.log(dataExsist);
-    return dataExsist;
+    console.log(dataExist);
+    return dataExist;
   };
 
-  // lọc thứ  không được chọn trong danh sách ngày
+  // lọc thứ không được chọn trong danh sách ngày
   useEffect(() => {
     console.log(removeDate(dates, checkRemoveDays ?? []));
     setDates(removeDate(dayOriginal, checkRemoveDays ?? []));
-    setFormData((prev) => ({
-      ...prev,
-      timeFinishFrequency: removeDate(
-        prev.timeFinishFrequency.map((date) => new Date(date)),
-        checkRemoveDays ?? []
-      ).map((date) => date.toISOString()),
-    }));
+    // setFormData((prev) => ({
+    //   ...prev,
+    //   timeFinishFrequency: removeDate(
+    //     prev.timeFinishFrequency.map((date) => new Date(date)),
+    //     checkRemoveDays ?? []
+    //   ).map((date) => date.toISOString()),
+    // }));
   }, [checkRemoveDays]);
 
   // ngày kết thúc tần suất thay đổi
@@ -138,12 +192,14 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
           )
         : []
     );
-    setDayOriginal(selectedDateEndOfFrequency
-    ? getDatesBetween(
-        dateSelected ? new Date(dateSelected) : new Date(),
-        selectedDateEndOfFrequency
-      )
-    : [])
+    setDayOriginal(
+      selectedDateEndOfFrequency
+        ? getDatesBetween(
+            dateSelected ? new Date(dateSelected) : new Date(),
+            selectedDateEndOfFrequency
+          )
+        : []
+    );
     setFormData((prev) => ({
       ...prev,
       timeFinishFrequency: selectedDateEndOfFrequency
@@ -353,9 +409,11 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                 <div className={cx("form-group")}>
                   <label>Ngày</label>
                   <input
-                    type="date"
+                    type="text"
                     name="time"
-                    value={dateSelected}
+                    value={formatDateString(
+                      dateSelected ?? new Date().toString()
+                    )}
                     disabled
                   />
                 </div>
@@ -471,8 +529,14 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                   </div>
 
                   <div
-                    className={cx("setting-btn")}
-                    onClick={handleOpenModalSetting}
+                    className={cx("setting-btn", {
+                      disabled: valueFrequency === "ONE_TIME",
+                    })}
+                    onClick={
+                      valueFrequency !== "ONE_TIME"
+                        ? handleOpenModalSetting
+                        : undefined
+                    }
                   >
                     <IconWrapper icon={IoSettingsOutline} />
                   </div>
@@ -488,45 +552,70 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                         <div className={cx("modal-body")}>
                           <div className={cx("setting-left")}>
                             <label>Loại bỏ thứ</label>
-                            {daysOfWeek.map((day) => (
-                              <div className={cx("checkbox-group")}>
+                            {daysOfWeek.map((day, index) => (
+                              <div key={index} className={cx("checkbox-group")}>
                                 <input
                                   style={{ width: "15px", height: "15px" }}
                                   type="checkbox"
                                   onChange={(e) => {
-                                    if(e.target.checked) {
-                                    setCheckRemoveDays((prev) =>
-                                      prev ? [...prev, day] : [day]
-                                    );
-                                  }else {
-                                    setCheckRemoveDays((prev) => prev?.filter((d) => d !== day));
-                                  }
+                                    if (e.target.checked) {
+                                      setCheckRemoveDays((prev) =>
+                                        prev ? [...prev, day] : [day]
+                                      );
+                                    } else {
+                                      setCheckRemoveDays((prev) =>
+                                        prev?.filter((d) => d !== day)
+                                      );
+                                    }
                                   }}
                                 />
                                 <span>{day}</span>
                               </div>
                             ))}
                           </div>
-                          <div className={cx("setting-left")}>
+                          <div className={cx("setting-right")}>
                             <label>Loại bỏ ngày</label>
-                            <table>
-                              <tr>
-                                <th>Chọn</th>
-                                <th>Ngày</th>
-                              </tr>
-                              {dates.map((date) => (
-                                <tr>
-                                  <td>
-                                    <input
-                                      style={{ width: "15px", height: "15px" }}
-                                      type="checkbox"
-                                    />
-                                  </td>
-                                  <td>{date.toISOString().split("T")[0]}</td>
-                                </tr>
-                              ))}
-                            </table>
+                            <div className={cx("table-checkbox-group")}>
+                              <table>
+                                <thead>
+                                  <tr>
+                                    <th>Chọn</th>
+                                    <th>Ngày</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {dates.map((date, index) => (
+                                    <tr key={index}>
+                                      <td>
+                                        <input
+                                          style={{
+                                            width: "15px",
+                                            height: "15px",
+                                          }}
+                                          type="checkbox"
+                                          onChange={(e) => {
+                                            if (e.target.checked) {
+                                              setCheckRemoveDates((prev) =>
+                                                prev ? [...prev, index] : []
+                                              );
+                                            } else {
+                                              setCheckRemoveDates((prev) =>
+                                                prev?.filter((d) => d !== index)
+                                              );
+                                            }
+                                          }}
+                                        />
+                                      </td>
+                                      <td>{formatDateDate(date)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
+                        </div>
+                        <div className={cx("modal-footer")}>
+                          <button onClick={handleRemoveDate}>Lưu</button>
                         </div>
                       </div>
                     </div>

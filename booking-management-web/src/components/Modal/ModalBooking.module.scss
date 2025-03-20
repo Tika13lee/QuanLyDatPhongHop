@@ -72,6 +72,10 @@
   align-items: center;
 }
 
+:global(.react-datepicker) {
+  font-size: 12px !important;
+}
+
 .setting-btn {
   display: flex;
   align-items: center;
@@ -99,8 +103,55 @@
   }
 }
 
-:global(.react-datepicker) {
-  font-size: 12px !important;
+.setting-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+// table ngày
+.table-checkbox-group {
+  max-height: 290px;
+  overflow-y: auto;
+  width: 100%;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 0 7px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #a7a2a2;
+    font-weight: bold;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #fff;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+}
+
+.table-checkbox-group input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
 }
 
 // thêm thành viên
@@ -172,7 +223,7 @@
 
 .modal-content {
   background: white;
-  height: 400px;
+  height: 450px;
   width: 400px;
   max-width: 90%;
   border-radius: 8px;
@@ -212,13 +263,17 @@
   justify-content: space-between;
 }
 
-.setting-left {
-  width: 45%;
+.setting-left,
+.setting-right {
   display: flex;
   flex-direction: column;
   align-items: start;
   margin-bottom: 10px;
+  justify-content: space-around;
+}
 
+.setting-right {
+  width: 60%;
 }
 
 .checkbox-group {
@@ -229,5 +284,28 @@
 
   input {
     cursor: pointer;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  button {
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--color-white);
+    background: var(--btn-add);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: var(--btn-add-hover);
+    }
   }
 }

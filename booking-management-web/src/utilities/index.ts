@@ -27,4 +27,26 @@ const times = Array.from({ length: 23 }, (_, i) => {
   return `${String(hour).padStart(2, "0")}:${minute}`;
 });
 
-export { uploadImageToCloudinary, times };
+// định dạng ngày tháng năm, truyền vào là date
+const formatDateDate = (date: Date) => {
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+    .format(date)
+    .replace(/\//g, "-");
+};
+
+// định dang ngày tháng năm, truyền vào là string
+const formatDateString = (date: string) => {
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+    .format(new Date(date))
+    .replace(/\//g, " - ");
+};
+
+export { uploadImageToCloudinary, times, formatDateDate, formatDateString };
