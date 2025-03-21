@@ -14,7 +14,6 @@ import {
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
 import {
-  Approve,
   ApprovedList,
   BookingList,
   BookingSearch,
@@ -22,6 +21,7 @@ import {
   RejectedList,
   Schedule,
   ViewSchedule,
+  ListApprovalByApprover,
 } from "./pages/pages-user";
 import { Home, Login } from "./pages/general";
 import { Provider } from "react-redux";
@@ -38,7 +38,7 @@ function App() {
           <Route path="/admin" element={<MainLayoutAdmin />}>
             <Route index element={<Dashboard />} />
             <Route path="overview" element={<Overview />} />
-            <Route path="waiting-list" element={<ApprovalList />} />
+            <Route path="approval-list" element={<ApprovalList />} />
             <Route path="room" element={<Room />} />
             <Route path="room/detail/:id" element={<RoomDetail />} />
             <Route path="location" element={<Location />} />
@@ -53,7 +53,7 @@ function App() {
             <Route path="booking" element={<Booking />} />
             <Route path="booking-list" element={<BookingList />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
-            <Route path="approve" element={<Approve />} />
+            <Route path="approve" element={<ListApprovalByApprover />} />
             <Route path="approved" element={<ApprovedList />} />
             <Route path="rejected" element={<RejectedList />} />
             <Route path="schedule" element={<Schedule />} />

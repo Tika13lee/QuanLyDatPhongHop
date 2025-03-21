@@ -102,10 +102,13 @@
   tr {
     min-height: 300px;
   }
-}
 
-.time-label {
-  width: 10px;
+  th:first-child,
+  td:first-child {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+  }
 }
 
 // modal

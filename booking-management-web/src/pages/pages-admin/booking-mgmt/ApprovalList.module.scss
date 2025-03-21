@@ -1,119 +1,149 @@
-.approval-list-container {
-  // background-color: aliceblue;
+.approve-list {
+  margin: 0 auto;
+  width: 100%;
   flex: 1;
-  display: flex;
-  gap: 20px;
 }
 
-.approval-list {
-  width: 400px;
+.no-schedule-message {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-secondary);
+  padding: 15px;
+}
+
+// search
+.approve-search {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  padding: 10px 20px;
+  background: #353231;
+
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.device {
+  height: 50px;
+  width: 1px;
+  background: var(--border-color);
+}
+
+.search-input {
+  width: 300px;
+  padding: 8px 12px;
   border: 1px solid var(--border-color);
-
-  &__header {
-    padding: 10px 0 0;
-    color: var(--text-primary);
-    font-weight: 500;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-
-    p {
-      margin: 0;
-      font-size: 20px;
-    }
-  }
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease-in-out;
 }
 
-.header-actions {
-  margin-top: 20px;
+.search-row {
   display: flex;
-  // gap: 10px;
+  gap: 15px;
+  align-items: center;
 
-  div {
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-
-    &:hover {
-      background: var(--bg-hover);
-    }
-  }
-
-  .active {
-    background: var(--bg-active);
+  label {
     color: var(--color-white);
   }
 }
 
-.approval-detail {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: 20px auto;
-  border-left: 5px solid #007bff;
+// ds lịch
+.schedule-list {
+  max-height: 570px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  // height: 570px;
 }
 
-.approval-detail h2 {
-  font-size: 20px;
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+}
+
+.schedule-table th {
+  background-color: #a7a2a2;
   font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
+  text-align: center;
 }
 
-.approval-detail p {
-  font-size: 16px;
-  margin: 8px 0;
-  color: #555;
+.schedule-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-.approval-detail strong {
-  color: #333;
+.schedule-table tbody tr:hover {
+  background-color: #e6f7ff;
 }
 
-.approval-detail ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 5px;
+.schedule-table td:first-child {
+  text-align: center;
+  vertical-align: middle;
 }
 
-.approval-detail li {
-  background: #f8f9fa;
-  padding: 8px;
-  margin: 5px 0;
-  border-radius: 5px;
+.checkbox input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+// button
+.actions {
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #333;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  label {
+    margin: 0;
+    color: var(--text-secondary);
+  }
 }
 
-.approval-detail .room-status {
-  font-weight: bold;
-  padding: 5px 10px;
+.btn-action {
+  color: white;
+  padding: 8px 12px;
+  border: none;
   border-radius: 5px;
-  display: inline-block;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
 }
 
-.approval-detail .room-status.available {
-  background-color: #28a745;
-  color: #fff;
+.approve-btn {
+  background-color: var(--btn-add);
+
+  &:hover {
+    background-color: var(--btn-add-hover);
+  }
 }
 
-.approval-detail .room-status.occupied {
+.reject-btn {
   background-color: #dc3545;
-  color: #fff;
+  &:hover {
+    background-color: #c82333;
+  }
 }
 
-.approval-detail .room-status.maintenance {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.approval-detail .room-location {
-  font-style: italic;
-  color: #777;
+.search-btn {
+  background-color: var(--btn-main);
+  &:hover {
+    background-color: #0056b3;
+  }
 }

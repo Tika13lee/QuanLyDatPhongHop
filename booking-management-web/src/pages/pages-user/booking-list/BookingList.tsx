@@ -7,7 +7,7 @@ import {
   ReservationProps,
 } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
-import DetailModal from "../approve/DetailModal";
+import DetailModal from "../../../components/Modal/DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 
@@ -20,9 +20,6 @@ function BookingList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
-  const [selectedReservation, setSelectedReservation] =
-    useState<ReservationDetailProps | null>(null);
-
   const [statusRequestForm, setStatusRequestForm] = useState<string>("");
 
   // Hàm format ngày giờ
@@ -69,6 +66,8 @@ function BookingList() {
     setIsModalOpen(false);
     selectedRequestForm && setSelectedRequestForm(null);
   };
+
+  console.log("selectedRequestForm", selectedRequestForm);
 
   return (
     <div className={cx("booking-list")}>

@@ -7,7 +7,7 @@ import {
 } from "../../../data/data";
 import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import DetailModal from "./DetailModal";
+import DetailModal from "../../../components/Modal/DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 
@@ -18,11 +18,9 @@ function RejectedList() {
   const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState<
-    number | null
-  >(null);
-  const [selectedReservation, setSelectedReservation] =
-    useState<ReservationDetailProps | null>(null);
+
+  const [selectedRequestForm, setSelectedRequestForm] =
+    useState<RequestFormProps | null>(null);
 
   // Hàm format ngày giờ
   const formatDateTime = (dateString: string) => {
@@ -36,13 +34,6 @@ function RejectedList() {
     };
   };
 
-  // Lấy chi tiết lịch đặt phòng
-  const { data, loading, error } = useFetch<ReservationDetailProps>(
-    selectedReservationId
-      ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
-      : ""
-  );
-
   // Lấy danh sách lịch đặt phòng đã từ chối
   const {
     data: rejectedList,
@@ -52,24 +43,16 @@ function RejectedList() {
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=REJECTED`
   );
 
-  // Cập nhật state khi API trả về dữ liệu
-  useEffect(() => {
-    if (data) {
-      setSelectedReservation(data);
-      setIsModalOpen(true);
-    }
-  }, [data]);
-
   // Mở modal
-  const handleShowDetails = (reservationId: number) => {
-    setSelectedReservationId(reservationId);
+  const handleShowDetails = (requestForm: RequestFormProps) => {
+    setSelectedRequestForm(requestForm);
+    setIsModalOpen(true);
   };
 
   // Đóng modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedReservationId(null);
-    setSelectedReservation(null);
+    setSelectedRequestForm(null);
   };
 
   return (
@@ -114,9 +97,7 @@ function RejectedList() {
                 const meetingEnd = formatDateTime(
                   schedule.requestReservation.timeEnd
                 );
-                const bookingTime = formatDateTime(
-                  schedule.timeRequest
-                );
+                const bookingTime = formatDateTime(schedule.timeRequest);
 
                 return (
                   <tr key={schedule.requestFormId}>
@@ -132,9 +113,7 @@ function RejectedList() {
                     <td>
                       <div
                         className={cx("actions")}
-                        onClick={() =>
-                          handleShowDetails(schedule.requestFormId)
-                        }
+                        onClick={() => handleShowDetails(schedule)}
                       >
                         <label>Chi tiết</label>
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
@@ -147,11 +126,11 @@ function RejectedList() {
           </table>
         </div>
       )}
-      {/* <DetailModal
+      <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        reservation={selectedReservation}
-      /> */}
+        requestForm={selectedRequestForm}
+      />
     </div>
   );
 }

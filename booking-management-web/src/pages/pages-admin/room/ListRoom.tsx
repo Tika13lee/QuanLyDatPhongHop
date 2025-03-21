@@ -9,6 +9,7 @@ import useFetch from "../../../hooks/useFetch";
 import { Link } from "react-router-dom";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { set } from "react-datepicker/dist/date_utils";
+import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -272,7 +273,7 @@ function ListRoom() {
                       : "Không có thông tin vị trí"}
                   </td>
                   <td>{room.capacity}</td>
-                  <td>${room.price}</td>
+                  <td>{formatCurrencyVND(Number(room.price))}</td>
                   <td>
                     {Array.isArray(room.approvers) && room.approvers.length > 0
                       ? room.approvers.map((approver) => (

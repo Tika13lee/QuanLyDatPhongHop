@@ -3,6 +3,7 @@ import styles from "./Room.module.scss";
 import { useState } from "react";
 import CreateRoom from "./CreateRoom";
 import ListRoom from "./ListRoom";
+import ApprovalAuthority from "./ApprovalAuthority";
 
 const cx = classNames.bind(styles);
 
@@ -38,6 +39,7 @@ const Room = () => {
         <div className={cx("tab-content")}>
           {activeTab === "list" && <ListRoom />}
           {activeTab === "create" && <CreateRoom />}
+          {activeTab === "approval" && <ApprovalAuthority />}
         </div>
       </div>
     </div>

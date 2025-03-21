@@ -17,7 +17,6 @@ import IconWrapper from "../icons/IconWrapper";
 import { IoSettingsOutline } from "../../components/icons/icons";
 import { FaPlus } from "../../components/icons/icons";
 import usePost from "../../hooks/usePost";
-import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -628,7 +627,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                     <DatePicker
                       selected={selectedDateEndOfFrequency}
                       onChange={(date) => setSelectedDateEndOfFrequency(date)}
-                      minDate={new Date()}
+                      minDate={new Date(dateSelected ?? new Date().toString())}
                       dateFormat="dd/MM/yyyy"
                       disabled={valueFrequency === "ONE_TIME"}
                       maxDate={

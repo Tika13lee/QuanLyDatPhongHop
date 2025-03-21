@@ -1,12 +1,12 @@
 import classNames from "classnames/bind";
-import styles from "./Approve.module.scss";
+import styles from "./ListApprovalByApprover.module.scss";
 import { useEffect, useState } from "react";
 import {
   RequestFormProps,
   ReservationDetailProps,
   ReservationProps,
 } from "../../../data/data";
-import DetailModal from "./DetailModal";
+import DetailModal from "../../../components/Modal/DetailModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -14,17 +14,17 @@ import { MdOutlineInfo } from "../../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
-function Approve() {
+function ListApprovalByApprover() {
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState<
+  const [selectedRequestFormId, setSelectedRequestFormId] = useState<
     number | null
   >(null);
-  const [selectedReservation, setSelectedReservation] =
-    useState<ReservationDetailProps | null>(null);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [selectedRequestForm, setSelectedRequestForm] =
+    useState<RequestFormProps | null>(null);
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -33,20 +33,9 @@ function Approve() {
     "info"
   );
 
-  // Lấy chi tiết lịch đặt phòng
-  const {
-    data: reservationDetail,
-    loading,
-    error,
-  } = useFetch<ReservationDetailProps>(
-    selectedReservationId
-      ? `http://localhost:8080/api/v1/reservation/getReservationById?reservationId=${selectedReservationId}`
-      : ""
-  );
-
   // Lấy danh sách lịch đặt phòng cần phê duyệt
   let {
-    data: reservation,
+    data: requestForm,
     loading: loadingReservation,
     error: errorReservation,
   } = useFetch<RequestFormProps[]>(
@@ -54,11 +43,11 @@ function Approve() {
   );
 
   const [schedulesApprove, setSchedulesApprove] = useState<RequestFormProps[]>(
-    reservation ?? []
+    requestForm ?? []
   );
 
   useEffect(() => {
-    setSchedulesApprove(reservation ?? []);
+    setSchedulesApprove(requestForm ?? []);
     fetch(
       `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}`
     )
@@ -66,7 +55,7 @@ function Approve() {
       .then((data) => {
         setSchedulesApprove(data);
       });
-  }, [reservation]);
+  }, [requestForm]);
 
   // Xử lý chọn/bỏ chọn item
   const handleCheckboxChange = (id: number) => {
@@ -103,7 +92,7 @@ function Approve() {
         )
       );
 
-      reservation = [];
+      requestForm = [];
     } else {
       setPopupMessage("Phê duyệt thất bại!");
       setPopupType("error");
@@ -137,24 +126,12 @@ function Approve() {
         )
       );
 
-      reservation = [];
+      requestForm = [];
     } else {
       setPopupMessage("Từ chối thất bại!");
       setPopupType("error");
       setIsPopupOpen(true);
     }
-  };
-
-  // Cập nhật state khi API trả về dữ liệu
-  useEffect(() => {
-    if (reservationDetail) {
-      setSelectedReservation(reservationDetail);
-      setIsModalOpen(true);
-    }
-  }, [reservationDetail]);
-
-  const handleShowDetails = (reservationId: number) => {
-    setSelectedReservationId(reservationId);
   };
 
   // Hàm format ngày giờ
@@ -169,10 +146,14 @@ function Approve() {
     };
   };
 
+  // đóng mở modal
+  const handleShowDetails = (requestForm: RequestFormProps) => {
+    setSelectedRequestForm(requestForm);
+    setIsModalOpen(true);
+  };
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedReservationId(null);
-    setSelectedReservation(null);
+    setSelectedRequestForm(null);
   };
 
   return (
@@ -259,9 +240,7 @@ function Approve() {
                     <td>
                       <div
                         className={cx("actions")}
-                        // onClick={() =>
-                        //   handleShowDetails(schedule.reservationId)
-                        // }
+                        onClick={() => handleShowDetails(schedule)}
                       >
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
@@ -273,13 +252,13 @@ function Approve() {
           </table>
         </div>
       )}
-      {/* <DetailModal
+      <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        reservation={selectedReservation}
-      /> */}
+        requestForm={selectedRequestForm}
+      />
     </div>
   );
 }
 
-export default Approve;
+export default ListApprovalByApprover;

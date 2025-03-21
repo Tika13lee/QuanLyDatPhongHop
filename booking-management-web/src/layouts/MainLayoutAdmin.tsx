@@ -76,7 +76,7 @@ const MainLayoutAdmin = () => {
                 </NavLink>
 
                 <NavLink
-                  to="/admin/waiting-list"
+                  to="/admin/approval-list"
                   className={({ isActive }) =>
                     cx("dropdown-item", { active: isActive })
                   }
