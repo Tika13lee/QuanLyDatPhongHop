@@ -12,53 +12,9 @@ import {
 import { vi } from "date-fns/locale";
 import useFetch from "../../../hooks/useFetch";
 import { ReservationDetailProps } from "../../../data/data";
-import { newDate } from "react-datepicker/dist/date_utils";
+import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
-
-// // Danh sách sự kiện mẫu
-// const events = [
-//   {
-//     id: 1,
-//     title: "Họp dự án",
-//     room: {
-//       roomName: "Phòng họp 1",
-//       location: "Tầng 2",
-//     },
-//     timeStart: "2025-03-15T08:30:00.000+07:00",
-//     timeEnd: "2025-03-15T10:00:00.000+07:00",
-//   },
-//   {
-//     id: 2,
-//     title: "Họp dự án",
-//     room: {
-//       roomName: "Phòng họp 1",
-//       location: "Tầng 2",
-//     },
-//     timeStart: "2025-03-15T14:30:00.000+07:00",
-//     timeEnd: "2025-03-15T16:00:00.000+07:00",
-//   },
-//   {
-//     id: 3,
-//     title: "Họp dự án",
-//     room: {
-//       roomName: "Phòng họp 1",
-//       location: "Tầng 2",
-//     },
-//     timeStart: "2025-03-15T14:30:00.000+07:00",
-//     timeEnd: "2025-03-15T16:00:00.000+07:00",
-//   },
-//   {
-//     id: 5,
-//     title: "Họp dự án",
-//     room: {
-//       roomName: "Phòng họp 1",
-//       location: "Tầng 2",
-//     },
-//     timeStart: "2025-03-13T14:30:00.000+07:00",
-//     timeEnd: "2025-03-13T16:00:00.000+07:00",
-//   },
-// ];
 
 const Schedule = () => {
   const userCurrent = localStorage.getItem("currentEmployee");
@@ -68,10 +24,13 @@ const Schedule = () => {
   const [weekStart, setWeekStart] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
-
+  const [selectedSchedule, setSelectedSchedule] =
+    useState<ReservationDetailProps | null>(null);
+  const [isModalOpenDetail, setIsModalOpenDetail] = useState(false);
   // Cập nhật danh sách ngày trong tuần
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
+  // Lấy danh sách lịch đặt phòng theo tuần
   const {
     data: reservations,
     loading,
@@ -84,7 +43,7 @@ const Schedule = () => {
     ).toISOString()}`
   );
 
-  // Chuyển đổi dữ liệu sự kiện
+  // Chuyển đổi dữ liệu lịch để hiển thị
   const formattedEvents = reservations?.map((event) => ({
     ...event,
     date: format(parseISO(event.timeStart), "yyyy-MM-dd"),
@@ -93,8 +52,6 @@ const Schedule = () => {
       "HH:mm"
     )}`,
   }));
-
-  console.log(reservations);
 
   // Chuyển tuần
   const changeWeek = (direction: "prev" | "current" | "next") => {
@@ -110,14 +67,23 @@ const Schedule = () => {
     setSelectedDate(newStart);
   };
 
-  // Khi chọn ngày từ input
+  // Xử lý sự kiện chọn ngày
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = new Date(e.target.value);
     setSelectedDate(newDate);
-
-    // Cập nhật `weekStart` để lịch nhảy đến tuần chứa ngày được chọn
     const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
     setWeekStart(newWeekStart);
+  };
+
+  // xử lý đóng mở modal chi tiết
+  const handleOpenDetail = (reservation: ReservationDetailProps) => {
+    setSelectedSchedule(reservation);
+    setIsModalOpenDetail(true);
+    console.log(reservation);
+  };
+  const handleCloseDetail = () => {
+    setSelectedSchedule(null);
+    setIsModalOpenDetail(false);
   };
 
   return (
@@ -143,49 +109,224 @@ const Schedule = () => {
 
       {/* Hiển thị lịch hàng tuần */}
       <div className={cx("calendar")}>
-        {daysOfWeek.map((day, index) => {
-          const dayFormatted = format(day, "yyyy-MM-dd");
+        <table className={cx("week-table")}>
+          <thead>
+            <tr>
+              <th></th>
+              {daysOfWeek.map((day, index) => (
+                <th key={index} className={cx("day")}>
+                  {format(day, "EEEE", { locale: vi })} <br />
+                  {format(day, "dd/MM")}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {/* Hàng buổi sáng */}
+            <tr>
+              <td className={cx("time-label")}>🌅 Sáng</td>
+              {daysOfWeek.map((day, index) => {
+                const dayFormatted = format(day, "yyyy-MM-dd");
 
-          const events = formattedEvents ?? [];
+                // sắp xếp theo thời gian bắt đầu
+                const dayEvents = (formattedEvents ?? [])
+                  .filter((event) => event.date === dayFormatted)
+                  .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
 
-          // Lọc và sắp xếp sự kiện theo ngày
-          const dayEvents = events
-            .filter((event) => event.date === dayFormatted)
-            .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
+                // Lọc sự kiện buổi sáng
+                const morningEvents = dayEvents.filter((event) => {
+                  const hour = parseInt(event.time.split(":")[0], 10);
+                  return hour < 12;
+                });
 
-          return (
-            <div key={index} className={cx("day")}>
-              <strong>{format(day, "EEEE", { locale: vi })}</strong> <br />
-              {format(day, "dd/MM")}
-              {/* Hiển thị sự kiện nếu có */}
-              {dayEvents.length > 0 && (
-                <ul className={cx("event-list")}>
-                  {dayEvents.map((event) => (
-                    <li key={event.reservationId} className={cx("event-item")}>
-                      <small>{event.time}</small> <br />
-                      {event.title} <br />
-                      <small>
-                        Phòng {event.room.roomName} -
-                        Tầng {event.room.location.floor} - Tòa{" "}
-                        {event.room.location.building.buildingName} -{" "}
-                        {event.room.location.building.branch.branchName}
-                      </small> <br />
-                      <small className={cx("status")}>
-                        {event.statusReservation === "PENDING" && "Đang chờ phê duyệt"}
-                        {event.statusReservation === "CHECKED_IN" && "Đã nhận phòng"}
-                        {event.statusReservation === "COMPLETED" && "Hoàn thành"}
-                        {event.statusReservation === "WAITING_CANCEL" && "Đang chờ hủy"}
-                        {event.statusReservation === "WAITING_PAYMENT" && "Đang chờ thanh toán"}
-                        
-                      </small>
+                return (
+                  <td key={index} style={{ verticalAlign: "top" }}>
+                    {morningEvents.map((event) => (
+                      <div
+                        className={cx("event-item")}
+                        key={event.reservationId}
+                        onClick={() => handleOpenDetail(event)}
+                      >
+                        <small>{event.time}</small> <br />
+                        {event.title} <br />
+                        <small>Phòng {event.room.roomName} </small> <br />
+                        <small>
+                          Tầng {event.room.location.floor} - Tòa{" "}
+                          {event.room.location.building.buildingName}
+                        </small>
+                        <br />
+                        <small>
+                          {event.room.location.building.branch.branchName}
+                        </small>
+                        <br />
+                        <small className={cx("status")}>
+                          {event.statusReservation === "PENDING" &&
+                            "Đang chờ phê duyệt"}
+                          {event.statusReservation === "CHECKED_IN" &&
+                            "Đã nhận phòng"}
+                          {event.statusReservation === "COMPLETED" &&
+                            "Hoàn thành"}
+                        </small>
+                      </div>
+                    ))}
+                  </td>
+                );
+              })}
+            </tr>
+
+            {/* Hàng buổi chiều */}
+            <tr>
+              <td className={cx("time-label")}>🌇 Chiều</td>
+              {daysOfWeek.map((day, index) => {
+                const dayFormatted = format(day, "yyyy-MM-dd");
+
+                const dayEvents = (formattedEvents ?? [])
+                  .filter((event) => event.date === dayFormatted)
+                  .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
+
+                const afternoonEvents = dayEvents.filter((event) => {
+                  const hour = parseInt(event.time.split(":")[0], 10);
+                  return hour >= 12;
+                });
+
+                return (
+                  <td key={index} style={{ verticalAlign: "top" }}>
+                    {afternoonEvents.map((event) => (
+                      <div
+                        key={event.reservationId}
+                        className={cx("event-item")}
+                        onClick={() => handleOpenDetail(event)}
+                      >
+                        <small>{event.time}</small> <br />
+                        {event.title} <br />
+                        <small>Phòng {event.room.roomName} </small> <br />
+                        <small>
+                          Tầng {event.room.location.floor} - Tòa{" "}
+                          {event.room.location.building.buildingName}
+                        </small>
+                        <br />
+                        <small>
+                          {event.room.location.building.branch.branchName}
+                        </small>
+                        <br />
+                        <small className={cx("status")}>
+                          {event.statusReservation === "PENDING" &&
+                            "Đang chờ phê duyệt"}
+                          {event.statusReservation === "CHECKED_IN" &&
+                            "Đã nhận phòng"}
+                          {event.statusReservation === "COMPLETED" &&
+                            "Hoàn thành"}
+                        </small>
+                      </div>
+                    ))}
+                  </td>
+                );
+              })}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* modal xem chi tiết */}
+      {isModalOpenDetail && selectedSchedule && (
+        <div className={cx("modal-overlay")}>
+          <div className={cx("modal")}>
+            <button className={cx("close-btn")} onClick={handleCloseDetail}>
+              ✖
+            </button>
+            <h3>Chi tiết lịch</h3>
+
+            <div className={cx("modal-content")}>
+              <div className={cx("info-left")}>
+                <p>
+                  <strong>Tiêu đề:</strong> {selectedSchedule.title}
+                </p>
+                <p>
+                  <strong>Mô tả:</strong> {selectedSchedule.description}
+                </p>
+                <p>
+                  <strong>Ghi chú:</strong> {selectedSchedule.note}
+                </p>
+                <p>
+                  <strong>Thời gian:</strong> {selectedSchedule.time}
+                </p>
+                <div className={cx("info-row")}>
+                  <p>
+                    <strong>Phòng:</strong> {selectedSchedule.room.roomName}
+                  </p>
+                  <p>
+                    <strong>Sức chứa:</strong> {selectedSchedule.room.capacity}
+                  </p>
+                  <p>
+                    <strong>Loại phòng:</strong>{" "}
+                    {selectedSchedule.room.typeRoom === "VIP"
+                      ? "VIP"
+                      : selectedSchedule.room.typeRoom === "DEFAULT"
+                      ? "Mặc định"
+                      : "Hội nghị"}
+                  </p>
+                </div>
+                <p>
+                  <strong>Vị trí:</strong> Tầng{" "}
+                  {selectedSchedule.room.location.floor} - tòa {""}
+                  {selectedSchedule.room.location.building.buildingName} - chi
+                  nhánh{" "}
+                  {selectedSchedule.room.location.building.branch.branchName}
+                </p>
+                <p>
+                  <strong>Thời gian nhận phòng:</strong>{" "}
+                  {selectedSchedule.timeCheckIn ?? "Chưa nhận phòng"}
+                </p>
+                <p>
+                  <strong>Thời gian trả phòng:</strong>{" "}
+                  {selectedSchedule.timeCheckOut ?? "Chưa trả phòng"}
+                </p>
+                <p>
+                  <strong>Thời gian hủy:</strong>{" "}
+                  {selectedSchedule.timeCancel ?? "Không có"}
+                </p>
+                <p>
+                  <strong>Chi phí:</strong>{" "}
+                  {formatCurrencyVND(selectedSchedule.total)} VNĐ
+                </p>
+              </div>
+
+              <div className={cx("info-right")}>
+                <ul className={cx("container-list")}>
+                  <strong>Tài liệu</strong>
+                  {selectedSchedule.filePaths.map((file, index) => (
+                    <li key={index}>
+                      <a href={file} target="_blank" rel="noreferrer">
+                        {file}
+                      </a>
                     </li>
                   ))}
                 </ul>
-              )}
+                <ul className={cx("container-list")}>
+                  <strong>Dịch vụ</strong>
+                  {selectedSchedule.services?.map((service) => (
+                    <li key={service.serviceId}>
+                      {service.serviceName} -{" "}
+                      {formatCurrencyVND(service.price.value)} VNĐ
+                    </li>
+                  ))}
+                </ul>
+                <ul className={cx("container-list")}>
+                  <strong>Người tham gia</strong>
+                  {selectedSchedule.attendants?.map((p) => (
+                    <li key={p.employeeId}>
+                      <div className={cx("info-row")}>
+                        <p>{p.employeeName}</p>
+                        <p>{p.phone}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

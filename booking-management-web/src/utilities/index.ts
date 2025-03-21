@@ -49,4 +49,15 @@ const formatDateString = (date: string) => {
     .replace(/\//g, " - ");
 };
 
-export { uploadImageToCloudinary, times, formatDateDate, formatDateString };
+// định dạng tiền
+function formatCurrencyVND(amount: number): string {
+  return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+}
+
+export {
+  uploadImageToCloudinary,
+  times,
+  formatDateDate,
+  formatDateString,
+  formatCurrencyVND,
+};

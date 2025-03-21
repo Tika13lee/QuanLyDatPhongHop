@@ -66,6 +66,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeProps[]>([
     user,
   ]);
+  const [listParticipant, setListParticipant] = useState<EmployeeProps[]>([]);
   const [modalSetting, setModalSetting] = useState<boolean>(false);
   const [dates, setDates] = useState<Date[]>([]);
   const [isClickedSelect, setIsClickedSelect] = useState(false);
@@ -74,13 +75,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [checkRemoveDates, setCheckRemoveDates] = useState<number[]>([]);
   const [TypeRequestForm, setTypeRequestForm] = useState<string>(
     "RESERVATION_ONETIME"
-  );
-
-  console.log(timeStart);
-  console.log(
-    new Date(
-      `${dateSelected ?? new Date().toString()}T${timeStart}`
-    ).toISOString()
   );
 
   // lấy ngày trong khoảng thời gian
@@ -132,6 +126,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     },
   });
 
+  // chọn tần suất set loại form
   useEffect(() => {
     if (valueFrequency === "ONE_TIME") {
       setTypeRequestForm("RESERVATION_ONETIME");
@@ -169,13 +164,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     }
 
     if (checkRemoveDays != undefined && checkRemoveDays.length > 0) {
-      // setFormData((prev) => ({
-      //   ...prev,
-      //   timeFinishFrequency: removeDate(
-      //     prev.timeFinishFrequency.map((date) => new Date(date)),
-      //     checkRemoveDays ?? []
-      //   ).map((date) => date.toISOString()),
-      // }));
       setFormData((prev) => ({
         ...prev,
         reservationDTO: {
@@ -261,6 +249,17 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   } = useFetch<EmployeeProps[]>(
     `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${phone}`
   );
+
+  // loại người đặt trong ds người tham gia
+  const removeBookerInEmployee = (employees: EmployeeProps[]) => {
+    return employees.filter((emp) => emp.employeeId !== user.employeeId);
+  };
+
+  useEffect(() => {
+    if (employees) {
+      setListParticipant(removeBookerInEmployee(employees));
+    }
+  }, [employees]);
 
   // thêm thành viên
   const handleAddEmployee = (emp: EmployeeProps) => {
@@ -427,6 +426,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     "http://localhost:8080/api/v1/requestForm/createRequestForm"
   );
 
+  // hiển thị thông báo lỗi
   useEffect(() => {
     if (roomError) {
       console.log("Error updated:", roomError);
@@ -456,13 +456,9 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
     const response = await postData(updatedFormData, { method: "POST" });
 
-    console.log(roomError);
     if (response) {
-      console.log(response);
       setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
       setIsModalClose();
-    } else {
-      console.log(roomError);
     }
   };
 
@@ -750,6 +746,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                   />
                 </div>
 
+                {/* hiện tài liệu đã chọn */}
                 <select className={cx("form-group")}>
                   {formData.reservationDTO.filePaths.map((file) => (
                     <option value={file}>{file}</option>
@@ -777,6 +774,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                   </div>
                 </div>
 
+                {/* hiện dịch vụ đã chọn */}
                 <div className={cx("form-group")}>
                   <select
                     onClick={() => setIsClickedSelect(true)}
@@ -812,28 +810,39 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
                 {selectedEmployee.length > 0 &&
                   selectedEmployee.map((emp) => (
-                    <div className={cx("form-row")}>
+                    <div className={cx("form-row", "list-emp-participant")}>
                       <div key={emp.employeeId}>
                         {emp.employeeName} - {emp.phone}
                       </div>
-                      <button onClick={() => handleRemoveEmployee(emp)}>
-                        x
+                      <button
+                        className={cx("btn-remove-employee")}
+                        onClick={() => handleRemoveEmployee(emp)}
+                        disabled={emp.employeeId === user.employeeId}
+                      >
+                        ✖
                       </button>
                     </div>
                   ))}
 
+                {/* modal thêm thành viên */}
                 {openModalParticipant && (
                   <div className={cx("modal-employee")}>
                     <div className={cx("model-add")}>
+                      <button
+                        className={cx("btn-close-modalParticipant")}
+                        onClick={() => setOpenModalParticipant(false)}
+                      >
+                        ✖
+                      </button>
                       <input
                         type="text"
                         placeholder="Nhập số điện thoại người tham gia"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />
-                      {phone && employees && (
+                      {phone && listParticipant && (
                         <div className={cx("form-group", "employee-list")}>
-                          {employees.map((emp) => (
+                          {listParticipant.map((emp) => (
                             <div className={cx("employee-item")}>
                               <div key={emp.employeeId}>
                                 {emp.employeeName} - {emp.phone}

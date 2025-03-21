@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BranchProps, RoomViewProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import ModalBooking from "../../../components/Modal/ModalBooking";
-import { times } from "../../../utilities";
+import { formatDateString, times } from "../../../utilities";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { set } from "react-datepicker/dist/date_utils";
 import { toast, ToastContainer } from "react-toastify";
@@ -140,8 +140,15 @@ function Booking() {
 
   // mở modal
   const handleOpenModal = () => {
-    // kiểm tra ngày đã chọn có hợp lệ hay không
-    // hợp lê thì chạy đoạn dưới
+    const today = new Date().toISOString().split("T")[0];
+    if (selectedDate < today) {
+      toast.warning(
+        "Vui lòng chọn ngày khác! " +
+          "Bạn không thể đặt lịch cho ngày " +
+          formatDateString(selectedDate)
+      );
+      return;
+    }
     const roomInfos =
       rooms?.map((room) => ({
         roomId: room.roomId + "",
@@ -156,7 +163,6 @@ function Booking() {
       listRoomInfo: roomInfos,
     });
     setIsModalOpen(true);
-    // không hợp lệ thì thông báo
   };
 
   // đóng modal
@@ -179,6 +185,15 @@ function Booking() {
     roomName: string,
     timeStart: string
   ) => {
+    const today = new Date().toISOString().split("T")[0];
+    if (selectedDate < today) {
+      toast.warning(
+        "Vui lòng chọn ngày khác! " +
+          "Bạn không thể đặt lịch cho ngày " +
+          formatDateString(selectedDate)
+      );
+      return;
+    }
     setSelectedCell(() => {
       setInfoCellRoom({
         roomInfo: {
