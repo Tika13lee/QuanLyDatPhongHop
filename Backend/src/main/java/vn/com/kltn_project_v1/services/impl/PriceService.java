@@ -14,6 +14,7 @@ import vn.com.kltn_project_v1.repositories.*;
 import vn.com.kltn_project_v1.services.IPrice;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -72,7 +73,7 @@ public class PriceService implements IPrice {
         return null;
     }
     @Override
-    public List<Price> checkTime(PriceDTO priceDTO){
-        return priceRepository.findPriceByTimeStartAndTimeEnd(priceDTO.getTimeStart(),priceDTO.getTimeEnd());
+    public List<Price> checkTime(Date timeStart, Date timeEnd){
+        return priceRepository.findPriceByTimeStartAndTimeEnd(timeStart,timeEnd);
     }
 }

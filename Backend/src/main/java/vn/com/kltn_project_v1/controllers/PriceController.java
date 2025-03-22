@@ -8,6 +8,8 @@ import vn.com.kltn_project_v1.dtos.PriceDTO;
 import vn.com.kltn_project_v1.services.IPrice;
 import vn.com.kltn_project_v1.services.IService;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/api/v1/price")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -17,12 +19,15 @@ public class PriceController {
     @PostMapping("/createPrice")
     public ResponseEntity<?> createPrice(@RequestBody PriceDTO priceDTO){
         try {
-            if(!priceService.checkTime(priceDTO).isEmpty()){
-                return ResponseEntity.badRequest().body(priceService.checkTime(priceDTO));
+            if (!priceDTO.isActive()){
+                return ResponseEntity.ok(priceService.savePrice(priceDTO));
+            }else {
+            if(!priceService.checkTime(priceDTO.getTimeStart(),priceDTO.getTimeEnd()).isEmpty()){
+                return ResponseEntity.badRequest().body(priceService.checkTime(priceDTO.getTimeStart(),priceDTO.getTimeEnd()));
             }
             else {
                 return ResponseEntity.ok(priceService.savePrice(priceDTO));
-            }
+            }}
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -32,6 +37,15 @@ public class PriceController {
     public ResponseEntity<?> getAllPrice(){
         try {
             return ResponseEntity.ok(priceService.getAllPrice());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @GetMapping("/checkTimePrice")
+    public ResponseEntity<?> checkTimePrice(@RequestParam(name = "timeStart") Date timeStart, @RequestParam(name = "timeEnd") Date timeEnd){
+        try {
+            return ResponseEntity.ok(priceService.checkTime(timeStart,timeEnd));
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
