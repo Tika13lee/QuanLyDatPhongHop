@@ -10,6 +10,8 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "price_room",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"roomId", "priceId"}))
 @ToString
 public class PriceRoom {
     @Id

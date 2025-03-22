@@ -13,6 +13,7 @@ public class PriceDTO {
     private boolean isActive;
     private Date timeStart;
     private Date timeEnd;
+    private String priceName;
     private List<PriceRoomDTO> priceRooms;
     private List<PriceServiceDTO> priceServices;
 }
