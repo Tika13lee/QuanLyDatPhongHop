@@ -7,6 +7,7 @@ import { ServiceProps } from "../../../data/data";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { FaPlus, MdSearch } from "../../../components/icons/icons";
+import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -126,7 +127,7 @@ function Service() {
     setFormData({
       serviceName: service.serviceName,
       description: service.description,
-      price: service.price.value,
+      price: service.priceService?.value,
     });
   };
 
@@ -149,7 +150,7 @@ function Service() {
           serviceId: selectedService.serviceId,
           serviceName: formData.serviceName,
           description: formData.description,
-          priceId: selectedService.price?.priceId,
+          priceId: selectedService.priceService?.priceServiceId,
         }
       : null;
 
@@ -320,7 +321,11 @@ function Service() {
                   <td>{index + 1}</td>
                   <td>{service.serviceName}</td>
                   <td>{service.description}</td>
-                  <td>{service.price?.value || "N/A"}</td>
+                  <td>
+                    {service.priceService
+                      ? formatCurrencyVND(service.priceService?.value)
+                      : "Chưa có"}
+                  </td>
                 </tr>
               ))
             )}

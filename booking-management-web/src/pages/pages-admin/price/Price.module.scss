@@ -43,7 +43,7 @@
   gap: 10px;
 }
 
-.submit-btn {
+.action-btn {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -51,15 +51,33 @@
   font-size: 16px;
   font-weight: bold;
   color: var(--color-white);
-  background: var(--btn-add);
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.3s;
+}
+
+.apply-btn {
+  background: var(--btn-main);
 
   &:hover {
-    background: var(--btn-add-hover);
+    background: var(--btn-hover);
+  }
+  
+  &:disabled {
+    background-color: #e0e0e0;
+    color: #b0b0b0;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.copy-btn {
+  background: #ffbb49;
+
+  &:hover {
+    background: #ffa537;
   }
 
   &:disabled {
@@ -67,6 +85,14 @@
     color: #b0b0b0;
     cursor: not-allowed;
     opacity: 0.6;
+  }
+}
+
+.add-btn {
+  background: var(--btn-add);
+
+  &:hover {
+    background: var(--btn-add-hover);
   }
 }
 

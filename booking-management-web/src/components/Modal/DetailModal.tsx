@@ -133,7 +133,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
               {requestForm.reservations[0].services?.map((service) => (
                 <li key={service.serviceId}>
                   {service.serviceName} -{" "}
-                  {formatCurrencyVND(service.price.value)}
+                  {/* {formatCurrencyVND(service.price.value)} */}
                 </li>
               ))}
             </ul>

@@ -455,6 +455,8 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
     const response = await postData(updatedFormData, { method: "POST" });
 
+    console.log(response);
+
     if (response) {
       setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
       setIsModalClose();

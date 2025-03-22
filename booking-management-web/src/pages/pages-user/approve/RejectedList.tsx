@@ -86,7 +86,7 @@ function RejectedList() {
                 <th>Người đặt</th>
                 <th>Thời gian gửi</th>
                 <th>Thời gian phê duyệt</th>
-                <th>Hành động</th>
+                <th>Chi tiết</th>
               </tr>
             </thead>
             <tbody>
@@ -110,12 +110,12 @@ function RejectedList() {
                     <td>
                       {bookingTime.date} - {bookingTime.time}
                     </td>
+                    <td>{new Date(schedule.timeResponse).toLocaleString()}</td>
                     <td>
                       <div
                         className={cx("actions")}
                         onClick={() => handleShowDetails(schedule)}
                       >
-                        <label>Chi tiết</label>
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>
                     </td>

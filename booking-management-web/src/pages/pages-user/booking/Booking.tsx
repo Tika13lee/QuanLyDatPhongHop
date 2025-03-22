@@ -106,8 +106,6 @@ function Booking() {
     setRooms(data);
   };
 
-  console.log(rooms);
-
   useEffect(() => {
     fetchRooms();
   }, [selectedBranch, selectedDate]);

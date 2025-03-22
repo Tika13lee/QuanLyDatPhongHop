@@ -353,7 +353,7 @@ function Overview() {
                           <strong>Dịch vụ:</strong> {service.serviceName}
                         </span>
                         <span>
-                          <strong>Giá:</strong> {service.price.value}
+                          {/* <strong>Giá:</strong> {service.pric e.value} */}
                         </span>
                       </div>
                     ))}

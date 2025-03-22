@@ -20,7 +20,13 @@ const timeSlots = Array.from({ length: 19 }, (_, i) => {
   return `${hour.toString().padStart(2, "0")}:${minute}`;
 });
 
-function CardRoom({ rooms, dataSearch }: { rooms: RoomProps[], dataSearch: DataSearch }) {
+function CardRoom({
+  rooms,
+  dataSearch,
+}: {
+  rooms: RoomProps[];
+  dataSearch: DataSearch;
+}) {
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState<RoomProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,14 +42,16 @@ function CardRoom({ rooms, dataSearch }: { rooms: RoomProps[], dataSearch: DataS
             <div className={cx("card-room__content")}>
               <h3 className={cx("card-room__name")}>{room.roomName}</h3>
               <p className={cx("card-room__location")}>
-                📍 {room.location.building.branch.branchName} - tòa{" "}
-                {room.location.building.buildingName} - tầng{" "}
+                📍 {room.location.building.branch.branchName}
+              </p>
+              <p className={cx("card-room__location")}>
+                📍 Tòa {room.location.building.buildingName} - tầng{" "}
                 {room.location.floor}{" "}
               </p>
               <p className={cx("card-room__capacity")}>
                 👥 {room.capacity} người
               </p>
-              <p className={cx("card-room__price")}>💲 {room.price.value}</p>
+              {/* <p className={cx("card-room__price")}>{room.price.value}</p> */}
 
               <div className={cx("card-room__buttons")}>
                 <button
@@ -55,7 +63,6 @@ function CardRoom({ rooms, dataSearch }: { rooms: RoomProps[], dataSearch: DataS
                 <button
                   className={cx("btn", "btn-book")}
                   onClick={() => {
-                    
                     setIsModalOpen(() => {
                       setSelectedRoom(room);
                       return true;
@@ -75,7 +82,14 @@ function CardRoom({ rooms, dataSearch }: { rooms: RoomProps[], dataSearch: DataS
         <ModalBooking
           isModalOpen={isModalOpen}
           setIsModalClose={() => setIsModalOpen(false)}
-          roomInfo={selectedRoom ? { roomName: selectedRoom.roomName, roomId: selectedRoom.roomId + "" } : { roomName: "", roomId: "" }}
+          roomInfo={
+            selectedRoom
+              ? {
+                  roomName: selectedRoom.roomName,
+                  roomId: selectedRoom.roomId + "",
+                }
+              : { roomName: "", roomId: "" }
+          }
           dateSelected={dataSearch.date}
           timeStart={dataSearch.timeStart}
           timeEnd={dataSearch.timeEnd}

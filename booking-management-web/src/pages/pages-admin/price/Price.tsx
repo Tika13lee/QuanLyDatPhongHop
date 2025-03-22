@@ -78,10 +78,20 @@ function Price() {
         <div className={cx("function-btn")}>
           <button
             type="button"
-            className={cx("submit-btn")}
+            className={cx("action-btn", "apply-btn")}
             disabled={isCheck.length === 0}
           >
             Áp dụng
+          </button>
+          <button
+            type="button"
+            className={cx("action-btn", "copy-btn")}
+            disabled={isCheck.length === 0}
+          >
+            Sao chép bảng giá
+          </button>
+          <button type="button" className={cx("action-btn", "add-btn")}>
+            Tạo bảng giá
           </button>
         </div>
       </div>
@@ -96,7 +106,7 @@ function Price() {
               <th style={{ width: "120px" }}>Tên bảng giá</th>
               <th style={{ width: "200px" }}>Thời gian bắt đầu</th>
               <th style={{ width: "200px" }}>Thời gian kết thúc</th>
-              <th style={{ width: "100px" }}>Đang được sử dụng</th>
+              <th style={{ width: "100px" }}>Đang áp dụng</th>
               <th style={{ width: "50px" }}>Chi tiết</th>
             </tr>
           </thead>

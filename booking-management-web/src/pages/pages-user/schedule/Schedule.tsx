@@ -287,7 +287,7 @@ const Schedule = () => {
                 </p>
                 <p>
                   <strong>Chi phí:</strong>{" "}
-                  {formatCurrencyVND(selectedSchedule.total)} VNĐ
+                  {formatCurrencyVND(selectedSchedule.total)}
                 </p>
               </div>
 
@@ -307,7 +307,7 @@ const Schedule = () => {
                   {selectedSchedule.services?.map((service) => (
                     <li key={service.serviceId}>
                       {service.serviceName} -{" "}
-                      {formatCurrencyVND(service.price.value)} VNĐ
+                      {formatCurrencyVND(service.priceService?.value)}
                     </li>
                   ))}
                 </ul>

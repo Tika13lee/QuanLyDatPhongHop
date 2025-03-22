@@ -48,14 +48,18 @@ function ApprovalList() {
 
   useEffect(() => {
     setSchedulesApprove(requestForm ?? []);
-    fetch(
-      `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setSchedulesApprove(data);
-      });
   }, [requestForm]);
+
+  // useEffect(() => {
+  //   setSchedulesApprove(requestForm ?? []);
+  //   fetch(
+  //     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}`
+  //   )
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setSchedulesApprove(data);
+  //     });
+  // }, [requestForm]);
 
   // Xử lý chọn/bỏ chọn item
   const handleCheckboxChange = (id: number) => {

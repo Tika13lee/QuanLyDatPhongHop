@@ -43,6 +43,7 @@ function BookingSearch() {
   const [capacity, setCapacity] = useState<number>(1);
   const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
   const [filterData, setFilterData] = useState<RoomProps[] | null>(null);
+
   const [dataSearch, setDataSearch] = useState<DataSearch>({
     branch: "",
     date: "",
