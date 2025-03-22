@@ -64,7 +64,7 @@
   &:hover {
     background: var(--btn-hover);
   }
-  
+
   &:disabled {
     background-color: #e0e0e0;
     color: #b0b0b0;
@@ -166,7 +166,8 @@
   }
 }
 
-.price-header {
+// modal
+.price-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -176,11 +177,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 100;
 }
 
-.price-info {
-  width: 45%;
+.price-header {
+  width: 50%;
   padding: 20px;
   background: var(--color-white);
   border-radius: 5px;
@@ -189,11 +190,23 @@
   animation: fadeIn 0.3s ease-in-out;
 
   h3 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 500;
-    margin-bottom: 15px;
+    margin-bottom: 7px;
     text-align: center;
   }
+}
+
+.form-group {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
 }
 
 // Hiệu ứng mở modal
@@ -232,29 +245,36 @@
   margin-top: 10px;
 }
 
+// table
 .table-container {
   max-width: 100%;
   overflow-y: auto;
-  height: 500px;
-  border-radius: 5px;
+  height: 400px;
 
-  table {
+  .price-detail-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 16px;
     text-align: left;
     background-color: #fff;
     border-radius: 5px;
-    overflow: hidden;
+
+    input {
+      width: 50%;
+    }
   }
 
   thead {
-    background-color: #007bff;
+    background-color: #68abf3;
     color: white;
     font-weight: bold;
   }
 
   thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #68abf3;
     border-bottom: 2px solid #ddd;
   }
 
@@ -269,10 +289,39 @@
 
   td,
   th {
-    padding: 7px 10px;
+    padding: 5px 7px;
   }
 
+  th:nth-child(2),
   td:nth-child(2) {
     text-align: right;
+  }
+}
+
+:global(.react-datepicker-popper) {
+  z-index: 2;
+}
+
+.price-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 20px;
+
+  .form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    label {
+      margin: 0;
+    }
+  }
+
+  input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
   }
 }

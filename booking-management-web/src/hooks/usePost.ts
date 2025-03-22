@@ -49,7 +49,7 @@ const usePost = <T>(url: string): PostResult<T> => {
 
   useEffect(() => {
     if (error) {
-      console.log("Error updated:", error); // Log error when it's updated
+      console.log("Error updated:", error);
     }
   }, [error]);
 

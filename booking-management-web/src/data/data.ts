@@ -1,3 +1,23 @@
+// bảng giá
+export type PriceTableProps = {
+  priceId: number;
+  timeStart: string;
+  timeEnd: string;
+  priceName: string;
+  active: boolean;
+  priceRoom: {
+    roomId: number;
+    roomName: string;
+    value: number;
+  }[];
+  priceService: {
+    serviceId: number;
+    serviceName: string;
+    value: number;
+  }[];
+};
+
+//
 export type Reservation = {
   time: string;
   timeStart: string;
