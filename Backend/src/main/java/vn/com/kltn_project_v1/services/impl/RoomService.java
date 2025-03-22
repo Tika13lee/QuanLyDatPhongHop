@@ -188,6 +188,7 @@ public class RoomService implements IRoom {
         roomDTO.setCapacity(room.getCapacity());
         roomDTO.setStatusRoom(room.getStatusRoom().name());
         roomDTO.setTypeRoom(room.getTypeRoom());
+        roomDTO.setPrice(room.getPriceRoom().getValue());
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setBranch(room.getLocation().getBuilding().getBranch().getBranchName());
         locationDTO.setBuilding(room.getLocation().getBuilding().getBuildingName());

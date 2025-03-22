@@ -17,7 +17,6 @@ public class PriceService {
     private long priceServiceId;
     private int value;
     @OneToOne
-    @JsonIgnore
     @ToString.Exclude
     @JoinColumn(name = "serviceId")
     private Service service;

@@ -29,7 +29,7 @@ public class PriceService implements IPrice {
 
     @Override
     public List<Price> getAllPrice() {
-        return null;
+        return priceRepository.findAll();
     }
 
     @Override
@@ -59,6 +59,8 @@ public class PriceService implements IPrice {
             vn.com.kltn_project_v1.model.Service service = serviceRepository.findById(priceServiceDTO.getServiceId()).get();
             priceService.setService(service);
             priceService.setPrice(price);
+            priceServiceRepository.save(priceService);
+            service.setPriceService(priceService);
             price.getPriceService().add(priceService);
         });
         return priceRepository.save(price);

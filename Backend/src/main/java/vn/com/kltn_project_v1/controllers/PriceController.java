@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.controllers;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,15 @@ public class PriceController {
             else {
                 return ResponseEntity.ok(priceService.savePrice(priceDTO));
             }
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @GetMapping("/getAllPrice")
+    public ResponseEntity<?> getAllPrice(){
+        try {
+            return ResponseEntity.ok(priceService.getAllPrice());
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

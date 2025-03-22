@@ -17,8 +17,8 @@ public class PriceRoom {
     private long priceRoomId;
     private int value;
     @OneToOne
-    @JsonIgnore
     @ToString.Exclude
+    @JsonIgnore
     @JoinColumn(name = "roomId")
     private Room room;
     @ManyToOne
@@ -26,5 +26,8 @@ public class PriceRoom {
     @ToString.Exclude
     @JoinColumn(name = "priceId")
     private Price price;
+    public String getRoomName() {
+        return room != null ? room.getRoomName() : null;
+    }
 
 }

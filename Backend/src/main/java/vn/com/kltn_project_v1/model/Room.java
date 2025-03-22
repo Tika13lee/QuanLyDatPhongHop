@@ -1,5 +1,6 @@
 package vn.com.kltn_project_v1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,11 +28,14 @@ public class Room {
     private Location location;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "priceRoomId")
+    @JsonIgnore
     private PriceRoom priceRoom;
     @ElementCollection
     private List<String> imgs;
     @ManyToOne
     @JoinColumn(name = "approverId")
     private Employee approver;
-
+    public int getPriceValue() {
+        return priceRoom != null ? priceRoom.getValue() : null;
+    }
 }
