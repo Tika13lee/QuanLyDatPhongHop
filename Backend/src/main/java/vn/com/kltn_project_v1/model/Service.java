@@ -17,7 +17,7 @@ public class Service {
     private long serviceId;
     private String serviceName;
     private String description;
-    @OneToOne
+     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "priceServiceId")
     private PriceService priceService;
 

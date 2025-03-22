@@ -25,6 +25,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findReservationsByBookerPhoneAndStatusReservation(String phone, StatusReservation statusReservation);
     @Query("select r.room from Reservation r where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2)")
     List<Room> findRoomsByTime(Date timeStart, Date timeEnd);
-    @Query("select r from Reservation r join r.attendants a where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2) or a.employeeId = ?3")
+    @Query("select r from Reservation r join r.attendants a where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2) and git a.employeeId = ?3")
     List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId);
 }

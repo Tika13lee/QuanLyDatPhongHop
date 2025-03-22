@@ -25,7 +25,7 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "locationId")
     private Location location;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "priceRoomId")
     private PriceRoom priceRoom;
     @ElementCollection

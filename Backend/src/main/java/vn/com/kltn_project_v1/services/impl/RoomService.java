@@ -171,6 +171,8 @@ public class RoomService implements IRoom {
     @Override
     public List<Room> searchRoomByAttribute(String branch, int capacity, Date timeStart, Date timeEnd, int price) throws DataNotFoundException {
         List<Room> rooms = roomRepository.findRoomsForReservation(branch, capacity, price);
+        System.out.println(branch+" "+capacity+" "+price+" "+timeStart+" "+timeEnd);
+        System.out.println(rooms.size());
         rooms.removeAll(reservationRepository.findRoomsByTime(timeStart, timeEnd));
         return rooms;
     }

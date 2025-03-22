@@ -17,12 +17,11 @@ public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long priceId;
-    private int value;
+    private boolean isActive;
     private Date timeStart;
     private Date timeEnd;
-    @OneToMany(mappedBy = "price")
+    @OneToMany(mappedBy = "price",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<PriceRoom> priceRoom;
-    @OneToMany(mappedBy = "price")
+    @OneToMany(mappedBy = "price",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<PriceService> priceService;
-
 }
