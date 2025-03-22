@@ -19,11 +19,15 @@ public class PriceService {
     @OneToOne
     @ToString.Exclude
     @JoinColumn(name = "serviceId")
+    @JsonIgnore
     private Service service;
     @ManyToOne
     @JsonIgnore
     @ToString.Exclude
     @JoinColumn(name = "priceId")
     private Price price;
+    public String getServiceName() {
+        return service != null ? service.getServiceName() : null;
+    }
 
 }
