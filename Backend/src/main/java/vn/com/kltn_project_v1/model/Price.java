@@ -20,6 +20,7 @@ public class Price {
     private boolean isActive;
     private Date timeStart;
     private Date timeEnd;
+    private String priceName;
     @OneToMany(mappedBy = "price",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<PriceRoom> priceRoom;
     @OneToMany(mappedBy = "price",cascade = CascadeType.ALL,orphanRemoval = true)
