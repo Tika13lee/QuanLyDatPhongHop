@@ -2,6 +2,7 @@ package vn.com.kltn_project_v1.controllers;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.PriceDTO;
@@ -43,7 +44,7 @@ public class PriceController {
         }
     }
     @GetMapping("/checkTimePrice")
-    public ResponseEntity<?> checkTimePrice(@RequestParam(name = "timeStart") Date timeStart, @RequestParam(name = "timeEnd") Date timeEnd){
+    public ResponseEntity<?> checkTimePrice(@RequestParam(name = "timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeStart, @RequestParam(name = "timeEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeEnd){
         try {
             return ResponseEntity.ok(priceService.checkTime(timeStart,timeEnd));
         }
