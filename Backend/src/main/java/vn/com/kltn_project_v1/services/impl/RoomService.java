@@ -40,7 +40,7 @@ public class RoomService implements IRoom {
     private final IReservation reservationService;
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
-        Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
+       // Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
         Location location = locationRepository.findById(roomDTO.getLocation().getLocationId())
                 .orElseThrow(()->new DataNotFoundException("Location not found"));
         Room room = Room.builder()
@@ -49,7 +49,7 @@ public class RoomService implements IRoom {
                 .capacity(roomDTO.getCapacity())
                 .statusRoom(StatusRoom.valueOf(roomDTO.getStatusRoom()))
                 .location(location)
-                .price(price)
+               // .price(price)
                 .imgs(roomDTO.getImgs())
                 .build();
         roomRepository.save(room);
@@ -192,13 +192,6 @@ public class RoomService implements IRoom {
         locationDTO.setFloor(room.getLocation().getFloor());
         roomDTO.setLocation(locationDTO);
 
-        try {
-            Price price = priceRepository.findById(room.getPrice().getPriceId())
-                    .orElseThrow(()->new DataNotFoundException("Price not found"));
-            roomDTO.setPrice(price.getValue());
-        } catch (DataNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         roomDTO.setImgs(room.getImgs());
         ArrayList<Room_DeviceDTO> room_deviceDTOS = new ArrayList<>();
         room_deviceRepository.findByRoomId(room.getRoomId()).forEach(rd->{

@@ -25,9 +25,9 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "locationId")
     private Location location;
-    @ManyToOne
-    @JoinColumn(name = "priceId")
-    private Price price;
+    @OneToOne
+    @JoinColumn(name = "priceRoomId")
+    private PriceRoom priceRoom;
     @ElementCollection
     private List<String> imgs;
     @ManyToOne

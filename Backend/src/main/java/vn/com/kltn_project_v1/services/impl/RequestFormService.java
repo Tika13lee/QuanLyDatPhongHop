@@ -50,28 +50,40 @@ public class RequestFormService implements IRequestForm {
         return requestFormRepository.findAll();
     }
     @Override
-    public RequestForm approveRequestForm(Long requestFormId) {
-        RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
-        if (requestForm != null) {
-            requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
-            requestForm.getReservations().forEach(reservation -> {
-                reservation.setStatusReservation(StatusReservation.WAITING);
-                reservationRepository.save(reservation);
-            });
-            return requestFormRepository.save(requestForm);
-        }
-        return null;
+    public List<RequestForm> approveRequestForm(List<Long> requestFormIds) {
+        ArrayList<RequestForm> requestForms = new ArrayList<>();
+        requestFormIds.forEach(requestFormId -> {
+            RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
+            if (requestForm != null) {
+                requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
+                requestForm.setTimeResponse(new Date());
+                requestForm.getReservations().forEach(reservation -> {
+                    reservation.setStatusReservation(StatusReservation.WAITING);
+                    reservationRepository.save(reservation);
+                });
+                requestForms.add(requestFormRepository.save(requestForm));
+            }
+        });
+        return requestForms;
     }
 
     @Override
-    public RequestForm rejectRequestForm(Long requestFormId, String reasonReject) {
-        RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
-        if (requestForm != null) {
-            requestForm.setStatusRequestForm(StatusRequestForm.REJECTED);
-            requestForm.setReasonReject(reasonReject);
-            return requestFormRepository.save(requestForm);
-        }
-        return null;
+    public List<RequestForm> rejectRequestForm(List<Long> requestFormIds, String reasonReject) {
+        ArrayList<RequestForm> requestForms = new ArrayList<>();
+        requestFormIds.forEach(requestFormId -> {
+            RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
+            if (requestForm != null) {
+                requestForm.setStatusRequestForm(StatusRequestForm.REJECTED);
+                requestForm.setReasonReject(reasonReject);
+                requestForm.setTimeResponse(new Date());
+                requestForm.getReservations().forEach(reservation -> {
+                    reservation.setStatusReservation(StatusReservation.CANCELED);
+                    reservationRepository.save(reservation);
+                });
+                requestForms.add(requestFormRepository.save(requestForm));
+            }
+        });
+        return requestForms;
     }
 
     @Override

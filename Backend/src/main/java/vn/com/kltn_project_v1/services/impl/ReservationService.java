@@ -144,12 +144,12 @@ public class ReservationService implements IReservation {
     private int totalMoney(List<Long> serviceIds, Long roomId, Date timeStart, Date timeEnd) {
         int total = 0;
         for(Long serviceId : serviceIds){
-            total += serviceRepository.findById(serviceId).get().getPrice().getValue();
+            total += serviceRepository.findById(serviceId).get().getPriceService().getValue();
         }
         Room room = roomRepository.findById(roomId).orElse(null);
         int diffInMinutes = (int)(timeEnd.getTime() - timeStart.getTime()) / (60 * 1000);
         assert room != null;
-        total += room.getPrice().getValue() * diffInMinutes;
+        total += room.getPriceRoom().getValue() * diffInMinutes;
         return total;
     }
 }

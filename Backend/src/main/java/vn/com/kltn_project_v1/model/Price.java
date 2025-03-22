@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Builder
@@ -16,15 +17,12 @@ public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long priceId;
-
     private int value;
-    private Date timeApply;
-    @Enumerated(EnumType.STRING)
-    private Type type;
+    private Date timeStart;
+    private Date timeEnd;
+    @OneToMany(mappedBy = "price")
+    private List<PriceRoom> priceRoom;
+    @OneToMany(mappedBy = "price")
+    private List<PriceService> priceService;
 
-    public Price(int value, Date timeApply, Type type) {
-        this.value = value;
-        this.timeApply = timeApply;
-        this.type = type;
-    }
 }

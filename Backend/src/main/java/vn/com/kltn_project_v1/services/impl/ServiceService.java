@@ -27,16 +27,13 @@ public class ServiceService implements IService {
 
     @Override
     public Service createService(ServiceDTO serviceDTO) {
-        Price price = priceRepository.save(new Price(serviceDTO.getPrice(), new Date(), Type.SERVICE));
         Service service = modelMapper.map(serviceDTO, Service.class);
-        service.setPrice(price);
         return serviceRepository.save(service);
     }
 
     @Override
     public Service upDateService(ServiceDTO serviceDTO) {
         Service service = modelMapper.map(serviceDTO, Service.class);
-        service.setPrice(priceRepository.findById(serviceDTO.getPriceId()).orElse(null));
         return serviceRepository.save(service);
     }
 

@@ -17,8 +17,8 @@ public class Service {
     private long serviceId;
     private String serviceName;
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "priceId")
-    private Price price;
+    @OneToOne
+    @JoinColumn(name = "priceServiceId")
+    private PriceService priceService;
 
 }

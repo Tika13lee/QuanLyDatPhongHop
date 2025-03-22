@@ -11,8 +11,8 @@ public interface IRequestForm {
     RequestForm createRequestForm(RequestFormDTO requestFormDTO);
     RequestForm getRequestFormById(Long requestFormId);
     List<RequestForm> getAllRequestForm();
-    RequestForm approveRequestForm(Long requestFormId);
-    RequestForm rejectRequestForm(Long requestFormId, String reasonReject);
+    List<RequestForm> approveRequestForm(List<Long> requestFormId);
+    List<RequestForm> rejectRequestForm(List<Long> requestFormId, String reasonReject);
     List<RequestForm> getRequestFormByBookerId(Long bookerId, StatusRequestForm statusRequestForm);
 
     List<RequestForm> getRequestFormByApproverId(Long approverId, StatusRequestForm statusRequestForm);

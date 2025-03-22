@@ -1,6 +1,8 @@
 package vn.com.kltn_project_v1.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +24,7 @@ public class RequestFormController {
         try {
             List<Reservation> reservations = requestFormService.checkDayRequestForm(requestFormDTO);
             if (!reservations.isEmpty()) {
-                return ResponseEntity.badRequest().body(reservations);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reservations);
             }
             return ResponseEntity.ok(requestFormService.createRequestForm(requestFormDTO));
         } catch (Exception e) {
@@ -47,17 +49,17 @@ public class RequestFormController {
         }
     }
     @PostMapping("/approveRequestForm")
-    public ResponseEntity<?> approveRequestForm(@RequestParam Long requestFormId) {
+    public ResponseEntity<?> approveRequestForm(@RequestBody List<Long> requestFormIds) {
         try {
-            return ResponseEntity.ok(requestFormService.approveRequestForm(requestFormId));
+            return ResponseEntity.ok(requestFormService.approveRequestForm(requestFormIds));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }
     }
     @PostMapping("/rejectRequestForm")
-    public ResponseEntity<?> rejectRequestForm(@RequestParam Long requestFormId, @RequestParam String reasonReject) {
+    public ResponseEntity<?> rejectRequestForm(@RequestBody List<Long> requestFormIds, @RequestParam String reasonReject) {
         try {
-            return ResponseEntity.ok(requestFormService.rejectRequestForm(requestFormId, reasonReject));
+            return ResponseEntity.ok(requestFormService.rejectRequestForm(requestFormIds, reasonReject));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }
