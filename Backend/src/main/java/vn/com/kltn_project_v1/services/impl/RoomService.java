@@ -15,6 +15,7 @@ import vn.com.kltn_project_v1.model.*;
 import vn.com.kltn_project_v1.repositories.*;
 import vn.com.kltn_project_v1.services.IReservation;
 import vn.com.kltn_project_v1.services.IRoom;
+import vn.com.kltn_project_v1.until.ConvertData;
 
 import java.awt.print.Pageable;
 import java.time.Instant;
@@ -53,13 +54,25 @@ public class RoomService implements IRoom {
                 .imgs(roomDTO.getImgs())
                 .build();
         Price price = priceRepository.findActivePrice(Date.from(Instant.now()));
+
         PriceRoom priceRoom = PriceRoom.builder()
                 .price(price)
                 .room(room)
                 .value(roomDTO.getPrice())
                 .build();
-        priceRoomRepository.save(priceRoom);
+        room.setPriceRoom(priceRoom);
         roomRepository.save(room);
+        //them phong vao tat ca bang gia
+        priceRepository.findAll().forEach(p->{
+            if (p.getPriceId()!=price.getPriceId()){
+                PriceRoom priceRoom1 = PriceRoom.builder()
+                        .price(p)
+                        .room(room)
+                        .value(roomDTO.getPrice())
+                        .build();
+                priceRoomRepository.save(priceRoom1);
+            }
+        });
         roomDTO.getRoom_deviceDTOS().forEach(rd->{
             Device device = null;
             try {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import vn.com.kltn_project_v1.model.Price;
 import vn.com.kltn_project_v1.model.Type;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 @Repository
@@ -16,10 +17,17 @@ public interface PriceRepository extends JpaRepository<Price, Long> {
             "WHERE p.isActive = true " +
             "AND FUNCTION('DATE', p.timeStart) <= FUNCTION('DATE', ?2) " +
             "AND FUNCTION('DATE', p.timeEnd) >= FUNCTION('DATE', ?1)")
-    List<Price> findPriceByTimeOverlap(Date timeStart, Date timeEnd);
+    List<Price> findPriceByTimeOverlap(LocalDate timeStart, LocalDate timeEnd);
 
     @Query("SELECT p FROM Price p " +
-            "WHERE p.isActive = true and (:time is null or(p.timeStart <= ?1 and p.timeEnd >= ?1))")
+            "WHERE p.isActive = true " +
+            "AND (:time IS NULL OR FUNCTION('DATE', p.timeStart) <= FUNCTION('DATE', :time) " +
+            "AND FUNCTION('DATE', p.timeEnd) >= FUNCTION('DATE', :time))")
     Price findActivePrice(@Param("time") Date time);
+
+    @Query("SELECT p FROM Price p " +
+            "WHERE :time IS NULL OR (FUNCTION('DATE', p.timeStart) <= FUNCTION('DATE', :time) " +
+            "AND FUNCTION('DATE', p.timeEnd) >= FUNCTION('DATE', :time))")
+    List<Price> findPriceInTime(@Param("time") Date time);
 
 }

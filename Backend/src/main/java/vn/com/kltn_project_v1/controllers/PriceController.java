@@ -70,4 +70,13 @@ public class PriceController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/getPricesInTime")
+    public ResponseEntity<?> getPricesInTime(@RequestParam(name = "time") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date time){
+        try {
+            return ResponseEntity.ok(priceService.findPriceInTime(time));
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

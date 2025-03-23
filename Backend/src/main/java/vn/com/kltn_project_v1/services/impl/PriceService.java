@@ -2,7 +2,7 @@ package vn.com.kltn_project_v1.services.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -12,10 +12,14 @@ import vn.com.kltn_project_v1.model.PriceRoom;
 import vn.com.kltn_project_v1.model.Room;
 import vn.com.kltn_project_v1.repositories.*;
 import vn.com.kltn_project_v1.services.IPrice;
+import vn.com.kltn_project_v1.until.ConvertData;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static vn.com.kltn_project_v1.until.ConvertData.convertToLocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class PriceService implements IPrice {
@@ -82,7 +86,7 @@ public class PriceService implements IPrice {
     public List<Price> checkTime(Date timeStart, Date timeEnd){
         System.out.println(timeStart);
         System.out.println(timeEnd);
-        return priceRepository.findPriceByTimeOverlap(timeStart,timeEnd);
+        return priceRepository.findPriceByTimeOverlap(convertToLocalDate(timeStart),convertToLocalDate(timeEnd));
     }
 
     @Override
@@ -111,4 +115,10 @@ public class PriceService implements IPrice {
     public Price getActivePrice() {
         return priceRepository.findActivePrice(new Date());
     }
+
+    @Override
+    public List<Price> findPriceInTime(Date time) {
+        return priceRepository.findPriceInTime(time);
+    }
+
 }

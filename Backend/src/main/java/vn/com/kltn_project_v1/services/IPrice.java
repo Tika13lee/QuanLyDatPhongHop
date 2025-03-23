@@ -16,4 +16,5 @@ public interface IPrice {
     Price activePrice(Price price);
     Price getActivePrice(Date time);
     Price getActivePrice();
+    List<Price> findPriceInTime(Date time);
 }

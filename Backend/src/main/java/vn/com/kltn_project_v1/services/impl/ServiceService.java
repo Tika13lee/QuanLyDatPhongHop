@@ -3,14 +3,18 @@ package vn.com.kltn_project_v1.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import vn.com.kltn_project_v1.dtos.ServiceDTO;
-import vn.com.kltn_project_v1.model.Device;
+
 import vn.com.kltn_project_v1.model.Price;
+import vn.com.kltn_project_v1.model.PriceRoom;
 import vn.com.kltn_project_v1.model.Service;
 import vn.com.kltn_project_v1.model.Type;
 import vn.com.kltn_project_v1.repositories.PriceRepository;
+import vn.com.kltn_project_v1.repositories.PriceServiceRepository;
 import vn.com.kltn_project_v1.repositories.ServiceRepository;
 import vn.com.kltn_project_v1.services.IService;
+import vn.com.kltn_project_v1.until.ConvertData;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +23,8 @@ import java.util.List;
 public class ServiceService implements IService {
     private final ServiceRepository serviceRepository;
     private final ModelMapper modelMapper;
+    private final PriceRepository priceRepository;
+    private final PriceServiceRepository priceServiceRepository;
     @Override
     public List<Service> findAll() {
       return serviceRepository.findAll();
@@ -27,7 +33,26 @@ public class ServiceService implements IService {
     @Override
     public Service createService(ServiceDTO serviceDTO) {
         Service service = modelMapper.map(serviceDTO, Service.class);
-        return serviceRepository.save(service);
+        Price price = priceRepository.findActivePrice(Date.from(Instant.now()));
+        if (price == null) {
+            return null;
+        }
+        vn.com.kltn_project_v1.model.PriceService priceService = new vn.com.kltn_project_v1.model.PriceService();
+        priceService.setPrice(price);
+        priceService.setService(service);
+        priceService.setValue(serviceDTO.getPrice());
+        service.setPriceService(priceService);
+        serviceRepository.save(service);
+        priceRepository.findAll().forEach(p->{
+            if (p.getPriceId()!=price.getPriceId()){
+                vn.com.kltn_project_v1.model.PriceService priceService1 = new vn.com.kltn_project_v1.model.PriceService();
+                priceService1.setPrice(p);
+                priceService1.setService(service);
+                priceService1.setValue(serviceDTO.getPrice());
+                priceServiceRepository.save(priceService1);
+            }
+        });
+        return service;
     }
 
     @Override
@@ -47,7 +72,7 @@ public class ServiceService implements IService {
     }
 
     @Override
-    public Service getServiceByName(String name) {
+    public List<Service> getServiceByName(String name) {
         return serviceRepository.findServiceByServiceName(name);
     }
 }
