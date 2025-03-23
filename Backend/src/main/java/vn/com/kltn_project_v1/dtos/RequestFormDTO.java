@@ -5,6 +5,7 @@ import vn.com.kltn_project_v1.model.StatusRequestForm;
 import vn.com.kltn_project_v1.model.TypeRequestForm;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +19,5 @@ public class RequestFormDTO {
     private String reasonReject;
     private TypeRequestForm typeRequestForm;
     private ReservationDTO reservationDTO;
+    private List<Long> reservationIds;
 }

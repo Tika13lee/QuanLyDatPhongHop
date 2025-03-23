@@ -1,15 +1,14 @@
 package vn.com.kltn_project_v1.services.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import vn.com.kltn_project_v1.dtos.RequestFormDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.model.*;
-import vn.com.kltn_project_v1.repositories.RequestFormRepository;
-import vn.com.kltn_project_v1.repositories.RequestReservationRepository;
-import vn.com.kltn_project_v1.repositories.ReservationRepository;
-import vn.com.kltn_project_v1.repositories.RoomRepository;
+import vn.com.kltn_project_v1.repositories.*;
 import vn.com.kltn_project_v1.services.IRequestForm;
 import vn.com.kltn_project_v1.services.IReservation;
 
@@ -30,6 +29,9 @@ public class RequestFormService implements IRequestForm {
     private final IReservation reservationService;
     private final ModelMapper modelMapper;
     private final RoomRepository roomRepository;
+    private final ServiceRepository serviceRepository;
+    private final EmployeeRepository employeeRepository;
+    private final EntityManager entityManager;
     @Override
     public RequestForm createRequestForm(RequestFormDTO requestFormDTO) {
         RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
@@ -55,16 +57,40 @@ public class RequestFormService implements IRequestForm {
         requestFormIds.forEach(requestFormId -> {
             RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
             if (requestForm != null) {
-                requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
-                requestForm.setTimeResponse(new Date());
-                requestForm.getReservations().forEach(reservation -> {
-                    reservation.setStatusReservation(StatusReservation.WAITING);
-                    reservationRepository.save(reservation);
-                });
-                requestForms.add(requestFormRepository.save(requestForm));
+                if(!requestForm.getTypeRequestForm().equals(TypeRequestForm.UPDATE_RESERVATION)){
+                    requestForms.add(approveRequestFormCreate(requestForm));
+                }else {
+                    if(requestForm.getReservations().size()==1){
+                        requestForms.add(approveRequestFormUpdateOne(requestForm));
+                    }
+                }
             }
         });
         return requestForms;
+    }
+    private RequestForm approveRequestFormCreate(RequestForm requestForm){
+        requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
+        requestForm.setTimeResponse(new Date());
+        requestForm.getReservations().forEach(reservation -> {
+            reservation.setStatusReservation(StatusReservation.WAITING);
+            reservationRepository.save(reservation);
+        });
+        return requestFormRepository.save(requestForm);
+    }
+    @Transactional
+    protected RequestForm approveRequestFormUpdateOne(RequestForm requestForm){
+        requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
+        requestForm.setTimeResponse(new Date());
+        requestForm.getReservations().forEach(reservation -> {
+            reservation.setNote(requestForm.getRequestReservation().getNote());
+            reservation.setServices(requestForm.getRequestReservation().getServiceIds().stream().map(serviceId -> serviceRepository.findById(serviceId).orElse(null)).toList());
+            reservation.setFilePaths(requestForm.getRequestReservation().getFilePaths());
+            reservation.setAttendants(requestForm.getRequestReservation().getEmployeeIds().stream().map(employeeId -> employeeRepository.findById(employeeId).orElse(null)).toList());
+            System.out.println(requestForm.getReservations().getClass());
+            entityManager.detach(reservation);
+            reservationRepository.save(reservation);
+        });
+        return requestFormRepository.save(requestForm);
     }
 
     @Override
@@ -122,5 +148,22 @@ public class RequestFormService implements IRequestForm {
             });
         });
         return reservations;
+    }
+
+    @Override
+    public RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO) {
+        RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
+        RequestForm requestForm = modelMapper.map(requestFormDTO, RequestForm.class);
+        requestForm.setRequestReservation(requestReservation);
+        requestForm.setStatusRequestForm(StatusRequestForm.PENDING);
+        requestForm.setTypeRequestForm(TypeRequestForm.UPDATE_RESERVATION);
+        requestForm.setReservations(new ArrayList<>());
+        requestFormDTO.getReservationIds().forEach(reservationId -> {
+            Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
+            if (reservation != null) {
+                requestForm.getReservations().add(reservation);
+            }
+        });
+        return requestFormRepository.save(requestForm);
     }
 }

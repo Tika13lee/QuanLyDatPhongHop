@@ -17,7 +17,6 @@ public interface IRequestForm {
 
     List<RequestForm> getRequestFormByApproverId(Long approverId, StatusRequestForm statusRequestForm);
     List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm);
-
-
     List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO);
+    RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO);
 }

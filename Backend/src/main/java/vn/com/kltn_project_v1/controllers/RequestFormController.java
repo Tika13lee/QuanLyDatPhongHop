@@ -88,4 +88,12 @@ public class RequestFormController {
             return ResponseEntity.ok(e.toString());
         }
     }
+    @PostMapping("/createRequestFormUpdateReservationOne")
+    public ResponseEntity<?> createRequestFormUpdateReservationOne(@RequestBody RequestFormDTO requestFormDTO) {
+        try {
+            return ResponseEntity.ok(requestFormService.createRequestFormUpdateReservationOne(requestFormDTO));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
 }
