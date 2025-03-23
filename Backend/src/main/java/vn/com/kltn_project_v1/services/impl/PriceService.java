@@ -101,4 +101,14 @@ public class PriceService implements IPrice {
             return null;
         }
     }
+
+    @Override
+    public Price getActivePrice(Date time) {
+        return priceRepository.findActivePrice(time);
+    }
+
+    @Override
+    public Price getActivePrice() {
+        return priceRepository.findActivePrice(new Date());
+    }
 }

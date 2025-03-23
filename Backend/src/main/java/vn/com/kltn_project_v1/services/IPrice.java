@@ -14,4 +14,6 @@ public interface IPrice {
 
     List<Price> checkTime(Date timeStart, Date timeEnd);
     Price activePrice(Price price);
+    Price getActivePrice(Date time);
+    Price getActivePrice();
 }

@@ -38,9 +38,10 @@ public class RoomService implements IRoom {
     private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
     private final IReservation reservationService;
+    private final PriceRoomRepository   priceRoomRepository;
     @Override
     public Room createRoom(RoomDTO roomDTO) throws DataNotFoundException {
-       // Price price = priceRepository.save(new Price(roomDTO.getPrice(), new Date(), Type.ROOM));
+
         Location location = locationRepository.findById(roomDTO.getLocation().getLocationId())
                 .orElseThrow(()->new DataNotFoundException("Location not found"));
         Room room = Room.builder()
@@ -49,9 +50,15 @@ public class RoomService implements IRoom {
                 .capacity(roomDTO.getCapacity())
                 .statusRoom(StatusRoom.valueOf(roomDTO.getStatusRoom()))
                 .location(location)
-               // .price(price)
                 .imgs(roomDTO.getImgs())
                 .build();
+        Price price = priceRepository.findActivePrice(Date.from(Instant.now()));
+        PriceRoom priceRoom = PriceRoom.builder()
+                .price(price)
+                .room(room)
+                .value(roomDTO.getPrice())
+                .build();
+        priceRoomRepository.save(priceRoom);
         roomRepository.save(room);
         roomDTO.getRoom_deviceDTOS().forEach(rd->{
             Device device = null;
@@ -175,6 +182,19 @@ public class RoomService implements IRoom {
         System.out.println(rooms.size());
         rooms.removeAll(reservationRepository.findRoomsByTime(timeStart, timeEnd));
         return rooms;
+    }
+
+    @Override
+    public Room updateRoom(RoomDTO roomDTO) throws DataNotFoundException {
+        Room room = roomRepository.findById(roomDTO.getRoomId())
+                .orElseThrow(()->new DataNotFoundException("Room not found"));
+        room.setRoomName(roomDTO.getRoomName());
+        room.setCapacity(roomDTO.getCapacity());
+        room.setStatusRoom(StatusRoom.valueOf(roomDTO.getStatusRoom()));
+        room.setTypeRoom(roomDTO.getTypeRoom());
+        room.setImgs(roomDTO.getImgs());
+        roomRepository.save(room);
+        return room;
     }
 
 

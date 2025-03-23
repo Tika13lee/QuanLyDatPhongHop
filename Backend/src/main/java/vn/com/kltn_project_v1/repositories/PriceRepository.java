@@ -2,6 +2,7 @@ package vn.com.kltn_project_v1.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.com.kltn_project_v1.model.Price;
 import vn.com.kltn_project_v1.model.Type;
@@ -16,5 +17,9 @@ public interface PriceRepository extends JpaRepository<Price, Long> {
             "AND FUNCTION('DATE', p.timeStart) <= FUNCTION('DATE', ?2) " +
             "AND FUNCTION('DATE', p.timeEnd) >= FUNCTION('DATE', ?1)")
     List<Price> findPriceByTimeOverlap(Date timeStart, Date timeEnd);
+
+    @Query("SELECT p FROM Price p " +
+            "WHERE p.isActive = true and (:time is null or(p.timeStart <= ?1 and p.timeEnd >= ?1))")
+    Price findActivePrice(@Param("time") Date time);
 
 }
