@@ -204,3 +204,44 @@
   cursor: pointer;
   color: var(--color-error);
 }
+
+// modal add device
+.device-table-container {
+  margin-top: 1rem;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.device-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  min-width: 300px;
+}
+
+.device-table th,
+.device-table td {
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.device-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.device-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.device-table tr:hover {
+  background-color: #eef;
+}
+
+.device-table input[type="number"] {
+  width: 80px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

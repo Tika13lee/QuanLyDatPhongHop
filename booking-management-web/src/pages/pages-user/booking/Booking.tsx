@@ -183,12 +183,15 @@ function Booking() {
     roomName: string,
     timeStart: string
   ) => {
-    const today = new Date().toISOString().split("T")[0];
-    if (selectedDate < today) {
+    const selectedDateTime = new Date(`${selectedDate}T${timeStart}:00`);
+    selectedDateTime.setMinutes(selectedDateTime.getMinutes() + 30);
+    const today = new Date();
+    console.log("today", today);
+    if (selectedDateTime < today) {
       toast.warning(
-        "Vui lòng chọn ngày khác! " +
-          "Bạn không thể đặt lịch cho ngày " +
-          formatDateString(selectedDate)
+        "Bạn không thể đặt lịch lúc này cho ngày " +
+          formatDateString(selectedDate) +
+          " Vui lòng chọn giờ khác hoặc ngày khác! "
       );
       return;
     }

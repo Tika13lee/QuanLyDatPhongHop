@@ -12,6 +12,7 @@ import { AppDispatch } from "../../../app/store";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import {
   FaPlus,
+  MdOutlineEdit,
   MdOutlineInfo,
   MdSearch,
 } from "../../../components/icons/icons";
@@ -138,8 +139,6 @@ const Employee = () => {
       [filterName]: value,
     }));
   };
-
-
 
   // xử lý url ảnh
   const handleFilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -652,7 +651,7 @@ const Employee = () => {
               <th>Điện thoại</th>
               <th>Phòng ban</th>
               <th>Vị trí</th>
-              <th>Chi tiết</th>
+              <th>Chỉnh sửa</th>
             </tr>
           </thead>
           <tbody>
@@ -685,8 +684,9 @@ const Employee = () => {
                 <td
                   className={cx("icon-info")}
                   onClick={() => handleEditEmployee(emp)}
+                  style={{width: "90px"}}
                 >
-                  <IconWrapper icon={MdOutlineInfo} color="#0670C7" />
+                  <IconWrapper icon={MdOutlineEdit} color="#0670C7" size={20} />
                 </td>
               </tr>
             ))}

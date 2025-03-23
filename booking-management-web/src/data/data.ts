@@ -6,6 +6,7 @@ export type PriceTableProps = {
   priceName: string;
   active: boolean;
   priceRoom: {
+    
     roomId: number;
     roomName: string;
     value: number;
@@ -175,7 +176,6 @@ export type DeviceProps = {
   deviceId: number;
   deviceName: string;
   description: string;
-  price?: PriceProps;
 };
 
 // dịch vụ

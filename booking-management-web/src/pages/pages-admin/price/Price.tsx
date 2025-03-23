@@ -10,6 +10,8 @@ import DatePicker from "react-datepicker";
 import { set } from "react-datepicker/dist/date_utils";
 import { log } from "console";
 import usePost from "../../../hooks/usePost";
+import DetailModal from "../../../components/Modal/DetailModal";
+import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
 
@@ -30,17 +32,18 @@ function Price() {
   const [isShowModalDetail, setIsShowModalDetail] = useState<boolean>(false);
   const [isOpenAddModal, setIsOpenAddModal] = useState<boolean>(false);
   const [isApply, setIsApply] = useState<boolean>(false);
-  const [selectedPriceTable, setSelectedPriceTable] = useState<
-    PriceTableProps | null | undefined
-  >(null);
-  // const [roomList, setRoomList] = useState<RoomListType[]>([]);
-  // const [serviceList, setServiceList] = useState<ServiceListType[]>([]);
+  const [selectedPriceTable, setSelectedPriceTable] =
+    useState<PriceTableProps | null>(null);
   const [isCheckApply, setIsCheckApply] = useState<boolean>(false);
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<Date>();
-  // const [duplicatePrices, setDuplicatePrices] = useState<
-  //   PriceTableProps[] | null
-  // >([]);
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   const [newPriceData, setNewPriceData] = useState({
     priceName: "",
@@ -51,16 +54,7 @@ function Price() {
     priceRooms: [] as RoomListType[],
   });
 
-  // const {
-  //   data: checkApply,
-  //   loading: checkApplyLoading,
-  //   error: checkApplyError,
-  // } = useFetch<PriceTableProps[]>(
-  //   `http://localhost:8080/api/v1/price/checkTimePrice?timeStart=${
-  //     new Date(newPriceData.timeStart).toISOString
-  //   }&timeEnd=${new Date(newPriceData.timeEnd).toISOString}`
-  // );
-
+  // kiểm tra thời gian áp dụng
   const fetchCheckApply = async () => {
     try {
       const response = await fetch(
@@ -74,10 +68,12 @@ function Price() {
     }
   };
 
+  // reset thời gian khi thay đổi
   useEffect(() => {
     setIsCheckApply(false);
   }, [startTime, endTime]);
 
+  // kiểm tra thời gian áp dụng
   const handleCheckApply = async () => {
     setIsCheckApply(!isCheckApply);
     if (startTime && endTime) {
@@ -101,7 +97,7 @@ function Price() {
               price.timeStart
             )} đến ${formatDateString(price.timeEnd)}\n`;
           });
-          alert("Thời gian này đã trùng với: " + response);
+          alert("Thời gian này đã trùng với: \n" + response);
           setIsCheckApply(false);
         }
       }
@@ -131,8 +127,14 @@ function Price() {
     const response = await postData(updateNewPriceData, { method: "POST" });
 
     if (response) {
-      alert("Thêm bảng giá thành công.");
-      setIsOpenAddModal(false);
+      console.log(response);
+      setPopupMessage("Thêm bảng giá thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      setPricesTable([...pricesTable, response.data]);
+      
+      handleCloseAddModal();
     } else {
       alert("Lỗi khi thêm bảng giá.");
     }
@@ -162,6 +164,9 @@ function Price() {
     setIsOpenAddModal(false);
     selectedPriceTable && setSelectedPriceTable(null);
     setIsCheck([]);
+    setIsCheckApply(false);
+    setStartTime(undefined);
+    setEndTime(undefined);
   };
 
   // lấy bảng giá
@@ -177,28 +182,6 @@ function Price() {
   useEffect(() => {
     if (priceList) {
       setPricesTable(priceList);
-      // priceList.forEach((price) => {
-      //   price.priceRoom.forEach((room) => {
-      //     setRoomList((prevRoomList) => [
-      //       ...prevRoomList,
-      //       {
-      //         roomId: room.priceRoomId,
-      //         roomName: room.roomName,
-      //       },
-      //     ]);
-      //   });
-      // });
-      // priceList.forEach((price) => {
-      //   price.priceService.forEach((service) => {
-      //     setServiceList((prevServiceList) => [
-      //       ...prevServiceList,
-      //       {
-      //         serviceId: service.priceServiceId,
-      //         serviceName: service.serviceName,
-      //       },
-      //     ]);
-      //   });
-      // });
     }
   }, [priceList]);
 
@@ -218,7 +201,7 @@ function Price() {
       const selected = pricesTable.find(
         (price) => price.priceId === updatedCheck[0]
       );
-      setSelectedPriceTable(selected);
+      if (selected) setSelectedPriceTable(selected);
     } else {
       setSelectedPriceTable(null);
     }
@@ -226,7 +209,8 @@ function Price() {
 
   // Xử lý mở và đóng modal chi tiết
   const handleOpenDetailModal = (priceTable: PriceTableProps) => {
-    setSelectedPriceTable(priceTable);
+    console.log(priceTable);
+    if (priceTable) setSelectedPriceTable(priceTable);
     setIsShowModalDetail(true);
   };
   const handleCloseDetailModal = () => {
@@ -234,7 +218,10 @@ function Price() {
     setSelectedPriceTable(null);
   };
 
-  console.log(selectedPriceTable);
+  // Hàm đóng popup thông báo
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
 
   return (
     <div className={cx("price-container")}>
@@ -341,6 +328,37 @@ function Price() {
               ✖
             </button>
             <h3>Thông tin</h3>
+            {/* <div className={cx("price-info")}>
+              <div className={cx("form-row")}>
+                <div className={cx("form-group")}>
+                  <label>Tên</label>
+                  <input
+                    type="text"
+                    placeholder="Tên bảng giá"
+                    value={selectedPriceTable?.priceName}
+                    disabled
+                  />
+                </div>
+                <div className={cx("form-group")}>
+                  <label>Thời gian bắt đầu</label>
+                  <input
+                    type="text"
+                    placeholder="Thời gian bắt đầu"
+                    value={formatDateString(selectedPriceTable?.timeStart)}
+                    disabled
+                  />
+                </div>
+                <div className={cx("form-group")}>
+                  <label>Thời gian kết thúc</label>
+                  <input
+                    type="text"
+                    placeholder="Thời gian bắt đầu"
+                    value={selectedPriceTable?.timeStart}
+                    disabled
+                  />
+                </div>
+              </div>
+            </div> */}
             <div className={cx("price-detail")}>
               <div style={{ width: "45%" }}>
                 <h3>Dịch vụ</h3>
@@ -434,7 +452,7 @@ function Price() {
                     onChange={(date) => {
                       setEndTime(date as Date);
                     }}
-                    minDate={new Date()}
+                    minDate={startTime}
                     dateFormat="dd/MM/yyyy"
                     showTimeSelect={false}
                   />
@@ -581,6 +599,13 @@ function Price() {
           </div>
         </div>
       )}
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+      />
     </div>
   );
 }

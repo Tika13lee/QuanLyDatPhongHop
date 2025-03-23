@@ -19,12 +19,11 @@ function ApprovalList() {
   const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRequestFormId, setSelectedRequestFormId] = useState<
-    number | null
-  >(null);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
+  const [reasonReject, setReasonReject] = useState<string>("");
+  const [openModalReject, setOpenModalReject] = useState(false);
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -50,17 +49,6 @@ function ApprovalList() {
     setSchedulesApprove(requestForm ?? []);
   }, [requestForm]);
 
-  // useEffect(() => {
-  //   setSchedulesApprove(requestForm ?? []);
-  //   fetch(
-  //     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}`
-  //   )
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setSchedulesApprove(data);
-  //     });
-  // }, [requestForm]);
-
   // Xử lý chọn/bỏ chọn item
   const handleCheckboxChange = (id: number) => {
     setSelectedItems((prevSelected) =>
@@ -72,21 +60,22 @@ function ApprovalList() {
 
   // Phê duyệt
   const {
-    data: deActiveDataRes,
+    data: deActiveDataRe,
     loading: deActiveLoading,
     error: deActiveError,
-    postData: deActiveData,
+    postData: approvalForm,
   } = usePost<string[]>(
-    "http://localhost:8080/api/v1/reservation/approveReservation"
+    "http://localhost:8080/api/v1/requestForm/approveRequestForm"
   );
 
-  // xử lý phê duyệt
+  // Hàm phê duyệt
   const handleApprove = async () => {
     console.log(selectedItems);
-    const resp = await deActiveData(selectedItems, { method: "PUT" });
+
+    const resp = await approvalForm(selectedItems, { method: "POST" });
 
     if (resp) {
-      setPopupMessage("Lịch đã được phê duyệt!");
+      setPopupMessage("Lịch đã được phê duyệt thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
 
@@ -111,18 +100,27 @@ function ApprovalList() {
     error: nonActiveError,
     postData: nonActiveData,
   } = usePost<string[]>(
-    "http://localhost:8080/api/v1/reservation/disApproveReservation"
+    `http://localhost:8080/api/v1/requestForm/rejectRequestForm?reasonReject=${reasonReject}`
   );
 
-  // xử lý từ chối
-  const handleRejected = async () => {
-    console.log(selectedItems);
-    const resp = await nonActiveData(selectedItems, { method: "PUT" });
+  // Hàm từ chối
+  const handleRejected = async (reasonReject: string) => {
+    console.log(reasonReject);
+
+    if (!reasonReject) {
+      setPopupMessage("Vui lòng nhập lý do từ chối!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const resp = await nonActiveData(selectedItems, { method: "POST" });
 
     if (resp) {
-      setPopupMessage("Lịch đã bị từ chối!");
+      setPopupMessage("Lịch đã bị từ chối thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
+      setOpenModalReject(false);
 
       setSchedulesApprove(
         schedulesApprove.filter(
@@ -136,6 +134,15 @@ function ApprovalList() {
       setPopupType("error");
       setIsPopupOpen(true);
     }
+  };
+
+  // đóng mở modal từ chối
+  const handleOpenModalReject = () => {
+    setReasonReject("");
+    setOpenModalReject(true);
+  };
+  const handleCloseModalReject = () => {
+    setOpenModalReject(false);
   };
 
   // Hàm format ngày giờ
@@ -184,17 +191,48 @@ function ApprovalList() {
           <button
             className={cx("btn-action", "approve-btn")}
             onClick={handleApprove}
+            disabled={selectedItems.length === 0}
           >
             ✔ Phê Duyệt
           </button>
           <button
             className={cx("btn-action", "reject-btn")}
-            onClick={handleRejected}
+            onClick={handleOpenModalReject}
+            disabled={selectedItems.length === 0}
           >
             ✖ Từ Chối
           </button>
         </div>
       </div>
+
+      {/* Modal từ chối */}
+      {openModalReject && (
+        <div className={cx("modal-reject")}>
+          <div className={cx("modal-content")}>
+            <h3>Lý do từ chối</h3>
+            <input
+              type="text"
+              className={cx("reason-input")}
+              value={reasonReject}
+              onChange={(e) => setReasonReject(e.target.value)}
+            />
+            <div className={cx("actions")}>
+              <button
+                className={cx("btn-action", "reject-btn")}
+                onClick={() => handleRejected(reasonReject)}
+              >
+                Xác nhận
+              </button>
+              <button
+                className={cx("btn-action", "search-btn")}
+                onClick={handleCloseModalReject}
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
         <p className={cx("no-schedule-message")}>
@@ -215,7 +253,7 @@ function ApprovalList() {
               </tr>
             </thead>
             <tbody>
-              {schedulesApprove?.map((schedule) => {
+              {[...schedulesApprove]?.reverse().map((schedule) => {
                 const meetingStart = formatDateTime(
                   schedule.requestReservation.timeStart
                 );

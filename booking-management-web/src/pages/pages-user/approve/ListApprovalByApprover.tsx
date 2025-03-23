@@ -1,11 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./ListApprovalByApprover.module.scss";
 import { useEffect, useState } from "react";
-import {
-  RequestFormProps,
-  ReservationDetailProps,
-  ReservationProps,
-} from "../../../data/data";
+import { RequestFormProps } from "../../../data/data";
 import DetailModal from "../../../components/Modal/DetailModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
@@ -20,9 +16,7 @@ function ListApprovalByApprover() {
   const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRequestFormId, setSelectedRequestFormId] = useState<
-    number | null
-  >(null);
+
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
@@ -262,7 +256,7 @@ function ListApprovalByApprover() {
               </tr>
             </thead>
             <tbody>
-              {schedulesApprove?.map((schedule) => {
+              {[...schedulesApprove]?.map((schedule) => {
                 const meetingStart = formatDateTime(
                   schedule.requestReservation.timeStart
                 );
