@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findReservationsByRoomRoomIdAndTime(Long roomId, Date timeStart, Date timeEnd);
     @Query("SELECT DISTINCT r.room FROM Reservation r WHERE r.booker.phone = ?1")
     List<Room> findDistinctRoomsByBookerPhone(String phone);
-    @Query("SELECT r FROM Reservation r WHERE r.booker.phone = ?1 and r.statusReservation != 'CANCELED'  and (:timeStart is null or (r.timeStart between ?2 and ?3))")
+    @Query("SELECT r FROM Reservation r join r.attendants a WHERE (r.booker.phone = ?1 or a.phone =?1) and r.statusReservation != 'CANCELED'  and (:timeStart is null or (r.timeStart between ?2 and ?3))")
     List<Reservation> findReservationsByBookerPhoneAndTime(String phone, Date timeStart, Date timeEnd);
     @Query("SELECT r FROM Reservation r join r.attendants a WHERE (?1 is null or r.statusReservation = ?1) and a.phone = ?2 and (?3 is null or r.time between ?3 and ?4) and (?5 is null or r.room.approver.employeeName like %?5%) and (?6 is null or r.title like %?6%) ")
     List<Reservation> findReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation status, String phone, Date timeStart, Date timeEnd, String approver, String title);
