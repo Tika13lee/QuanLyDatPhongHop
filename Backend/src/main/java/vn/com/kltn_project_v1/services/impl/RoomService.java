@@ -188,11 +188,15 @@ public class RoomService implements IRoom {
     public Room updateRoom(RoomDTO roomDTO) throws DataNotFoundException {
         Room room = roomRepository.findById(roomDTO.getRoomId())
                 .orElseThrow(()->new DataNotFoundException("Room not found"));
-        room.setRoomName(roomDTO.getRoomName());
-        room.setCapacity(roomDTO.getCapacity());
-        room.setStatusRoom(StatusRoom.valueOf(roomDTO.getStatusRoom()));
-        room.setTypeRoom(roomDTO.getTypeRoom());
-        room.setImgs(roomDTO.getImgs());
+        if(roomDTO.getRoomName()!=null)
+            room.setRoomName(roomDTO.getRoomName());
+        if(roomDTO.getCapacity()!=0)
+            room.setCapacity(roomDTO.getCapacity());
+        if(roomDTO.getStatusRoom()!=null)
+            room.setStatusRoom(StatusRoom.valueOf(roomDTO.getStatusRoom()));
+        if(roomDTO.getTypeRoom()!=null)
+            room.setTypeRoom(roomDTO.getTypeRoom());
+
         roomRepository.save(room);
         return room;
     }

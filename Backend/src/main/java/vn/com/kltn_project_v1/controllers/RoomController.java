@@ -120,5 +120,13 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             return ResponseEntity.ok(e.toString());
         }
     }
+    @PutMapping("/updateRoom")
+    public ResponseEntity<?> updateRoom(@RequestBody RoomDTO roomDTO){
+        try {
+            return ResponseEntity.ok(roomService.updateRoom(roomDTO));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }
