@@ -13,4 +13,5 @@ public interface IPrice {
     Price updatePrice(Price price);
 
     List<Price> checkTime(Date timeStart, Date timeEnd);
+    Price activePrice(Price price);
 }

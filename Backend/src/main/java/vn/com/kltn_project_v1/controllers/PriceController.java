@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.PriceDTO;
+import vn.com.kltn_project_v1.model.Price;
 import vn.com.kltn_project_v1.services.IPrice;
 import vn.com.kltn_project_v1.services.IService;
 
@@ -47,6 +48,21 @@ public class PriceController {
     public ResponseEntity<?> checkTimePrice(@RequestParam(name = "timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeStart, @RequestParam(name = "timeEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date timeEnd){
         try {
             return ResponseEntity.ok(priceService.checkTime(timeStart,timeEnd));
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PostMapping("/activePrice")
+    public ResponseEntity<?> activePrice(@RequestParam Long priceId){
+        try {
+            Price price = priceService.getPriceById(priceId);
+            if(!priceService.checkTime(price.getTimeStart(),price.getTimeEnd()).isEmpty()){
+                return ResponseEntity.badRequest().body(priceService.checkTime(price.getTimeStart(),price.getTimeEnd()));
+            }
+            else {
+                return ResponseEntity.ok(priceService.activePrice(price));
+            }
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -31,5 +31,8 @@ public class PriceService {
     public String getServiceName() {
         return service != null ? service.getServiceName() : null;
     }
+    public Long getServiceId() {
+        return service != null ? service.getServiceId() : null;
+    }
 
 }

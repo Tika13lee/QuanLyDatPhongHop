@@ -35,7 +35,7 @@ public class PriceService implements IPrice {
 
     @Override
     public Price getPriceById(Long id) {
-        return null;
+        return priceRepository.findById(id).orElse(null);
     }
     @Override
     public Price savePrice(PriceDTO priceDTO) {
@@ -47,21 +47,27 @@ public class PriceService implements IPrice {
         priceDTO.getPriceRooms().forEach(priceRoomDTO -> {
             PriceRoom priceRoom = new PriceRoom();
             priceRoom.setValue(priceRoomDTO.getValue());
-            Room room = roomRepository.findById(priceRoomDTO.getRoomId()).get();
+            Room room = roomRepository.findById(priceRoomDTO.getRoomId()).orElse(null);
             priceRoom.setRoom(room);
             priceRoom.setPrice(price);
             priceRoomRepository.save(priceRoom);
-            room.setPriceRoom(priceRoom);
+            assert room != null;
+            if (price.isActive()) {
+                room.setPriceRoom(priceRoom);
+            }
             price.getPriceRoom().add(priceRoom);
         });
         priceDTO.getPriceServices().forEach(priceServiceDTO -> {
             vn.com.kltn_project_v1.model.PriceService priceService = new vn.com.kltn_project_v1.model.PriceService();
             priceService.setValue(priceServiceDTO.getValue());
-            vn.com.kltn_project_v1.model.Service service = serviceRepository.findById(priceServiceDTO.getServiceId()).get();
+            vn.com.kltn_project_v1.model.Service service = serviceRepository.findById(priceServiceDTO.getServiceId()).orElse(null);
             priceService.setService(service);
             priceService.setPrice(price);
             priceServiceRepository.save(priceService);
-            service.setPriceService(priceService);
+            assert service != null;
+            if (price.isActive()) {
+                service.setPriceService(priceService);
+            }
             price.getPriceService().add(priceService);
         });
         return priceRepository.save(price);
@@ -74,6 +80,25 @@ public class PriceService implements IPrice {
     }
     @Override
     public List<Price> checkTime(Date timeStart, Date timeEnd){
-        return priceRepository.findPriceByTimeStartAndTimeEnd(timeStart,timeEnd);
+        System.out.println(timeStart);
+        System.out.println(timeEnd);
+        return priceRepository.findPriceByTimeOverlap(timeStart,timeEnd);
+    }
+
+    @Override
+    public Price activePrice(Price price) {
+        if(price != null){
+            price.setActive(!price.isActive());
+            price.getPriceRoom().forEach(priceRoom -> {
+                priceRoom.getRoom().setPriceRoom(priceRoom);
+            });
+            price.getPriceService().forEach(priceService -> {
+                priceService.getService().setPriceService(priceService);
+            });
+            return priceRepository.save(price);
+        }
+        else {
+            return null;
+        }
     }
 }
