@@ -255,10 +255,10 @@ function ApprovalList() {
             <tbody>
               {[...schedulesApprove]?.reverse().map((schedule) => {
                 const meetingStart = formatDateTime(
-                  schedule.requestReservation.timeStart
+                  schedule.reservations[0].timeStart
                 );
                 const meetingEnd = formatDateTime(
-                  schedule.requestReservation.timeEnd
+                  schedule.reservations[0].timeEnd
                 );
 
                 return (
@@ -272,7 +272,7 @@ function ApprovalList() {
                         }
                       />
                     </td>
-                    <td>{schedule.requestReservation.title}</td>
+                    <td>{schedule.reservations[0].title}</td>
                     <td>{meetingStart.date}</td>
                     <td>
                       {meetingStart.time} - {meetingEnd.time}

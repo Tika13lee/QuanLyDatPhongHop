@@ -6,7 +6,7 @@ import PopupNotification from "../../../components/popup/PopupNotification";
 import { ServiceProps } from "../../../data/data";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { FaPlus, MdSearch } from "../../../components/icons/icons";
+import { FaPlus, FiRefreshCw, MdSearch } from "../../../components/icons/icons";
 import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
@@ -14,6 +14,7 @@ const cx = classNames.bind(styles);
 function Service() {
   const [openForm, setOpenForm] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceProps | null>();
+  const [searchValue, setSearchValue] = useState("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -21,6 +22,36 @@ function Service() {
   const [popupType, setPopupType] = useState<"success" | "error" | "info">(
     "info"
   );
+
+  const handleRefresh = () => {
+    setSearchValue("");
+    setServiceList(services || []);
+  };
+
+  // hàm xử lý tìm kiếm
+  const handleSearch = async () => {
+    if (!searchValue.trim()) {
+      setServiceList(services || []);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/v1/service/getServiceByName?name=${encodeURIComponent(
+          searchValue
+        )}`
+      );
+      if (!res.ok) throw new Error("Lỗi tìm kiếm");
+
+      const data = await res.json();
+      setServiceList(Array.isArray(data) ? data : [data]);
+    } catch (err) {
+      console.error("Lỗi khi tìm kiếm dịch vụ:", err);
+      setPopupMessage("Không tìm thấy dịch vụ phù hợp.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
 
   const {
     data: services,
@@ -204,10 +235,18 @@ function Service() {
       {/* Tìm kiếm */}
       <div className={cx("search-container")}>
         <div className={cx("search-box")}>
-          <input type="search" placeholder="Tìm kiếm theo tên dịch vụ" />
-          <button>
+          <input
+            type="search"
+            placeholder="Tìm kiếm theo tên dịch vụ"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+          <button onClick={handleSearch}>
             <IconWrapper icon={MdSearch} color="#fff" size={24} />
           </button>
+        </div>
+        <div className={cx("refresh-btn")} onClick={handleRefresh}>
+          <IconWrapper icon={FiRefreshCw} color="#000" size={24} />
         </div>
       </div>
 

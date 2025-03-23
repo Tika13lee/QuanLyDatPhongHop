@@ -8,9 +8,16 @@
 // tìm kiếm
 .search-container {
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
+  gap: 20px;
   align-items: center;
   background: var(--color-white);
+}
+
+.refresh-btn {
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
 }
 
 .search-box {

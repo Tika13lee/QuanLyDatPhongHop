@@ -183,12 +183,7 @@ const RoomDetail = () => {
       statusRoom: roomUpdateData.statusRoom,
       room_deviceDTOS: roomDetail.room_deviceDTOS,
       imgs: roomDetail.imgs,
-      // location: {
-      //   locationId: roomDetail.location.locationId,
-      //   branch: roomDetail.location.branch,
-      //   building: roomDetail.location.building,
-      //   floor: roomDetail.location,
-      // },
+
     };
 
     console.log("Dữ liệu gửi UPDATE", updateRoom);
