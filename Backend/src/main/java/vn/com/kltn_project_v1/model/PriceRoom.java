@@ -31,5 +31,8 @@ public class PriceRoom {
     public String getRoomName() {
         return room != null ? room.getRoomName() : null;
     }
+    public Long getRoomId() {
+        return room != null ? room.getRoomId() : null;
+    }
 
 }

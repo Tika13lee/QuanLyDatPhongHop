@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface PriceRepository extends JpaRepository<Price, Long> {
-    @Query("SELECT p FROM Price p WHERE(p.timeStart < ?1 and p.timeStart> ?2)or(p.timeEnd < ?1 and p.timeEnd >?2) or(p.timeStart <= ?1 and p.timeEnd >= ?2)")
-    List<Price> findPriceByTimeStartAndTimeEnd(Date timeStart, Date timeEnd);
+    @Query("SELECT p FROM Price p " +
+            "WHERE p.isActive = true " +
+            "AND FUNCTION('DATE', p.timeStart) <= FUNCTION('DATE', ?2) " +
+            "AND FUNCTION('DATE', p.timeEnd) >= FUNCTION('DATE', ?1)")
+    List<Price> findPriceByTimeOverlap(Date timeStart, Date timeEnd);
+
 }

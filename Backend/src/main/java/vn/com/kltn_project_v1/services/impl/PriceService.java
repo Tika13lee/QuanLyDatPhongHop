@@ -47,7 +47,7 @@ public class PriceService implements IPrice {
         priceDTO.getPriceRooms().forEach(priceRoomDTO -> {
             PriceRoom priceRoom = new PriceRoom();
             priceRoom.setValue(priceRoomDTO.getValue());
-            Room room = roomRepository.findById(priceRoomDTO.getRoomId()).get();
+            Room room = roomRepository.findById(priceRoomDTO.getRoomId()).orElse(null);
             priceRoom.setRoom(room);
             priceRoom.setPrice(price);
             priceRoomRepository.save(priceRoom);
@@ -57,7 +57,7 @@ public class PriceService implements IPrice {
         priceDTO.getPriceServices().forEach(priceServiceDTO -> {
             vn.com.kltn_project_v1.model.PriceService priceService = new vn.com.kltn_project_v1.model.PriceService();
             priceService.setValue(priceServiceDTO.getValue());
-            vn.com.kltn_project_v1.model.Service service = serviceRepository.findById(priceServiceDTO.getServiceId()).get();
+            vn.com.kltn_project_v1.model.Service service = serviceRepository.findById(priceServiceDTO.getServiceId()).orElse(null);
             priceService.setService(service);
             priceService.setPrice(price);
             priceServiceRepository.save(priceService);
@@ -74,6 +74,8 @@ public class PriceService implements IPrice {
     }
     @Override
     public List<Price> checkTime(Date timeStart, Date timeEnd){
-        return priceRepository.findPriceByTimeStartAndTimeEnd(timeStart,timeEnd);
+        System.out.println(timeStart);
+        System.out.println(timeEnd);
+        return priceRepository.findPriceByTimeOverlap(timeStart,timeEnd);
     }
 }
