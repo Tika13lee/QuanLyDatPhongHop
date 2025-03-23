@@ -102,8 +102,6 @@ function Location() {
     }
   }, [selectedBuilding]);
 
-  console.log(maxFloor);
-
   // mở modal thêm branch
   const handleOpenBranchModal = () => {
     setOpenBranchModal(true);
@@ -240,19 +238,18 @@ function Location() {
 
     console.log(newLocation);
 
-    // const response = await postLocation(newLocation);
+    const response = await postLocation(newLocation);
 
-    // if (response) {
-    //   setPopupMessage("Vị trí đã được thêm thành công!");
-    //   setPopupType("success");
-    //   setIsPopupOpen(true);
-    //   dispatch(fetchLocations());
-    //   resetForm();
-    // } else {
-    //   setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
-    //   setPopupType("error");
-    //   setIsPopupOpen(true);
-    // }
+    if (response) {
+      setPopupMessage("Vị trí đã được thêm thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      resetForm();
+    } else {
+      setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
   };
 
   // Reset form sau khi thêm

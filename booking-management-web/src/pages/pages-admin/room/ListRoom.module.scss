@@ -105,6 +105,20 @@
     border: 1px solid var(--border-color);
     padding: 7px;
     border-bottom: 1px solid var(--border-color);
+    width: 100px;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3),
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 50px;
+    text-align: right;
+  }
+
+  th:last-child,
+  :last-child {
+    width: 30px;
   }
 }
 

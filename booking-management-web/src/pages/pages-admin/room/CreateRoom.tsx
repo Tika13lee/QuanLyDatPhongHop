@@ -12,7 +12,6 @@ import usePost from "../../../hooks/usePost";
 import { useEffect, useRef, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import PopupNotification from "../../../components/popup/PopupNotification";
-import { set } from "react-datepicker/dist/date_utils";
 import { uploadImageToCloudinary } from "../../../utilities";
 
 const cx = classNames.bind(styles);
@@ -217,6 +216,7 @@ const CreateRoom = () => {
     "http://localhost:8080/api/v1/room/create"
   );
 
+  // Hàm kiểm tra form
   const validateForm = () => {
     // if (!roomData.location.building.branch.branchName) {
     //   return { isValid: false, message: "Vui lòng chọn chi nhánh!" };
@@ -284,9 +284,12 @@ const CreateRoom = () => {
       imgs: responsePictureCLoudinary,
     };
     console.log("Dữ liệu trước khi gửi:", requestData);
+
     const response = await postData(requestData, {
       headers: { "Content-Type": "application/json" },
     });
+
+    console.log("Response:", response);
 
     if (response) {
       if (response.status === 200 || response.status === 201) {
@@ -309,8 +312,6 @@ const CreateRoom = () => {
   const handleClosePopup = () => {
     setIsPopupOpen(false);
   };
-
-  console.log("Room Data:", roomData);
 
   return (
     <div className={cx("create-container")}>

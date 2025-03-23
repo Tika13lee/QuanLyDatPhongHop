@@ -3,20 +3,19 @@ import styles from "./RoomDetail.module.scss";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { IoIosArrowBack, MdOutlineEdit } from "../../../components/icons/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setSelectedRoom } from "../../../features/roomSlice";
 import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import {
-  DeviceProps,
-  RoomDeviceProps,
-  RoomProps,
-  RoomProps2,
-} from "../../../data/data";
+import { DeviceProps, RoomDeviceProps } from "../../../data/data";
 import { FaPlus } from "react-icons/fa";
-import { set } from "react-datepicker/dist/date_utils";
+import usePost from "../../../hooks/usePost";
+import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
+
+type RoomDevice = {
+  deviceName: string;
+  quantity: number;
+};
 
 const RoomDetail = () => {
   const navigate = useNavigate();
@@ -25,33 +24,38 @@ const RoomDetail = () => {
   const [selectedDevices, setSelectedDevices] = useState<{
     [deviceName: string]: { deviceId: number; quantity: number };
   }>({});
-  type RoomDevice = {
-    deviceName: string;
-    quantity: number;
-  };
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
+
   const [roomDevices, setRoomDevices] = useState<RoomDevice[]>([]);
 
-  // const dispatch = useDispatch();
   const { id } = useParams();
 
   // Lấy thông tin phòng
-  const {
+  let {
     data: roomDetail,
     loading,
     error,
+    setData,
   } = useFetch<any>(
     id ? `http://localhost:8080/api/v1/room/getRoomById?roomId=${id}` : ""
   );
 
-  useEffect(() => {
-      roomDetail?.room_deviceDTOS?.map((device: RoomDeviceProps) => {
-        setRoomDevices((prev) => [...prev, { deviceName: device.deviceName, quantity: device.quantity }]);
-      });
-      console.log("roomDevices", roomDevices);
-    
-  }, [roomDetail]);
-
   console.log("roomDetail", roomDetail);
+
+  // set ds thiết bị vào mảng mới
+  useEffect(() => {
+    roomDetail?.room_deviceDTOS?.map((device: RoomDeviceProps) => {
+      setRoomDevices((prev) => [
+        ...prev,
+        { deviceName: device.deviceName, quantity: device.quantity },
+      ]);
+    });
+  }, [roomDetail]);
 
   // Lấy ds thiết bị
   const {
@@ -97,7 +101,9 @@ const RoomDetail = () => {
     const roomId = roomDetail?.roomId;
 
     if (!roomId) {
-      alert("Không có roomId!");
+      setPopupMessage("Lỗi khi thêm thiết bị: không tìm thấy phòng.");
+      setPopupType("error");
+      setIsPopupOpen(true);
       return;
     }
 
@@ -118,7 +124,9 @@ const RoomDetail = () => {
       console.log("roomDevices1", roomDevices);
     }
 
-    alert("Thêm thiết bị thành công!");
+    setPopupMessage("Thêm thiết bị thành công!");
+    setPopupType("success");
+    setIsPopupOpen(true);
     handleCloseAddDeviceModal();
   };
 
@@ -131,13 +139,97 @@ const RoomDetail = () => {
     setIsModelAddDeviceOpen(false);
   };
 
+  const [roomUpdateData, setRoomUpdateData] = useState({
+    roomId: 0,
+    roomName: "",
+    capacity: "",
+    price: "",
+    location: {
+      locationId: 0,
+    },
+    typeRoom: "",
+    statusRoom: "",
+    room_deviceDTOS: [] as RoomDevice[],
+    imgs: [] as string[],
+  });
+
+  // cập nhật phòng
+  const {
+    data,
+    loading: updateRoomLoading,
+    error: updateRoomError,
+    postData,
+  } = usePost("http://localhost:8080/api/v1/room/updateRoom");
+
+  // cập nhật dữ liệu phòng khi popup đóng
+  useEffect(() => {
+    if (setData && isPopupOpen == false)
+      setData((prev: any) => ({
+        ...prev,
+        ...roomUpdateData,
+        // location: { ...prev.location },
+      }));
+  }, [isPopupOpen]);
+
+  // xử lý cập nhật phòng
+  const handleUpdateRoom = async () => {
+    const updateRoom = {
+      ...roomUpdateData,
+      roomId: roomDetail.roomId,
+      roomName: roomUpdateData.roomName,
+      capacity: roomUpdateData.capacity,
+      price: roomDetail.price,
+      typeRoom: roomUpdateData.typeRoom,
+      statusRoom: roomUpdateData.statusRoom,
+      room_deviceDTOS: roomDetail.room_deviceDTOS,
+      imgs: roomDetail.imgs,
+      // location: {
+      //   locationId: roomDetail.location.locationId,
+      //   branch: roomDetail.location.branch,
+      //   building: roomDetail.location.building,
+      //   floor: roomDetail.location,
+      // },
+    };
+
+    console.log("Dữ liệu gửi UPDATE", updateRoom);
+
+    const response = await postData(updateRoom, { method: "PUT" });
+    console.log("response", response);
+
+    if (response) {
+      setPopupMessage("Cập nhật phòng thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      handleCloseUpdateModal();
+    } else {
+      setPopupMessage("Cập nhật phòng thất bại!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
   // đóng mở modal chỉnh sửa
   const handleOpenUpdateModal = () => {
     setIsModelEditOpen(true);
+    setRoomUpdateData({
+      ...roomUpdateData,
+      roomName: roomDetail?.roomName,
+      capacity: roomDetail?.capacity,
+      typeRoom: roomDetail?.typeRoom,
+      statusRoom: roomDetail?.statusRoom,
+      imgs: roomDetail?.imgs,
+      price: roomDetail?.price,
+    });
     console.log("Edit room");
   };
   const handleCloseUpdateModal = () => {
     setIsModelEditOpen(false);
+  };
+
+  // Hàm đóng popup thông báo
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
   };
 
   return (
@@ -189,24 +281,48 @@ const RoomDetail = () => {
                         type="text"
                         id="room-name"
                         defaultValue={roomDetail.roomName}
+                        value={roomUpdateData.roomName}
+                        onChange={(e) => {
+                          setRoomUpdateData({
+                            ...roomUpdateData,
+                            roomName: e.target.value,
+                          });
+                        }}
                       />
                     </div>
 
                     <div className={cx("input-group")}>
                       <label htmlFor="room-capacity">Sức chứa</label>
                       <input
-                        type="text"
+                        type="number"
+                        min={1}
                         id="room-capacity"
                         defaultValue={roomDetail.capacity}
+                        value={roomUpdateData.capacity}
+                        onChange={(e) =>
+                          setRoomUpdateData({
+                            ...roomUpdateData,
+                            capacity: e.target.value,
+                          })
+                        }
                       />
                     </div>
 
                     <div className={cx("input-group")}>
                       <label htmlFor="room-type">Loại phòng</label>
-                      <select id="room-type" defaultValue={roomDetail.typeRoom}>
-                        <option value="Mặc định">Mặc định</option>
-                        <option value="Cao cấp">Cao cấp</option>
-                        <option value="Tiêu chuẩn">Tiêu chuẩn</option>
+                      <select
+                        id="room-type"
+                        defaultValue={roomDetail.typeRoom}
+                        onChange={(e) =>
+                          setRoomUpdateData({
+                            ...roomUpdateData,
+                            typeRoom: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="DEFAULT">Phòng mặc định</option>
+                        <option value="VIP">Phòng cao cấp</option>
+                        <option value="CONFERENCEROOM">Phòng hội nghị</option>
                       </select>
                     </div>
 
@@ -215,14 +331,25 @@ const RoomDetail = () => {
                       <select
                         id="room-status"
                         defaultValue={roomDetail.statusRoom}
+                        onChange={(e) =>
+                          setRoomUpdateData({
+                            ...roomUpdateData,
+                            statusRoom: e.target.value,
+                          })
+                        }
                       >
-                        <option value="Có sẵn">Có sẵn</option>
-                        <option value="Đã đặt">Đã đặt</option>
-                        <option value="Chờ phê duyệt">Chờ phê duyệt</option>
+                        <option value="AVAILABLE">Có sẵn</option>
+                        <option value="MAINTAIN">Đang bảo trì</option>
+                        <option value="REPAIR">Đang sửa chữa</option>
                       </select>
                     </div>
 
-                    <button className={cx("btn-save")}>Lưu</button>
+                    <button
+                      className={cx("btn-save")}
+                      onClick={handleUpdateRoom}
+                    >
+                      Lưu
+                    </button>
 
                     <button
                       className={cx("close-button")}
@@ -238,11 +365,11 @@ const RoomDetail = () => {
             <div className={cx("room-details")}>
               {/* vị trí */}
               <div className={cx("room-info-row")}>
-                {/* <p>
-                  <strong>Vị trí:</strong> {roomDetail?.location.branch} -{" "}
+                <p>
+                  <strong>Vị trí:</strong> {roomDetail?.location.branch} - tòa{" "}
                   {roomDetail?.location.building} - tầng{" "}
                   {roomDetail?.location.floor}
-                </p> */}
+                </p>
               </div>
               {/* sức chứa, giá */}
               <div className={cx("room-info-row")}>
@@ -301,7 +428,7 @@ const RoomDetail = () => {
                 </div>
               </div>
               <div className={cx("device-details")}>
-                {roomDevices.length >  roomDetail?.room_deviceDTOS?.length ? (
+                {roomDevices.length > roomDetail?.room_deviceDTOS?.length ? (
                   roomDevices.map((device, index) => (
                     <div key={index} className={cx("device-row")}>
                       <p className={cx("device-name")}>{device.deviceName}</p>
@@ -410,6 +537,13 @@ const RoomDetail = () => {
           </div>
         </div>
       </div>
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ type FetchResult<T> = {
   data: T | null;
   loading: boolean;
   error: Error | null;
+  setData?: (data: T) => void;
 };
 
 const useFetch = <T>(
@@ -43,7 +44,7 @@ const useFetch = <T>(
     };
   }, [url]);
 
-  return { data, loading, error };
+  return { data, loading, error, setData };
 };
 
 export default useFetch;
