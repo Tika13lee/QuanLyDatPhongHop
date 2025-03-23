@@ -19,7 +19,6 @@ import java.util.List;
 public class ServiceService implements IService {
     private final ServiceRepository serviceRepository;
     private final ModelMapper modelMapper;
-    private final PriceRepository priceRepository;
     @Override
     public List<Service> findAll() {
       return serviceRepository.findAll();
@@ -33,7 +32,12 @@ public class ServiceService implements IService {
 
     @Override
     public Service upDateService(ServiceDTO serviceDTO) {
-        Service service = modelMapper.map(serviceDTO, Service.class);
+        Service service = serviceRepository.findById(serviceDTO.getServiceId()).orElse(null);
+        if (service == null) {
+            return null;
+        }
+        service.setServiceName(serviceDTO.getServiceName());
+        service.setDescription(serviceDTO.getDescription());
         return serviceRepository.save(service);
     }
 

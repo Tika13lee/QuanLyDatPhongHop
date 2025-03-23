@@ -11,6 +11,7 @@ import vn.com.kltn_project_v1.services.IPrice;
 import vn.com.kltn_project_v1.services.IService;
 
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/price")
@@ -57,7 +58,8 @@ public class PriceController {
     public ResponseEntity<?> activePrice(@RequestParam Long priceId){
         try {
             Price price = priceService.getPriceById(priceId);
-            if(!priceService.checkTime(price.getTimeStart(),price.getTimeEnd()).isEmpty()){
+            List<Price> priceDuplicate = priceService.checkTime(price.getTimeStart(),price.getTimeEnd());
+            if(priceDuplicate.size()>1||(priceDuplicate.size()==1&&!priceDuplicate.get(0).getPriceId().equals(priceId))){
                 return ResponseEntity.badRequest().body(priceService.checkTime(price.getTimeStart(),price.getTimeEnd()));
             }
             else {
