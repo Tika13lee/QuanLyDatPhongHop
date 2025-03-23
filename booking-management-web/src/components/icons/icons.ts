@@ -13,7 +13,7 @@ import {
 import { FaRegBell } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
-
+import { FiRefreshCw } from "react-icons/fi";
 export {
   IoSettingsOutline,
   FaPlus,
@@ -26,4 +26,5 @@ export {
   MdOutlineInfo,
   MdSearch,
   IoIosArrowBack,
+  FiRefreshCw
 };

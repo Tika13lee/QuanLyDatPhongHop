@@ -12,6 +12,7 @@ import { log } from "console";
 import usePost from "../../../hooks/usePost";
 import DetailModal from "../../../components/Modal/DetailModal";
 import PopupNotification from "../../../components/popup/PopupNotification";
+import { FiRefreshCw } from "../../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
@@ -37,14 +38,15 @@ function Price() {
   const [isCheckApply, setIsCheckApply] = useState<boolean>(false);
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<Date>();
-
+  const [render, setRender] = useState<boolean>(false);
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupType, setPopupType] = useState<"success" | "error" | "info">(
     "info"
   );
-
+  const [dateFind, setDateFind] = useState<Date>();
+  const [dateValue, setDateValue] = useState<String>("");
   const [newPriceData, setNewPriceData] = useState({
     priceName: "",
     timeStart: "",
@@ -67,6 +69,21 @@ function Price() {
       console.error("Error:", error);
     }
   };
+  // tim kiem bang gia ap dung theo ngay
+  const handleSearchPrice = async (dateSreach : Date) => {
+    try {
+      
+      const response = await fetch(
+        `http://localhost:8080/api/v1/price/getPricesInTime?time=${dateSreach?.toISOString()}`
+      );
+      const data = await response.json();
+      console.log(data);
+      setPricesTable(data);
+    }
+    catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
   // reset thời gian khi thay đổi
   useEffect(() => {
@@ -183,11 +200,15 @@ function Price() {
     if (priceList) {
       setPricesTable(priceList);
     }
-  }, [priceList]);
+  }, [priceList, render]);
 
   // Xử lý khi chọn hoặc bỏ chọn
-  const handleCheckboxChange = (itemId: number, isActive: boolean) => {
+  const handleCheckboxChange = (itemId: number, isActive: boolean,eventCheck: boolean ) => {
+    if(eventCheck === false) {
+      setIsApply(eventCheck);
+    }else {
     setIsApply(isActive);
+    }
     let updatedCheck = [] as number[];
     if (isCheck.includes(itemId)) {
       updatedCheck = isCheck.filter((id) => id !== itemId);
@@ -207,6 +228,55 @@ function Price() {
     }
   };
 
+  // Áp dụng bảng giá
+  const handleActivePrice = async () => {
+    if (isCheck.length === 0) {
+      alert("Vui lòng chọn ít nhất một bảng giá.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/price/activePrice?priceId=${isCheck[0]}`, 
+        {
+          method: "POST", // Hoặc "POST" nếu cần
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      let stringErr = "";
+      data.forEach((resDup:any) => {
+        stringErr += `Bảng giá: ${resDup.priceName} từ ${formatDateString(resDup.timeStart)} đến ${formatDateString(resDup.timeEnd)}`;
+      });
+
+      if (response.status !== 200) {
+        setPopupMessage("Ngày áp dụng bị trùng với bảng giá khác:\n" + stringErr);
+        setPopupType("error");
+        setIsPopupOpen(true);
+        return;
+      }
+      setPopupMessage("Áp dụng bảng giá thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      setPricesTable((prevPrices) =>
+        prevPrices.map((price) =>
+          price.priceId === isCheck[0] ? { ...price, active: true } : price
+        )
+      );
+      
+    } catch (error) {
+      console.error("Lỗi khi áp dụng bảng giá:", error);
+      setPopupMessage("Lỗi khi áp dụng bảng giá.");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+    setIsCheck([]);
+  };
+  console.log(isCheck);
   // Xử lý mở và đóng modal chi tiết
   const handleOpenDetailModal = (priceTable: PriceTableProps) => {
     console.log(priceTable);
@@ -229,7 +299,15 @@ function Price() {
       <div className={cx("search-container")}>
         <div className={cx("search-date")}>
           <label>Tìm kiếm bảng giá theo ngày</label>
-          <input type="date" />
+          <input type="date" 
+           value={String(dateValue)}
+           onChange={(e) => {handleSearchPrice(new Date(e.target.value)); setDateValue(e.target.value)}}
+          />
+          <button type="button"
+          onClick={(e)=>{setRender(!render); setDateValue("")}} 
+          ><IconWrapper icon={FiRefreshCw} size={20}/></button>
+          
+            
         </div>
       </div>
 
@@ -240,7 +318,8 @@ function Price() {
           <button
             type="button"
             className={cx("action-btn", "apply-btn")}
-            disabled={isCheck.length === 0 || isApply === true}
+            disabled={isCheck.length === 0 || isApply === true || isCheck.length > 1}
+            onClick={handleActivePrice}
           >
             Áp dụng
           </button>
@@ -291,10 +370,11 @@ function Price() {
                       type="checkbox"
                       className={cx("checkbox")}
                       checked={isCheck.includes(Number(price.priceId))}
-                      onChange={() =>
+                      onChange={(e) =>
                         handleCheckboxChange(
                           Number(price.priceId),
-                          price.active
+                          price.active,
+                          e.target.checked
                         )
                       }
                     />
@@ -328,37 +408,6 @@ function Price() {
               ✖
             </button>
             <h3>Thông tin</h3>
-            {/* <div className={cx("price-info")}>
-              <div className={cx("form-row")}>
-                <div className={cx("form-group")}>
-                  <label>Tên</label>
-                  <input
-                    type="text"
-                    placeholder="Tên bảng giá"
-                    value={selectedPriceTable?.priceName}
-                    disabled
-                  />
-                </div>
-                <div className={cx("form-group")}>
-                  <label>Thời gian bắt đầu</label>
-                  <input
-                    type="text"
-                    placeholder="Thời gian bắt đầu"
-                    value={formatDateString(selectedPriceTable?.timeStart)}
-                    disabled
-                  />
-                </div>
-                <div className={cx("form-group")}>
-                  <label>Thời gian kết thúc</label>
-                  <input
-                    type="text"
-                    placeholder="Thời gian bắt đầu"
-                    value={selectedPriceTable?.timeStart}
-                    disabled
-                  />
-                </div>
-              </div>
-            </div> */}
             <div className={cx("price-detail")}>
               <div style={{ width: "45%" }}>
                 <h3>Dịch vụ</h3>
