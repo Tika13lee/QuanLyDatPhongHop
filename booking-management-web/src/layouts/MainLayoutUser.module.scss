@@ -15,9 +15,10 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-main);
+  background-color: var(--bg-sidebar);
   height: 100%;
   width: 210px;
+  border-right: 1px solid var(--border-color);
 }
 
 .sidebar-item {
@@ -26,14 +27,13 @@
   padding: 0 20px 0;
   height: 45px;
   width: 100%;
-  background-color: var(--bg-main);
-  color: var(--text-secondary);
+  background-color: var(--bg-sidebar);
+  color: var(--text-primary);
   text-decoration: none;
   cursor: pointer;
 
   &:hover {
     background-color: var(--bg-hover);
-    color: var(--color-white);
   }
 
   &.active {
@@ -59,30 +59,28 @@
     padding: 0 20px 0;
     height: 45px;
     cursor: pointer;
-    background-color: var(--bg-main);
-    color: var(--text-secondary);
+    background-color: var(--bg-sidebar);
+    color: var(--text-primary);
 
     &:hover {
       background-color: var(--bg-hover);
-      color: var(--color-white);
     }
   }
 
   .dropdown-menu {
-    background-color: var(--bg-main);
+    background-color: var(--bg-sidebar);
     border-radius: 5px;
 
     .dropdown-item {
       display: block;
       padding: 10px 16px;
-      color: var(--text-secondary);
+      color: var(--text-primary);
       text-decoration: none;
       transition: background-color 0.1s ease;
       padding-left: 40px;
 
       &:hover {
         background-color: var(--bg-hover);
-        color: var(--color-white);
       }
 
       &.active {
@@ -92,8 +90,4 @@
       }
     }
   }
-}
-
-.booking-open {
-  color: #cdc6c6;
 }

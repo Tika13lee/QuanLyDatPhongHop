@@ -13,17 +13,16 @@
 .approve-search {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   gap: 50px;
   padding: 10px 20px;
   background: var(--color-white);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  background-color: #353231;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1;
 }
 
 .search-input {
@@ -41,7 +40,7 @@
   align-items: center;
 
   label {
-    color: var(--color-white);
+    color: var(--text-primary);
   }
 }
 
@@ -49,7 +48,8 @@
 .schedule-list {
   max-height: 600px;
   overflow-y: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
+  margin: 10px 20px;
 }
 
 .schedule-table {
@@ -60,7 +60,7 @@
     position: sticky;
     top: 0;
     background-color: #fff;
-    z-index: 10;
+    z-index: 1;
   }
 
   th,
@@ -68,20 +68,29 @@
     border: 1px solid #ddd;
     padding: 10px;
     text-align: left;
+    width: 150px;
   }
-}
 
-.schedule-table th {
-  background-color: #a7a2a2;
-  font-weight: bold;
-}
+  th {
+    background-color: var(--color-table);
+    font-weight: bold;
+    color: var(--color-white);
+    text-align: center;
+  }
 
-.schedule-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
 
-.schedule-table tbody tr:hover {
-  background-color: #e6f7ff;
+  tbody tr:hover {
+    background-color: #e6f7ff;
+  }
+
+  td:last-child,
+  th:last-child {
+    width: 70px;
+    text-align: center;
+  }
 }
 
 .actions {

@@ -38,7 +38,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
       requestForm.requestReservation.timeFinishFrequency.length - 1
     ]
   );
-  
+
   return (
     <div className={cx("modal-overlay")} onClick={onClose}>
       <div className={cx("modal")} onClick={(e) => e.stopPropagation()}>
@@ -133,7 +133,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
               {requestForm.reservations[0].services?.map((service) => (
                 <li key={service.serviceId}>
                   {service.serviceName} -{" "}
-                  {/* {formatCurrencyVND(service.price.value)} */}
+                  {formatCurrencyVND(service.priceService.value)}
                 </li>
               ))}
             </ul>

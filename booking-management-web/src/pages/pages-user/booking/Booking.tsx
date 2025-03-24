@@ -6,7 +6,6 @@ import useFetch from "../../../hooks/useFetch";
 import ModalBooking from "../../../components/Modal/ModalBooking";
 import { formatDateString, times } from "../../../utilities";
 import PopupNotification from "../../../components/popup/PopupNotification";
-import { set } from "react-datepicker/dist/date_utils";
 import { toast, ToastContainer } from "react-toastify";
 
 const cx = classNames.bind(styles);
@@ -243,7 +242,7 @@ function Booking() {
                 setSelectedDate(new Date().toISOString().split("T")[0])
               }
             >
-              Hôm nay
+              Hiện tại
             </button>
             <button onClick={() => changeDay("previous")}>Trở về</button>
             <button onClick={() => changeDay("next")}>Tiếp</button>
@@ -288,7 +287,6 @@ function Booking() {
                           .split("T")[1]
                           .substring(0, 5);
 
-                        // Kiểm tra `time` có nằm trong khoảng đặt phòng không
                         return startTime <= time && time < endTime;
                       }
                     );
@@ -297,11 +295,9 @@ function Booking() {
                     const editBackground: { [key: string]: string } = {
                       normal: "normal",
                       pending: "pending",
-                      waiting_payment: "waiting_payment",
                       waiting: "waiting",
                       checked_in: "checked_in",
                       completed: "completed",
-                      waiting_cancel: "waiting_cancel",
                     };
                     let statusKey =
                       reservations[0]?.statusReservation.toLocaleLowerCase() ||

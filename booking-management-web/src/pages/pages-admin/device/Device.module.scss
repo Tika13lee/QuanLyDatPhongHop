@@ -94,7 +94,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 5;
 }
 
 .device-info {
@@ -228,7 +228,7 @@
     position: sticky;
     top: 0;
     background: var(--bg-active);
-    z-index: 10;
+    z-index: 1;
   }
 
   th,

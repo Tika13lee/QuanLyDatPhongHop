@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Schedule.module.scss";
-import {
-  format,
-  addDays,
-  startOfWeek,
-  addWeeks,
-  parseISO,
-  set,
-} from "date-fns";
-import { se, vi } from "date-fns/locale";
+import { format, addDays, startOfWeek, addWeeks, parseISO } from "date-fns";
+import { vi } from "date-fns/locale";
 import useFetch from "../../../hooks/useFetch";
 import {
   EmployeeProps,
@@ -108,7 +101,7 @@ const Schedule = () => {
     setIsModalOpenDetail(false);
   };
 
-  // xử lý đóng mở modal cập nhật
+  // mở modal cập nhật
   const handleOpenUpdate = () => {
     setIsOpenUpdateModal(true);
     setIsModalOpenDetail(false);
@@ -117,16 +110,7 @@ const Schedule = () => {
       reservationIds: [selectedSchedule?.reservationId ?? 0],
       reservationDTO: {
         ...formData.reservationDTO,
-        // time: selectedSchedule?.time ?? "",
-        // timeStart: selectedSchedule?.timeStart ?? "",
-        // timeEnd: selectedSchedule?.timeEnd ?? "",
         note: selectedSchedule?.note ?? "",
-        // description: selectedSchedule?.description ?? "",
-        // title: selectedSchedule?.title ?? "",
-        // frequency: selectedSchedule?.frequency ?? "",
-        // timeFinishFrequency: "",
-        // bookerId: user?.employeeId ?? "",
-        // roomId: selectedSchedule?.room.roomId,
         employeeIds:
           selectedSchedule?.attendants?.map((p) => p.employeeId) ?? [],
         serviceIds: selectedSchedule?.services?.map((s) => s.serviceId) ?? [],
@@ -136,6 +120,8 @@ const Schedule = () => {
 
     setSelectedEmployees(selectedSchedule?.attendants ?? []);
   };
+
+  // đóng modal cập nhật
   const handleCloseUpdate = () => {
     setIsOpenUpdateModal(false);
     setSelectedServiceNames([]);
@@ -145,16 +131,7 @@ const Schedule = () => {
       reservationIds: [] as number[],
       reservationDTO: {
         ...formData.reservationDTO,
-        // time: "",
-        // timeStart: "",
-        // timeEnd: "",
         note: "",
-        // description: "",
-        // title: "",
-        // frequency: "",
-        // timeFinishFrequency: "",
-        // bookerId: user?.employeeId ?? "",
-        // roomId: 0,
         employeeIds: [] as number[],
         serviceIds: [] as number[],
         filePaths: [] as string[],
@@ -162,28 +139,18 @@ const Schedule = () => {
     });
   };
 
-  console.log(selectedSchedule);
-
   const [formData, setFormData] = useState({
     timeRequest: new Date().toISOString(),
     reservationIds: [] as number[],
     reservationDTO: {
-      // time: new Date().toISOString(),
-      // timeStart: selectedSchedule?.timeStart ?? "",
-      // timeEnd: selectedSchedule?.timeEnd ?? "",
       note: "",
-      // description: selectedSchedule?.description ?? "",
-      // title: selectedSchedule?.title ?? "",
-      // frequency: selectedSchedule?.frequency ?? "",
-      // timeFinishFrequency: "",
-      // bookerId: user?.employeeId ?? "",
-      // roomId: selectedSchedule?.room.roomId,
       employeeIds: [] as number[],
       serviceIds: [] as number[],
       filePaths: [] as string[],
     },
   });
 
+  // cập nhật thông tin
   const {
     data,
     loading: requestLoading,
@@ -193,6 +160,7 @@ const Schedule = () => {
     "http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationOne"
   );
 
+  // xử lý cập nhật thông tin
   const handleUpdateForm = async () => {
     const updateForm = {
       ...formData,
@@ -226,19 +194,7 @@ const Schedule = () => {
       )
   );
 
-  // lấy nhân viên
-  const {
-    data: employees,
-    loading: employeesLoading,
-    error: employeesError,
-  } = useFetch<EmployeeProps[]>(
-    "http://localhost:8080/api/v1/employee/getAllEmployee"
-  );
-
-  // lấy danh sách nhân viên có trong lịch
-  const employeeIds =
-    selectedSchedule?.attendants?.map((p) => p.employeeId) ?? [];
-
+  // tìm kiếm nhân viên tham gia
   useEffect(() => {
     if (!phoneInput.trim()) {
       setSuggestedEmployees([]);
@@ -260,9 +216,6 @@ const Schedule = () => {
               !selectedEmployees.some((e) => e.employeeId === emp.employeeId)
           )
         );
-
-        console.log(data);
-        console.log(selectedEmployees);
         setShowSuggestions(true);
       } catch (err) {
         console.error("Lỗi tìm nhân viên:", err);
@@ -274,6 +227,7 @@ const Schedule = () => {
     return () => clearTimeout(delay);
   }, [phoneInput]);
 
+  // xử lý thêm nhân viên tham gia
   const handleAddEmployee = (employee: EmployeeProps) => {
     if (selectedEmployees.find((e) => e.employeeId === employee.employeeId))
       return;
@@ -296,6 +250,7 @@ const Schedule = () => {
     setShowSuggestions(false);
   };
 
+  // xử lý xóa nhân viên tham gia
   const handleRemoveEmployee = (employeeId: number) => {
     const updatedEmployees = selectedEmployees.filter(
       (e) => e.employeeId !== employeeId
@@ -323,6 +278,7 @@ const Schedule = () => {
             value={format(selectedDate, "yyyy-MM-dd")}
             onChange={handleDateChange}
             className={cx("date-picker")}
+            
           />
         </div>
         {/* Nút chuyển tuần */}
@@ -350,7 +306,10 @@ const Schedule = () => {
           <tbody>
             {/* Hàng buổi sáng */}
             <tr>
-              <td className={cx("time-label")}>🌅 Sáng</td>
+              <td className={cx("time-label")}>
+                🌅 <br />
+                Sáng
+              </td>
               {daysOfWeek.map((day, index) => {
                 const dayFormatted = format(day, "yyyy-MM-dd");
 
@@ -373,26 +332,14 @@ const Schedule = () => {
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
-                        <small>{event.timeStartEnd}</small> <br />
-                        {event.title} <br />
-                        <small>Phòng {event.room.roomName} </small> <br />
-                        <small>
-                          Tầng {event.room.location.floor} - Tòa{" "}
-                          {event.room.location.building.buildingName}
-                        </small>
-                        <br />
-                        <small>
-                          {event.room.location.building.branch.branchName}
-                        </small>
-                        <br />
-                        <small className={cx("status")}>
-                          {event.statusReservation === "PENDING" &&
-                            "Đang chờ phê duyệt"}
-                          {event.statusReservation === "CHECKED_IN" &&
-                            "Đã nhận phòng"}
-                          {event.statusReservation === "COMPLETED" &&
-                            "Hoàn thành"}
-                        </small>
+                        <p>
+                          <span style={{ color: "red" }}>●</span>{" "}
+                          {event.timeStartEnd}
+                        </p>
+                        <p>
+                          <strong>{event.title}</strong>
+                        </p>
+                        <p>Phòng {event.room.roomName} </p>
                       </div>
                     ))}
                   </td>
@@ -402,7 +349,9 @@ const Schedule = () => {
 
             {/* Hàng buổi chiều */}
             <tr>
-              <td className={cx("time-label")}>🌇 Chiều</td>
+              <td className={cx("time-label")}>
+                🌇 <br /> Chiều
+              </td>
               {daysOfWeek.map((day, index) => {
                 const dayFormatted = format(day, "yyyy-MM-dd");
 
@@ -419,30 +368,18 @@ const Schedule = () => {
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {afternoonEvents.map((event) => (
                       <div
-                        key={event.reservationId}
                         className={cx("event-item")}
+                        key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
-                        <small>{event.timeStartEnd}</small> <br />
-                        {event.title} <br />
-                        <small>Phòng {event.room.roomName} </small> <br />
-                        <small>
-                          Tầng {event.room.location.floor} - Tòa{" "}
-                          {event.room.location.building.buildingName}
-                        </small>
-                        <br />
-                        <small>
-                          {event.room.location.building.branch.branchName}
-                        </small>
-                        <br />
-                        <small className={cx("status")}>
-                          {event.statusReservation === "PENDING" &&
-                            "Đang chờ phê duyệt"}
-                          {event.statusReservation === "CHECKED_IN" &&
-                            "Đã nhận phòng"}
-                          {event.statusReservation === "COMPLETED" &&
-                            "Hoàn thành"}
-                        </small>
+                        <p>
+                          <span style={{ color: "red" }}>●</span>{" "}
+                          {event.timeStartEnd}
+                        </p>
+                        <p>
+                          <strong>{event.title}</strong>
+                        </p>
+                        <p>Phòng {event.room.roomName} </p>
                       </div>
                     ))}
                   </td>

@@ -10,16 +10,9 @@ import {
   RoomViewProps,
 } from "../../../data/data";
 import axios from "axios";
-import { cp } from "fs";
+import { times } from "../../../utilities";
 
 const cx = classNames.bind(styles);
-
-// hàm tạo ds thời gian
-const times = Array.from({ length: 23 }, (_, i) => {
-  const hour = Math.floor(i / 2) + 7;
-  const minute = i % 2 === 0 ? "00" : "30";
-  return `${String(hour).padStart(2, "0")}:${minute}`;
-});
 
 function Overview() {
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -190,7 +183,6 @@ function Overview() {
             <tbody>
               {times.map((time) => (
                 <tr key={time}>
-                  {/* Cột hiển thị thời gian */}
                   <td className={cx("time-column")}>{time}</td>
 
                   {/* Duyệt qua từng phòng */}
@@ -213,11 +205,9 @@ function Overview() {
                     const editBackground: { [key: string]: string } = {
                       normal: "normal",
                       pending: "pending",
-                      waiting_payment: "waiting_payment",
                       waiting: "waiting",
                       checked_in: "checked_in",
                       completed: "completed",
-                      waiting_cancel: "waiting_cancel",
                     };
                     let statusKey =
                       reservations[0]?.statusReservation.toLocaleLowerCase() ||
@@ -242,17 +232,13 @@ function Overview() {
                             <p className={cx("status")}>
                               {res.statusReservation === "PENDING"
                                 ? "Chờ phê duyệt"
-                                : res.statusReservation === "WAITING_PAYMENT"
-                                ? "Chờ thanh toán"
                                 : res.statusReservation === "WAITING"
                                 ? "Chờ nhận phòng"
                                 : res.statusReservation === "CHECKED_IN"
                                 ? "Đã nhận phòng"
                                 : res.statusReservation === "COMPLETED"
                                 ? "Đã hoàn thành"
-                                : res.statusReservation === "WAITING_CANCEL"
-                                ? "Chờ hủy"
-                                : ""}
+                                : "Đã hủy"}
                             </p>
                           </div>
                         ))}

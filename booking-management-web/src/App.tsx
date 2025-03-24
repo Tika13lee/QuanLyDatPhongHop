@@ -26,6 +26,7 @@ import {
 import { Home, Login } from "./pages/general";
 import { Provider } from "react-redux";
 import store from "./app/store";
+import ScheduleList from "./pages/pages-user/schedule/ScheduleList";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
             <Route path="approved" element={<ApprovedList />} />
             <Route path="rejected" element={<RejectedList />} />
             <Route path="schedule" element={<Schedule />} />
+            <Route path="schedulelist" element={<ScheduleList />} />
           </Route>
         </Routes>
       </Router>

@@ -1,11 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./BookingList.module.scss";
-import { useEffect, useState } from "react";
-import {
-  RequestFormProps,
-  ReservationDetailProps,
-  ReservationProps,
-} from "../../../data/data";
+import { useState } from "react";
+import { RequestFormProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -45,16 +41,6 @@ function BookingList() {
       : `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}`
   );
 
-  console.log("requestList", requestList);
-
-  // Cập nhật state khi API trả về dữ liệu
-  // useEffect(() => {
-  //   if (data) {
-  //     setSelectedReservation(data);
-  //     setIsModalOpen(true);
-  //   }
-  // }, [data]);
-
   // Mở modal
   const handleShowDetails = (requestFormDetail: RequestFormProps) => {
     setSelectedRequestForm(requestFormDetail);
@@ -72,19 +58,23 @@ function BookingList() {
   return (
     <div className={cx("booking-list")}>
       <div className={cx("booking-search")}>
-        <div className={cx("search-row")}>
+        <div className={cx("search-group")}>
           <label>Tìm kiếm</label>
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
+            placeholder="Tìm kiếm theo tên cuộc họp"
             className={cx("search-input")}
           />
         </div>
-        <div className={cx("search-row")}>
+        <div className={cx("search-group")}>
           <label>Ngày gửi</label>
           <input type="date" className={cx("search-input")} />
         </div>
-        <div className={cx("search-row")}>
+        <div className={cx("search-group")}>
+          <label>Ngày bắt đầu</label>
+          <input type="date" className={cx("search-input")} />
+        </div>
+        <div className={cx("search-group")}>
           <label>Trạng thái</label>
           <select
             className={cx("search-input")}

@@ -16,7 +16,7 @@ const Navbar = () => {
     <div className={cx("navbar-container")}>
       <div className={cx("navbar")}>
         <div className={cx("brand")}>
-          <p>TÊN CÔNG TY - THƯƠNG HIỆU</p>
+          <p><strong>HỆ THỐNG QUẢN LÝ ĐẶT PHÒNG HỌP</strong></p>
         </div>
 
         <div className={cx("user")}>

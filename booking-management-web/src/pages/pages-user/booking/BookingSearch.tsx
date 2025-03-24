@@ -10,7 +10,6 @@ import {
 import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import axios from "axios";
-import DatePicker from "react-datepicker";
 import { times } from "../../../utilities";
 
 const cx = classNames.bind(styles);
@@ -145,7 +144,6 @@ function BookingSearch() {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log("API response:", data);
         setFilterData(data);
         setDataSearch({
           branch: branchName,
@@ -158,6 +156,10 @@ function BookingSearch() {
         console.error("Error fetching data:", error);
       });
   };
+
+  useEffect(() => {
+    handleFilter();
+  }, []);
 
   return (
     <div className={cx("Search-container")}>

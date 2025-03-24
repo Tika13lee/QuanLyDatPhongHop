@@ -171,15 +171,19 @@ function ApprovalList() {
     <div className={cx("approve-list")}>
       <div className={cx("approve-search")}>
         <div className={cx("search-row")}>
-          <div className={cx("search-row")}>
+          <div className={cx("search-group")}>
             <label>Tìm kiếm</label>
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
+              placeholder="Tiêu đề cuộc họp, tên người đặt"
               className={cx("search-input")}
             />
           </div>
-          <div className={cx("search-row")}>
+          <div className={cx("search-group")}>
+            <label>Ngày bắt đầu </label>
+            <input type="date" className={cx("search-input")} />
+          </div>
+          <div className={cx("search-group")}>
             <label>Ngày gửi</label>
             <input type="date" className={cx("search-input")} />
           </div>
@@ -187,6 +191,7 @@ function ApprovalList() {
         </div>
 
         <div className={cx("device")}></div>
+
         <div className={cx("actions")}>
           <button
             className={cx("btn-action", "approve-btn")}

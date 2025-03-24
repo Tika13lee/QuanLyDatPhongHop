@@ -1,11 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./RejectedList.module.scss";
-import {
-  RequestFormProps,
-  ReservationDetailProps,
-  ReservationProps,
-} from "../../../data/data";
-import { useEffect, useState } from "react";
+import { RequestFormProps } from "../../../data/data";
+import { useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -62,9 +58,13 @@ function RejectedList() {
           <label>Tìm kiếm</label>
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
+            placeholder="Tên phòng, tiêu đề cuộc họp, tên người đặt"
             className={cx("search-input")}
           />
+        </div>
+        <div className={cx("search-row")}>
+          <label>Ngày bắt đầu</label>
+          <input type="date" className={cx("search-input")} />
         </div>
         <div className={cx("search-row")}>
           <label>Ngày gửi</label>
@@ -97,7 +97,7 @@ function RejectedList() {
                 const meetingEnd = formatDateTime(
                   schedule.requestReservation.timeEnd
                 );
-                const bookingTime = formatDateTime(schedule.timeRequest);
+                const requestTime = formatDateTime(schedule.timeRequest);
 
                 return (
                   <tr key={schedule.requestFormId}>
@@ -108,7 +108,7 @@ function RejectedList() {
                     </td>
                     <td>{schedule.reservations[0].booker.employeeName}</td>
                     <td>
-                      {bookingTime.date} - {bookingTime.time}
+                      {requestTime.date} - {requestTime.time}
                     </td>
                     <td>{new Date(schedule.timeResponse).toLocaleString()}</td>
                     <td>

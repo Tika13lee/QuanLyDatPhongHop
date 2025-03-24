@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 5;
 }
 
 .modal {
@@ -17,6 +17,7 @@
   padding: 20px;
   max-width: 900px;
   width: 800px;
+  height: 500px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   position: relative;
 
@@ -72,7 +73,7 @@
 .container-list {
   list-style: none;
   padding: 10px;
-  max-height: 127px;
+  height: 127px;
   overflow-y: auto;
   border: 1px solid #eee;
   border-radius: 6px;
@@ -83,7 +84,7 @@
     background-color: #f9f9f9;
     border-radius: 6px;
     font-size: 14px;
-    color: #444;
+    color: var(--text-primary);
   }
 }
 

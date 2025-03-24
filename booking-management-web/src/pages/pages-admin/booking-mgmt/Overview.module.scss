@@ -11,7 +11,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
 }
 
 .filterContainer {
@@ -54,7 +53,6 @@
   max-width: 1285px;
   max-height: 580px;
   position: relative;
-  table-layout: auto;
 
   &::-webkit-scrollbar {
     width: 5px;
@@ -80,59 +78,51 @@
   width: 100%;
   border-collapse: collapse;
   text-align: center;
+  table-layout: fixed;
 
   th,
   td {
     border: 1px solid var(--border-color);
     padding: 10px;
-    height: 50px;
+    height: 70px;
+    width: 150px;
     min-width: 150px;
-  }
-
-  .time-column {
-    min-width: 100px;
-    width: 10 0px;
-    max-width: 120px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .cell {
-    background-color: var(--color-white);
-    cursor: pointer;
-    &:hover {
-      background-color: #f0f0f0;
-    }
   }
 }
 
+// cố định hàng đầu và cột đầu
 .schedule-table thead th {
   position: sticky;
   top: 0;
-  background: var(--bg-active);
+  background: var(--color-table);
   z-index: 2;
   color: var(--color-white);
+  height: 50px;
 }
-
 .schedule-table tbody td:first-child,
 .schedule-table thead th:first-child {
   position: sticky;
   left: 0;
-  background-color: #567ea8;
+  background-color: var(--color-table);
   z-index: 3;
   color: var(--color-white);
 }
 
 .schedule-table thead th:first-child {
   z-index: 15;
-  background-color: rgb(150, 155, 85);
+  background-color: rgb(187, 187, 183);
 }
 
 .schedule-table thead th:first-child,
 .schedule-table tbody td:first-child {
   border: none !important;
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
 }
 
 .schedule-table tbody td:first-child {
@@ -140,6 +130,25 @@
   vertical-align: super;
   padding: 0;
   padding-right: 10px;
+}
+
+.booked-title {
+  height: 100%;
+  font-size: 14px;
+  text-align: left;
+
+  p {
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .status {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-error);
+  }
 }
 
 // màu lịch
@@ -150,42 +159,21 @@
   color: #fff;
 }
 
-.booked-title {
-  height: 100%;
-  font-size: 14px;
-  text-align: left;
-
-  .status {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--color-error);
-  }
-}
-
 .waiting {
-  background-color: rgb(231, 171, 239);
+  background-color: var(--color-status-waiting);
 }
 
 .completed {
-  background-color: rgb(160, 244, 156);
+  background-color: var(--color-status-completed);
 }
 
 .pending {
-  background-color: rgb(232, 213, 87);
-}
-
-.waiting_payment {
-  background-color: rgb(237, 176, 124);
+  background-color: var(--color-status-pending);
 }
 
 .checked_in {
-  background-color: rgb(131, 211, 211);
+  background-color: var(--color-status-checked_in);
 }
-
-.waiting_cancel {
-  background-color: rgb(243, 156, 156);
-}
-
 
 // Modal
 .modal {
@@ -194,7 +182,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); 
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;

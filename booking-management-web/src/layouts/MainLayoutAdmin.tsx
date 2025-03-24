@@ -61,7 +61,7 @@ const MainLayoutAdmin = () => {
               </span>
               <IconWrapper
                 icon={!isBookingOpen ? IoIosArrowForward : IoIosArrowDown}
-                color={isBookingOpen ? "#fff" : "#7c7f83"}
+                color={isBookingOpen ? "#212529" : "#7c7f83"}
               />
             </div>
             {isBookingOpen && (

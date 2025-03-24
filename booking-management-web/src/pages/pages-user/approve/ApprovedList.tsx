@@ -1,12 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovedList.module.scss";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RequestFormProps, ReservationDetailProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
-import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -34,7 +33,6 @@ function ApprovedList() {
       }),
     };
   };
-
 
   // Lấy danh sách lịch đặt phòng đã phê duyệt
   const {
@@ -64,9 +62,13 @@ function ApprovedList() {
           <label>Tìm kiếm</label>
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
+            placeholder="Tên phòng, tiêu đề cuộc họp, tên người đặt"
             className={cx("search-input")}
           />
+        </div>
+        <div className={cx("search-row")}>
+          <label>Ngày bắt đầu</label>
+          <input type="date" className={cx("search-input")} />
         </div>
         <div className={cx("search-row")}>
           <label>Ngày gửi</label>
@@ -85,6 +87,7 @@ function ApprovedList() {
               <tr>
                 <th>Tiêu đề</th>
                 <th>Ngày</th>
+                <th>Thời gian</th>
                 <th>Người đặt</th>
                 <th>Thời gian gửi</th>
                 <th>Thời gian phê duyệt</th>
@@ -99,23 +102,23 @@ function ApprovedList() {
                 const meetingEnd = formatDateTime(
                   schedule.requestReservation.timeEnd
                 );
+                const requestTime = formatDateTime(schedule.timeRequest);
+                const approverTime = formatDateTime(schedule.timeResponse);
 
                 return (
                   <tr key={schedule.requestFormId}>
                     <td>{schedule.requestReservation.title}</td>
+                    <td>{meetingStart.date} </td>
                     <td>
-                      {meetingStart.date} từ {meetingStart.time} -{" "}
-                      {meetingEnd.time}
+                      {meetingStart.time} - {meetingEnd.time}
                     </td>
                     <td>{schedule.reservations[0].booker.employeeName}</td>
-                    <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
-                    <td>{new Date(schedule.timeResponse).toLocaleString()}</td>
+                    <td>{requestTime.date}</td>
+                    <td>{approverTime.date}</td>
                     <td>
                       <div
                         className={cx("actions")}
-                        onClick={() =>
-                          handleShowDetails(schedule)
-                        }
+                        onClick={() => handleShowDetails(schedule)}
                       >
                         <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
                       </div>

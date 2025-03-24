@@ -4,9 +4,9 @@
 :root {
   --text-primary: #212529;
   --text-secondary: #7c7f83;
-  --bg-main: #0b2c56;
-  --bg-active: #0056b3;
-  --bg-hover: #567ea8;
+  --bg-sidebar: #e5ebf7;
+  --bg-active: #0569d5;
+  --bg-hover: #dadee2;
   --bg-primary: #c2dcfa;
   --color-white: #ffffff;
   --color-error: #c31818;
@@ -26,6 +26,11 @@
   --btn-add-hover: #179817;
   --btn-danger: #dc3545;
   --btn-danger-hover: #c82333;
+  --color-table: #548cdc;
+  --color-status-waiting: #edc6f2;
+  --color-status-pending: #fcf2b3;
+  --color-status-checked_in: #b9fefe;
+  --color-status-completed: #b0feac;
 }
 
 * {

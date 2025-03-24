@@ -174,15 +174,19 @@ function ListApprovalByApprover() {
     <div className={cx("approve")}>
       <div className={cx("approve-search")}>
         <div className={cx("search-row")}>
-          <div className={cx("search-row")}>
+          <div className={cx("search-group")}>
             <label>Tìm kiếm</label>
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên cuộc họp, tên người đặt"
+              placeholder="Tiêu đề cuộc họp, tên người đặt"
               className={cx("search-input")}
             />
           </div>
-          <div className={cx("search-row")}>
+          <div className={cx("search-group")}>
+            <label>Ngày bắt đầu </label>
+            <input type="date" className={cx("search-input")} />
+          </div>
+          <div className={cx("search-group")}>
             <label>Ngày gửi</label>
             <input type="date" className={cx("search-input")} />
           </div>
@@ -208,6 +212,7 @@ function ListApprovalByApprover() {
           </button>
         </div>
       </div>
+      
       {/* Modal từ chối */}
       {openModalReject && (
         <div className={cx("modal-reject")}>
@@ -227,7 +232,7 @@ function ListApprovalByApprover() {
                 Xác nhận
               </button>
               <button
-                className={cx("btn-action", "search-btn")}
+                className={cx("btn-action", "cancel-btn")}
                 onClick={handleCloseModalReject}
               >
                 Hủy

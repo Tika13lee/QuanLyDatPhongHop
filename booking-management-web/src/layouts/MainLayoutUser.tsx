@@ -11,6 +11,7 @@ const cx = classNames.bind(styles);
 
 const MainLayoutUser = () => {
   const [isApprovedOpen, setIsApprovedOpen] = useState(true);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(true);
 
   return (
     <div className={cx("main-layout-user")}>
@@ -55,7 +56,7 @@ const MainLayoutUser = () => {
               </span>
               <IconWrapper
                 icon={!isApprovedOpen ? IoIosArrowForward : IoIosArrowDown}
-                color={isApprovedOpen ? "#fff" : "#7c7f83"}
+                color={isApprovedOpen ? "#212529" : "#7c7f83"}
               />
             </div>
             {isApprovedOpen && (
@@ -90,15 +91,45 @@ const MainLayoutUser = () => {
             )}
           </div>
 
-          <NavLink
-            to="/user/schedule"
-            className={({ isActive }) =>
-              cx("sidebar-item", { active: isActive })
-            }
-          >
-            Lịch cá nhân
-          </NavLink>
+          <div className={cx("dropdown")}>
+            <div
+              className={cx("dropdown-header")}
+              onClick={() => {
+                setIsScheduleOpen(!isScheduleOpen);
+              }}
+            >
+              <span className={cx({ "booking-open": isScheduleOpen })}>
+                Lịch cá nhân
+              </span>
+              <IconWrapper
+                icon={!isScheduleOpen ? IoIosArrowForward : IoIosArrowDown}
+                color={isScheduleOpen ? "#212529" : "#7c7f83"}
+              />
+            </div>
+            {isScheduleOpen && (
+              <div className={cx("dropdown-menu")}>
+                <NavLink
+                  to="/user/schedule"
+                  className={({ isActive }) =>
+                    cx("dropdown-item", { active: isActive })
+                  }
+                >
+                  Lịch theo tuần
+                </NavLink>
+
+                <NavLink
+                  to="/user/schedulelist"
+                  className={({ isActive }) =>
+                    cx("dropdown-item", { active: isActive })
+                  }
+                >
+                  Danh sách lịch
+                </NavLink>
+              </div>
+            )}
+          </div>
         </div>
+
         <div className={cx("outlet-container")}>
           <Outlet />
         </div>

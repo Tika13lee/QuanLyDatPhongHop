@@ -249,9 +249,12 @@ function Price() {
       const data = await response.json();
       console.log(data);
       let stringErr = "";
-      data.forEach((resDup:any) => {
+      const dataArray = Array.isArray(data) ? data : [data];
+      if(dataArray.length !==0){
+        dataArray?.forEach((resDup:any) => {
         stringErr += `Bảng giá: ${resDup.priceName} từ ${formatDateString(resDup.timeStart)} đến ${formatDateString(resDup.timeEnd)}`;
       });
+    }
 
       if (response.status !== 200) {
         setPopupMessage("Ngày áp dụng bị trùng với bảng giá khác:\n" + stringErr);
