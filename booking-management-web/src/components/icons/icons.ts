@@ -10,11 +10,12 @@ import {
   IoIosArrowForward,
   IoIosArrowDown,
 } from "react-icons/io";
-import { FaRegBell } from "react-icons/fa";
+import { FaRegBell, FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FiRefreshCw } from "react-icons/fi";
 export {
+  FaEdit,
   IoSettingsOutline,
   FaPlus,
   MdOutlineEdit,
@@ -26,5 +27,5 @@ export {
   MdOutlineInfo,
   MdSearch,
   IoIosArrowBack,
-  FiRefreshCw
+  FiRefreshCw,
 };

@@ -108,7 +108,11 @@ const ScheduleList = () => {
         `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}`
       )
       .then((res) => {
-        const transformed = transformData(res.data);
+        const filteredData = res.data.filter(
+          (item) => item.typeRequestForm !== "UPDATE_RESERVATION"
+        );
+
+        const transformed = transformData(filteredData);
         setEventsByDay(transformed);
       })
       .catch((err) => {

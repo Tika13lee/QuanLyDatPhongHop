@@ -4,12 +4,12 @@ import ListApprovalByApprover from "./approve/ListApprovalByApprover";
 import ApprovedList from "./approve/ApprovedList";
 import ViewSchedule from "./booking/ViewSchedule";
 import Booking from "./booking/Booking";
-import BookingList from "./booking-list/BookingList";
+import RequestList from "./request-list/RequestList";
 import RejectedList from "./approve/RejectedList";
 
 export {
   RejectedList,
-  BookingList,
+  RequestList,
   Booking,
   ApprovedList,
   BookingSearch,

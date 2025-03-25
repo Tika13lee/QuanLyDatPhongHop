@@ -124,7 +124,7 @@
     opacity: 1;
     transform: scale(1);
   }
-} 
+}
 
 .close-btn {
   position: absolute;
@@ -199,24 +199,6 @@
   overflow-y: auto;
   height: 540px;
   border: 1px solid var(--border-color);
-
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--bg-scroll-track);
-    border-radius: 5px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--bg-scroll-thumb);
-    border-radius: 5px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--bg-scroll-thumb-hover);
-  }
 }
 
 .device-table {

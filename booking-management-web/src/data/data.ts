@@ -237,7 +237,7 @@ export const frequency = [
 ];
 
 export type ReservationDetailProps = {
-  reservationId: number;
+  reservationId?: number;
   time: string;
   timeStart: string;
   timeEnd: string;
@@ -276,6 +276,8 @@ export type ReservationDetailProps = {
     imgs: string[];
     approver: EmployeeProps;
   };
+
+  [key: string]: any;
 };
 
 export const devices: DeviceProps[] = [

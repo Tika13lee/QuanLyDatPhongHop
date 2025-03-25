@@ -61,24 +61,6 @@
   border-radius: 5px;
   border: 1px solid var(--border-color);
   margin-top: 10px;
-
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--bg-scroll-track);
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--bg-scroll-thumb);
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--bg-scroll-thumb-hover);
-  }
 }
 
 .scheduleTable {

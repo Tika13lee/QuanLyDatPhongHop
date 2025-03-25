@@ -1,5 +1,5 @@
 import classNames from "classnames/bind";
-import styles from "./BookingList.module.scss";
+import styles from "./RequestList.module.scss";
 import { useState } from "react";
 import { RequestFormProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
@@ -9,7 +9,7 @@ import { MdOutlineInfo } from "../../../components/icons/icons";
 
 const cx = classNames.bind(styles);
 
-function BookingList() {
+function RequestList() {
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
@@ -160,4 +160,4 @@ const getStatusText = (status: string) => {
   }
 };
 
-export default BookingList;
+export default RequestList;

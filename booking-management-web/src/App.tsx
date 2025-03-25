@@ -15,7 +15,7 @@ import {
 import MainLayoutUser from "./layouts/MainLayoutUser";
 import {
   ApprovedList,
-  BookingList,
+  RequestList,
   BookingSearch,
   Booking,
   RejectedList,
@@ -52,7 +52,7 @@ function App() {
           <Route path="/user" element={<MainLayoutUser />}>
             <Route index element={<BookingSearch />} />
             <Route path="booking" element={<Booking />} />
-            <Route path="booking-list" element={<BookingList />} />
+            <Route path="booking-list" element={<RequestList />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
             <Route path="approve" element={<ListApprovalByApprover />} />
             <Route path="approved" element={<ApprovedList />} />

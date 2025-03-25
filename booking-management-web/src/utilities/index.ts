@@ -1,3 +1,5 @@
+import { parseISO, format } from "date-fns";
+
 // load file ảnh lên cloudinary
 const uploadImageToCloudinary = async (file: File) => {
   const formData = new FormData();
@@ -49,12 +51,19 @@ const formatDateString = (date: string) => {
     .replace(/\//g, " - ");
 };
 
+// lấy giờ từ chuỗi thời gian
+const getHourMinute = (isoString: string) => {
+  const date = parseISO(isoString);
+  return format(date, "HH:mm");
+};
+
 // định dạng tiền
-function formatCurrencyVND(amount: number): string {
+const formatCurrencyVND = (amount: number) => {
   return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-}
+};
 
 export {
+  getHourMinute,
   uploadImageToCloudinary,
   times,
   formatDateDate,

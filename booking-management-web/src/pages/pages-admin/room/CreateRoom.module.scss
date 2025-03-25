@@ -106,24 +106,6 @@
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
-
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--bg-scroll-track);
-    border-radius: 5px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--bg-scroll-thumb);
-    border-radius: 5px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--bg-scroll-thumb-hover);
-  }
 }
 
 .device-table {

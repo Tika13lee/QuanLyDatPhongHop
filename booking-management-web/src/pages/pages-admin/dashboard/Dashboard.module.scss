@@ -1,0 +1,78 @@
+.dashboard {
+  padding: 2rem;
+  background-color: #f7fafd;
+  min-height: 100vh;
+  // display: flex;
+  // flex-direction: column;
+  flex: 1;
+
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+      h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #0070f3;
+      }
+    }
+  }
+
+  .upcoming {
+    margin-top: 2.5rem;
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .meeting {
+      background: white;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 5px solid #0070f3;
+      border-radius: 8px;
+
+      h4 {
+        font-size: 1.2rem;
+        margin-bottom: 0.3rem;
+      }
+
+      p {
+        margin: 0.2rem 0;
+        color: #444;
+      }
+    }
+  }
+}
+
+.chartContainer {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+
+  h2 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+}
