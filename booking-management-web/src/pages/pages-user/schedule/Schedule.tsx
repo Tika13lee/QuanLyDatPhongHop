@@ -57,9 +57,9 @@ const Schedule = () => {
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
-    "info"
-  );
+  const [popupType, setPopupType] = useState<
+    "success" | "error" | "info" | "warning"
+  >("info");
 
   // Cập nhật danh sách ngày trong tuần
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -441,7 +441,16 @@ const Schedule = () => {
             </button>
             <button
               className={cx("btn-update")}
-              onClick={() => setIsEdit(true)}
+              onClick={() => {
+                // nếu ngày hiện tại > ngày bắt đầu lịch thì không cho chỉnh sửa
+                if (new Date(selectedSchedule.timeStart) < new Date()) {
+                  setPopupMessage(`Lịch này đã qua, không được phép chỉnh sửa!`);
+                  setPopupType("warning");
+                  setIsPopupOpen(true);
+                  return;
+                }
+                setIsEdit(true);
+              }}
               disabled={selectedSchedule.booker.employeeId !== user.employeeId}
             >
               <IconWrapper icon={FaEdit} size={16} color="white" />

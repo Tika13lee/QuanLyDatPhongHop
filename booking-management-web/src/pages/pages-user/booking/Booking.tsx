@@ -138,15 +138,27 @@ function Booking() {
 
   // mở modal
   const handleOpenModal = () => {
-    const today = new Date().toISOString().split("T")[0];
-    if (selectedDate < today) {
+    const now = new Date();
+    const selected = new Date(selectedDate);
+    const isToday = now.toDateString() === selected.toDateString();
+    if (isToday) {
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const limitMinutes = 17 * 60 + 30;
+
+      if (currentMinutes > limitMinutes) {
+        toast.warning("Không thể đặt lịch cho hôm nay sau 17:30!");
+        return;
+      }
+    } else if (selected < now) {
       toast.warning(
-        "Vui lòng chọn ngày khác! " +
-          "Bạn không thể đặt lịch cho ngày " +
-          formatDateString(selectedDate)
+        "Ngày " +
+          formatDateString(selectedDate) +
+          " đã qua. " +
+          "Vui lòng chọn ngày khác! "
       );
       return;
     }
+
     const roomInfos =
       rooms?.map((room) => ({
         roomId: room.roomId + "",
@@ -339,7 +351,7 @@ function Booking() {
                                 ? "Đã nhận phòng"
                                 : res.statusReservation === "COMPLETED"
                                 ? "Đã hoàn thành"
-                                : ""}
+                                : "Không nhận phòng"}
                             </p>
                           </div>
                         ))}
@@ -377,7 +389,7 @@ function Booking() {
           setIsPopupOpen={handleOpenPopup}
         />
       )}
-      
+
       {/* Popup thông báo */}
       {infoPopup.close && (
         <PopupNotification

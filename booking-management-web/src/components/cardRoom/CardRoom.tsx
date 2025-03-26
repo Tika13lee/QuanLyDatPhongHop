@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalBooking from "../Modal/ModalBooking";
 import PopupNotification from "../popup/PopupNotification";
+import { formatDateString } from "../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -33,6 +34,56 @@ function CardRoom({
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState<RoomProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // handleOpenModal
+  const handleOpenModal = (room: RoomProps) => {
+    // kiểm tra dữ liệu dataSearch
+    const now = new Date();
+    const dateSelected = new Date(dataSearch.date);
+    if (dateSelected < now) {
+      handleOpenPopup(
+        `Ngày ${formatDateString(
+          dataSearch.date
+        )} đã qua, vui lòng chọn ngày khác!`,
+        "warning",
+        true
+      );
+      return;
+    } else if (dateSelected.getDate() === now.getDate()) {
+      const nowHour = now.getHours();
+      const nowMinute = now.getMinutes();
+      const nowTime = nowHour + nowMinute / 60;
+      const timeStartHour = parseInt(dataSearch.timeStart.split(":")[0]);
+      const timeStartMinute = parseInt(dataSearch.timeStart.split(":")[1]);
+      const timeStartValue = timeStartHour + timeStartMinute / 60;
+      const timeEndHour = parseInt(dataSearch.timeEnd.split(":")[0]);
+      const timeEndMinute = parseInt(dataSearch.timeEnd.split(":")[1]);
+      const timeEndValue = timeEndHour + timeEndMinute / 60;
+
+      // kiểm tra giờ bắt đầu
+      if (nowTime > timeStartValue) {
+        handleOpenPopup(
+          `Giờ bắt đầu phải lớn hơn giờ hiện tại!`,
+          "warning",
+          true
+        );
+        return;
+      }
+      // kiểm tra giờ kết thúc
+      if (timeStartValue >= timeEndValue) {
+      } else if (nowTime > timeEndValue) {
+        handleOpenPopup(
+          `Giờ kết thúc phải lớn hơn giờ hiện tại!`,
+          "warning",
+          true
+        );
+        return;
+      }
+    }
+
+    setSelectedRoom(room);
+    setIsModalOpen(true);
+  };
 
   // thông báo popup
   const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
@@ -102,12 +153,7 @@ function CardRoom({
                 </button>
                 <button
                   className={cx("btn", "btn-book")}
-                  onClick={() => {
-                    setIsModalOpen(() => {
-                      setSelectedRoom(room);
-                      return true;
-                    });
-                  }}
+                  onClick={() => handleOpenModal(room)}
                 >
                   Đặt ngay
                 </button>

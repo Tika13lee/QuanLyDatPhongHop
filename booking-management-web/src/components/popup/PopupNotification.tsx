@@ -11,19 +11,24 @@ type PopupNotificationProps = {
   onClose: () => void;
 };
 
-const PopupNotification: React.FC<PopupNotificationProps> = ({ message, type, isOpen, onClose }) => {
+const PopupNotification: React.FC<PopupNotificationProps> = ({
+  message,
+  type,
+  isOpen,
+  onClose,
+}) => {
   if (!isOpen) return null;
 
   return (
     <div className={cx("popup-overlay")}>
       <div className={cx("popup-container", type)}>
         <div className={cx("popup-header")}>
+          <h3>Thông báo</h3>
           <button className={cx("close-btn")} onClick={onClose}>
             &times;
           </button>
         </div>
         <div className={cx("popup-message")}>
-          <h3>Thông báo</h3>
           <p>{message}</p>
         </div>
       </div>

@@ -48,7 +48,7 @@ const formatDateString = (date: string) => {
     year: "numeric",
   })
     .format(new Date(date))
-    .replace(/\//g, " - ");
+    .replace(/\//g, "-");
 };
 
 // lấy giờ từ chuỗi thời gian

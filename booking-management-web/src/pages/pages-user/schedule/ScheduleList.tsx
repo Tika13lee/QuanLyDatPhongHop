@@ -113,6 +113,9 @@ const ScheduleList = () => {
 
         const transformed = transformData(filteredData);
         setEventsByDay(transformed);
+
+        const allDates = transformed.map((d) => d.date);
+        setExpandedDays(allDates);
       })
       .catch((err) => {
         console.error("Lỗi khi lấy dữ liệu:", err);

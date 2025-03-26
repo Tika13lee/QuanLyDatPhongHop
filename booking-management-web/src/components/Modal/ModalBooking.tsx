@@ -81,6 +81,60 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     return dates;
   };
 
+  // lọc giờ theo ngày hiện tại
+  const getTimes = () => {
+    const currentDate = new Date();
+    const selectedDate = new Date(dateSelected ?? currentDate);
+    const isToday = currentDate.toDateString() === selectedDate.toDateString();
+
+    if (!isToday) return times;
+
+    const currentMinutes =
+      currentDate.getHours() * 60 + (currentDate.getMinutes() < 30 ? 0 : 30);
+
+    return times.filter((time) => {
+      const [hour, minute] = time.split(":").map(Number);
+      const timeInMinutes = hour * 60 + minute;
+      return timeInMinutes >= currentMinutes;
+    });
+  };
+
+  useEffect(() => {
+    const filteredTimes = getTimes();
+    if (filteredTimes.length > 0) {
+      setSelectedStartTime(filteredTimes[0]);
+    }
+  }, [dateSelected]);
+
+  // hiển thị giờ kết thúc
+  useEffect(() => {
+    if (timeStart) {
+      const index = times.findIndex((time) => time === timeStart);
+      setTimeEndSchedule(times.slice(index + 1, times.length));
+      setFormData((prev) => ({
+        ...prev,
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeEnd: new Date(
+            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
+          ).toISOString(),
+        },
+      }));
+    } else {
+      const index = times.findIndex((time) => time === selectedStartTime);
+      setTimeEndSchedule(times.slice(index + 1, times.length));
+      setFormData((prev) => ({
+        ...prev,
+        reservationDTO: {
+          ...prev.reservationDTO,
+          timeEnd: new Date(
+            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
+          ).toISOString(),
+        },
+      }));
+    }
+  }, [selectedStartTime]);
+
   // form data
   const [formData, setFormData] = useState({
     timeRequest: new Date().toISOString(),
@@ -367,35 +421,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     }
   };
 
-  // hiển thị giờ kết thúc
-  useEffect(() => {
-    if (timeStart) {
-      const index = times.findIndex((time) => time === timeStart);
-      setTimeEndSchedule(times.slice(index + 1, times.length));
-      setFormData((prev) => ({
-        ...prev,
-        reservationDTO: {
-          ...prev.reservationDTO,
-          timeEnd: new Date(
-            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
-          ).toISOString(),
-        },
-      }));
-    } else {
-      const index = times.findIndex((time) => time === selectedStartTime);
-      setTimeEndSchedule(times.slice(index + 1, times.length));
-      setFormData((prev) => ({
-        ...prev,
-        reservationDTO: {
-          ...prev.reservationDTO,
-          timeEnd: new Date(
-            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
-          ).toISOString(),
-        },
-      }));
-    }
-  }, [selectedStartTime]);
-
   // lấy dịch vụ
   const {
     data: services,
@@ -559,7 +584,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                           handleInputChange(e);
                         }}
                       >
-                        {times.map((time, index) => (
+                        {getTimes().map((time, index) => (
                           <option
                             key={time}
                             value={time}
