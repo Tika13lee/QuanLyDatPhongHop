@@ -70,7 +70,7 @@ public class ReservationController {
             return ResponseEntity.badRequest().build();
         }
     }
-    @PostMapping
+    @PostMapping("/checkIn")
     public ResponseEntity<?> checkIn(@RequestBody Map<String, Object> payload) {
         try {
             String encryptedData = payload.get("encryptedData").toString();
