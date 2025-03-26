@@ -125,6 +125,14 @@ const MainLayoutUser = () => {
                 >
                   Danh sách lịch
                 </NavLink>
+                <NavLink
+                  to="/user/schedule-frequency"
+                  className={({ isActive }) =>
+                    cx("dropdown-item", { active: isActive })
+                  }
+                >
+                  Lịch tần suất
+                </NavLink>
               </div>
             )}
           </div>

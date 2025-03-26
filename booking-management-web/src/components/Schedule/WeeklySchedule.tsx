@@ -4,11 +4,13 @@ import styles from "./WeeklySchedule.module.scss";
 import { toast, ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { EmployeeProps, ServiceProps } from "../../data/data";
+import { EmployeeProps, RoomProps, ServiceProps } from "../../data/data";
 import useFetch from "../../hooks/useFetch";
 import usePost from "../../hooks/usePost";
 import PopupNotification from "../popup/PopupNotification";
-import { times } from "../../utilities";
+import { formatDateString, times } from "../../utilities";
+import ModalBooking from "../Modal/ModalBooking";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -38,17 +40,25 @@ type FormData = {
   filePaths: string[];
 };
 
+type typeMessage = "error" | "success" | "info" | "warning";
+
+type typeInfoPopup = {
+  message: string;
+  type: typeMessage;
+  close: boolean;
+};
+
 const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
-  const roomDetail = useSelector((state: RootState) => state.room.selectedRoom);
+  const roomRedux = useSelector((state: RootState) => state.room.selectedRoom);
+  const [roomDetail, setRoomDetail] = useState<RoomProps | null>(null);
+  const reservations = roomDetail?.reservationDTOS || [];
 
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
-
-  const reservations = roomDetail?.reservationDTOS || [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{
@@ -56,38 +66,59 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     time: string;
   } | null>(null);
 
-  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
-
-  // popup thông báo
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
-    "info"
-  );
-
-  const date = new Date();
-  const [timeEnd, setTimeEnd] = useState<string>("");
-  const [files, setFiles] = useState<string>();
-  const [serviceName, setServiceName] = useState<string[]>([]);
-  const [phone, setPhone] = useState<string>("");
-  const [addOpen, setAddOpen] = useState<boolean>(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeProps[]>([]);
-
-  const [formData, setFormData] = useState({
-    time: "",
-    timeStart: "",
-    timeEnd: "",
-    note: "",
-    description: "",
-    title: "",
-    frequency: "ONE_TIME",
-    timeFinishFrequency: "",
-    bookerId: "",
-    roomId: "",
-    employeeIds: [] as string[],
-    serviceIds: [] as string[],
-    filePaths: [] as string[],
+  // thông báo popup
+  const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
+    message: "",
+    type: "success",
+    close: false,
   });
+
+  // xử lý mở popup
+  const handleOpenPopup = (
+    message: string,
+    type: typeMessage,
+    close: boolean
+  ) => {
+    setInfoPopup({ message, type, close: true });
+  };
+
+  useEffect(() => {
+    setRoomDetail(roomRedux);
+  }, [roomRedux]);
+
+  // lấy danh sách mới sau khi đã phê duyệt thành công
+  useEffect(() => {
+    console.log(roomDetail?.roomId);
+    if (infoPopup.close === true && roomDetail?.roomId) {
+      console.log("reload");
+      fetch(`http://localhost:8080/api/v1/room/getRoomById?roomId=${roomDetail.roomId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setRoomDetail(data);
+        })
+        .catch((error) =>
+          console.error("Lỗi khi reload dữ liệu phòng:", error)
+        );
+    }
+  }, [infoPopup.close]);
+
+  const [phone, setPhone] = useState<string>("");
+
+  // const [formData, setFormData] = useState({
+  //   time: "",
+  //   timeStart: "",
+  //   timeEnd: "",
+  //   note: "",
+  //   description: "",
+  //   title: "",
+  //   frequency: "ONE_TIME",
+  //   timeFinishFrequency: "",
+  //   bookerId: "",
+  //   roomId: "",
+  //   employeeIds: [] as string[],
+  //   serviceIds: [] as string[],
+  //   filePaths: [] as string[],
+  // });
 
   // lấy dịch vụ
   const {
@@ -107,114 +138,34 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${phone}`
   );
 
-  // đặt lịch
-  const {
-    data,
-    loading: roomLoading,
-    error: roomError,
-    postData,
-  } = usePost<FormData>(
-    "http://localhost:8080/api/v1/reservation/createReservation"
-  );
-
-  // Hàm xử lý sự thay đổi khi người dùng chọn một dịch vụ
-  const handleServiceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setServiceName((prevServiceName) => [
-      ...prevServiceName,
-      event.target.options[event.target.selectedIndex].id,
-    ]);
-    console.log();
-    const serviceId = event.target.value;
-    setFormData((prevFormData) => {
-      const updatedServiceIds = [...prevFormData.serviceIds];
-
-      if (updatedServiceIds.includes(serviceId)) {
-        const index = updatedServiceIds.indexOf(serviceId);
-        updatedServiceIds.splice(index, 1);
-      } else {
-        updatedServiceIds.push(serviceId);
-      }
-
-      return {
-        ...prevFormData,
-        serviceIds: updatedServiceIds,
-      };
-    });
-  };
-
-  useEffect(() => {
-    if (roomDetail) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        roomId: roomDetail.roomId.toString() || "",
-      }));
-    }
-  }, [roomDetail]);
-
-  // Hàm xử lý sự thay đổi khi người dùng nhập vào input
-  const handleInputChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleAddEmployee = (emp: EmployeeProps) => {
-    setSelectedEmployee((prev) => [...prev, emp]);
-    setPhone("");
-    setAddOpen(false);
-  };
-
-  const handleRemoveEmployee = (emp: EmployeeProps) => {
-    setSelectedEmployee((prev) =>
-      prev.filter((employee) => employee.employeeId !== emp.employeeId)
-    );
-  };
+  // useEffect(() => {
+  //   if (roomDetail) {
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       roomId: roomDetail.roomId.toString() || "",
+  //     }));
+  //   }
+  // }, [roomDetail]);
 
   // xử lý khi click vào ô
   const handleCellClick = (date: string, time: string) => {
-    const today = new Date().toISOString().split("T")[0];
+    console.log(date, time);
 
-    if (date < today) {
-      toast.warning("Bạn không thể đặt lịch cho ngày trong quá khứ!");
+    const selectedDateTime = new Date(`${selectedDate}T${time}:00`);
+    selectedDateTime.setMinutes(selectedDateTime.getMinutes() + 30);
+    const today = new Date();
+    console.log("today", today);
+    if (selectedDateTime < today) {
+      toast.warning(
+        "Bạn không thể đặt lịch lúc này cho ngày " +
+          formatDateString(selectedDate) +
+          " Vui lòng chọn giờ khác hoặc ngày khác! "
+      );
       return;
     }
+
     setSelectedSlot({ date, time });
     setIsModalOpen(true);
-  };
-
-  // Hàm xử lý gửi form
-  const handleFormSubmit = async () => {
-    const newData = {
-      ...formData,
-      time: new Date().toISOString(),
-      timeStart: new Date(
-        `${selectedSlot?.date}T${selectedSlot?.time}:00`
-      ).toISOString(),
-      timeEnd: new Date(`${selectedSlot?.date}T${timeEnd}:00`).toISOString(),
-      timeFinishFrequency: formData.timeFinishFrequency
-        ? formData.timeFinishFrequency
-        : new Date().toISOString(),
-      employeeIds: selectedEmployee.map((emp) => emp.employeeId),
-      bookerId: user.employeeId,
-    };
-
-    console.log(newData);
-
-    const response = await postData(newData);
-
-    if (response) {
-      setPopupMessage("Đặt lịch thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
-      setIsModalOpen(false);
-    } else {
-      setPopupMessage("Đặt lịch không thành công!");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
   };
 
   // Hàm chuyển đổi tuần
@@ -257,9 +208,9 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     ).padStart(2, "0")}`;
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  // đóng modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -329,14 +280,12 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                       );
                     });
 
-                    console.log(bookedSchedule);
                     const editBackground: { [key: string]: string } = {
                       normal: "normal",
                       pending: "pending",
                       waiting: "waiting",
                       checked_in: "checked_in",
                       completed: "completed",
-                      waitingCanceled: "waitingCanceled",
                     };
                     const statusKey =
                       bookedSchedule?.statusReservation.toLocaleLowerCase() ||
@@ -364,9 +313,6 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                             <p className={cx("status")}>
                               {bookedSchedule.statusReservation === "PENDING"
                                 ? "Chờ phê duyệt"
-                                : bookedSchedule.statusReservation ===
-                                  "WAITING_PAYMENT"
-                                ? "Chờ thanh toán"
                                 : bookedSchedule.statusReservation === "WAITING"
                                 ? "Chờ nhận phòng"
                                 : bookedSchedule.statusReservation ===
@@ -375,9 +321,6 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                                 : bookedSchedule.statusReservation ===
                                   "COMPLETED"
                                 ? "Đã hoàn thành"
-                                : bookedSchedule.statusReservation ===
-                                  "WAITING_CANCELED"
-                                ? "Chờ hủy"
                                 : ""}
                             </p>
                           </div>
@@ -393,267 +336,35 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
           </table>
 
           {/* Modal */}
-          {isModalOpen && selectedSlot && (
-            <div className={cx("modal-overlay")}>
-              <div className={cx("modal")}>
-                <button
-                  className={cx("close-btn")}
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  ✖
-                </button>
-                <h3>Đặt lịch phòng "{roomDetail?.roomName}"</h3>
+          {isModalOpen && (
+            <ModalBooking
+              isModalOpen={isModalOpen}
+              setIsModalClose={handleCloseModal}
+              roomInfo={
+                {
+                  roomId: roomDetail?.roomId,
+                  roomName: roomDetail?.roomName,
+                } as any
+              }
+              dateSelected={selectedSlot?.date}
+              timeStart={selectedSlot?.time}
+              setIsPopupOpen={handleOpenPopup}
+            />
+          )}
 
-                <div className={cx("form")}>
-                  <div className={cx("form-info")}>
-                    {/* Tiêu đề cuộc họp */}
-                    <div className={cx("form-group")}>
-                      <label>Tiêu đề</label>
-                      <input
-                        type="text"
-                        placeholder="Nhập tiêu đề cuộc họp"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    {/* chọn ngày */}
-                    <div className={cx("form-group")}>
-                      <label>Ngày</label>
-                      <input
-                        type="date"
-                        value={selectedSlot?.date || ""}
-                        name="time"
-                        onChange={(e) => {
-                          setSelectedSlot((prev) => ({
-                            ...prev!,
-                            date: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-
-                    <div className={cx("form-row")}>
-                      {/* bắt đầu */}
-                      <div className={cx("form-group")}>
-                        <label>Giờ bắt đầu</label>
-                        <select
-                          value={selectedSlot?.time || ""}
-                          onChange={(e) =>
-                            setSelectedSlot((prev) => ({
-                              ...prev!,
-                              time: e.target.value,
-                            }))
-                          }
-                        >
-                          {times.map((time) => (
-                            <option key={time} value={time}>
-                              {time}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      {/* kết thúc */}
-                      <div className={cx("form-group")}>
-                        <label>Giờ kết thúc</label>
-                        <select
-                          value={timeEnd}
-                          onChange={(e) => setTimeEnd(e.target.value)}
-                        >
-                          {times.map((time) => (
-                            <option key={time} value={time}>
-                              {time}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Ghi chú */}
-                    <div className={cx("form-group")}>
-                      <label>Ghi chú</label>
-                      <input
-                        type="text"
-                        placeholder="Nhập ghi chú"
-                        name="note"
-                        value={formData.note}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    {/* Mô tả */}
-                    <div className={cx("form-group")}>
-                      <label>Mô tả</label>
-                      <input
-                        type="text"
-                        placeholder="Nhập mô tả"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    <div className={cx("form-row")}>
-                      {/* Chọn tần suất */}
-                      <div className={cx("form-group")}>
-                        <label>Tần suất</label>
-                        <select
-                          value={formData.frequency}
-                          onChange={handleInputChange}
-                          name="frequency"
-                        >
-                          <option value="ONE_TIME">Một lần</option>
-                          <option value="DAILY">Mỗi ngày</option>
-                          <option value="WEEKLY">Mỗi tuần</option>
-                        </select>
-                      </div>
-
-                      {/* Chọn ngày kết thúc */}
-                      <div className={cx("form-group")}>
-                        <label>Ngày kết thúc</label>
-                        <input
-                          type="date"
-                          name="timeFinishFrequency"
-                          value={formData.timeFinishFrequency}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={cx("devide")}></div>
-
-                  <div className={cx("form-info")}>
-                    {/* tài liệu */}
-                    <div className={cx("form-group")}>
-                      <label>Tài liệu</label>
-                      <input
-                        type="file"
-                        multiple
-                        name="filePaths"
-                        value={files}
-                        onChange={(e) => {
-                          setFiles(e.target.value);
-                          setFormData((prev) => ({
-                            ...prev,
-                            filePaths: [...prev.filePaths, e.target.value],
-                          }));
-                        }}
-                      />
-                    </div>
-
-                    <select className={cx("form-group")}>
-                      {formData.filePaths.map((file, index) => (
-                        <option key={index}>{file}</option>
-                      ))}
-                    </select>
-
-                    {/* Chọn dịch vụ */}
-                    <div className={cx("form-group")}>
-                      <label>Dịch vụ</label>
-                      <div className={cx("checkbox-group")}>
-                        <select
-                          value={selectedServiceId}
-                          onChange={handleServiceChange}
-                        >
-                          <option value="" disabled>
-                            Chọn dịch vụ
-                          </option>
-                          {services?.map((service) => (
-                            <option
-                              key={service.serviceId}
-                              value={service.serviceId}
-                              id={service.serviceName}
-                            >
-                              {service.serviceName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className={cx("form-group")}>
-                      <input
-                        type="text"
-                        readOnly
-                        value={serviceName.join(", ")}
-                      />
-                    </div>
-
-                    {/* Người tham gia */}
-                    <div className={cx("form-row")}>
-                      <label>Người tham gia</label>
-
-                      <button
-                        className={cx("submit-btn")}
-                        onClick={() => {
-                          setAddOpen(true);
-                        }}
-                      >
-                        Thêm
-                      </button>
-                    </div>
-
-                    {selectedEmployee.length > 0 &&
-                      selectedEmployee.map((emp) => (
-                        <div className={cx("form-row")}>
-                          <div key={emp.employeeId}>
-                            {emp.employeeName} - {emp.phone}
-                          </div>
-                          <button onClick={() => handleRemoveEmployee(emp)}>
-                            x
-                          </button>
-                        </div>
-                      ))}
-
-                    {addOpen && (
-                      <div className={cx("modal-employee")}>
-                        <div className={cx("model-add")}>
-                          <input
-                            type="text"
-                            placeholder="Nhập số điện thoại người tham gia"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                          />
-                          {phone && employees && (
-                            <div className={cx("form-group", "employee-list")}>
-                              {employees.map((emp) => (
-                                <div className={cx("employee-item")}>
-                                  <div key={emp.employeeId}>
-                                    {emp.employeeName} - {emp.phone}
-                                  </div>
-                                  <button
-                                    onClick={() => handleAddEmployee(emp)}
-                                  >
-                                    Thêm
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Nút gửi phê duyệt */}
-                <button className={cx("submit-btn")} onClick={handleFormSubmit}>
-                  Gửi phê duyệt
-                </button>
-              </div>
-            </div>
+          {/* Popup thông báo */}
+          {infoPopup.close && (
+            <PopupNotification
+              message={infoPopup.message}
+              type={infoPopup.type}
+              isOpen={infoPopup.close}
+              onClose={() =>
+                setInfoPopup({ message: "", type: "success", close: false })
+              }
+            />
           )}
         </div>
       </div>
-
-      <PopupNotification
-        message={popupMessage}
-        type={popupType}
-        isOpen={isPopupOpen}
-        onClose={handleClosePopup}
-      />
     </div>
   );
 };

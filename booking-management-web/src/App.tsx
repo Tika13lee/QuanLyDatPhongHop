@@ -22,6 +22,7 @@ import {
   Schedule,
   ViewSchedule,
   ListApprovalByApprover,
+  FrequencySchedules,
 } from "./pages/pages-user";
 import { Home, Login } from "./pages/general";
 import { Provider } from "react-redux";
@@ -59,6 +60,7 @@ function App() {
             <Route path="rejected" element={<RejectedList />} />
             <Route path="schedule" element={<Schedule />} />
             <Route path="schedulelist" element={<ScheduleList />} />
+            <Route path="schedule-frequency" element={<FrequencySchedules />} />
           </Route>
         </Routes>
       </Router>

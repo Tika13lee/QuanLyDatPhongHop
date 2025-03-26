@@ -48,20 +48,20 @@ const ViewSchedule = () => {
           <span>Quay lại</span>
         </div>
 
-        <div className={cx("switch-container")}>
-          <button
-            className={cx("switch-btn", { active: view === "week" })}
-            onClick={toggleView}
-          >
-            Tuần
-          </button>
-          <button
-            className={cx("switch-btn", { active: view === "month" })}
-            onClick={toggleView}
-          >
-            Tháng
-          </button>
-        </div>
+          {/* <div className={cx("switch-container")}>
+            <button
+              className={cx("switch-btn", { active: view === "week" })}
+              onClick={toggleView}
+            >
+              Tuần
+            </button>
+            <button
+              className={cx("switch-btn", { active: view === "month" })}
+              onClick={toggleView}
+            >
+              Tháng
+            </button>
+          </div> */}
       </div>
 
       <div className={cx("room-schedule-container")}>

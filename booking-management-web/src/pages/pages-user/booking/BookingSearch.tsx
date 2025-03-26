@@ -6,6 +6,7 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import {
   IoIosArrowDown,
   IoIosArrowForward,
+  MdSearch,
 } from "../../../components/icons/icons";
 import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
@@ -24,7 +25,10 @@ type DataSearch = {
   timeEnd: string;
 };
 
+
+
 function BookingSearch() {
+  // lưu emp hiện tại vào localStorage
   const [empPhone, setEmpPhone] = useState<string>("0914653334");
   const { data, loading, error } = useFetch<EmployeeProps>(
     `http://localhost:8080/api/v1/employee/getEmployeeByPhone?phone=${empPhone}`
@@ -42,7 +46,9 @@ function BookingSearch() {
   const [capacity, setCapacity] = useState<number>(1);
   const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
   const [filterData, setFilterData] = useState<RoomProps[] | null>(null);
+  const [searchName, setSearchName] = useState<string>("");
 
+  // dữ liệu tìm kiếm
   const [dataSearch, setDataSearch] = useState<DataSearch>({
     branch: "",
     date: "",
@@ -157,17 +163,52 @@ function BookingSearch() {
       });
   };
 
+  // lọc dữ liệu lần đầu theo filter
   useEffect(() => {
     handleFilter();
   }, []);
 
+  // Lọc dữ liệu theo tên phòng
+  useEffect(() => {
+    const trimmedSearch = searchName.trim();
+    const delayDebounce = setTimeout(() => {
+      if (trimmedSearch !== "") {
+        fetch(
+          `http://localhost:8080/api/v1/room/searchRoomByName?roomName=${encodeURIComponent(
+            trimmedSearch
+          )}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            setFilterData(data);
+          })
+          .catch((error) => {
+            console.error("Error searching room by name:", error);
+          });
+      } else {
+        handleFilter();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchName]);
+
   return (
     <div className={cx("Search-container")}>
       <div className={cx("booking-header")}>
-        <div className={cx("search")}>
-          <label>Tìm kiếm theo tên phòng</label>
-          <div>
-            <input type="text" placeholder="Nhập tên phòng" />
+        {/* room name */}
+        <div className={cx("search-room")}>
+          <label>Tìm kiếm phòng theo tên</label>
+          <div className={cx("search-box")}>
+            <input
+              type="text"
+              placeholder="Nhập tên phòng"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+            <button>
+              <IconWrapper icon={MdSearch} color="#fff" size={24} />
+            </button>
           </div>
         </div>
         <div className={cx("filters")}>

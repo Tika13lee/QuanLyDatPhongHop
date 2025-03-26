@@ -250,8 +250,8 @@ function Device() {
         <table className={cx("device-table")}>
           <thead>
             <tr>
-              <th style={{ width: "70px" }}>STT</th>
-              <th style={{ width: "300px" }}>Tên thiết bị</th>
+              <th>STT</th>
+              <th>Tên thiết bị</th>
               <th>Mô tả</th>
             </tr>
           </thead>

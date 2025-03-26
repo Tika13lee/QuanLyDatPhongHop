@@ -6,13 +6,7 @@ import { formatDateDate, formatDateString, times } from "../../utilities";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useFetch from "../../hooks/useFetch";
-import {
-  EmployeeProps,
-  frequency,
-  Reservation,
-  ReservationProps,
-  ServiceProps,
-} from "../../data/data";
+import { EmployeeProps, ReservationProps, ServiceProps } from "../../data/data";
 import IconWrapper from "../icons/IconWrapper";
 import { IoSettingsOutline } from "../../components/icons/icons";
 import { FaPlus } from "../../components/icons/icons";
@@ -198,13 +192,11 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       console.log(date.toString().split(" ")[0]);
       return !weekOfDates.includes(date.toString().split(" ")[0]);
     });
-    console.log(dataExist);
     return dataExist;
   };
 
   // lọc thứ không được chọn trong danh sách ngày
   useEffect(() => {
-    console.log(removeDate(dates, checkRemoveDays ?? []));
     setDates(removeDate(dayOriginal, checkRemoveDays ?? []));
   }, [checkRemoveDays]);
 
@@ -415,7 +407,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
   useEffect(() => {});
 
-  // đặt lịch
+  // gửi yêu cầu phê duyệt
   const {
     data,
     loading: roomLoading,
@@ -449,6 +441,10 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       ...formData,
       TypeRequestForm: TypeRequestForm,
       timeRequest: new Date().toISOString(),
+      reservationDTO: {
+        ...formData.reservationDTO,
+        employeeIds: selectedEmployee.map((emp) => emp.employeeId + ""),
+      },
     };
 
     console.log(updatedFormData);
@@ -466,7 +462,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const handleOpenModalSetting = () => {
     setModalSetting(true);
   };
-
   const handleCloseModalSetting = () => {
     setModalSetting(false);
   };
@@ -496,7 +491,23 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                       </option>
                     </select>
                   ) : (
-                    <select>
+                    <select
+                      onChange={(e) => {
+                        const selectedOption = e.target.selectedOptions[0];
+                        const roomId =
+                          selectedOption.getAttribute("data-bindid");
+                        setFormData((prev) => ({
+                          ...prev,
+                          reservationDTO: {
+                            ...prev.reservationDTO,
+                            roomId: roomId ?? "",
+                          },
+                        }));
+                      }}
+                    >
+                      <option value="" disabled selected>
+                        Chọn phòng
+                      </option>
                       {dataRoomByBranch?.map((room) => (
                         <option value={room.roomName} data-bindid={room.roomId}>
                           {room.roomName}
@@ -809,6 +820,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                   </button>
                 </div>
 
+                {/* hiện người tham gia */}
                 {selectedEmployee.length > 0 &&
                   selectedEmployee.map((emp) => (
                     <div className={cx("form-row", "list-emp-participant")}>

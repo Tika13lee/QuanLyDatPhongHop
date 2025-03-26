@@ -99,9 +99,11 @@ export type RoomProps = {
   capacity: number;
   statusRoom: string;
   typeRoom: string;
-  location: LocationProps;
+  location: LocationProps | LocationProps2;
   imgs: string[];
-  price: PriceProps;
+  // price: PriceProps;
+  price?: number;
+  priceValue?: number;
   approvers: {
     id: number;
     name: string;

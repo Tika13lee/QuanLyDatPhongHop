@@ -6,8 +6,10 @@ import ViewSchedule from "./booking/ViewSchedule";
 import Booking from "./booking/Booking";
 import RequestList from "./request-list/RequestList";
 import RejectedList from "./approve/RejectedList";
+import FrequencySchedules from "./schedule/FrequencySchedules";
 
 export {
+  FrequencySchedules,
   RejectedList,
   RequestList,
   Booking,

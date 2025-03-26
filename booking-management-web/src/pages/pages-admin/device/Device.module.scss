@@ -216,23 +216,33 @@
   th,
   td {
     padding: 8px;
-    text-align: center;
+    text-align: left;
     border: 1px solid var(--border-color);
-  }
-
-  tr {
     cursor: pointer;
   }
 
   tr:hover {
     background-color: var(--bg-primary);
   }
-}
 
-.device-table th {
-  background-color: var(--bg-active);
-  color: var(--color-white);
-  font-weight: 500;
+  th {
+    background-color: var(--bg-active);
+    color: var(--color-white);
+    font-weight: 500;
+    cursor: default;
+    text-align: center;
+  }
+
+  td:first-child,
+  th:first-child {
+    width: 100px;
+    text-align: center;
+  }
+
+  td:last-child,
+  th:last-child {
+    width: 900px;
+  }
 }
 
 .edit-btn {

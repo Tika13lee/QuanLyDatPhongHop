@@ -49,14 +49,14 @@ const DetailModal: React.FC<DetailModalProps> = ({
         <div className={cx("modal-content")}>
           <div className={cx("info-left")}>
             <p>
-              <strong>Tiêu đề:</strong> {requestForm.requestReservation.title}
+              <strong>Tiêu đề:</strong> {requestForm.reservations[0].title}
             </p>
             <p>
               <strong>Mô tả:</strong>{" "}
-              {requestForm.requestReservation.description}
+              {requestForm.reservations[0].description}
             </p>
             <p>
-              <strong>Ghi chú:</strong> {requestForm.requestReservation.note}
+              <strong>Ghi chú:</strong> {requestForm.reservations[0].note}
             </p>
             <div className={cx("info-row")}>
               <p>

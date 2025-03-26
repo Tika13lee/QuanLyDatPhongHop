@@ -7,6 +7,7 @@ import {
   startOfWeek,
   addWeeks,
   parseISO,
+  set,
 } from "date-fns";
 import { vi } from "date-fns/locale";
 import useFetch from "../../../hooks/useFetch";
@@ -23,6 +24,7 @@ import {
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { FaEdit, FaPlus } from "../../../components/icons/icons";
 import usePost from "../../../hooks/usePost";
+import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
 
@@ -51,6 +53,13 @@ const Schedule = () => {
   const [openModalAddService, setOpenModalAddService] = useState(false);
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [selectedServices, setSelectedServices] = useState<ServiceProps[]>([]);
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   // Cập nhật danh sách ngày trong tuần
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -131,18 +140,8 @@ const Schedule = () => {
     },
   });
 
-  // cập nhật thông tin
-  const {
-    data,
-    loading: requestLoading,
-    error: requestError,
-    postData,
-  } = usePost(
-    "http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationOne"
-  );
-
   // xử lý cập nhật
-  const handleSaveUpdate = () => {
+  const handleSaveUpdate = async () => {
     const updateForm = {
       ...formData,
       reservationIds: [selectedSchedule?.reservationId ?? 0],
@@ -150,55 +149,20 @@ const Schedule = () => {
         ...formData.reservationDTO,
         note: valueNote,
         employeeIds: selectedEmployees.map((e) => e.employeeId),
-        serviceIds: selectedServices.map((s) => s.serviceId),
+        // serviceIds: selectedServices.map((s) => s.serviceId),
         filePaths: selectedSchedule?.filePaths ?? [],
       },
     };
     console.log("Dữ liệu gửi: ", updateForm);
 
+    // const response = await postData(updateForm, { method: "POST" });
+
+    // if (response) {
+    //   console.log("Cập nhật thành công");
+    // } else {
+    //   console.log("Cập nhật thất bại");
+    // }
     handleCloseDetail();
-  };
-
-  // xử lý cập nhật thông tin
-  const handleUpdateForm = async () => {
-    const updateForm = {
-      ...formData,
-    };
-    console.log("Dữ liệu gửi: ", updateForm);
-
-    const response = await postData(updateForm, { method: "POST" });
-
-    if (response) {
-      console.log("Cập nhật thành công");
-    } else {
-      console.log("Cập nhật thất bại");
-    }
-  };
-
-  // Lấy danh sách dịch vụ
-  const {
-    data: services,
-    loading: serviceLoading,
-    error: serviceError,
-  } = useFetch<ServiceProps[]>(
-    "http://localhost:8080/api/v1/service/getAllServices"
-  );
-
-  // lấy ds dịch vụ không có trong lịch
-  const servicesNotInSchedule = services?.filter(
-    (service) =>
-      !selectedSchedule?.services?.some(
-        (s) => s.serviceId === service.serviceId
-      )
-  );
-
-  // xử lý xóa dịch vụ
-  const handleRemoveService = (id: number) => {
-    const updated = selectedServices.filter(
-      (service) => service.serviceId !== id
-    );
-
-    setSelectedServices(updated);
   };
 
   // mở modal thêm người tham gia
@@ -267,6 +231,83 @@ const Schedule = () => {
       (e) => e.employeeId !== employeeId
     );
     setSelectedEmployees(updatedEmployees);
+  };
+
+  // xử lý xóa tài liệu
+  const handleRemoveDocument = (index: number) => {
+    const updated = selectedSchedule?.filePaths.filter((_, i) => i !== index);
+
+    if (updated)
+      setSelectedSchedule((prev) =>
+        prev
+          ? {
+              ...prev,
+              filePaths: updated,
+            }
+          : prev
+      );
+  };
+
+  // Lấy danh sách dịch vụ
+  const {
+    data: services,
+    loading: serviceLoading,
+    error: serviceError,
+  } = useFetch<ServiceProps[]>(
+    "http://localhost:8080/api/v1/service/getAllServices"
+  );
+
+  // lấy ds dịch vụ không có trong lịch
+  const servicesNotInSchedule = services?.filter(
+    (service) =>
+      !selectedSchedule?.services?.some(
+        (s) => s.serviceId === service.serviceId
+      )
+  );
+
+  // xử lý xóa dịch vụ
+  const handleRemoveService = (id: number) => {
+    const updated = selectedServices.filter(
+      (service) => service.serviceId !== id
+    );
+
+    setSelectedServices(updated);
+  };
+
+  // gửi phê duyệt chỉnh sửa dịch vụ
+  const {
+    data,
+    loading: requestLoading,
+    error: requestError,
+    postData,
+  } = usePost(
+    "http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationOne"
+  );
+
+  // xử lý gửi phê duyệt chỉnh sửa dịch vụ
+  const handleSubmitService = async () => {
+    const updateForm = {
+      ...formData,
+      reservationIds: [selectedSchedule?.reservationId ?? 0],
+      reservationDTO: {
+        ...formData.reservationDTO,
+        serviceIds: selectedServices.map((s) => s.serviceId),
+      },
+    };
+    console.log("Dữ liệu gửi dv: ", updateForm);
+
+    const response = await postData(updateForm, { method: "POST" });
+
+    if (response) {
+      setPopupMessage("Gửi phê duyệt thành công");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      setOpenModalAddService(false);
+    } else {
+      setPopupMessage("Gửi phê duyệt thất bại");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
   };
 
   return (
@@ -527,11 +568,20 @@ const Schedule = () => {
                       </>
                     )}
                   </div>
+                  {/* hiện tài liệu */}
                   {selectedSchedule.filePaths.map((file, index) => (
-                    <li key={index}>
+                    <li key={index} className={cx("file-item")}>
                       <a href={file} target="_blank" rel="noreferrer">
                         {file}
                       </a>
+                      {isEdit && (
+                        <button
+                          className={cx("remove-btn")}
+                          onClick={() => handleRemoveDocument(index)}
+                        >
+                          ❌
+                        </button>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -623,7 +673,7 @@ const Schedule = () => {
 
                         {/* Hiển thị dịch vụ đã chọn trong modal */}
                         <h4>Dịch vụ đã chọn:</h4>
-                        <div className={cx("selected-service-list")}>
+                        <div className={cx("selected-list")}>
                           <ul>
                             {selectedServices.map((service) => (
                               <li
@@ -652,7 +702,10 @@ const Schedule = () => {
                         </div>
 
                         <div className={cx("modal-footer")}>
-                          <button className={cx("btn-update")}>
+                          <button
+                            className={cx("btn-update")}
+                            onClick={handleSubmitService}
+                          >
                             Gửi phê duyệt
                           </button>
                         </div>
@@ -735,8 +788,9 @@ const Schedule = () => {
                               )}
                           </div>
 
-                          <div className={cx("form-group")}>
-                            <label>Người tham gia đã chọn:</label>
+                          {/* hiển thị emp  */}
+                          <h4>Người tham gia đã chọn:</h4>
+                          <div className={cx("selected-list")}>
                             <ul>
                               {selectedEmployees.map((emp) => (
                                 <li
@@ -777,6 +831,14 @@ const Schedule = () => {
 
             {isEdit && (
               <div className={cx("modal-footer")}>
+                <button
+                  className={cx("btn-cancel")}
+                  onClick={() => {
+                    setIsEdit(false);
+                  }}
+                >
+                  Hủy
+                </button>
                 <button className={cx("btn-update")} onClick={handleSaveUpdate}>
                   Lưu
                 </button>
@@ -785,6 +847,14 @@ const Schedule = () => {
           </div>
         </div>
       )}
+
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </div>
   );
 };

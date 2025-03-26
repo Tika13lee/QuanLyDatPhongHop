@@ -183,7 +183,6 @@ const RoomDetail = () => {
       statusRoom: roomUpdateData.statusRoom,
       room_deviceDTOS: roomDetail.room_deviceDTOS,
       imgs: roomDetail.imgs,
-
     };
 
     console.log("Dữ liệu gửi UPDATE", updateRoom);
@@ -227,6 +226,20 @@ const RoomDetail = () => {
     setIsPopupOpen(false);
   };
 
+  const [urlQR, setUrlQR] = useState("");
+
+  const handleCreateQR = () => {
+    fetch(
+      `http://localhost:8080/api/v1/room/generateRoomQR?roomId=${roomDetail?.roomId}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setUrlQR(data.qrCode);
+      });
+  };
+
+  console.log(urlQR);
+
   return (
     <div className={cx("room-detail-container")}>
       <div className={cx("header")}>
@@ -246,7 +259,13 @@ const RoomDetail = () => {
                   : "/images/default-room.jpg"
               }
               alt="Phòng họp"
+              style={{ width: "300px", height: "210px", objectFit: "cover" }}
             />
+            <div className={cx("qr-code")}>
+              {urlQR != "" && (
+                <img src={urlQR} alt="QR Code" width={300} height={300} />
+              )}
+            </div>
           </div>
 
           <div className={cx("room-info")}>
@@ -254,8 +273,31 @@ const RoomDetail = () => {
               <span className={cx("room-title")}>
                 Tên phòng - {roomDetail?.roomName}
               </span>
-              <div className={cx("btn-edit")} onClick={handleOpenUpdateModal}>
-                <IconWrapper icon={MdOutlineEdit} size={22} />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <button
+                  onClick={() => handleCreateQR()}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    backgroundColor: "#0056B3",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                  }}
+                >
+                  Tạo mã QR
+                </button>
+                <div className={cx("btn-edit")} onClick={handleOpenUpdateModal}>
+                  <IconWrapper icon={MdOutlineEdit} size={22} />
+                </div>
               </div>
 
               {/* modal chỉnh sửa */}
@@ -272,6 +314,7 @@ const RoomDetail = () => {
 
                     <div className={cx("input-group")}>
                       <label htmlFor="room-name">Tên phòng</label>
+
                       <input
                         type="text"
                         id="room-name"

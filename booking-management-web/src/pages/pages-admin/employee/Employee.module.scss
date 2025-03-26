@@ -102,8 +102,8 @@
 
   &:disabled {
     background-color: #e0e0e0;
-    color: #b0b0b0; 
-    cursor: not-allowed; 
+    color: #b0b0b0;
+    cursor: not-allowed;
     opacity: 0.6;
   }
 }
@@ -211,29 +211,45 @@
     th,
     td {
       padding: 5px;
-      text-align: center;
+      text-align: left;
       border: 1px solid var(--border-color);
+      width: 150px;
     }
 
     tr:hover {
       background-color: var(--bg-primary);
+    }
+
+    td:first-child,
+    th:first-child {
+      width: 50px;
+      text-align: center;
+    }
+
+    td:last-child,
+    th:last-child {
+      width: 70px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    td:nth-child(2),
+    th:nth-child(2) {
+      width: 70px;
+      text-align: center;
     }
   }
 
   .employee-table th {
     background-color: var(--bg-active);
     color: var(--color-white);
+    text-align: center;
   }
 
-  .employee-image {
+  .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-  }
-
-  .icon-info {
-    cursor: pointer;
-    text-align: center;
   }
 }

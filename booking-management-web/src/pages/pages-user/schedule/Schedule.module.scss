@@ -202,6 +202,25 @@
   }
 }
 
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    background-color: #b02a37;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
 .modal-content {
   display: flex;
   justify-content: space-between;
@@ -275,6 +294,25 @@
   margin-top: 20px;
 }
 
+// chỉnh sửa file
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-radius: 5px;
+  background: #f5f5f5;
+  margin: 5px 0;
+
+  button {
+    background: none;
+    border: none;
+    color: var(--color-error);
+    font-size: 10px;
+    cursor: pointer;
+  }
+}
+
 // modal add participant
 .modal-add-participant {
   position: fixed;
@@ -342,6 +380,7 @@
     cursor: pointer;
   }
 }
+
 .employee-item {
   display: flex;
   align-items: center;
@@ -435,7 +474,7 @@
   }
 }
 
-.selected-service-list {
+.selected-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -454,35 +493,11 @@
   }
 
   .remove-btn {
+    color: var(--color-white);
+    font-size: 13px;
     background: transparent;
     border: none;
     color: #dc3545;
-    font-size: 14px;
     cursor: pointer;
   }
 }
-
-// .selected-item {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   padding: 6px 10px;
-//   border: 1px solid #eee;
-//   border-radius: 6px;
-//   margin-bottom: 6px;
-//   font-size: 14px;
-//   background-color: #f8f8f8;
-//   border-radius: 0;
-
-//   .remove-btn {
-//     background: transparent;
-//     border: none;
-//     color: #dc3545;
-//     font-size: 16px;
-//     cursor: pointer;
-
-//     &:hover {
-//       transform: scale(1.1);
-//     }
-//   }
-// }

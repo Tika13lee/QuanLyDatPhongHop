@@ -47,6 +47,7 @@ function Booking() {
   });
   const [rooms, setRooms] = useState<RoomViewProps[]>([]);
 
+  // thông báo popup
   const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
     message: "",
     type: "success",
@@ -376,6 +377,8 @@ function Booking() {
           setIsPopupOpen={handleOpenPopup}
         />
       )}
+      
+      {/* Popup thông báo */}
       {infoPopup.close && (
         <PopupNotification
           message={infoPopup.message}

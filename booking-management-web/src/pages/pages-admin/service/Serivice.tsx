@@ -334,10 +334,10 @@ function Service() {
         <table className={cx("service-table")}>
           <thead>
             <tr>
-              <th style={{ width: "50px" }}>STT</th>
-              <th style={{ width: "200px" }}>Tên dịch vụ</th>
-              <th style={{ width: "300px" }}>Mô tả</th>
-              <th style={{ width: "100px" }}>Giá</th>
+              <th>STT</th>
+              <th>Tên dịch vụ</th>
+              <th>Mô tả</th>
+              <th>Giá</th>
             </tr>
           </thead>
           <tbody>

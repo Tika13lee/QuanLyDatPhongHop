@@ -665,11 +665,11 @@ const Employee = () => {
                     onChange={() => handleCheckboxChange(emp.employeeId)}
                   />
                 </td>
-                <td>
+                <td className={cx("employee-image")}>
                   <img
                     src={emp.avatar}
                     alt=""
-                    className={cx("employee-image")}
+                    className={cx("avatar")}
                   />
                 </td>
                 <td>{emp.employeeName}</td>
@@ -681,11 +681,7 @@ const Employee = () => {
                     "N/A"}
                 </td>
 
-                <td
-                  className={cx("icon-info")}
-                  onClick={() => handleEditEmployee(emp)}
-                  style={{width: "90px"}}
-                >
+                <td onClick={() => handleEditEmployee(emp)}>
                   <IconWrapper icon={MdOutlineEdit} color="#0670C7" size={20} />
                 </td>
               </tr>

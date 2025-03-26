@@ -1,9 +1,10 @@
 import classNames from "classnames/bind";
 import styles from "./CardRoom.module.scss";
-import { RoomProps } from "../../data/data";
+import { LocationProps2, RoomProps } from "../../data/data";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalBooking from "../Modal/ModalBooking";
+import PopupNotification from "../popup/PopupNotification";
 
 const cx = classNames.bind(styles);
 
@@ -14,11 +15,13 @@ type DataSearch = {
   timeEnd: string;
 };
 
-const timeSlots = Array.from({ length: 19 }, (_, i) => {
-  const hour = Math.floor(i / 2) + 8;
-  const minute = i % 2 === 0 ? "00" : "30";
-  return `${hour.toString().padStart(2, "0")}:${minute}`;
-});
+type typeMessage = "error" | "success" | "info" | "warning";
+
+type typeInfoPopup = {
+  message: string;
+  type: typeMessage;
+  close: boolean;
+};
 
 function CardRoom({
   rooms,
@@ -31,6 +34,22 @@ function CardRoom({
   const [selectedRoom, setSelectedRoom] = useState<RoomProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // thông báo popup
+  const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
+    message: "",
+    type: "success",
+    close: false,
+  });
+
+  // xử lý mở popup
+  const handleOpenPopup = (
+    message: string,
+    type: typeMessage,
+    close: boolean
+  ) => {
+    setInfoPopup({ message, type, close: true });
+  };
+
   return (
     <>
       <div className={cx("card-room-list")}>
@@ -41,17 +60,38 @@ function CardRoom({
             </div>
             <div className={cx("card-room__content")}>
               <h3 className={cx("card-room__name")}>{room.roomName}</h3>
-              <p className={cx("card-room__location")}>
-                📍 {room.location.building.branch.branchName}
-              </p>
-              <p className={cx("card-room__location")}>
-                📍 Tòa {room.location.building.buildingName} - tầng{" "}
-                {room.location.floor}{" "}
-              </p>
+              <div className={cx("card-room__location")}>
+                {(() => {
+                  const loc = room.location;
+
+                  if ("building" in loc && typeof loc.building === "object") {
+                    // Kiểu LocationProps
+                    return (
+                      <>
+                        <p>📍 {loc.building.branch.branchName}</p>
+                        <p>
+                          🏢 Tòa {loc.building.buildingName} - tầng {loc.floor}
+                        </p>
+                      </>
+                    );
+                  } else {
+                    // Kiểu LocationProps2
+                    const loc2 = loc as LocationProps2;
+                    return (
+                      <>
+                        <p>📍 {loc2.branch}</p>
+                        <p>
+                          🏢 Tòa {loc2.building} - tầng {loc2.floor}
+                        </p>
+                      </>
+                    );
+                  }
+                })()}
+              </div>
+
               <p className={cx("card-room__capacity")}>
                 👥 {room.capacity} người
               </p>
-              {/* <p className={cx("card-room__price")}>{room.price.value}</p> */}
 
               <div className={cx("card-room__buttons")}>
                 <button
@@ -93,6 +133,19 @@ function CardRoom({
           dateSelected={dataSearch.date}
           timeStart={dataSearch.timeStart}
           timeEnd={dataSearch.timeEnd}
+          setIsPopupOpen={handleOpenPopup}
+        />
+      )}
+
+      {/* Popup thông báo */}
+      {infoPopup.close && (
+        <PopupNotification
+          message={infoPopup.message}
+          type={infoPopup.type}
+          isOpen={infoPopup.close}
+          onClose={() =>
+            setInfoPopup({ message: "", type: "success", close: false })
+          }
         />
       )}
     </>

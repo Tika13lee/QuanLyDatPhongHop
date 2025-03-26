@@ -1,4 +1,3 @@
-// ScheduleList.tsx
 import React, { useState, useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./ScheduleList.module.scss";
@@ -109,7 +108,7 @@ const ScheduleList = () => {
       )
       .then((res) => {
         const filteredData = res.data.filter(
-          (item) => item.typeRequestForm !== "UPDATE_RESERVATION"
+          (item) => item.typeRequestForm === "RESERVATION_ONETIME"
         );
 
         const transformed = transformData(filteredData);
