@@ -16,9 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -133,6 +131,11 @@ public class RequestFormService implements IRequestForm {
     @Override
     public List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO){
         ArrayList<Reservation> reservations = new ArrayList<>();
+        if(requestFormDTO.getReservationDTO().getTimeFinishFrequency().isEmpty()){
+            System.out.println("1");
+            requestFormDTO.getReservationDTO().setTimeFinishFrequency(Collections.singletonList(requestFormDTO.getReservationDTO().getTimeStart()));
+        }
+        System.out.println("2");
         requestFormDTO.getReservationDTO().getTimeFinishFrequency().forEach(date -> {
             LocalDate day = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalTime hourStart = requestFormDTO.getReservationDTO().getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
@@ -141,11 +144,11 @@ public class RequestFormService implements IRequestForm {
             LocalDateTime timeEnd = LocalDateTime.of(day, hourEnd);
             Date dateEnd = Date.from(timeEnd.atZone(ZoneId.systemDefault()).toInstant());
             Date dateStart = Date.from(timeStart.atZone(ZoneId.systemDefault()).toInstant());
-            reservationRepository.findRoomsByTimeAndAttendant(dateStart,dateEnd,requestFormDTO.getReservationDTO().getBookerId()).forEach(reservation -> {
-               if(reservation.getRoom().getRoomId()==requestFormDTO.getReservationDTO().getRoomId()){
-                   reservations.add(reservation);
-               }
-            });
+            System.out.println(dateStart);
+            System.out.println(dateEnd);
+            System.out.println(date);
+            System.out.println(reservationRepository.findRoomsByTimeAndAttendant(dateStart, dateEnd, requestFormDTO.getReservationDTO().getBookerId()));
+            reservations.addAll(reservationRepository.findRoomsByTimeAndAttendant(dateStart, dateEnd, requestFormDTO.getReservationDTO().getBookerId()));
         });
         return reservations;
     }

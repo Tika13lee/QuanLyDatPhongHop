@@ -1,4 +1,4 @@
-package vn.com.kltn_project_v1.until;
+package vn.com.kltn_project_v1.util;
 
 import org.springframework.stereotype.Component;
 

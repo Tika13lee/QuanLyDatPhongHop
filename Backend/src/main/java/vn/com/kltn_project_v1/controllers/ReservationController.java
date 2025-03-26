@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.model.StatusReservation;
 import vn.com.kltn_project_v1.services.IReservation;
+import vn.com.kltn_project_v1.util.AESUtil;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/reservation")
@@ -60,6 +63,31 @@ public class ReservationController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PostMapping
+    public ResponseEntity<?> checkIn(@RequestBody Map<String, Object> payload) {
+        try {
+            String encryptedData = payload.get("encryptedData").toString();
+            Long employeeId = payload.get("employeeId") instanceof Number ? ((Number) payload.get("employeeId")).longValue() : null;
 
+            // Giải mã dữ liệu từ QR code
+            String decryptedData = AESUtil.decrypt(encryptedData);
+            Long roomId = Long.parseLong(decryptedData.split("=")[1]);
+
+            // Log dữ liệu để kiểm tra (roomId & timestamp)
+            System.out.println("Dữ liệu giải mã: " + decryptedData);
+            System.out.println("Người dùng: " + employeeId);
+
+            // Kiểm tra dữ liệu check-in
+            String message = reservationService.checkDataCheckIn(roomId, employeeId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", message);
+            response.put("decryptedData", decryptedData);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi giải mã QR", e);
+        }
+
+}
 
 }

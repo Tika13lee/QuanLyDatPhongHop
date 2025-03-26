@@ -16,5 +16,6 @@ public interface IReservation {
     List<Reservation> getAllReservationByBooker(String phone,Date dayStart,Date dayEnd);
     List<ReservationViewDTO> getReservationsByStatusReservationAndBookerPhoneAndTimeAndApproverAndTitle(StatusReservation statusReservation, String phone, Date dayStart, Date dayEnd, String approverName, String title);
     List<ReservationViewDTO> getReservationsByBookerPhone(String phone,StatusReservation statusReservation);
+    String checkDataCheckIn(Long roomId, Long employeeId);
 
 }

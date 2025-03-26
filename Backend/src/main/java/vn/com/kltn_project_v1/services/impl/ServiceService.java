@@ -5,17 +5,13 @@ import org.modelmapper.ModelMapper;
 import vn.com.kltn_project_v1.dtos.ServiceDTO;
 
 import vn.com.kltn_project_v1.model.Price;
-import vn.com.kltn_project_v1.model.PriceRoom;
 import vn.com.kltn_project_v1.model.Service;
-import vn.com.kltn_project_v1.model.Type;
 import vn.com.kltn_project_v1.repositories.PriceRepository;
 import vn.com.kltn_project_v1.repositories.PriceServiceRepository;
 import vn.com.kltn_project_v1.repositories.ServiceRepository;
 import vn.com.kltn_project_v1.services.IService;
-import vn.com.kltn_project_v1.until.ConvertData;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 @org.springframework.stereotype.Service

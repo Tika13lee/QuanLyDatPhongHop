@@ -25,6 +25,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findReservationsByBookerPhoneAndStatusReservation(String phone, StatusReservation statusReservation);
     @Query("select r.room from Reservation r where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2)")
     List<Room> findRoomsByTime(Date timeStart, Date timeEnd);
-    @Query("select r from Reservation r join r.attendants a where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2) and a.employeeId = ?3")
+    //lich cua nhan vien nam trong khoang thoi gian bi trung
+    @Query("select r from Reservation r join r.attendants a where( (:timeStart is null) or(r.timeStart <= ?1 and r.timeStart>= ?2)or(r.timeEnd <= ?1 and r.timeEnd >=?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2)) and a.employeeId = ?3")
     List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId);
+    //so sánh ngày checkin
+    @Query("SELECT r FROM Reservation r " +
+            "WHERE r.booker.employeeId =?1 and FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?2) order by r.timeStart desc")
+    List<Reservation> findReservationCheckInByDay(Long employeeId, Date timeCheckin);
+    @Query("SELECT r FROM Reservation r " +
+            "where r.booker.employeeId =?1 and r.timeEnd < ?2 order by r.timeStart desc")
+    List<Reservation> findReservationCheckInOutTime(Long employeeId, Date timeCheckin);
+    @Query("SELECT r FROM Reservation r " +
+            "where r.booker.employeeId =?1 and ?2 between r.timeStart and r.timeEnd ")
+    List<Reservation> findReservationCheckInDone(Long employeeId, Date timeCheckin);
 }

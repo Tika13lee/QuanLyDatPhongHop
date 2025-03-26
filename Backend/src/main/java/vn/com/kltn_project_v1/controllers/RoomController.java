@@ -10,8 +10,13 @@ import vn.com.kltn_project_v1.model.StatusRoom;
 import vn.com.kltn_project_v1.model.TypeRoom;
 import vn.com.kltn_project_v1.services.IDevice;
 import vn.com.kltn_project_v1.services.IRoom;
+import vn.com.kltn_project_v1.util.AESUtil;
+import vn.com.kltn_project_v1.util.QRCodeGenerator;
 
+import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/room")
@@ -126,6 +131,26 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             return ResponseEntity.ok(roomService.updateRoom(roomDTO));
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/generateRoomQR")
+    public ResponseEntity<?> generateQRCode(@RequestParam Long roomId) {
+        try {
+
+            String rawData = "roomId=" + roomId;
+
+            // Mã hóa dữ liệu trước khi tạo QR
+            String encryptedData = AESUtil.encrypt(rawData);
+
+            // Tạo QR code chỉ chứa encryptedData
+            String base64QRCode = QRCodeGenerator.generateQRCode(encryptedData, 300, 300);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("qrCode", "data:image/png;base64," + base64QRCode);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi tạo mã QR", e);
         }
     }
 

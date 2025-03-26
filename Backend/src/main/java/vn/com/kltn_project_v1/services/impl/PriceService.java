@@ -12,13 +12,12 @@ import vn.com.kltn_project_v1.model.PriceRoom;
 import vn.com.kltn_project_v1.model.Room;
 import vn.com.kltn_project_v1.repositories.*;
 import vn.com.kltn_project_v1.services.IPrice;
-import vn.com.kltn_project_v1.until.ConvertData;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static vn.com.kltn_project_v1.until.ConvertData.convertToLocalDate;
+import static vn.com.kltn_project_v1.util.ConvertData.convertToLocalDate;
 
 @Service
 @RequiredArgsConstructor

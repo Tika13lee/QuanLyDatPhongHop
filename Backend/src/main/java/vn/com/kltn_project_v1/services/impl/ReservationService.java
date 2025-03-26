@@ -12,6 +12,7 @@ import vn.com.kltn_project_v1.repositories.RoomRepository;
 import vn.com.kltn_project_v1.repositories.ServiceRepository;
 import vn.com.kltn_project_v1.services.IReservation;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -96,6 +97,41 @@ public class ReservationService implements IReservation {
     @Override
     public List<ReservationViewDTO> getReservationsByBookerPhone(String phone, StatusReservation statusReservation) {
         return convertApprovalReservation(reservationRepository.findReservationsByBookerPhoneAndStatusReservation(phone, statusReservation));
+    }
+
+    @Override
+    public String checkDataCheckIn(Long roomId, Long employeeId) {
+        Date TimeCheckin = new Date();
+        String mesResult = "";
+        List<Reservation> reservationsInDay = reservationRepository.findReservationCheckInByDay(employeeId, TimeCheckin);
+        if(reservationsInDay.isEmpty()){
+            mesResult = "Không có lịch hẹn đặt phòng trong ngày";
+            return mesResult;
+        }else {
+            List<Reservation> reservationsOutTime = reservationRepository.findReservationCheckInOutTime(employeeId, TimeCheckin);
+            if (reservationsOutTime.isEmpty()) {
+                mesResult = "Hết lịch trong ngày";
+                return mesResult;
+            }else {
+                SimpleDateFormat formatter = new SimpleDateFormat("HH'h'mm");
+                String formattedTime = formatter.format(reservationsInDay.get(0).getTimeStart());
+                if(reservationsInDay.get(0).getRoom().getRoomId() != roomId) {
+                    mesResult= "Phòng không đúng, lịch hiện tại của bạn là phòng " + reservationsInDay.get(0).getRoom().getRoomName() + " vào lúc " + formattedTime;
+                    mesResult+= reservationsInDay.stream().map(r ->{
+                         return "\nlịch phòng này vào lúc " + formatter.format(r.getTimeStart());
+                    });
+                }else {
+                     if(reservationsInDay.get(0).getTimeStart().before(TimeCheckin)){
+                        mesResult = "Chưa đến giờ checkin" + "lịch của bạn vào lúc " + formattedTime;
+                    }else {
+                        mesResult = "Checkin thành công";
+                        reservationsInDay.get(0).setStatusReservation(StatusReservation.CHECKED_IN);
+                        reservationRepository.save(reservationsInDay.get(0));
+                    }
+                }
+            }
+        }
+        return mesResult;
     }
 
 
