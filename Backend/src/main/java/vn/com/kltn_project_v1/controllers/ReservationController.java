@@ -3,16 +3,21 @@ package vn.com.kltn_project_v1.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
+import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.StatusReservation;
 import vn.com.kltn_project_v1.services.IReservation;
 import vn.com.kltn_project_v1.util.AESUtil;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/v1/reservation")
@@ -20,7 +25,9 @@ import java.util.Map;
 public class ReservationController {
     @Autowired
     private IReservation reservationService;
-
+    private  SimpMessagingTemplate simpMessagingTemplate;
+    // Lưu danh sách phòng đã check-in cùng thời gian hết hạn
+    private final ConcurrentHashMap<Long, Date> checkinSessions = new ConcurrentHashMap<>();
 
     @GetMapping("/getReservationById")
     public ResponseEntity<?> getReservationById(@RequestParam Long reservationId) {
@@ -78,16 +85,31 @@ public class ReservationController {
             System.out.println("Người dùng: " + employeeId);
 
             // Kiểm tra dữ liệu check-in
-            String message = reservationService.checkDataCheckIn(roomId, employeeId);
+            String message = reservationService.checkDataCheckIn(roomId, employeeId).get("message").toString();
             Map<String, Object> response = new HashMap<>();
             response.put("message", message);
             response.put("decryptedData", decryptedData);
+            Reservation reservation = (Reservation) reservationService.checkDataCheckIn(roomId, employeeId).get("reservation");
+            Date expireTime = reservation.getTimeEnd();
+            checkinSessions.put(reservation.getReservationId(), expireTime);
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             throw new RuntimeException("Lỗi giải mã QR", e);
         }
-
-}
+    }
+    // Kiểm tra phòng hết giờ mỗi phút
+    @Scheduled(fixedRate = 60000) // Chạy mỗi phút
+    public void checkExpiredSessions() {
+        Date now = new Date();
+        checkinSessions.forEach((reservationId, expiryTime) -> {
+            if (now.after(expiryTime)) {
+                simpMessagingTemplate.convertAndSend("/topic/room-expired", "Phòng đã hết giờ!");
+                reservationService.getReservationById(reservationId).setStatusReservation(StatusReservation.COMPLETED);
+                checkinSessions.remove(reservationId);
+            }
+        });
+    }
 
 }

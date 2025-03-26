@@ -3,6 +3,7 @@ package vn.com.kltn_project_v1.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import vn.com.kltn_project_v1.dtos.Overview.ReservationViewDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.model.*;
@@ -20,6 +21,9 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @RequiredArgsConstructor
 @org.springframework.stereotype.Service
 public class ReservationService implements IReservation {
@@ -28,6 +32,7 @@ public class ReservationService implements IReservation {
     private final RoomRepository roomRepository;
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
+
     @Override
     public List<ReservationViewDTO> getAllReservationInRoom(long roomId, Date dayStart, Date dayEnd) {
         List<Reservation> reservations = reservationRepository.findReservationsByRoomRoomIdAndTime(roomId, dayStart, dayEnd);
@@ -100,18 +105,21 @@ public class ReservationService implements IReservation {
     }
 
     @Override
-    public String checkDataCheckIn(Long roomId, Long employeeId) {
+    public Map<String,Object> checkDataCheckIn(Long roomId, Long employeeId) {
         Date TimeCheckin = new Date();
         String mesResult = "";
+        Map<String,Object> response = new ConcurrentHashMap<>();
         List<Reservation> reservationsInDay = reservationRepository.findReservationCheckInByDay(employeeId, TimeCheckin);
         if(reservationsInDay.isEmpty()){
             mesResult = "Không có lịch hẹn đặt phòng trong ngày";
-            return mesResult;
+            response.put("message", mesResult);
+            return response;
         }else {
             List<Reservation> reservationsOutTime = reservationRepository.findReservationCheckInOutTime(employeeId, TimeCheckin);
             if (reservationsOutTime.isEmpty()) {
                 mesResult = "Hết lịch trong ngày";
-                return mesResult;
+                response.put("message", mesResult);
+                return response;
             }else {
                 SimpleDateFormat formatter = new SimpleDateFormat("HH'h'mm");
                 String formattedTime = formatter.format(reservationsInDay.get(0).getTimeStart());
@@ -120,18 +128,22 @@ public class ReservationService implements IReservation {
                     mesResult+= reservationsInDay.stream().map(r ->{
                          return "\nlịch phòng này vào lúc " + formatter.format(r.getTimeStart());
                     });
+                    response.put("message", mesResult);
                 }else {
                      if(reservationsInDay.get(0).getTimeStart().before(TimeCheckin)){
                         mesResult = "Chưa đến giờ checkin" + "lịch của bạn vào lúc " + formattedTime;
+                         response.put("message", mesResult);
                     }else {
                         mesResult = "Checkin thành công";
                         reservationsInDay.get(0).setStatusReservation(StatusReservation.CHECKED_IN);
                         reservationRepository.save(reservationsInDay.get(0));
+                        response.put("message", mesResult);
+                        response.put("reservation", reservationsInDay.get(0));
                     }
                 }
             }
         }
-        return mesResult;
+        return response;
     }
 
 
