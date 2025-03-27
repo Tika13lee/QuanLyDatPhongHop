@@ -30,6 +30,7 @@ public class RequestFormService implements IRequestForm {
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
     private final EntityManager entityManager;
+    private RequestFormService self;
     @Override
     public RequestForm createRequestForm(RequestFormDTO requestFormDTO) {
         RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
@@ -60,7 +61,9 @@ public class RequestFormService implements IRequestForm {
                     requestForms.add(approveRequestFormCreate(requestForm));
                 }else {
                     if(requestForm.getReservations().size()==1){
-                        requestForms.add(approveRequestFormUpdateOne(requestForm));
+                        requestForms.add(self.approveRequestFormUpdateOne(requestForm));
+                    }else{
+                        requestForms.add(self.approveRequestFormUpdateMany(requestForm));
                     }
                 }
             }
@@ -91,7 +94,34 @@ public class RequestFormService implements IRequestForm {
         });
         return requestFormRepository.save(requestForm);
     }
-
+    @Transactional
+    protected RequestForm approveRequestFormUpdateMany(RequestForm requestForm){
+        ArrayList<Date> timeFinishNew = new ArrayList<>();
+        ArrayList<Date> timeFinishOld = (ArrayList<Date>) requestForm.getRequestReservation().getTimeFinishFrequency();
+        for (Date date : requestForm.getRequestReservation().getTimeFinishFrequency()){
+            LocalDate dayNew = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate dayOld = requestForm.getReservations().get(requestForm.getReservations().size()-1).getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            if(dayNew.isAfter(dayOld)){
+                timeFinishNew.add(date);
+            }
+        }
+        LocalDate dayNew = requestForm.getRequestReservation().getTimeFinishFrequency().get(requestForm.getRequestReservation().getTimeFinishFrequency().size()-1).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate dayOld = requestForm.getReservations().get(requestForm.getReservations().size()-1).getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        while (!dayNew.plusDays(1).isAfter(dayOld)){
+            requestForm.getReservations().get(requestForm.getReservations().size()-1).setStatusReservation(StatusReservation.CANCELED);
+            requestForm.getReservations().remove(requestForm.getReservations().size()-1);
+            dayNew = dayNew.plusDays(1);
+        }
+        if(!timeFinishNew.isEmpty()){
+            requestForm.getRequestReservation().setTimeFinishFrequency(timeFinishNew);
+            List<Reservation> reservations =  reservationService.createReservation(modelMapper.map(requestForm.getRequestReservation(), ReservationDTO.class));
+            requestForm.getReservations().addAll(reservations);
+            requestForm.getRequestReservation().setTimeFinishFrequency(timeFinishOld);
+        }
+        requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
+        requestForm.setTimeResponse(new Date());
+        return requestFormRepository.save(requestForm);
+    }
     @Override
     public List<RequestForm> rejectRequestForm(List<Long> requestFormIds, String reasonReject) {
         ArrayList<RequestForm> requestForms = new ArrayList<>();
@@ -195,11 +225,12 @@ RequestForm requestForm = new RequestForm();
         RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
         RequestForm requestFormUpdate = new RequestForm();
         requestFormUpdate.setTimeRequest(new Date());
+        assert requestForm != null;
+        requestFormUpdate.setReservations(new ArrayList<>((Collection) requestForm.getReservations().get(0)));
         requestFormUpdate.setStatusRequestForm(StatusRequestForm.PENDING);
         requestFormUpdate.setTypeRequestForm(TypeRequestForm.UPDATE_RESERVATION);
 
         ArrayList<Date> timeDateIn = new ArrayList<>();
-        assert requestForm != null;
         requestForm.getRequestReservation().getTimeFinishFrequency().forEach(date -> {
             if(!date.after(dayFisnishFrequencyNew)){
                 timeDateIn.add(date);
