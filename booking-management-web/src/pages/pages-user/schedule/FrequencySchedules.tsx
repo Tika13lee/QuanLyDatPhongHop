@@ -13,6 +13,9 @@ import {
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
 import DatePicker from "react-datepicker";
 import PopupNotification from "../../../components/popup/PopupNotification";
+import { timeEnd } from "console";
+import { set } from "react-datepicker/dist/date_utils";
+import usePost from "../../../hooks/usePost";
 
 const cx = classNames.bind(styles);
 
@@ -62,17 +65,46 @@ function FrequencySchedules() {
     setOpenModalDetail(false);
     setSelectedSchedule(null);
     setIsEdit(false);
+    setSelectedFrequencyEndDate(null);
   };
 
+  const {
+    data: requestUpdate,
+    loading: requestLoading,
+    error: requestError,
+    postData,
+  } = usePost(
+    `http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationMany?requestFormId=${selectedSchedule?.requestFormId}&&dayFinishFrequencyNew=${selectedFrequencyEndDate?.toISOString()}`
+  );
+
   // xử lý lưu chỉnh sửa
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (selectedFrequencyEndDate && selectedFrequencyEndDate < new Date()) {
       setPopupMessage("Đã hết hạn chỉnh sửa!");
       setPopupType("error");
       setIsPopupOpen(true);
       return;
     }
-    console.log(selectedFrequencyEndDate?.toISOString());
+
+    const updatedSchedule = {
+      requestFormId: selectedSchedule?.requestFormId,
+      dayFinishFrequencyNew: selectedFrequencyEndDate?.toISOString(),
+    };
+
+    console.log(updatedSchedule);
+
+    const response = await postData(updatedSchedule, { method: "POST" });
+
+    if (response) {
+      setPopupMessage("Chỉnh sửa thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+      handleCloseModalDetail();
+    } else {
+      setPopupMessage("Chỉnh sửa thất bại!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
   };
 
   return (
