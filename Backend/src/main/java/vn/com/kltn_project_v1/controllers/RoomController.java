@@ -153,5 +153,13 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             throw new RuntimeException("Lỗi tạo mã QR", e);
         }
     }
+    @GetMapping("/getRoomNotApprover")
+    public ResponseEntity<?> getRoomNotApprover(){
+        try {
+            return ResponseEntity.ok(roomService.getRoomNotApprover());
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

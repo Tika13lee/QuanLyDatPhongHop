@@ -36,6 +36,7 @@ public class RequestFormService implements IRequestForm {
         RequestForm requestForm = modelMapper.map(requestFormDTO, RequestForm.class);
         requestForm.setRequestReservation(requestReservation);
         requestForm.setStatusRequestForm(StatusRequestForm.PENDING);
+        requestForm.setTypeRequestForm(requestFormDTO.getTypeRequestForm());
         List<Reservation> reservations =  reservationService.createReservation(modelMapper.map(requestForm.getRequestReservation(), ReservationDTO.class));
         requestForm.setReservations(reservations);
         return requestFormRepository.save(requestForm);
@@ -155,9 +156,8 @@ public class RequestFormService implements IRequestForm {
 
     @Override
     public RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO) {
-        RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
-        RequestForm requestForm = modelMapper.map(requestFormDTO, RequestForm.class);
-        requestForm.setRequestReservation(requestReservation);
+RequestForm requestForm = new RequestForm();
+        requestForm.setTimeRequest(requestFormDTO.getTimeRequest());
         requestForm.setStatusRequestForm(StatusRequestForm.PENDING);
         requestForm.setTypeRequestForm(TypeRequestForm.UPDATE_RESERVATION);
         requestForm.setReservations(new ArrayList<>());
@@ -165,8 +165,28 @@ public class RequestFormService implements IRequestForm {
             Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
             if (reservation != null) {
                 requestForm.getReservations().add(reservation);
+
             }
         });
+        RequestReservation requestReservationOld = requestFormRepository.findRequestFormByReservationId(requestFormDTO.getReservationIds().get(0)).getRequestReservation();
+        RequestReservation requestReservation = new RequestReservation();
+        requestReservation.setBookerId(requestReservationOld.getBookerId());
+        requestReservation.setServiceIds(requestFormDTO.getReservationDTO().getServiceIds());
+        requestReservation.setEmployeeIds(new ArrayList<>(requestReservationOld.getEmployeeIds()));
+        requestReservation.setNote(requestReservationOld.getNote());
+        requestReservation.setFilePaths(new ArrayList<>(requestReservationOld.getFilePaths()));
+        requestReservation.setTimeStart(requestReservationOld.getTimeStart());
+        requestReservation.setTimeEnd(requestReservationOld.getTimeEnd());
+        requestReservation.setRoomId(requestReservationOld.getRoomId());
+        requestReservation.setFrequency(requestReservationOld.getFrequency());
+        requestReservation.setTimeFinishFrequency(new ArrayList<>(requestReservationOld.getTimeFinishFrequency()));
+        requestReservation.setDescription(requestReservationOld.getDescription());
+        requestReservation.setTime(requestReservationOld.getTime());
+        requestReservation.setTitle(requestReservationOld.getTitle());
+        requestReservationRepository.save(requestReservation);
+        requestForm.setRequestReservation(requestReservation);
+        System.out.println(requestForm.getRequestFormId());
+        System.out.println(requestForm.getRequestReservation().getRequestReservationId());
         return requestFormRepository.save(requestForm);
     }
 }

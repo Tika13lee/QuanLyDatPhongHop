@@ -15,5 +15,6 @@ public interface RequestFormRepository extends JpaRepository<RequestForm, Long> 
     List<RequestForm> findRequestFormByRoomId(long roomId,StatusRequestForm statusRequestForm);
     @Query("SELECT r FROM RequestForm r WHERE  ( :statusRequestForm is null or r.statusRequestForm = :statusRequestForm) ")
     List<RequestForm> findRequestFormByStatusPending(StatusRequestForm statusRequestForm);
-
+    @Query("select r from RequestForm r join r.reservations res where res.reservationId = :reservationId and r.typeRequestForm != 'UPDATE_RESERVATION'")
+    RequestForm findRequestFormByReservationId(long reservationId);
 }

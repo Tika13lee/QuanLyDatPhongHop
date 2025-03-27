@@ -209,6 +209,11 @@ public class RoomService implements IRoom {
         return room;
     }
 
+    @Override
+    public List<Room> getRoomNotApprover() throws DataNotFoundException {
+        return roomRepository.findRoomsNotApprover();
+    }
+
 
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         return rooms.stream().map(this::convertRoomToDTO).toList();
