@@ -263,6 +263,7 @@ RequestForm requestForm = new RequestForm();
         requestReservation.setDescription(requestReservationOld.getDescription());
         requestReservation.setTime(requestReservationOld.getTime());
         requestReservation.setTitle(requestReservationOld.getTitle());
+        requestReservation.setServiceIds(new ArrayList<>(requestReservationOld.getServiceIds()));
         requestReservationRepository.save(requestReservation);
         requestFormUpdate.setRequestReservation(requestReservation);
         return requestFormRepository.save(requestFormUpdate);
