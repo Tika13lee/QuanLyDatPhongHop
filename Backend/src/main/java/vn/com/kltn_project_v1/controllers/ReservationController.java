@@ -90,8 +90,11 @@ public class ReservationController {
             response.put("message", message);
             response.put("decryptedData", decryptedData);
             Reservation reservation = (Reservation) reservationService.checkDataCheckIn(roomId, employeeId).get("reservation");
-            Date expireTime = reservation.getTimeEnd();
-            checkinSessions.put(reservation.getReservationId(), expireTime);
+            if (reservation != null) {
+                Date expireTime = reservation.getTimeEnd();
+                checkinSessions.put(reservation.getReservationId(), expireTime);
+                response.put("reservationId", reservation.getReservationId());
+            }
 
             return ResponseEntity.ok(response);
 

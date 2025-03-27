@@ -189,4 +189,52 @@ RequestForm requestForm = new RequestForm();
         System.out.println(requestForm.getRequestReservation().getRequestReservationId());
         return requestFormRepository.save(requestForm);
     }
+
+    @Override
+    public RequestForm createRequestFormUpdateReservationMany(Long requestFormId, Date dayFisnishFrequencyNew) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
+        RequestForm requestFormUpdate = new RequestForm();
+        requestFormUpdate.setTimeRequest(new Date());
+        requestFormUpdate.setStatusRequestForm(StatusRequestForm.PENDING);
+        requestFormUpdate.setTypeRequestForm(TypeRequestForm.UPDATE_RESERVATION);
+
+        ArrayList<Date> timeDateIn = new ArrayList<>();
+        assert requestForm != null;
+        requestForm.getRequestReservation().getTimeFinishFrequency().forEach(date -> {
+            if(!date.after(dayFisnishFrequencyNew)){
+                timeDateIn.add(date);
+            }
+        });
+        if (!timeDateIn.isEmpty()) {
+            Date lastDate = timeDateIn.get(timeDateIn.size() - 1);
+
+            // Thêm các ngày còn thiếu vào danh sách
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(lastDate);
+
+            while (calendar.getTime().before(dayFisnishFrequencyNew) || calendar.getTime().equals(dayFisnishFrequencyNew)) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                timeDateIn.add(calendar.getTime());
+            }
+        }
+        RequestReservation requestReservationOld = requestForm.getRequestReservation();
+        RequestReservation requestReservation = new RequestReservation();
+        requestReservation.setBookerId(requestReservationOld.getBookerId());
+        requestReservation.setServiceIds(requestReservationOld.getServiceIds());
+        requestReservation.setEmployeeIds(new ArrayList<>(requestReservationOld.getEmployeeIds()));
+        requestReservation.setNote(requestReservationOld.getNote());
+        requestReservation.setFilePaths(new ArrayList<>(requestReservationOld.getFilePaths()));
+        requestReservation.setTimeStart(requestReservationOld.getTimeStart());
+        requestReservation.setTimeEnd(requestReservationOld.getTimeEnd());
+        requestReservation.setRoomId(requestReservationOld.getRoomId());
+        requestReservation.setFrequency(requestReservationOld.getFrequency());
+        requestReservation.setTimeFinishFrequency(new ArrayList<>(timeDateIn));
+        requestReservation.setDescription(requestReservationOld.getDescription());
+        requestReservation.setTime(requestReservationOld.getTime());
+        requestReservation.setTitle(requestReservationOld.getTitle());
+        requestReservationRepository.save(requestReservation);
+        requestFormUpdate.setRequestReservation(requestReservation);
+        return requestFormRepository.save(requestFormUpdate);
+
+    }
 }

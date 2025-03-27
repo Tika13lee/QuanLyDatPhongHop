@@ -1,6 +1,7 @@
 package vn.com.kltn_project_v1.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import vn.com.kltn_project_v1.model.StatusRequestForm;
 import vn.com.kltn_project_v1.services.IRequestForm;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -92,6 +94,14 @@ public class RequestFormController {
     public ResponseEntity<?> createRequestFormUpdateReservationOne(@RequestBody RequestFormDTO requestFormDTO) {
         try {
             return ResponseEntity.ok(requestFormService.createRequestFormUpdateReservationOne(requestFormDTO));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
+    @PostMapping("/createRequestFormUpdateReservationMany")
+    public ResponseEntity<?> createRequestFormUpdateReservationMany(@RequestParam Long requestFormId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayFinishFrequencyNew) {
+        try {
+            return ResponseEntity.ok(requestFormService.createRequestFormUpdateReservationMany(requestFormId, dayFinishFrequencyNew));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }

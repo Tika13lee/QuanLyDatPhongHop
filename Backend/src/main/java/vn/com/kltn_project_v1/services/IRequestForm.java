@@ -5,6 +5,7 @@ import vn.com.kltn_project_v1.model.RequestForm;
 import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.StatusRequestForm;
 
+import java.util.Date;
 import java.util.List;
 
 public interface IRequestForm {
@@ -19,5 +20,5 @@ public interface IRequestForm {
     List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm);
     List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO);
     RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO);
-
+    RequestForm createRequestFormUpdateReservationMany(Long requestFormId, Date dayFisnishFrequencyNew);
 }

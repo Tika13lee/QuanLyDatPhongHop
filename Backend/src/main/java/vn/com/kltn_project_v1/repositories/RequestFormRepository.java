@@ -9,7 +9,7 @@ import vn.com.kltn_project_v1.model.StatusRequestForm;
 import java.util.List;
 @Repository
 public interface RequestFormRepository extends JpaRepository<RequestForm, Long> {
-    @Query("SELECT r FROM RequestForm r WHERE ( :statusRequestForm is null or r.statusRequestForm = :statusRequestForm) and r.requestReservation.bookerId = :bookerId ")
+    @Query("SELECT r FROM RequestForm r WHERE ( :statusRequestForm is null or r.statusRequestForm = :statusRequestForm) and r.requestReservation.bookerId = :bookerId order by r.timeRequest desc ")
     List<RequestForm> findRequestFormByBookerId(long bookerId, StatusRequestForm statusRequestForm);
     @Query("SELECT r FROM RequestForm r WHERE ( :statusRequestForm is null or r.statusRequestForm = :statusRequestForm) and r.requestReservation.roomId = :roomId")
     List<RequestForm> findRequestFormByRoomId(long roomId,StatusRequestForm statusRequestForm);
