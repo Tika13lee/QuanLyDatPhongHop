@@ -19,4 +19,5 @@ public interface IRequestForm {
     List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm);
     List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO);
     RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO);
+
 }

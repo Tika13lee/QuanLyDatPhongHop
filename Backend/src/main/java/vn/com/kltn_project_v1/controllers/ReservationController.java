@@ -111,5 +111,13 @@ public class ReservationController {
             }
         });
     }
+    @PostMapping("/updateReservation")
+    public ResponseEntity<?> updateReservation(@RequestBody ReservationDTO reservationDTO){
+        try {
+            return ResponseEntity.ok(reservationService.updateReservation(reservationDTO));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

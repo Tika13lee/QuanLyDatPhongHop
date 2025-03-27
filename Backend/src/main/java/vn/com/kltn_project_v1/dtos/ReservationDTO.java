@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReservationDTO {
+    private long reservationId;
     private Date time;
     private Date timeStart;
     private Date timeEnd;
