@@ -149,18 +149,12 @@ public class ReservationService implements IReservation {
     @Override
     public Reservation updateReservation(ReservationDTO reservationDTO) {
         Reservation reservation = reservationRepository.findById(reservationDTO.getReservationId()).orElse(null);
-        if(!reservationDTO.getEmployeeIds().isEmpty()){
+        if(!reservationDTO.getEmployeeIds().isEmpty()) {
             List<Employee> employees = new ArrayList<>();
             reservationDTO.getEmployeeIds().forEach(e -> employees.add(employeeRepository.findById(e).orElse(null)));
             assert reservation != null;
             reservation.setAttendants(employees);
-        }
-        if (!reservationDTO.getFilePaths().isEmpty()){
-            assert reservation != null;
             reservation.setFilePaths(reservationDTO.getFilePaths());
-        }
-        if(reservationDTO.getNote().isEmpty()){
-            assert reservation != null;
             reservation.setNote(reservationDTO.getNote());
         }
         assert reservation != null;
