@@ -1,3 +1,5 @@
+@import "../../../components/GlobalStyles/GlobalStyles";
+
 .employee-container {
   flex: 1;
   margin: 20px auto;
@@ -9,7 +11,6 @@
 .search-container {
   display: flex;
   gap: 30px;
-  // justify-content: space-between;
   align-items: center;
   background: var(--color-white);
 }
@@ -136,20 +137,9 @@
   border-radius: 5px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   position: relative;
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeInModal 0.3s ease-in-out;
 }
 
-// Hiệu ứng mở modal
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
 .close-btn {
   position: absolute;
@@ -201,14 +191,6 @@
     border-collapse: collapse;
     background: var(--color-white);
 
-    thead {
-      position: sticky;
-      top: 0;
-      background: var(--bg-active);
-      z-index: 1;
-    }
-
-    th,
     td {
       padding: 5px;
       text-align: left;
@@ -217,7 +199,7 @@
     }
 
     tr:hover {
-      background-color: var(--bg-primary);
+      background-color: var(--table-hover);
     }
 
     td:first-child,
@@ -240,16 +222,16 @@
     }
   }
 
-  .employee-table th {
-    background-color: var(--bg-active);
-    color: var(--color-white);
-    text-align: center;
-  }
-
   .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
   }
 }

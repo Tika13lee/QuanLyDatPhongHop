@@ -1,3 +1,5 @@
+@import "../../../components/GlobalStyles/GlobalStyles";
+
 .frequency-schedules {
   width: 100%;
   margin: 0 auto;
@@ -40,7 +42,6 @@
 
 // lịch
 .schedule-list {
-  // padding: 0 20px;
   margin: 0 20px;
 }
 
@@ -48,7 +49,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.9rem 1rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   transition: background 0.2s ease;
@@ -111,5 +112,130 @@
       margin-left: 6px;
       align-self: center;
     }
+  }
+}
+
+// modal
+.modal-detail {
+  @include modal-overlay;
+}
+
+.modal-content {
+  position: relative;
+  background-color: var(--color-white);
+  padding: 20px;
+  border-radius: 10px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: fadeInModal 0.3s ease-out;
+
+  .modal-header,
+  .modal-footer {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .modal-footer {
+    border-bottom: none;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .modal-header h2 {
+    text-align: center;
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .modal-body {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    margin-top: 15px;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+}
+
+.btn-update {
+  background-color: #e6c449;
+
+  &:hover {
+    background-color: #cac715;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+
+  &:hover {
+    background-color: #b02a37;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.info-detail {
+  line-height: 40px;
+  text-rendering: optimizeSpeed;
+  font-size: 16px;
+}
+
+.info-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+
+  label {
+    width: 70px;
+    margin: 0;
+  }
+}
+
+.container-list {
+  list-style: none;
+  height: 140px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+
+  .list-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1;
+    padding: 3px 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .edit-icon {
+    color: var(--text-primary);
+    cursor: pointer;
+    margin: 0;
+  }
+
+  li {
+    margin: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-primary);
   }
 }

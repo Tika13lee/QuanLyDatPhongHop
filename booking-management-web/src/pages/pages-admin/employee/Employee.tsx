@@ -13,7 +13,6 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import {
   FaPlus,
   MdOutlineEdit,
-  MdOutlineInfo,
   MdSearch,
 } from "../../../components/icons/icons";
 import usePost from "../../../hooks/usePost";

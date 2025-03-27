@@ -510,7 +510,7 @@ function Location() {
         <table className={cx("location-table")}>
           <thead>
             <tr>
-              <th style={{ width: "70px" }}>STT</th>
+              <th>STT</th>
               <th>Chi nhánh</th>
               <th>Tòa nhà</th>
               <th>Tầng</th>

@@ -34,20 +34,45 @@
 }
 
 // table
-.table {
+.room-list {
+  width: 100%;
+  margin-top: 10px;
+  overflow-y: auto;
+  max-height: 510px;
+  border: 1px solid var(--border-color);
+}
+
+.room-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 16px;
-}
 
-.table th,
-.table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
+  td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid var(--border-color);
+    width: 200px;
+    // cursor: pointer;
+  }
 
-.table th {
-  background-color: #f2f2f2;
-}
+  tbody tr:hover {
+    background-color: var(--table-hover);
+  }
 
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 70px;
+    text-align: right;
+  }
+
+  td:first-child,
+  th:first-child {
+    width: 10px;
+    text-align: center;
+  }
+
+  td:last-child,
+  th:last-child {
+    width: 100px;
+    text-align: right;
+  }
+}

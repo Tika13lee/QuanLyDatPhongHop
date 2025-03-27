@@ -63,30 +63,11 @@
   width: 100%;
   border-collapse: collapse;
 
-  thead {
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-    z-index: 1;
-  }
-
-  th,
   td {
     border: 1px solid var(--border-color);
     padding: 10px;
     text-align: left;
     width: 150px;
-  }
-
-  th {
-    background-color: var(--color-table);
-    font-weight: bold;
-    text-align: center;
-    color: var(--color-white);
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
   }
 
   tbody tr:hover {

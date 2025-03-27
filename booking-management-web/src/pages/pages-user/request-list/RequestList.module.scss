@@ -62,7 +62,7 @@
   }
 
   th {
-    background-color: var(--color-table);
+    background-color: var(--table-color);
     font-weight: bold;
     text-align: center;
     color: var(--color-white);
@@ -71,8 +71,8 @@
   td:last-child,
   th:last-child {
     width: 50px;
-    text-align: center; 
-  } 
+    text-align: center;
+  }
 
   tbody tr:nth-child(even) {
     background-color: #f9f9f9;

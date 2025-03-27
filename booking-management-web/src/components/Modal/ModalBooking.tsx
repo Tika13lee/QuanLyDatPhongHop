@@ -66,7 +66,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [checkRemoveDays, setCheckRemoveDays] = useState<string[]>();
   const [dayOriginal, setDayOriginal] = useState<Date[]>([]);
   const [checkRemoveDates, setCheckRemoveDates] = useState<number[]>([]);
-  const [TypeRequestForm, setTypeRequestForm] = useState<string>(
+  const [typeRequestForm, setTypeRequestForm] = useState<string>(
     "RESERVATION_ONETIME"
   );
 
@@ -98,6 +98,17 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       return timeInMinutes >= currentMinutes;
     });
   };
+
+  // xử lý cập nhật timeFinsishFrequency
+  const handleUpdateTimeFinsihFrequency = (dateFinishFequency: Date[]) => {
+        if(valueFrequency === "WEEKLY") {
+            const dayOfWeekByDayStart = dateSelected ? new Date(dateSelected).toString().split(" ")[0] : new Date().toString().split(" ")[0];
+            const daysFilter = dateFinishFequency.filter((date) => date.toString().split(" ")[0] === dayOfWeekByDayStart)
+            return daysFilter;
+        }else {
+          return dateFinishFequency;
+        }
+  }
 
   useEffect(() => {
     const filteredTimes = getTimes();
@@ -138,7 +149,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   // form data
   const [formData, setFormData] = useState({
     timeRequest: new Date().toISOString(),
-    TypeRequestForm: TypeRequestForm,
+    typeRequestForm: typeRequestForm,
     reservationDTO: {
       time: new Date().toISOString(),
       timeStart: timeStart
@@ -160,11 +171,11 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       title: "",
       frequency: valueFrequency,
       timeFinishFrequency: selectedDateEndOfFrequency
-        ? getDatesBetween(
-            dateSelected ? new Date(dateSelected) : new Date(),
-            selectedDateEndOfFrequency
-          ).map((date) => date.toISOString())
-        : [],
+      ? getDatesBetween(
+          dateSelected ? new Date(dateSelected) : new Date(),
+          selectedDateEndOfFrequency
+        ).map((date) => date.toISOString())
+      : [],
       bookerId: user?.employeeId ?? "",
       roomId: roomInfo?.roomId ?? "",
       employeeIds: [] as string[],
@@ -256,32 +267,27 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
   // ngày kết thúc tần suất thay đổi
   useEffect(() => {
-    setDates(
-      selectedDateEndOfFrequency
+    const dataTemp = selectedDateEndOfFrequency
         ? getDatesBetween(
             dateSelected ? new Date(dateSelected) : new Date(),
             selectedDateEndOfFrequency
           )
         : []
+    const formatDateList =  [...handleUpdateTimeFinsihFrequency(dataTemp)]
+    setDates(prev => {
+        return [...formatDateList]
+      }
     );
     setDayOriginal(
-      selectedDateEndOfFrequency
-        ? getDatesBetween(
-            dateSelected ? new Date(dateSelected) : new Date(),
-            selectedDateEndOfFrequency
-          )
-        : []
+      prev => {
+        return [...formatDateList]
+      }
     );
     setFormData((prev) => ({
       ...prev,
       reservationDTO: {
         ...prev.reservationDTO,
-        timeFinishFrequency: selectedDateEndOfFrequency
-          ? getDatesBetween(
-              dateSelected ? new Date(dateSelected) : new Date(),
-              selectedDateEndOfFrequency
-            ).map((date) => date.toISOString())
-          : [],
+        timeFinishFrequency: [...formatDateList].map((date) => date.toISOString()),
       },
     }));
   }, [selectedDateEndOfFrequency]);
@@ -464,7 +470,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const handleSubmit = async () => {
     const updatedFormData = {
       ...formData,
-      TypeRequestForm: TypeRequestForm,
+      typeRequestForm: typeRequestForm,
       timeRequest: new Date().toISOString(),
       reservationDTO: {
         ...formData.reservationDTO,

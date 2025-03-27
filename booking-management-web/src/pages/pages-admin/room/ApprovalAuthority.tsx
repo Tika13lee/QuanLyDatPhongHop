@@ -1,5 +1,9 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovalAuthority.module.scss";
+import { RoomProps } from "../../../data/data";
+import { use, useEffect, useState } from "react";
+import useFetch from "../../../hooks/useFetch";
+import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -43,6 +47,18 @@ const departmentsWithoutApprover = [
 ];
 
 function ApprovalAuthority() {
+  const [roomsNotApproved, setRoomsNotApproved] = useState<RoomProps[]>([]);
+
+  const { data, loading, error } = useFetch<RoomProps[]>(
+    "http://localhost:8080/api/v1/room/getRoomNotApprover"
+  );
+
+  useEffect(() => {
+    if (data) {
+      setRoomsNotApproved(data);
+    }
+  }, [data]);
+
   return (
     <div className={cx("approval-authority")}>
       <div className={cx("header")}>
@@ -53,7 +69,7 @@ function ApprovalAuthority() {
               <option value="">-- Chọn chi nhánh --</option>
             </select>
           </div>
-  
+
           <div className={cx("filter-item")}>
             <label>Nhân viên:</label>
             <select>
@@ -61,39 +77,53 @@ function ApprovalAuthority() {
             </select>
           </div>
         </div>
-        <div>
-          
-        </div>
+        <div></div>
       </div>
 
-      <table className={cx("table")}>
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Tên phòng</th>
-            <th>Vị trí</th>
-            <th>Sức chứa</th>
-            <th>Giá đang áp dụng</th>
-          </tr>
-        </thead>
-        <tbody>
-          {departmentsWithoutApprover.length === 0 ? (
+      <div className={cx("room-list")}>
+        <table className={cx("room-table")}>
+          <thead>
             <tr>
-              <td colSpan={3}>Tất cả các phòng đã có người phê duyệt.</td>
+              <th>STT</th>
+              <th>Tên phòng</th>
+              <th>Vị trí</th>
+              <th>Sức chứa</th>
+              <th>Giá đang áp dụng</th>
             </tr>
-          ) : (
-            departmentsWithoutApprover.map((dept, index) => (
-              <tr key={dept.id}>
-                <td>{index + 1}</td>
-                <td>{dept.name}</td>
-                <td>{dept.location}</td>
-                <td>{dept.capacity}</td>
-                <td>{dept.price}</td>
+          </thead>
+          <tbody>
+            {roomsNotApproved.length === 0 ? (
+              <tr>
+                <td colSpan={5}>Tất cả các phòng đã có người phê duyệt.</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              roomsNotApproved.map((room, index) => (
+                <tr key={room.roomId}>
+                  <td>{index + 1}</td>
+                  <td>{room.roomName}</td>
+                  <td>
+                    {(() => {
+                      const loc = room.location;
+  
+                      if ("building" in loc && typeof loc.building === "object") {
+                        // Kiểu LocationProps
+                        return (
+                          <>
+                            {loc.building.branch.branchName} - Tòa{" "}
+                            {loc.building.buildingName} - tầng {loc.floor}
+                          </>
+                        );
+                      }
+                    })()}
+                  </td>
+                  <td>{room.capacity}</td>
+                  <td>{formatCurrencyVND(Number(room.priceValue))}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

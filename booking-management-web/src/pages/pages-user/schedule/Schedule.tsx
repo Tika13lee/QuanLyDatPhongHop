@@ -25,6 +25,7 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { FaEdit, FaPlus } from "../../../components/icons/icons";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
+import CloseModalButton from "../../../components/Modal/CloseModalButton";
 
 const cx = classNames.bind(styles);
 
@@ -53,6 +54,9 @@ const Schedule = () => {
   const [openModalAddService, setOpenModalAddService] = useState(false);
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [selectedServices, setSelectedServices] = useState<ServiceProps[]>([]);
+  const [reservations, setReservations] = useState<ReservationDetailProps[]>(
+    []
+  );
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -65,17 +69,18 @@ const Schedule = () => {
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   // Lấy danh sách lịch đặt phòng theo tuần
-  const {
-    data: reservations,
-    loading,
-    error,
-  } = useFetch<ReservationDetailProps[]>(
+  const { data, loading, error } = useFetch<ReservationDetailProps[]>(
     `http://localhost:8080/api/v1/reservation/getAllReservationByBooker?phone=${
       user.phone
     }&dayStart=${new Date(daysOfWeek[0]).toISOString()}&dayEnd=${new Date(
       daysOfWeek[6]
     ).toISOString()}`
   );
+
+  useEffect(() => {
+    if (!data) return;
+    setReservations(data);
+  }, [data]);
 
   // Chuyển đổi dữ liệu lịch để hiển thị
   const formattedEvents = reservations?.map((event) => ({
@@ -129,41 +134,7 @@ const Schedule = () => {
     setSelectedServices([]);
   };
 
-  const [formData, setFormData] = useState({
-    timeRequest: new Date().toISOString(),
-    reservationIds: [] as number[],
-    reservationDTO: {
-      note: "",
-      employeeIds: [] as number[],
-      serviceIds: [] as number[],
-      filePaths: [] as string[],
-    },
-  });
-
-  // xử lý cập nhật
-  const handleSaveUpdate = async () => {
-    const updateForm = {
-      ...formData,
-      reservationIds: [selectedSchedule?.reservationId ?? 0],
-      reservationDTO: {
-        ...formData.reservationDTO,
-        note: valueNote,
-        employeeIds: selectedEmployees.map((e) => e.employeeId),
-        // serviceIds: selectedServices.map((s) => s.serviceId),
-        filePaths: selectedSchedule?.filePaths ?? [],
-      },
-    };
-    console.log("Dữ liệu gửi: ", updateForm);
-
-    // const response = await postData(updateForm, { method: "POST" });
-
-    // if (response) {
-    //   console.log("Cập nhật thành công");
-    // } else {
-    //   console.log("Cập nhật thất bại");
-    // }
-    handleCloseDetail();
-  };
+  // cập nhật lịch
 
   // mở modal thêm người tham gia
   const handleOpenAddParticipant = () => {
@@ -248,6 +219,59 @@ const Schedule = () => {
       );
   };
 
+  const {
+    data: updateData,
+    loading: updateLoading,
+    error: updateError,
+    postData,
+  } = usePost("http://localhost:8080/api/v1/reservation/updateReservation");
+
+  // xử lý cập nhật
+  const handleSaveUpdate = async () => {
+    const updateForm = {
+      reservationId: `${selectedSchedule?.reservationId}`,
+      note: valueNote ?? "",
+      employeeIds: selectedEmployees.map((e) => e.employeeId),
+      filePaths: selectedSchedule?.filePaths ?? [],
+    };
+    console.log("Dữ liệu gửi: ", updateForm);
+
+    try {
+      const response = await postData(updateForm, { method: "POST" });
+
+      if (response) {
+        console.log(response.data);
+        setPopupMessage("Cập nhật thành công");
+        setPopupType("success");
+        setIsPopupOpen(true);
+
+        // cập nhật lại lịch
+        setSelectedSchedule(
+          (prev) =>
+            ({
+              ...(response.data || {}),
+            } as ReservationDetailProps)
+        );
+
+        setReservations((prev: ReservationDetailProps[]) => {
+          return prev.map((schedule) =>
+            schedule.reservationId === Number(updateForm.reservationId)
+              ? (response.data as ReservationDetailProps)
+              : schedule
+          );
+        });
+
+        handleCloseDetail();
+      } else {
+        setPopupMessage("Cập nhật thất bại");
+        setPopupType("error");
+        setIsPopupOpen(true);
+      }
+    } catch (err) {
+      console.error("Lỗi cập nhật: ", err);
+    }
+  };
+
   // Lấy danh sách dịch vụ
   const {
     data: services,
@@ -274,12 +298,23 @@ const Schedule = () => {
     setSelectedServices(updated);
   };
 
+  const [formData, setFormData] = useState({
+    timeRequest: new Date().toISOString(),
+    reservationIds: [] as number[],
+    reservationDTO: {
+      note: "",
+      employeeIds: [] as number[],
+      serviceIds: [] as number[],
+      filePaths: [] as string[],
+    },
+  });
+
   // gửi phê duyệt chỉnh sửa dịch vụ
   const {
-    data,
+    data: requestUpdateService,
     loading: requestLoading,
     error: requestError,
-    postData,
+    postData: postDataService,
   } = usePost(
     "http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationOne"
   );
@@ -296,7 +331,7 @@ const Schedule = () => {
     };
     console.log("Dữ liệu gửi dv: ", updateForm);
 
-    const response = await postData(updateForm, { method: "POST" });
+    const response = await postDataService(updateForm, { method: "POST" });
 
     if (response) {
       setPopupMessage("Gửi phê duyệt thành công");
@@ -366,11 +401,16 @@ const Schedule = () => {
                   return hour < 12;
                 });
 
+                const getBorderColorByScheduleType = (type: string) => {
+                  if (type === "ONE_TIME") return "#2196f3";
+                  return "#4caf50";
+                };
+
                 return (
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {morningEvents.map((event) => (
                       <div
-                        className={cx("event-item")}
+                        className={cx("event-item", event.frequency)}
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
@@ -410,7 +450,7 @@ const Schedule = () => {
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {afternoonEvents.map((event) => (
                       <div
-                        className={cx("event-item")}
+                        className={cx("event-item", event.frequency)}
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
@@ -436,16 +476,15 @@ const Schedule = () => {
       {isModalOpenDetail && selectedSchedule && (
         <div className={cx("modal-overlay")}>
           <div className={cx("modal")}>
-            <button className={cx("close-btn")} onClick={handleCloseDetail}>
-              ✖
-            </button>
+            <CloseModalButton onClick={handleCloseDetail} />
             <button
               className={cx("btn-update")}
               onClick={() => {
-                // nếu ngày hiện tại > ngày bắt đầu lịch thì không cho chỉnh sửa
                 if (new Date(selectedSchedule.timeStart) < new Date()) {
-                  setPopupMessage(`Lịch này đã qua, không được phép chỉnh sửa!`);
-                  setPopupType("warning");
+                  setPopupMessage(
+                    `Lịch này đã qua, không được phép chỉnh sửa!`
+                  );
+                  setPopupType("error");
                   setIsPopupOpen(true);
                   return;
                 }
@@ -463,13 +502,18 @@ const Schedule = () => {
                 <p>
                   <strong>Tiêu đề:</strong> {selectedSchedule.title}
                 </p>
+                <div className={cx("info-row")}>
+                  <p>
+                    <strong>Ngày:</strong>{" "}
+                    {formatDateString(selectedSchedule.timeStart)}
+                  </p>
 
-                <p>
-                  <strong>Thời gian:</strong>{" "}
-                  {formatDateString(selectedSchedule.timeStart)} từ {""}
-                  {getHourMinute(selectedSchedule.timeStart)} -{" "}
-                  {getHourMinute(selectedSchedule.timeEnd)}
-                </p>
+                  <p>
+                    <strong>Thời gian:</strong>{" "}
+                    {getHourMinute(selectedSchedule.timeStart)} -{" "}
+                    {getHourMinute(selectedSchedule.timeEnd)}
+                  </p>
+                </div>
 
                 <div className={cx("info-row")}>
                   <p>
@@ -516,12 +560,26 @@ const Schedule = () => {
                   <strong>Mô tả:</strong> {selectedSchedule.description}
                 </p>
                 <p>
+                  <strong>Trạng thái:</strong>{" "}
+                  {statusLabels[
+                    selectedSchedule.statusReservation as keyof typeof statusLabels
+                  ] || "Không xác định"}
+                </p>
+                <p>
                   <strong>Thời gian nhận phòng:</strong>{" "}
-                  {selectedSchedule.timeCheckIn ?? "Chưa nhận phòng"}
+                  {selectedSchedule.timeCheckIn
+                    ? `Ngày ${formatDateString(
+                        selectedSchedule.timeCheckIn
+                      )} lúc ${getHourMinute(selectedSchedule.timeCheckIn)}`
+                    : "Chưa nhận"}
                 </p>
                 <p>
                   <strong>Thời gian trả phòng:</strong>{" "}
-                  {selectedSchedule.timeCheckOut ?? "Chưa trả phòng"}
+                  {selectedSchedule.timeCheckOut
+                    ? `Ngày ${formatDateString(
+                        selectedSchedule.timeCheckOut
+                      )} lúc ${getHourMinute(selectedSchedule.timeCheckOut)}`
+                    : "Chưa trả"}
                 </p>
                 <p>
                   <strong>Thời gian hủy:</strong>{" "}
@@ -623,12 +681,9 @@ const Schedule = () => {
                   {openModalAddService && (
                     <div className={cx("modal-add-service")}>
                       <div className={cx("modal-add-service-content")}>
-                        <button
-                          className={cx("close-btn")}
+                        <CloseModalButton
                           onClick={() => setOpenModalAddService(false)}
-                        >
-                          ✖
-                        </button>
+                        />
                         <h3>Thêm dịch vụ</h3>
 
                         <div className={cx("custom-dropdown")}>
@@ -751,12 +806,7 @@ const Schedule = () => {
                   {openModalAddParticipant && (
                     <div className={cx("modal-add-participant")}>
                       <div className={cx("modal-add-participant-content")}>
-                        <button
-                          className={cx("close-btn")}
-                          onClick={() => setOpenModalAddParticipant(false)}
-                        >
-                          ✖
-                        </button>
+                        <CloseModalButton onClick={handleCloseAddParticipant} />
                         <h3>Thêm người tham gia</h3>
                         <div className={cx("modal-body")}>
                           <div
@@ -866,6 +916,16 @@ const Schedule = () => {
       />
     </div>
   );
+};
+
+const statusLabels = {
+  APPROVED: "Đã duyệt",
+  PENDING: "Chờ duyệt",
+  CANCELED: "Đã hủy",
+  CHECKED_IN: "Đã nhận phòng",
+  COMPLETED: "Hoàn tất",
+  WAITING: "Đang chờ nhận",
+  NOT_CHECKED_IN: "Không nhận phòng",
 };
 
 export default Schedule;

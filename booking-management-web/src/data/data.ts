@@ -267,6 +267,7 @@ export type ReservationDetailProps = {
     };
   }[];
 
+  cancelReservation?: string;
   room: {
     roomId: number;
     roomName: string;

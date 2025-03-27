@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./DetailModal.module.scss";
-import { RequestFormProps, ReservationDetailProps } from "../../data/data";
+import { RequestFormProps } from "../../data/data";
 import { formatCurrencyVND } from "../../utilities";
 
 const cx = classNames.bind(styles);
@@ -45,7 +45,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
         <button className={cx("close-btn")} onClick={onClose}>
           ✖
         </button>
-        <h3>Thông tin chi tiết lịch đặt</h3>
+        <h3>Thông tin chi tiết yêu cầu</h3>
         <div className={cx("modal-content")}>
           <div className={cx("info-left")}>
             <p>
