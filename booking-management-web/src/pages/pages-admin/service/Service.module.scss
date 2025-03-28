@@ -10,7 +10,6 @@
 // tìm kiếm
 .search-container {
   display: flex;
-  // justify-content: space-between;
   gap: 20px;
   align-items: center;
   background: var(--color-white);
@@ -30,7 +29,6 @@
   width: 300px;
 
   input {
-    padding: 8px;
     border: none;
     border-radius: 5px;
     font-size: 14px;
@@ -42,9 +40,7 @@
     padding: 0 10px;
     background: var(--btn-add);
     color: var(--color-white);
-    border: none;
     border-radius: 0 5px 5px 0;
-    cursor: pointer;
     transition: background 0.3s;
 
     &:hover {
@@ -76,16 +72,11 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 10px;
   font-size: 16px;
   font-weight: bold;
   color: var(--color-white);
   background: var(--btn-add);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 
   &:hover {
     background: var(--btn-add-hover);

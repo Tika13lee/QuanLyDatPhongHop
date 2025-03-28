@@ -11,7 +11,7 @@
   --color-white: #ffffff;
   --color-error: #c31818;
   --btn-main: #0d6efd;
-  --btn-hover: #0056b3;
+  --btn-hover: #0c6ed7;
   --btn-edit: #f39c12;
   --tab-hover: #e6e9ef;
   --border-color: #ced4da;
@@ -28,22 +28,17 @@
   --btn-danger-hover: #c82333;
   --table-color: #548cdc;
   --table-hover: #e6f7ff;
-  --color-status-waiting: #edc6f2;
-  --color-status-pending: #fcf2b3;
-  --color-status-checked_in: #b9fefe;
-  --color-status-completed: #b0feac;
+  --color-status-pending: #fff8ce;
+  --color-status-waiting: #e3f2fd;
+  --color-status-checked_in: #fce4ff;
+  --color-status-completed: #d0ffce;
+  --color-status-canceled: #ffcfcf;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
-  thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
 
   th {
     padding: 7px;

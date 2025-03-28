@@ -6,7 +6,14 @@ import { useEffect, useState } from "react";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import useFetch from "../../../hooks/useFetch";
-import { BranchProps, BuildingProps, LocationProps } from "../../../data/data";
+import {
+  BranchProps,
+  BuildingProps,
+  LocationProps,
+  LocationProps2,
+} from "../../../data/data";
+import CloseModalButton from "../../../components/Modal/CloseModalButton";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -22,6 +29,7 @@ function Location() {
   const [selectedBuilding, setSelectedBuilding] = useState<string>();
   const [maxFloor, setMaxFloor] = useState(1);
   const [floor, setFloor] = useState(maxFloor);
+  const [locations, setLocations] = useState<LocationProps2[]>([]);
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -39,6 +47,20 @@ function Location() {
     branchId: "",
     building: "",
   });
+
+  const {
+    data: locationsData,
+    loading: locationsLoading,
+    error: locationsError,
+  } = useFetch<LocationProps2[]>(
+    "http://localhost:8080/api/v1/location/getAllLocation"
+  );
+
+  useEffect(() => {
+    if (locationsData) {
+      setLocations(locationsData);
+    }
+  }, [locationsData]);
 
   // lấy chi nhánh
   const {
@@ -63,13 +85,6 @@ function Location() {
       })
       .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
   }, [branchName]);
-
-  // load danh sách location từ store
-  const {
-    locations,
-    loading: locationsLoading,
-    error: locationsError,
-  } = useSelector((state: RootState) => state.location);
 
   // lấy ds tầng theo tòa nhà
   useEffect(() => {
@@ -101,11 +116,6 @@ function Location() {
         .catch((error) => console.error("Lỗi khi lấy danh sách tầng:", error));
     }
   }, [selectedBuilding]);
-
-  // mở modal thêm branch
-  const handleOpenBranchModal = () => {
-    setOpenBranchModal(true);
-  };
 
   // đóng modal thêm branch
   const handleCloseBranchModal = () => {
@@ -241,9 +251,22 @@ function Location() {
     const response = await postLocation(newLocation);
 
     if (response) {
+      console.log("phan hoi", response);
       setPopupMessage("Vị trí đã được thêm thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
+
+      // cập nhật lại danh sách
+      setLocations((prev) => [
+        {
+          locationId: response.data.locationId,
+          branch: branchName,
+          building: response.data.building.buildingName,
+          floor: formData.floor,
+        },
+        ...prev,
+      ]);
+
       resetForm();
     } else {
       setPopupMessage("Thêm vị trí thất bại, vui lòng thử lại.");
@@ -252,14 +275,16 @@ function Location() {
     }
   };
 
-  // Reset form sau khi thêm
   const resetForm = () => {
+    setBranchName("");
+    setBuildings([]);
+    setMaxFloor(1);
+    setFloor(1);
+    setSelectedBuilding("");
     setFormData({
       building: "",
       floor: "",
     });
-    setBranchName("");
-    setBuildings([]);
   };
 
   // xử lý khi thay đổi branch
@@ -269,6 +294,8 @@ function Location() {
     console.log(selectedBranch);
     if (selectedBranch === "") {
       setBuildings([]);
+      setMaxFloor(1);
+      setFloor(1);
     }
   };
 
@@ -310,11 +337,30 @@ function Location() {
   // Hàm xử lý thay đổi của checkbox
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked);
+    setBranchName("");
+    setBuildings([]);
+    setMaxFloor(1);
+    setFloor(1);
+    if (locationsData) setLocations(locationsData);
   };
 
-  // đóng popup
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  // xử lý lọc theo chi nhánh
+  const handleFilterByBranch = async () => {
+    if (!branchName) {
+      setPopupMessage("Vui lòng chọn chi nhánh!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    fetch(
+      `http://localhost:8080/api/v1/location/getLocationsByBranchName?branchName=${branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setLocations(data);
+      })
+      .catch((error) => console.error("Lỗi khi lấy danh sách tòa nhà:", error));
   };
 
   return (
@@ -325,7 +371,7 @@ function Location() {
             <div className={cx("form-row")}>
               {/* branch */}
               <div className={cx("form-group")}>
-                <label>Chi nhánh:</label>
+                <label>Tên chi nhánh:</label>
                 <div className={cx("form-select")}>
                   <select
                     name="branch"
@@ -341,7 +387,10 @@ function Location() {
                   </select>
                   <button
                     type="button"
-                    onClick={handleOpenBranchModal}
+                    onClick={() => {
+                      setOpenBranchModal(true);
+                      setBranchName("");
+                    }}
                     disabled={isChecked}
                   >
                     Thêm chi nhánh
@@ -351,14 +400,9 @@ function Location() {
 
               {/* modal branch */}
               {openBranchModal && (
-                <div className={cx("modal")}>
+                <div className={cx("modal-overlay")}>
                   <div className={cx("modal-content")}>
-                    <button
-                      className={cx("close-btn")}
-                      onClick={handleCloseBranchModal}
-                    >
-                      ✖
-                    </button>
+                    <CloseModalButton onClick={handleCloseBranchModal} />
                     <h3>Thêm chi nhánh</h3>
                     <div className={cx("form")}>
                       <div className={cx("form-group")}>
@@ -371,7 +415,7 @@ function Location() {
                         />
                       </div>
                       <button
-                        className={cx("btn-submit")}
+                        className={cx("submit-btn")}
                         onClick={handleAddBranch}
                       >
                         Thêm
@@ -383,12 +427,13 @@ function Location() {
 
               {/* building */}
               <div className={cx("form-group")}>
-                <label>Tòa nhà:</label>
+                <label>Tên tòa nhà:</label>
                 <div className={cx("form-select")}>
                   <select
                     name="building"
                     value={formData.building}
                     onChange={handleInputChange}
+                    disabled={isChecked}
                   >
                     <option value="">Chọn tòa nhà...</option>
                     {buildings.map((building: BuildingProps) => (
@@ -412,14 +457,9 @@ function Location() {
 
               {/* modal building */}
               {openBuildingModal && (
-                <div className={cx("modal")}>
+                <div className={cx("modal-overlay")}>
                   <div className={cx("modal-content")}>
-                    <button
-                      className={cx("close-btn")}
-                      onClick={handleCloseBuildingModal}
-                    >
-                      ✖
-                    </button>
+                    <CloseModalButton onClick={handleCloseBuildingModal} />
                     <h3>Thêm tòa nhà</h3>
                     <div className={cx("form")}>
                       <div className={cx("form-group")}>
@@ -450,7 +490,7 @@ function Location() {
                         />
                       </div>
                       <button
-                        className={cx("btn-submit")}
+                        className={cx("submit-btn")}
                         onClick={() => handleAddBuilding()}
                       >
                         Thêm
@@ -462,7 +502,7 @@ function Location() {
 
               {/* floor */}
               <div className={cx("form-group")}>
-                <label>Tầng:</label>
+                <label>Tầng: (số tầng chưa có )</label>
                 <input
                   type="number"
                   name="floor"
@@ -470,6 +510,7 @@ function Location() {
                   placeholder="Nhập tầng..."
                   value={floor}
                   onChange={handleFloorChange}
+                  disabled
                 />
               </div>
             </div>
@@ -488,6 +529,7 @@ function Location() {
                   type="button"
                   className={cx("submit-btn")}
                   disabled={!isChecked}
+                  onClick={handleFilterByBranch}
                 >
                   {"Tìm kiếm"}
                 </button>
@@ -546,7 +588,7 @@ function Location() {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

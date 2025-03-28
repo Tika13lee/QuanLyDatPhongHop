@@ -3,7 +3,7 @@ import styles from "./ApprovedList.module.scss";
 import { useState } from "react";
 import { RequestFormProps, ReservationDetailProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
-import DetailModal from "../../../components/Modal/DetailModal";
+import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 

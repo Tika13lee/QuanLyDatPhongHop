@@ -43,16 +43,10 @@
 }
 
 .search-btn {
-  // width: 130px;
-  padding: 8px;
   font-size: 16px;
   font-weight: bold;
   color: white;
   background: var(--btn-main);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease;
 
   &:hover {
     background: var(--btn-hover);

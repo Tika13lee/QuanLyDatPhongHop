@@ -21,7 +21,6 @@
   width: 300px;
 
   input {
-    padding: 8px;
     border: none;
     border-radius: 5px;
     font-size: 14px;
@@ -67,16 +66,11 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 10px;
   font-size: 16px;
   font-weight: bold;
   color: var(--color-white);
   background: var(--btn-add);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 
   &:hover {
     background: var(--btn-add-hover);

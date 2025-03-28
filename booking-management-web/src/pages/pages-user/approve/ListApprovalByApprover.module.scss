@@ -68,6 +68,9 @@
     padding: 10px;
     text-align: left;
     width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   tbody tr:hover {

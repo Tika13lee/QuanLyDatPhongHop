@@ -14,7 +14,10 @@ import { FaRegBell, FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FiRefreshCw } from "react-icons/fi";
+import { TbRepeat } from "react-icons/tb";
+
 export {
+  TbRepeat,
   FaEdit,
   IoSettingsOutline,
   FaPlus,

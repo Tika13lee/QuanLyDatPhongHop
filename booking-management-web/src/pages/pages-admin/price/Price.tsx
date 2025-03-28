@@ -1,16 +1,13 @@
 import classNames from "classnames/bind";
 import styles from "./Price.module.scss";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { MdOutlineInfo, MdSearch } from "../../../components/icons/icons";
-import { use, useEffect, useState } from "react";
+import { MdOutlineInfo } from "../../../components/icons/icons";
+import { useEffect, useState } from "react";
 import { PriceTableProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import { formatCurrencyVND, formatDateString } from "../../../utilities";
 import DatePicker from "react-datepicker";
-import { set } from "react-datepicker/dist/date_utils";
-import { log } from "console";
 import usePost from "../../../hooks/usePost";
-import DetailModal from "../../../components/Modal/DetailModal";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { FiRefreshCw } from "../../../components/icons/icons";
 
@@ -39,13 +36,14 @@ function Price() {
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<Date>();
   const [render, setRender] = useState<boolean>(false);
+
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupType, setPopupType] = useState<"success" | "error" | "info">(
     "info"
   );
-  const [dateFind, setDateFind] = useState<Date>();
+
   const [dateValue, setDateValue] = useState<String>("");
   const [newPriceData, setNewPriceData] = useState({
     priceName: "",
@@ -69,21 +67,20 @@ function Price() {
       console.error("Error:", error);
     }
   };
+
   // tim kiem bang gia ap dung theo ngay
-  const handleSearchPrice = async (dateSreach : Date) => {
+  const handleSearchPrice = async (dateSreach: Date) => {
     try {
-      
       const response = await fetch(
         `http://localhost:8080/api/v1/price/getPricesInTime?time=${dateSreach?.toISOString()}`
       );
       const data = await response.json();
       console.log(data);
       setPricesTable(data);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error:", error);
     }
-  }
+  };
 
   // reset thời gian khi thay đổi
   useEffect(() => {
@@ -150,7 +147,7 @@ function Price() {
       setIsPopupOpen(true);
 
       setPricesTable([...pricesTable, response.data]);
-      
+
       handleCloseAddModal();
     } else {
       alert("Lỗi khi thêm bảng giá.");
@@ -203,11 +200,15 @@ function Price() {
   }, [priceList, render]);
 
   // Xử lý khi chọn hoặc bỏ chọn
-  const handleCheckboxChange = (itemId: number, isActive: boolean,eventCheck: boolean ) => {
-    if(eventCheck === false) {
+  const handleCheckboxChange = (
+    itemId: number,
+    isActive: boolean,
+    eventCheck: boolean
+  ) => {
+    if (eventCheck === false) {
       setIsApply(eventCheck);
-    }else {
-    setIsApply(isActive);
+    } else {
+      setIsApply(isActive);
     }
     let updatedCheck = [] as number[];
     if (isCheck.includes(itemId)) {
@@ -234,15 +235,15 @@ function Price() {
       alert("Vui lòng chọn ít nhất một bảng giá.");
       return;
     }
-  
+
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/price/activePrice?priceId=${isCheck[0]}`, 
+        `http://localhost:8080/api/v1/price/activePrice?priceId=${isCheck[0]}`,
         {
           method: "POST", // Hoặc "POST" nếu cần
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            Accept: "application/json",
           },
         }
       );
@@ -250,14 +251,18 @@ function Price() {
       console.log(data);
       let stringErr = "";
       const dataArray = Array.isArray(data) ? data : [data];
-      if(dataArray.length !==0){
-        dataArray?.forEach((resDup:any) => {
-        stringErr += `Bảng giá: ${resDup.priceName} từ ${formatDateString(resDup.timeStart)} đến ${formatDateString(resDup.timeEnd)}`;
-      });
-    }
+      if (dataArray.length !== 0) {
+        dataArray?.forEach((resDup: any) => {
+          stringErr += `Bảng giá: ${resDup.priceName} từ ${formatDateString(
+            resDup.timeStart
+          )} đến ${formatDateString(resDup.timeEnd)}`;
+        });
+      }
 
       if (response.status !== 200) {
-        setPopupMessage("Ngày áp dụng bị trùng với bảng giá khác:\n" + stringErr);
+        setPopupMessage(
+          "Ngày áp dụng bị trùng với bảng giá khác:\n" + stringErr
+        );
         setPopupType("error");
         setIsPopupOpen(true);
         return;
@@ -270,7 +275,6 @@ function Price() {
           price.priceId === isCheck[0] ? { ...price, active: true } : price
         )
       );
-      
     } catch (error) {
       console.error("Lỗi khi áp dụng bảng giá:", error);
       setPopupMessage("Lỗi khi áp dụng bảng giá.");
@@ -279,6 +283,7 @@ function Price() {
     }
     setIsCheck([]);
   };
+
   console.log(isCheck);
   // Xử lý mở và đóng modal chi tiết
   const handleOpenDetailModal = (priceTable: PriceTableProps) => {
@@ -291,26 +296,31 @@ function Price() {
     setSelectedPriceTable(null);
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-  };
-
   return (
     <div className={cx("price-container")}>
       {/* Tìm kiếm */}
       <div className={cx("search-container")}>
         <div className={cx("search-date")}>
           <label>Tìm kiếm bảng giá theo ngày</label>
-          <input type="date" 
-           value={String(dateValue)}
-           onChange={(e) => {handleSearchPrice(new Date(e.target.value)); setDateValue(e.target.value)}}
+          <input
+            type="date"
+            value={String(dateValue)}
+            onChange={(e) => {
+              handleSearchPrice(new Date(e.target.value));
+              setDateValue(e.target.value);
+            }}
           />
-          <button type="button"
-          onClick={(e)=>{setRender(!render); setDateValue("")}} 
-          ><IconWrapper icon={FiRefreshCw} size={20}/></button>
-          
-            
+          <div className={cx("refresh-btn")}>
+            <button
+              type="button"
+              onClick={(e) => {
+                setRender(!render);
+                setDateValue("");
+              }}
+            >
+              <IconWrapper icon={FiRefreshCw} size={20} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -321,7 +331,9 @@ function Price() {
           <button
             type="button"
             className={cx("action-btn", "apply-btn")}
-            disabled={isCheck.length === 0 || isApply === true || isCheck.length > 1}
+            disabled={
+              isCheck.length === 0 || isApply === true || isCheck.length > 1
+            }
             onClick={handleActivePrice}
           >
             Áp dụng
@@ -334,6 +346,9 @@ function Price() {
           >
             Sao chép bảng giá
           </button>
+          <button type="button" className={cx("action-btn", "add-btn")}>
+            Tạo bảng giá
+          </button>
         </div>
       </div>
 
@@ -342,13 +357,13 @@ function Price() {
         <table className={cx("price-table")}>
           <thead>
             <tr>
-              <th style={{ width: "10px" }}>Check</th>
-              <th style={{ width: "100px" }}>Mã</th>
-              <th style={{ width: "120px" }}>Tên bảng giá</th>
-              <th style={{ width: "200px" }}>Thời gian bắt đầu</th>
-              <th style={{ width: "200px" }}>Thời gian kết thúc</th>
-              <th style={{ width: "100px" }}>Đang áp dụng</th>
-              <th style={{ width: "50px" }}>Chi tiết</th>
+              <th>Check</th>
+              <th>Mã</th>
+              <th>Tên bảng giá</th>
+              <th>Thời gian bắt đầu</th>
+              <th>Thời gian kết thúc</th>
+              <th>Đang áp dụng</th>
+              <th>Chi tiết</th>
             </tr>
           </thead>
           <tbody>
@@ -656,7 +671,7 @@ function Price() {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

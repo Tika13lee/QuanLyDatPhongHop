@@ -1,8 +1,9 @@
 import React from "react";
 import classNames from "classnames/bind";
-import styles from "./DetailModal.module.scss";
+import styles from "./DetailRequestModal.module.scss";
 import { RequestFormProps } from "../../data/data";
 import { formatCurrencyVND } from "../../utilities";
+import CloseModalButton from "./CloseModalButton";
 
 const cx = classNames.bind(styles);
 
@@ -12,7 +13,7 @@ type DetailModalProps = {
   requestForm: RequestFormProps | null;
 };
 
-const DetailModal: React.FC<DetailModalProps> = ({
+const DetailRequestModal: React.FC<DetailModalProps> = ({
   isOpen,
   onClose,
   requestForm,
@@ -42,21 +43,12 @@ const DetailModal: React.FC<DetailModalProps> = ({
   return (
     <div className={cx("modal-overlay")} onClick={onClose}>
       <div className={cx("modal")} onClick={(e) => e.stopPropagation()}>
-        <button className={cx("close-btn")} onClick={onClose}>
-          ✖
-        </button>
+        <CloseModalButton onClick={onClose} />
         <h3>Thông tin chi tiết yêu cầu</h3>
         <div className={cx("modal-content")}>
           <div className={cx("info-left")}>
             <p>
               <strong>Tiêu đề:</strong> {requestForm.reservations[0].title}
-            </p>
-            <p>
-              <strong>Mô tả:</strong>{" "}
-              {requestForm.reservations[0].description}
-            </p>
-            <p>
-              <strong>Ghi chú:</strong> {requestForm.reservations[0].note}
             </p>
             <div className={cx("info-row")}>
               <p>
@@ -66,6 +58,29 @@ const DetailModal: React.FC<DetailModalProps> = ({
                 <strong>Giờ:</strong> {meetingStart.time} - {meetingEnd.time}
               </p>
             </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Tần suất:</strong>{" "}
+                {requestForm.reservations[0].frequency === "ONE_TIME"
+                  ? "Một lần"
+                  : requestForm.reservations[0].frequency === "DAILY"
+                  ? "Hàng ngày"
+                  : "Hàng tuần"}
+              </p>
+              <p>
+                <strong>Thời gian kết thúc:</strong>{" "}
+                {requestForm.requestReservation.frequency === "ONE_TIME"
+                  ? "Không có"
+                  : timeEndFrequency.date}
+              </p>
+            </div>
+            <p>
+              <strong>Mô tả:</strong> {requestForm.reservations[0].description}
+            </p>
+            <p>
+              <strong>Ghi chú:</strong> {requestForm.reservations[0].note}
+            </p>
+
             <div className={cx("info-row")}>
               <p>
                 <strong>Phòng:</strong>{" "}
@@ -84,20 +99,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
                   : "Hội nghị"}
               </p>
             </div>
-            <p>
-              <strong>Tần suất:</strong>{" "}
-              {requestForm.requestReservation.frequency === "ONE_TIME"
-                ? "Một lần"
-                : requestForm.requestReservation.frequency === "DAILY"
-                ? "Hàng ngày"
-                : "Hàng tuần"}
-            </p>
-            <p>
-              <strong>Thời gian kết thúc tần suất:</strong>{" "}
-              {requestForm.requestReservation.frequency === "WEEKLY"
-                ? timeEndFrequency.date
-                : "Không có"}
-            </p>
+
             <p>
               <strong>Vị trí:</strong> Tầng{" "}
               {requestForm.reservations[0].room.location.floor} - tòa {""}
@@ -115,11 +117,31 @@ const DetailModal: React.FC<DetailModalProps> = ({
               <strong>Chi phí:</strong>{" "}
               {formatCurrencyVND(requestForm.reservations[0].total)}
             </p>
+            <p>
+              <strong>Trạng thái của yêu cầu:</strong>{" "}
+              {requestForm.statusRequestForm === "PENDING"
+                ? "Đang chờ phê duyệt"
+                : requestForm.statusRequestForm === "APPROVED"
+                ? "Đã phê duyệt"
+                : "Từ chối"}
+            </p>
+            <p>
+              <strong>Lý do từ chối:</strong>{" "}
+              {requestForm.reasonReject || "Không có"}
+            </p>
+            <p>
+              <strong>Thời gian phản hồi:</strong>{" "}
+              {requestForm.timeResponse
+                ? formatDateTime(requestForm.timeResponse).date
+                : "Chưa có"}
+            </p>
           </div>
 
           <div className={cx("info-right")}>
             <ul className={cx("container-list")}>
-              <strong>Tài liệu</strong>
+              <div className={cx("list-header")}>
+                <strong>Tài liệu</strong>
+              </div>
               {requestForm.reservations[0].filePaths.map((file, index) => (
                 <li key={index}>
                   <a href={file} target="_blank" rel="noreferrer">
@@ -128,8 +150,11 @@ const DetailModal: React.FC<DetailModalProps> = ({
                 </li>
               ))}
             </ul>
+
             <ul className={cx("container-list")}>
-              <strong>Dịch vụ</strong>
+              <div className={cx("list-header")}>
+                <strong>Dịch vụ</strong>
+              </div>
               {requestForm.reservations[0].services?.map((service) => (
                 <li key={service.serviceId}>
                   {service.serviceName} -{" "}
@@ -138,7 +163,9 @@ const DetailModal: React.FC<DetailModalProps> = ({
               ))}
             </ul>
             <ul className={cx("container-list")}>
-              <strong>Người tham gia</strong>
+              <div className={cx("list-header")}>
+                <strong>Người tham gia</strong>
+              </div>
               {requestForm.reservations[0].attendants?.map((p) => (
                 <li key={p.employeeId}>
                   <div className={cx("info-row")}>
@@ -155,4 +182,4 @@ const DetailModal: React.FC<DetailModalProps> = ({
   );
 };
 
-export default DetailModal;
+export default DetailRequestModal;

@@ -160,7 +160,9 @@ const MainLayoutAdmin = () => {
           </NavLink> */}
         </div>
 
-        <Outlet />
+        <div className={cx("outlet-container")}>
+          <Outlet />
+        </div>
       </div>
     </div>
   );

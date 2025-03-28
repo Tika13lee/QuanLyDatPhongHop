@@ -19,6 +19,7 @@ import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { fetchEmployees } from "../../../features/employeeSlice";
 import { uploadImageToCloudinary } from "../../../utilities";
+import CloseModalButton from "../../../components/Modal/CloseModalButton";
 
 const cx = classNames.bind(styles);
 
@@ -495,7 +496,7 @@ const Employee = () => {
         <div className={cx("function-btn")}>
           <button
             type="button"
-            className={cx("submit-btn", "btn-delete")}
+            className={cx("submit-btn", "delete-btn")}
             disabled={isCheck.length === 0}
             onClick={handleDisableAccount}
           >
@@ -516,9 +517,7 @@ const Employee = () => {
       {openForm && (
         <div className={cx("form-container")}>
           <div className={cx("form")}>
-            <button className={cx("close-btn")} onClick={handleCloseForm}>
-              ✖
-            </button>
+            <CloseModalButton onClick={handleCloseForm} />
 
             <h3>Thông tin nhân viên</h3>
 
@@ -665,11 +664,7 @@ const Employee = () => {
                   />
                 </td>
                 <td className={cx("employee-image")}>
-                  <img
-                    src={emp.avatar}
-                    alt=""
-                    className={cx("avatar")}
-                  />
+                  <img src={emp.avatar} alt="" className={cx("avatar")} />
                 </td>
                 <td>{emp.employeeName}</td>
                 <td>{emp.email}</td>

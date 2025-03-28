@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Schedule.module.scss";
-import {
-  format,
-  addDays,
-  startOfWeek,
-  addWeeks,
-  parseISO,
-  set,
-} from "date-fns";
+import { format, addDays, startOfWeek, addWeeks, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
 import useFetch from "../../../hooks/useFetch";
 import {
@@ -22,7 +15,7 @@ import {
   getHourMinute,
 } from "../../../utilities";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { FaEdit, FaPlus } from "../../../components/icons/icons";
+import { FaEdit, FaPlus, TbRepeat } from "../../../components/icons/icons";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
@@ -121,7 +114,6 @@ const Schedule = () => {
     setValueNote(reservation.note);
     setSelectedEmployees(reservation.attendants ?? []);
     setSelectedServices(reservation.services ?? []);
-    console.log(reservation);
   };
 
   // đóng modal chi tiết
@@ -281,14 +273,6 @@ const Schedule = () => {
     "http://localhost:8080/api/v1/service/getAllServices"
   );
 
-  // lấy ds dịch vụ không có trong lịch
-  const servicesNotInSchedule = services?.filter(
-    (service) =>
-      !selectedSchedule?.services?.some(
-        (s) => s.serviceId === service.serviceId
-      )
-  );
-
   // xử lý xóa dịch vụ
   const handleRemoveService = (id: number) => {
     const updated = selectedServices.filter(
@@ -383,10 +367,7 @@ const Schedule = () => {
           <tbody>
             {/* Hàng buổi sáng */}
             <tr>
-              <td className={cx("time-label")}>
-                🌅 <br />
-                Sáng
-              </td>
+              <td className={cx("time-label")}>Sáng</td>
               {daysOfWeek.map((day, index) => {
                 const dayFormatted = format(day, "yyyy-MM-dd");
 
@@ -401,21 +382,24 @@ const Schedule = () => {
                   return hour < 12;
                 });
 
-                const getBorderColorByScheduleType = (type: string) => {
-                  if (type === "ONE_TIME") return "#2196f3";
-                  return "#4caf50";
-                };
-
                 return (
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {morningEvents.map((event) => (
                       <div
-                        className={cx("event-item", event.frequency)}
+                        className={cx("event-item", event.statusReservation)}
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
                         <p>
-                          <span style={{ color: "red" }}>●</span>{" "}
+                          {event.frequency === "ONE_TIME" ? (
+                            <span style={{ color: "red" }}>●</span>
+                          ) : (
+                            <IconWrapper
+                              icon={TbRepeat}
+                              size={12}
+                              color="blue"
+                            />
+                          )}{" "}
                           {event.timeStartEnd}
                         </p>
                         <p>
@@ -431,9 +415,7 @@ const Schedule = () => {
 
             {/* Hàng buổi chiều */}
             <tr>
-              <td className={cx("time-label")}>
-                🌇 <br /> Chiều
-              </td>
+              <td className={cx("time-label")}>Chiều</td>
               {daysOfWeek.map((day, index) => {
                 const dayFormatted = format(day, "yyyy-MM-dd");
 
@@ -450,7 +432,7 @@ const Schedule = () => {
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {afternoonEvents.map((event) => (
                       <div
-                        className={cx("event-item", event.frequency)}
+                        className={cx("event-item", event.statusReservation)}
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
@@ -470,6 +452,25 @@ const Schedule = () => {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      {/* ghi chú màu */}
+      <div className={cx("schedule-legend")}>
+        <div className={cx("legend-item")}>
+          <span className={cx("legend-color", "pending")}></span> Đang chờ phê duyệt
+        </div>
+        <div className={cx("legend-item")}>
+          <span className={cx("legend-color", "waiting")}></span>Đang chờ nhận phòng
+        </div>
+        <div className={cx("legend-item")}>
+          <span className={cx("legend-color", "check_in")}></span>Đã nhận phòng
+        </div>
+        <div className={cx("legend-item")}>
+          <span className={cx("legend-color", "not_check_in")}></span>Không nhận phòng
+        </div>
+        <div className={cx("legend-item")}>
+          <span className={cx("legend-color", "completed")}></span>Hoàn thành
+        </div>
       </div>
 
       {/* modal xem chi tiết */}
@@ -514,6 +515,15 @@ const Schedule = () => {
                     {getHourMinute(selectedSchedule.timeEnd)}
                   </p>
                 </div>
+
+                <p>
+                  <strong>Tần suất:</strong>{" "}
+                  {selectedSchedule.frequency === "ONE_TIME"
+                    ? "Một lần"
+                    : selectedSchedule.frequency === "DAILY"
+                    ? "Mỗi ngày"
+                    : "Hàng tuần"}
+                </p>
 
                 <div className={cx("info-row")}>
                   <p>
@@ -698,7 +708,7 @@ const Schedule = () => {
 
                           {showServiceDropdown && (
                             <div className={cx("dropdown-menu")}>
-                              {servicesNotInSchedule?.map((service) => {
+                              {services?.map((service) => {
                                 const isChecked = selectedServices.some(
                                   (s) => s.serviceId === service.serviceId
                                 );
@@ -919,11 +929,10 @@ const Schedule = () => {
 };
 
 const statusLabels = {
-  APPROVED: "Đã duyệt",
-  PENDING: "Chờ duyệt",
+  PENDING: "Chờ phê duyệt",
   CANCELED: "Đã hủy",
   CHECKED_IN: "Đã nhận phòng",
-  COMPLETED: "Hoàn tất",
+  COMPLETED: "Hoàn thành",
   WAITING: "Đang chờ nhận",
   NOT_CHECKED_IN: "Không nhận phòng",
 };

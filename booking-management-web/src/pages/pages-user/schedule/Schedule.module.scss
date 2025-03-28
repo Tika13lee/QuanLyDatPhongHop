@@ -6,6 +6,7 @@
 }
 
 .header {
+  height: 55px;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -23,9 +24,8 @@
   }
 
   .date-picker {
-    padding: 8px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 3px;
   }
 }
 
@@ -77,16 +77,72 @@
     white-space: nowrap;
   }
 
-  &.ONE_TIME {
-    background: #e3f2fd;
+  &.PENDING {
+    background: var(--color-status-pending);
+    border-left: 5px solid #ffe031;
+  }
+  &.WAITING {
+    background: var(--color-status-waiting);
     border-left: 5px solid #2196f3;
   }
-
-  &.WEEKLY,
-  &.DAILY {
-    background: #f6eccf;
-    border-left: 5px solid #e8b942;
+  &.CHECKED_IN {
+    background: var(--color-status-checked_in);
+    border-left: 5px solid #e93fff;
   }
+  &.COMPLETED {
+    background: var(--color-status-completed);
+    border-left: 5px solid #3bff34;
+  }
+  &.NOT_CHECKED_IN {
+    background: #ffd4d4;
+    border-left: 5px solid #ff3f3f;
+  }
+  &.CANCELED {
+    background: var(--color-status-canceled);
+    border-left: 5px solid #2196f3;
+  }
+}
+
+// ghi chú màu
+.schedule-legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-color {
+    width: 20px;
+    height: 12px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+  }
+}
+
+.pending {
+  background-color: var(--color-status-pending);
+}
+
+.waiting {
+  background-color: var(--color-status-waiting);
+}
+
+.check_in {
+  background-color: var(--color-status-checked_in);
+}
+
+.not_check_in {
+  background-color: #ffd4d4;
+}
+
+.completed {
+  background-color: var(--color-status-completed);
 }
 
 // table
@@ -124,9 +180,9 @@
     min-width: 150px;
     max-width: 150px;
 
-    height: 245px;
-    min-height: 245px;
-    max-height: 245px;
+    height: 240px;
+    min-height: 240px;
+    max-height: 240px;
 
     overflow: hidden;
     white-space: nowrap;
@@ -150,7 +206,7 @@
   position: relative;
   background-color: white;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 5px;
   width: 900px;
   max-width: 90%;
   height: 600px;
@@ -169,12 +225,7 @@
   gap: 10px;
   background-color: #e6c449;
   color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 16px;
-  transition: all 0.3s ease-in-out;
 
   &:hover {
     background-color: #cac715;
@@ -194,11 +245,7 @@
   background-color: #dc3545;
   color: white;
   border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 16px;
-  transition: all 0.3s ease-in-out;
 
   &:hover {
     background-color: #b02a37;
@@ -303,27 +350,19 @@
 
 // modal add participant
 .modal-add-participant {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
+  @include modal-overlay;
 
   .modal-add-participant-content {
     background-color: white;
     padding: 24px;
-    border-radius: 8px;
+    border-radius: 5px;
     width: 400px;
     height: 450px;
     max-width: 90%;
     position: relative;
     display: flex;
     flex-direction: column;
+    animation: fadeInModal 0.3s ease-out;
   }
 
   .modal-body {
@@ -386,27 +425,19 @@
 
 // modal add service
 .modal-add-service {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
+  @include modal-overlay;
 
   .modal-add-service-content {
     background-color: white;
     padding: 24px;
-    border-radius: 8px;
+    border-radius: 5px;
     width: 400px;
     height: 450px;
     max-width: 90%;
     position: relative;
     display: flex;
     flex-direction: column;
+    animation: fadeInModal 0.3s ease-out;
   }
 
   .modal-body {
@@ -426,7 +457,7 @@
   .dropdown-toggle {
     border: 1px solid #ccc;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: 5px;
     background-color: #fff;
     cursor: pointer;
     user-select: none;
@@ -442,7 +473,7 @@
   overflow-y: auto;
   background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 5px;
   z-index: 5;
   padding: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -472,7 +503,6 @@
   border-radius: 5px;
 
   li {
-    padding: 5px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -485,7 +515,6 @@
     font-size: 13px;
     background: transparent;
     border: none;
-    color: #dc3545;
-    cursor: pointer;
+    color: var(--color-error);
   }
 }

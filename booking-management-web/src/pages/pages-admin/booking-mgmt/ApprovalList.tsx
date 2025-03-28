@@ -10,7 +10,7 @@ import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
-import DetailModal from "../../../components/Modal/DetailModal";
+import DetailModal from "../../../components/Modal/DetailRequestModal";
 
 const cx = classNames.bind(styles);
 

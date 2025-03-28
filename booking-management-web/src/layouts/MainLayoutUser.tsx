@@ -76,7 +76,7 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  DS lịch đã phê duyệt
+                  DS đã phê duyệt
                 </NavLink>
 
                 <NavLink
@@ -85,7 +85,7 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  DS lịch đã từ chối
+                  DS đã từ chối
                 </NavLink>
               </div>
             )}

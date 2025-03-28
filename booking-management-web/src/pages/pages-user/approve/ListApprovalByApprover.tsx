@@ -2,7 +2,7 @@ import classNames from "classnames/bind";
 import styles from "./ListApprovalByApprover.module.scss";
 import { useEffect, useState } from "react";
 import { RequestFormProps } from "../../../data/data";
-import DetailModal from "../../../components/Modal/DetailModal";
+import DetailModal from "../../../components/Modal/DetailRequestModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -212,7 +212,7 @@ function ListApprovalByApprover() {
           </button>
         </div>
       </div>
-      
+
       {/* Modal từ chối */}
       {openModalReject && (
         <div className={cx("modal-reject")}>
@@ -256,6 +256,7 @@ function ListApprovalByApprover() {
                 <th>Ngày</th>
                 <th>Giờ bắt đầu - Kết thúc</th>
                 <th>Người đặt</th>
+                <th>Loại yêu cầu</th>
                 <th>Thời gian gửi</th>
                 <th>Chi tiết</th>
               </tr>
@@ -286,6 +287,11 @@ function ListApprovalByApprover() {
                       {meetingStart.time} - {meetingEnd.time}
                     </td>
                     <td>{schedule.reservations[0]?.booker.employeeName}</td>
+                    <td>
+                      {schedule.typeRequestForm === "UPDATE_RESERVATION"
+                        ? "Cập nhật"
+                        : "Đặt lịch"}
+                    </td>
                     <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
                     <td>
                       <div

@@ -3,7 +3,7 @@ import styles from "./RequestList.module.scss";
 import { useState } from "react";
 import { RequestFormProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
-import DetailModal from "../../../components/Modal/DetailModal";
+import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 
@@ -101,6 +101,7 @@ function RequestList() {
                 <th>Ngày</th>
                 <th>Giờ bắt đầu - kết thúc</th>
                 <th>Trạng thái</th>
+                <th>Loại yêu cầu</th>
                 <th>Thời gian gửi</th>
                 <th>Chi tiết</th>
               </tr>
@@ -124,6 +125,11 @@ function RequestList() {
                     </td>
 
                     <td>{statusText}</td>
+                    <td>
+                      {schedule.typeRequestForm === "UPDATE_RESERVATION"
+                        ? "Cập nhật"
+                        : "Đặt lịch"}
+                    </td>
                     <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
                     <td>
                       <div
