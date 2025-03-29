@@ -47,9 +47,11 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
         <h3>Thông tin chi tiết yêu cầu</h3>
         <div className={cx("modal-content")}>
           <div className={cx("info-left")}>
-            <p>
-              <strong>Tiêu đề:</strong> {requestForm.reservations[0].title}
-            </p>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Tiêu đề:</strong> {requestForm.reservations[0].title}
+              </p>
+            </div>
             <div className={cx("info-row")}>
               <p>
                 <strong>Ngày:</strong> {meetingStart.date}
@@ -74,12 +76,17 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
                   : timeEndFrequency.date}
               </p>
             </div>
-            <p>
-              <strong>Mô tả:</strong> {requestForm.reservations[0].description}
-            </p>
-            <p>
-              <strong>Ghi chú:</strong> {requestForm.reservations[0].note}
-            </p>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Mô tả:</strong>{" "}
+                {requestForm.reservations[0].description}
+              </p>
+            </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Ghi chú:</strong> {requestForm.reservations[0].note}
+              </p>
+            </div>
 
             <div className={cx("info-row")}>
               <p>
@@ -99,42 +106,52 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
                   : "Hội nghị"}
               </p>
             </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Vị trí:</strong> Tầng{" "}
+                {requestForm.reservations[0].room.location.floor} - tòa {""}
+                {
+                  requestForm.reservations[0].room.location.building
+                    .buildingName
+                }{" "}
+                - chi nhánh{" "}
+                {
+                  requestForm.reservations[0].room.location.building.branch
+                    .branchName
+                }
+              </p>
+            </div>
 
-            <p>
-              <strong>Vị trí:</strong> Tầng{" "}
-              {requestForm.reservations[0].room.location.floor} - tòa {""}
-              {
-                requestForm.reservations[0].room.location.building.buildingName
-              }{" "}
-              - chi nhánh{" "}
-              {
-                requestForm.reservations[0].room.location.building.branch
-                  .branchName
-              }
-            </p>
-
-            <p>
-              <strong>Chi phí:</strong>{" "}
-              {formatCurrencyVND(requestForm.reservations[0].total)}
-            </p>
-            <p>
-              <strong>Trạng thái của yêu cầu:</strong>{" "}
-              {requestForm.statusRequestForm === "PENDING"
-                ? "Đang chờ phê duyệt"
-                : requestForm.statusRequestForm === "APPROVED"
-                ? "Đã phê duyệt"
-                : "Từ chối"}
-            </p>
-            <p>
-              <strong>Lý do từ chối:</strong>{" "}
-              {requestForm.reasonReject || "Không có"}
-            </p>
-            <p>
-              <strong>Thời gian phản hồi:</strong>{" "}
-              {requestForm.timeResponse
-                ? formatDateTime(requestForm.timeResponse).date
-                : "Chưa có"}
-            </p>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Chi phí:</strong>{" "}
+                {formatCurrencyVND(requestForm.reservations[0].total)}
+              </p>
+            </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Trạng thái của yêu cầu:</strong>{" "}
+                {requestForm.statusRequestForm === "PENDING"
+                  ? "Đang chờ phê duyệt"
+                  : requestForm.statusRequestForm === "APPROVED"
+                  ? "Đã phê duyệt"
+                  : "Từ chối"}
+              </p>
+            </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Lý do từ chối:</strong>{" "}
+                {requestForm.reasonReject || "Không có"}
+              </p>
+            </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Thời gian phản hồi:</strong>{" "}
+                {requestForm.timeResponse
+                  ? formatDateTime(requestForm.timeResponse).date
+                  : "Chưa có"}
+              </p>
+            </div>
           </div>
 
           <div className={cx("info-right")}>

@@ -126,8 +126,6 @@ const Schedule = () => {
     setSelectedServices([]);
   };
 
-  // cập nhật lịch
-
   // mở modal thêm người tham gia
   const handleOpenAddParticipant = () => {
     setOpenModalAddParticipant(true);
@@ -457,16 +455,19 @@ const Schedule = () => {
       {/* ghi chú màu */}
       <div className={cx("schedule-legend")}>
         <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "pending")}></span> Đang chờ phê duyệt
+          <span className={cx("legend-color", "pending")}></span> Đang chờ phê
+          duyệt
         </div>
         <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "waiting")}></span>Đang chờ nhận phòng
+          <span className={cx("legend-color", "waiting")}></span>Đang chờ nhận
+          phòng
         </div>
         <div className={cx("legend-item")}>
           <span className={cx("legend-color", "check_in")}></span>Đã nhận phòng
         </div>
         <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "not_check_in")}></span>Không nhận phòng
+          <span className={cx("legend-color", "not_check_in")}></span>Không nhận
+          phòng
         </div>
         <div className={cx("legend-item")}>
           <span className={cx("legend-color", "completed")}></span>Hoàn thành

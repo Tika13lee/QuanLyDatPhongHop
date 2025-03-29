@@ -2,7 +2,12 @@ import { Fragment } from "react/jsx-runtime";
 import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./ModalBooking.module.scss";
-import { formatDateDate, formatDateString, times } from "../../utilities";
+import {
+  formatCurrencyVND,
+  formatDateDate,
+  formatDateString,
+  times,
+} from "../../utilities";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useFetch from "../../hooks/useFetch";
@@ -11,6 +16,8 @@ import IconWrapper from "../icons/IconWrapper";
 import { IoSettingsOutline } from "../../components/icons/icons";
 import { FaPlus } from "../../components/icons/icons";
 import usePost from "../../hooks/usePost";
+import CloseModalButton from "./CloseModalButton";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -52,17 +59,10 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [selectedDateEndOfFrequency, setSelectedDateEndOfFrequency] =
     useState<Date | null>(new Date());
   const [valueFrequency, setValueFrequency] = useState<string>("ONE_TIME");
-  const [serviceNames, setServiceNames] = useState<string[]>([]);
-  const [openModalParticipant, setOpenModalParticipant] =
-    useState<boolean>(false);
-  const [phone, setPhone] = useState<string>("");
-  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeProps[]>([
-    user,
-  ]);
-  const [listParticipant, setListParticipant] = useState<EmployeeProps[]>([]);
+  useState<boolean>(false);
+
   const [modalSetting, setModalSetting] = useState<boolean>(false);
   const [dates, setDates] = useState<Date[]>([]);
-  const [isClickedSelect, setIsClickedSelect] = useState(false);
   const [checkRemoveDays, setCheckRemoveDays] = useState<string[]>();
   const [dayOriginal, setDayOriginal] = useState<Date[]>([]);
   const [checkRemoveDates, setCheckRemoveDates] = useState<number[]>([]);
@@ -70,45 +70,19 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     "RESERVATION_ONETIME"
   );
 
-  // lấy ngày trong khoảng thời gian
-  const getDatesBetween = (startDate: Date, endDate: Date) => {
-    const dates = [];
-    let currentDate = startDate;
-    while (currentDate <= endDate) {
-      dates.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return dates;
-  };
+  const [openModalAddService, setOpenModalAddService] = useState(false);
+  const [showServiceDropdown, setShowServiceDropdown] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<ServiceProps[]>([]);
 
-  // lọc giờ theo ngày hiện tại
-  const getTimes = () => {
-    const currentDate = new Date();
-    const selectedDate = new Date(dateSelected ?? currentDate);
-    const isToday = currentDate.toDateString() === selectedDate.toDateString();
-
-    if (!isToday) return times;
-
-    const currentMinutes =
-      currentDate.getHours() * 60 + (currentDate.getMinutes() < 30 ? 0 : 30);
-
-    return times.filter((time) => {
-      const [hour, minute] = time.split(":").map(Number);
-      const timeInMinutes = hour * 60 + minute;
-      return timeInMinutes >= currentMinutes;
-    });
-  };
-
-  // xử lý cập nhật timeFinsishFrequency
-  const handleUpdateTimeFinsihFrequency = (dateFinishFequency: Date[]) => {
-        if(valueFrequency === "WEEKLY") {
-            const dayOfWeekByDayStart = dateSelected ? new Date(dateSelected).toString().split(" ")[0] : new Date().toString().split(" ")[0];
-            const daysFilter = dateFinishFequency.filter((date) => date.toString().split(" ")[0] === dayOfWeekByDayStart)
-            return daysFilter;
-        }else {
-          return dateFinishFequency;
-        }
-  }
+  const [openModalAddParticipant, setOpenModalAddParticipant] = useState(false);
+  const [phoneInput, setPhoneInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestedEmployees, setSuggestedEmployees] = useState<EmployeeProps[]>(
+    []
+  );
+  const [selectedEmployees, setSelectedEmployees] = useState<EmployeeProps[]>([
+    user,
+  ]);
 
   useEffect(() => {
     const filteredTimes = getTimes();
@@ -146,52 +120,51 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     }
   }, [selectedStartTime]);
 
-  // form data
-  const [formData, setFormData] = useState({
-    timeRequest: new Date().toISOString(),
-    typeRequestForm: typeRequestForm,
-    reservationDTO: {
-      time: new Date().toISOString(),
-      timeStart: timeStart
-        ? new Date(
-            `${dateSelected ?? new Date().toString()}T${timeStart}`
-          ).toISOString()
-        : new Date(
-            `${dateSelected ?? new Date().toString()}T${times[0]}`
-          ).toISOString(),
-      timeEnd: timeEnd
-        ? new Date(
-            `${dateSelected ?? new Date().toString()}T${timeEnd}`
-          ).toISOString()
-        : new Date(
-            `${dateSelected ?? new Date().toString()}T${times[1]}`
-          ).toISOString(),
-      note: "",
-      description: "",
-      title: "",
-      frequency: valueFrequency,
-      timeFinishFrequency: selectedDateEndOfFrequency
-      ? getDatesBetween(
-          dateSelected ? new Date(dateSelected) : new Date(),
-          selectedDateEndOfFrequency
-        ).map((date) => date.toISOString())
-      : [],
-      bookerId: user?.employeeId ?? "",
-      roomId: roomInfo?.roomId ?? "",
-      employeeIds: [] as string[],
-      serviceIds: [] as string[],
-      filePaths: [] as string[],
-    },
-  });
-
-  // chọn tần suất set loại form
-  useEffect(() => {
-    if (valueFrequency === "ONE_TIME") {
-      setTypeRequestForm("RESERVATION_ONETIME");
-    } else {
-      setTypeRequestForm("RESERVATION_RECURRING");
+  // lấy ngày trong khoảng thời gian
+  const getDatesBetween = (startDate: Date, endDate: Date) => {
+    const dates = [];
+    let currentDate = startDate;
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
     }
-  }, [valueFrequency]);
+    return dates;
+  };
+
+  // lọc giờ theo ngày hiện tại
+  const getTimes = () => {
+    const currentDate = new Date();
+    const selectedDate = new Date(dateSelected ?? currentDate);
+    const isToday = currentDate.toDateString() === selectedDate.toDateString();
+
+    if (!isToday) return times;
+
+    const minutesNow = currentDate.getHours() * 60 + currentDate.getMinutes();
+    const currentMinutes = Math.ceil(minutesNow / 30) * 30;
+
+    const filteredTimes = times.filter((time) => {
+      const [hour, minute] = time.split(":").map(Number);
+      const timeInMinutes = hour * 60 + minute;
+      return timeInMinutes >= currentMinutes;
+    });
+
+    return filteredTimes.slice(0, filteredTimes.length - 1);
+  };
+
+  // xử lý cập nhật timeFinsishFrequency
+  const handleUpdateTimeFinsihFrequency = (dateFinishFequency: Date[]) => {
+    if (valueFrequency === "WEEKLY") {
+      const dayOfWeekByDayStart = dateSelected
+        ? new Date(dateSelected).toString().split(" ")[0]
+        : new Date().toString().split(" ")[0];
+      const daysFilter = dateFinishFequency.filter(
+        (date) => date.toString().split(" ")[0] === dayOfWeekByDayStart
+      );
+      return daysFilter;
+    } else {
+      return dateFinishFequency;
+    }
+  };
 
   // loại bỏ ngày
   const handleRemoveDate = () => {
@@ -268,89 +241,158 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   // ngày kết thúc tần suất thay đổi
   useEffect(() => {
     const dataTemp = selectedDateEndOfFrequency
-        ? getDatesBetween(
-            dateSelected ? new Date(dateSelected) : new Date(),
-            selectedDateEndOfFrequency
-          )
-        : []
-    const formatDateList =  [...handleUpdateTimeFinsihFrequency(dataTemp)]
-    setDates(prev => {
-        return [...formatDateList]
-      }
-    );
-    setDayOriginal(
-      prev => {
-        return [...formatDateList]
-      }
-    );
+      ? getDatesBetween(
+          dateSelected ? new Date(dateSelected) : new Date(),
+          selectedDateEndOfFrequency
+        )
+      : [];
+    const formatDateList = [...handleUpdateTimeFinsihFrequency(dataTemp)];
+    setDates((prev) => {
+      return [...formatDateList];
+    });
+    setDayOriginal((prev) => {
+      return [...formatDateList];
+    });
     setFormData((prev) => ({
       ...prev,
       reservationDTO: {
         ...prev.reservationDTO,
-        timeFinishFrequency: [...formatDateList].map((date) => date.toISOString()),
+        timeFinishFrequency: [...formatDateList].map((date) =>
+          date.toISOString()
+        ),
       },
     }));
   }, [selectedDateEndOfFrequency]);
 
-  // lấy nhân viên
+  // chọn tần suất set loại form
+  useEffect(() => {
+    if (valueFrequency === "ONE_TIME") {
+      setTypeRequestForm("RESERVATION_ONETIME");
+    } else {
+      setTypeRequestForm("RESERVATION_RECURRING");
+    }
+  }, [valueFrequency]);
+
+  // form data
+  const [formData, setFormData] = useState({
+    timeRequest: new Date().toISOString(),
+    typeRequestForm: typeRequestForm,
+    reservationDTO: {
+      time: new Date().toISOString(),
+      timeStart: timeStart
+        ? new Date(
+            `${dateSelected ?? new Date().toString()}T${timeStart}`
+          ).toISOString()
+        : new Date(
+            `${dateSelected ?? new Date().toString()}T${times[0]}`
+          ).toISOString(),
+      timeEnd: timeEnd
+        ? new Date(
+            `${dateSelected ?? new Date().toString()}T${timeEnd}`
+          ).toISOString()
+        : new Date(
+            `${dateSelected ?? new Date().toString()}T${times[1]}`
+          ).toISOString(),
+      note: "",
+      description: "",
+      title: "",
+      frequency: valueFrequency,
+      timeFinishFrequency: selectedDateEndOfFrequency
+        ? getDatesBetween(
+            dateSelected ? new Date(dateSelected) : new Date(),
+            selectedDateEndOfFrequency
+          ).map((date) => date.toISOString())
+        : [],
+      bookerId: user?.employeeId ?? "",
+      roomId: roomInfo?.roomId ?? "",
+      employeeIds: [] as string[],
+      serviceIds: [] as string[],
+      filePaths: [] as string[],
+    },
+  });
+
+  // gửi yêu cầu phê duyệt
   const {
-    data: employees,
-    loading: employeesLoading,
-    error: employeesError,
-  } = useFetch<EmployeeProps[]>(
-    `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${phone}`
+    data,
+    loading: roomLoading,
+    error: roomError,
+    postData,
+  } = usePost<FormData>(
+    "http://localhost:8080/api/v1/requestForm/createRequestForm"
   );
 
-  // loại người đặt trong ds người tham gia
-  const removeBookerInEmployee = (employees: EmployeeProps[]) => {
-    return employees.filter((emp) => emp.employeeId !== user.employeeId);
-  };
-
+  // hiển thị thông báo lỗi
   useEffect(() => {
-    if (employees) {
-      setListParticipant(removeBookerInEmployee(employees));
+    if (roomError) {
+      console.log("Error updated:", roomError);
+      let data = [] as string[];
+      roomError?.map((res: ReservationProps) => {
+        data.push(res.timeStart.substring(8, 10));
+      });
+      console.log(data);
+      setIsPopupOpen &&
+        setIsPopupOpen(
+          "Bạn hoặc phòng này có lịch trùng vào ngày " + data.join(", "),
+          "error",
+          true
+        );
     }
-  }, [employees]);
+  }, [roomError]);
 
-  // thêm thành viên
-  const handleAddEmployee = (emp: EmployeeProps) => {
-    setSelectedEmployee((prev) => [...prev, emp]);
-    setFormData((prev) => ({
-      ...prev,
-      reservationDTO: {
-        ...prev.reservationDTO,
-        employeeIds: [...prev.reservationDTO.employeeIds, emp.employeeId + ""],
-      },
-    }));
-    setPhone("");
-    setOpenModalParticipant(false);
+  // ràng buộc dữ liệu
+  const validateForm = () => {
+    if (!formData.reservationDTO.roomId) {
+      return { isValid: false, message: "Vui lòng chọn phòng!" };
+    }
+
+    if (!formData.reservationDTO.title) {
+      return { isValid: false, message: "Vui lòng nhập tiêu đề cuộc họp!" };
+    }
+
+    if (selectedEmployees.length === 1) {
+      return { isValid: false, message: "Vui lòng chọn thêm người tham gia!" };
+    }
+
+    return { isValid: true, message: "" };
   };
 
-  // loại bỏ thành viên
-  const handleRemoveEmployee = (emp: EmployeeProps) => {
-    setSelectedEmployee((prev) =>
-      prev.filter((employee) => employee.employeeId !== emp.employeeId)
-    );
-    setFormData((prev) => ({
-      ...prev,
+  // Xử lý khi nhấn nút gửi phê duyệt
+  const handleSubmit = async () => {
+    const updatedFormData = {
+      ...formData,
+      typeRequestForm: typeRequestForm,
+      timeRequest: new Date().toISOString(),
       reservationDTO: {
-        ...prev.reservationDTO,
-        employeeIds: prev.reservationDTO.employeeIds.filter(
-          (employeeId) => employeeId !== emp.employeeId + ""
-        ),
+        ...formData.reservationDTO,
+        serviceIds: selectedServices.map((service) => service.serviceId + ""),
+        employeeIds: selectedEmployees.map((emp) => emp.employeeId + ""),
       },
-    }));
+    };
+
+    const { isValid, message } = validateForm();
+    if (!isValid) {
+      setIsPopupOpen && setIsPopupOpen(message, "error", false);
+      return;
+    }
+
+    console.log(updatedFormData);
+
+    resetData();
+
+    // const response = await postData(updatedFormData, { method: "POST" });
+
+    // console.log(response);
+
+    // if (response) {
+    //   setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
+    //   setIsModalClose();
+    // }
   };
 
-  // lấy service name render select option
-  useEffect(() => {
-    const arrServiceName = services?.filter((service) =>
-      formData.reservationDTO.serviceIds.includes(service.serviceId + "")
-    );
-    setServiceNames(
-      arrServiceName?.map((service) => service.serviceName) ?? []
-    );
-  }, [formData.reservationDTO.serviceIds]);
+  const resetData = () => {
+    setSelectedServices([]);
+    setSelectedEmployees([user]);
+  };
 
   // Hàm xử lý sự thay đổi khi người dùng nhập vào input
   const handleInputChange = (
@@ -362,7 +404,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     console.log(name);
     switch (name) {
       case "filePaths": {
-        console.log("Vào");
         setFormData((prev) => ({
           ...prev,
           reservationDTO: {
@@ -396,16 +437,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
         }));
         break;
       }
-      case "serviceIds": {
-        setFormData((prev) => ({
-          ...prev,
-          reservationDTO: {
-            ...prev.reservationDTO,
-            serviceIds: [...prev.reservationDTO.serviceIds, value],
-          },
-        }));
-        break;
-      }
       case "frequency": {
         setValueFrequency(value);
         setFormData((prev) => ({
@@ -427,6 +458,21 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     }
   };
 
+  // xử lý xóa tài liệu
+  const handleRemoveDocument = (index: number) => {
+    const updated = formData.reservationDTO.filePaths.filter(
+      (_, i) => i !== index
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      reservationDTO: {
+        ...prev.reservationDTO,
+        filePaths: updated,
+      },
+    }));
+  };
+
   // lấy dịch vụ
   const {
     data: services,
@@ -436,78 +482,63 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     "http://localhost:8080/api/v1/service/getAllServices"
   );
 
-  useEffect(() => {});
-
-  // gửi yêu cầu phê duyệt
-  const {
-    data,
-    loading: roomLoading,
-    error: roomError,
-    postData,
-  } = usePost<FormData>(
-    "http://localhost:8080/api/v1/requestForm/createRequestForm"
-  );
-
-  // hiển thị thông báo lỗi
+  // tìm kiếm participant
   useEffect(() => {
-    if (roomError) {
-      console.log("Error updated:", roomError);
-      let data = [] as string[];
-      roomError?.map((res: ReservationProps) => {
-        data.push(res.timeStart.substring(8, 10));
-      });
-      console.log(data);
-      setIsPopupOpen &&
-        setIsPopupOpen(
-          "Bạn hoặc phòng này có lịch trùng vào ngày " + data.join(", "),
-          "error",
-          true
+    if (!phoneInput.trim()) {
+      setSuggestedEmployees([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const delay = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${encodeURIComponent(
+            phoneInput
+          )}`
         );
-    }
-  }, [roomError]);
+        const data: EmployeeProps[] = await res.json();
+        setSuggestedEmployees(
+          data.filter(
+            (emp) =>
+              !selectedEmployees.some((e) => e.employeeId === emp.employeeId)
+          )
+        );
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error("Lỗi tìm nhân viên:", err);
+        setSuggestedEmployees([]);
+        setShowSuggestions(false);
+      }
+    }, 300);
 
-  // Xử lý khi nhấn nút gửi phê duyệt
-  const handleSubmit = async () => {
-    const updatedFormData = {
-      ...formData,
-      typeRequestForm: typeRequestForm,
-      timeRequest: new Date().toISOString(),
-      reservationDTO: {
-        ...formData.reservationDTO,
-        employeeIds: selectedEmployee.map((emp) => emp.employeeId + ""),
-      },
-    };
+    return () => clearTimeout(delay);
+  }, [phoneInput]);
 
-    console.log(updatedFormData);
-
-    const response = await postData(updatedFormData, { method: "POST" });
-
-    console.log(response);
-
-    if (response) {
-      setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
-      setIsModalClose();
-    }
+  // xử lý thêm participant
+  const handleAddEmployee = (employee: EmployeeProps) => {
+    if (selectedEmployees.find((e) => e.employeeId === employee.employeeId))
+      return;
+    setSelectedEmployees((prev) => [...prev, employee]);
+    setPhoneInput("");
+    setSuggestedEmployees([]);
+    setShowSuggestions(false);
   };
 
-  const handleOpenModalSetting = () => {
-    setModalSetting(true);
-  };
-  const handleCloseModalSetting = () => {
-    setModalSetting(false);
+  // xử lý xóa participant
+  const handleRemoveEmployee = (employeeId: number) => {
+    const updatedEmployees = selectedEmployees.filter(
+      (e) => e.employeeId !== employeeId
+    );
+    setSelectedEmployees(updatedEmployees);
   };
 
   return (
     <Fragment>
       {isModalOpen ? (
         <div className={cx("modal-overlay")}>
-          <div className={cx("modal")}>
-            <button
-              className={cx("close-btn")}
-              onClick={() => setIsModalClose()}
-            >
-              ✖
-            </button>
+          <div className={cx("modal-content")}>
+            <CloseModalButton onClick={setIsModalClose} />
             <h3>Đặt lịch phòng</h3>
 
             <div className={cx("form")}>
@@ -540,7 +571,11 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                         Chọn phòng
                       </option>
                       {dataRoomByBranch?.map((room) => (
-                        <option value={room.roomName} data-bindid={room.roomId}>
+                        <option
+                          key={room.roomId}
+                          value={room.roomName}
+                          data-bindid={room.roomId}
+                        >
                           {room.roomName}
                         </option>
                       ))}
@@ -686,7 +721,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                     })}
                     onClick={
                       valueFrequency !== "ONE_TIME"
-                        ? handleOpenModalSetting
+                        ? () => setModalSetting(true)
                         : undefined
                     }
                   >
@@ -695,11 +730,13 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
                   {/* modal setting */}
                   {modalSetting && (
-                    <div className={cx("modal-setting")}>
-                      <div className={cx("modal-content")}>
+                    <div className={cx("modal-overlay")}>
+                      <div className={cx("modal-content-setting")}>
+                        <CloseModalButton
+                          onClick={() => setModalSetting(false)}
+                        />
                         <div className={cx("modal-header")}>
                           <h4>Cài đặt </h4>
-                          <button onClick={handleCloseModalSetting}>✖</button>
                         </div>
                         <div className={cx("modal-body")}>
                           <div className={cx("setting-left")}>
@@ -778,133 +815,264 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
               <div className={cx("devide")}></div>
 
               <div className={cx("form-info")}>
-                {/* tài liệu */}
-                <div className={cx("form-group")}>
-                  <label>Tài liệu</label>
-                  <input
-                    type="file"
-                    multiple
-                    name="filePaths"
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                {/* hiện tài liệu đã chọn */}
-                <select className={cx("form-group")}>
-                  {formData.reservationDTO.filePaths.map((file) => (
-                    <option value={file}>{file}</option>
-                  ))}
-                </select>
-
-                {/* Chọn dịch vụ */}
-                <div className={cx("form-group")}>
-                  <label>Dịch vụ</label>
-                  <div className={cx("checkbox-group")}>
-                    <select name="serviceIds" onChange={handleInputChange}>
-                      <option value="" disabled>
-                        Chọn dịch vụ
-                      </option>
-                      {services?.map((service) => (
-                        <option
-                          key={service.serviceId}
-                          value={service.serviceId}
-                          id={service.serviceName}
-                        >
-                          {service.serviceName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* hiện dịch vụ đã chọn */}
-                <div className={cx("form-group")}>
-                  <select
-                    onClick={() => setIsClickedSelect(true)}
-                    onBlur={() => setIsClickedSelect(false)}
-                  >
-                    {!isClickedSelect && (
-                      <option value="" disabled selected>
-                        {serviceNames.join(", ")}
-                      </option>
-                    )}
-
-                    {serviceNames.map((serviceName, index) => (
-                      <option key={index} value={serviceName} disabled>
-                        {serviceName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Người tham gia */}
-                <div className={cx("form-row")}>
-                  <label>Người tham gia</label>
-
-                  <button
-                    className={cx("submit-btn")}
-                    onClick={() => {
-                      setOpenModalParticipant(true);
-                    }}
-                  >
-                    <IconWrapper icon={FaPlus} size={14} color="#fff" />
-                  </button>
-                </div>
-
-                {/* hiện người tham gia */}
-                {selectedEmployee.length > 0 &&
-                  selectedEmployee.map((emp) => (
-                    <div className={cx("form-row", "list-emp-participant")}>
-                      <div key={emp.employeeId}>
-                        {emp.employeeName} - {emp.phone}
-                      </div>
-                      <button
-                        className={cx("btn-remove-employee")}
-                        onClick={() => handleRemoveEmployee(emp)}
-                        disabled={emp.employeeId === user.employeeId}
-                      >
-                        ✖
-                      </button>
-                    </div>
-                  ))}
-
-                {/* modal thêm thành viên */}
-                {openModalParticipant && (
-                  <div className={cx("modal-employee")}>
-                    <div className={cx("model-add")}>
-                      <button
-                        className={cx("btn-close-modalParticipant")}
-                        onClick={() => setOpenModalParticipant(false)}
-                      >
-                        ✖
-                      </button>
+                {/* document */}
+                <ul className={cx("container-list")}>
+                  <div className={cx("list-header")}>
+                    <strong>Tài liệu</strong>
+                    <div>
                       <input
-                        type="text"
-                        placeholder="Nhập số điện thoại người tham gia"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        id="file-upload"
+                        type="file"
+                        style={{ display: "none" }}
+                        name="filePaths"
+                        onChange={handleInputChange}
                       />
-                      {phone && listParticipant && (
-                        <div className={cx("form-group", "employee-list")}>
-                          {listParticipant.map((emp) => (
-                            <div className={cx("employee-item")}>
-                              <div key={emp.employeeId}>
-                                {emp.employeeName} - {emp.phone}
-                              </div>
-                              <button onClick={() => handleAddEmployee(emp)}>
-                                <IconWrapper
-                                  icon={FaPlus}
-                                  size={14}
-                                  color="#fff"
-                                />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <label htmlFor="file-upload" className={cx("edit-icon")}>
+                        <IconWrapper icon={FaPlus} size={16} color="#33cc33" />
+                      </label>
                     </div>
                   </div>
-                )}
+                  {/* hiện tài liệu */}
+                  {formData.reservationDTO.filePaths.map((file, index) => (
+                    <li key={index} className={cx("file-item")}>
+                      <a href={file} target="_blank" rel="noreferrer">
+                        {file}
+                      </a>
+                      <button
+                        className={cx("remove-btn")}
+                        onClick={() => {
+                          handleRemoveDocument(index);
+                        }}
+                      >
+                        ❌
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* service */}
+                <ul className={cx("container-list")}>
+                  <div className={cx("list-header")}>
+                    <strong>Dịch vụ</strong>
+                    <div
+                      className={cx("edit-icon")}
+                      onClick={() => {
+                        setOpenModalAddService(true);
+                      }}
+                    >
+                      <IconWrapper icon={FaPlus} size={16} color="#33cc33" />
+                    </div>
+                  </div>
+
+                  {/* render list service */}
+                  {selectedServices?.map((service) => (
+                    <li key={service.serviceId}>
+                      {service.serviceName} -{" "}
+                      {service.priceService?.value &&
+                        formatCurrencyVND(service.priceService?.value)}
+                    </li>
+                  ))}
+
+                  {/* modal add, remove service */}
+                  {openModalAddService && (
+                    <div className={cx("modal-add-service")}>
+                      <div className={cx("modal-add-service-content")}>
+                        <CloseModalButton
+                          onClick={() => {
+                            setOpenModalAddService(false);
+                            setShowServiceDropdown(false);
+                            setSelectedServices([...selectedServices]);
+                          }}
+                        />
+                        <h3>Thêm dịch vụ</h3>
+
+                        <div className={cx("custom-dropdown")}>
+                          <div
+                            className={cx("dropdown-toggle")}
+                            onClick={() =>
+                              setShowServiceDropdown((prev) => !prev)
+                            }
+                          >
+                            Chọn dịch vụ ({selectedServices.length})
+                          </div>
+
+                          {showServiceDropdown && (
+                            <div className={cx("dropdown-menu")}>
+                              {services?.map((service) => {
+                                const isChecked = selectedServices.some(
+                                  (s) => s.serviceId === service.serviceId
+                                );
+
+                                return (
+                                  <div
+                                    key={service.serviceId}
+                                    className={cx("checkbox-item")}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        const updated = checked
+                                          ? [...selectedServices, service]
+                                          : selectedServices.filter(
+                                              (s) =>
+                                                s.serviceId !==
+                                                service.serviceId
+                                            );
+                                        setSelectedServices(updated);
+                                      }}
+                                    />
+                                    {service.serviceName} -{" "}
+                                    {service.priceService &&
+                                      formatCurrencyVND(
+                                        service?.priceService?.value
+                                      )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Hiển thị dịch vụ đã chọn trong modal */}
+                        <h4>Dịch vụ đã chọn:</h4>
+                        <div className={cx("selected-list")}>
+                          <ul>
+                            {selectedServices.map((service) => (
+                              <li
+                                key={service.serviceId}
+                                className={cx("selected-item")}
+                              >
+                                <span>
+                                  {service.serviceName} –{" "}
+                                  {service.priceService &&
+                                    formatCurrencyVND(
+                                      service.priceService.value
+                                    )}
+                                </span>
+
+                                <button
+                                  className={cx("remove-btn")}
+                                  onClick={() => {
+                                    setSelectedServices(
+                                      selectedServices.filter(
+                                        (s) => s.serviceId !== service.serviceId
+                                      )
+                                    );
+                                  }}
+                                >
+                                  ❌
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </ul>
+
+                {/* participant */}
+                <ul className={cx("container-list")}>
+                  <div className={cx("list-header")}>
+                    <strong>Người tham gia</strong>
+                    <div
+                      className={cx("edit-icon")}
+                      onClick={() => setOpenModalAddParticipant(true)}
+                    >
+                      <IconWrapper icon={FaPlus} size={16} color="#33cc33" />
+                    </div>
+                  </div>
+
+                  {/* render list emp  */}
+                  {selectedEmployees.map((p) => (
+                    <li key={p.employeeId}>
+                      <div className={cx("info-row")}>
+                        <p>{p.employeeName}</p>
+                        <p>{p.phone}</p>
+                      </div>
+                    </li>
+                  ))}
+
+                  {/* add, remove emp */}
+                  {openModalAddParticipant && (
+                    <div className={cx("modal-overlay")}>
+                      <div className={cx("modal-add-participant-content")}>
+                        <CloseModalButton
+                          onClick={() => setOpenModalAddParticipant(false)}
+                        />
+                        <h3>Thêm người tham gia</h3>
+                        <div className={cx("modal-body")}>
+                          <div
+                            className={cx("form-group")}
+                            style={{ position: "relative" }}
+                          >
+                            <input
+                              type="text"
+                              name="attendant"
+                              placeholder="Nhập số điện thoại"
+                              value={phoneInput}
+                              onChange={(e) => setPhoneInput(e.target.value)}
+                              autoComplete="off"
+                            />
+                            {showSuggestions &&
+                              suggestedEmployees.length > 0 && (
+                                <div className={cx("suggestion-box")}>
+                                  {suggestedEmployees.map((emp) => (
+                                    <div
+                                      key={emp.employeeId}
+                                      className={cx("suggestion-item")}
+                                    >
+                                      <span>
+                                        {emp.employeeName} - {emp.phone}
+                                      </span>
+                                      <button
+                                        onClick={() => handleAddEmployee(emp)}
+                                      >
+                                        <IconWrapper
+                                          icon={FaPlus}
+                                          size={16}
+                                          color="#33CC33"
+                                        />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                          </div>
+
+                          {/* hiển thị emp  */}
+                          <h4>Người tham gia đã chọn:</h4>
+                          <div className={cx("selected-list")}>
+                            <ul>
+                              {selectedEmployees.map((emp) => (
+                                <li
+                                  key={emp.employeeId}
+                                  className={cx("employee-item")}
+                                >
+                                  {emp.employeeName} - {emp.phone}
+                                  {emp.employeeId === user.employeeId ? (
+                                    <span>(Bạn)</span>
+                                  ) : (
+                                    <button
+                                      className={cx("remove-btn")}
+                                      onClick={() =>
+                                        handleRemoveEmployee(emp.employeeId)
+                                      }
+                                    >
+                                      ❌
+                                    </button>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </ul>
               </div>
             </div>
 

@@ -49,9 +49,6 @@ type typeInfoPopup = {
 };
 
 const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
-
   const roomRedux = useSelector((state: RootState) => state.room.selectedRoom);
   const [roomDetail, setRoomDetail] = useState<RoomProps | null>(null);
   const reservations = roomDetail?.reservationDTOS || [];
@@ -91,7 +88,9 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     console.log(roomDetail?.roomId);
     if (infoPopup.close === true && roomDetail?.roomId) {
       console.log("reload");
-      fetch(`http://localhost:8080/api/v1/room/getRoomById?roomId=${roomDetail.roomId}`)
+      fetch(
+        `http://localhost:8080/api/v1/room/getRoomById?roomId=${roomDetail.roomId}`
+      )
         .then((res) => res.json())
         .then((data) => {
           setRoomDetail(data);
@@ -102,66 +101,35 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
     }
   }, [infoPopup.close]);
 
-  const [phone, setPhone] = useState<string>("");
-
-  // const [formData, setFormData] = useState({
-  //   time: "",
-  //   timeStart: "",
-  //   timeEnd: "",
-  //   note: "",
-  //   description: "",
-  //   title: "",
-  //   frequency: "ONE_TIME",
-  //   timeFinishFrequency: "",
-  //   bookerId: "",
-  //   roomId: "",
-  //   employeeIds: [] as string[],
-  //   serviceIds: [] as string[],
-  //   filePaths: [] as string[],
-  // });
-
-  // lấy dịch vụ
-  const {
-    data: services,
-    loading: serviceLoading,
-    error: serviceError,
-  } = useFetch<ServiceProps[]>(
-    "http://localhost:8080/api/v1/service/getAllServices"
-  );
-
-  // lấy nhân viên
-  const {
-    data: employees,
-    loading: employeesLoading,
-    error: employeesError,
-  } = useFetch<EmployeeProps[]>(
-    `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${phone}`
-  );
-
-  // useEffect(() => {
-  //   if (roomDetail) {
-  //     setFormData((prevFormData) => ({
-  //       ...prevFormData,
-  //       roomId: roomDetail.roomId.toString() || "",
-  //     }));
-  //   }
-  // }, [roomDetail]);
-
   // xử lý khi click vào ô
   const handleCellClick = (date: string, time: string) => {
     console.log(date, time);
 
-    const selectedDateTime = new Date(`${selectedDate}T${time}:00`);
-    selectedDateTime.setMinutes(selectedDateTime.getMinutes() + 30);
-    const today = new Date();
-    console.log("today", today);
-    if (selectedDateTime < today) {
-      toast.warning(
-        "Bạn không thể đặt lịch lúc này cho ngày " +
-          formatDateString(selectedDate) +
-          " Vui lòng chọn giờ khác hoặc ngày khác! "
-      );
-      return;
+    const selectedDateTime = new Date(`${date}T${time}:00`);
+    const now = new Date();
+
+    const isToday = selectedDateTime.toDateString() === now.toDateString();
+
+    if (isToday) {
+      const minutesNow = now.getHours() * 60 + now.getMinutes();
+      const currentMinutes = Math.ceil(minutesNow / 30) * 30;
+
+      const [hour, minute] = time.split(":").map(Number);
+      const selectedMinutes = hour * 60 + minute;
+
+      if (selectedMinutes < currentMinutes) {
+        toast.warning(`Bạn không thể đặt lịch vào lúc ${time} đã qua.`);
+        return;
+      }
+    } else {
+      if (selectedDateTime < now) {
+        toast.warning(
+          `Bạn không thể đặt lịch họp trong ngày ${formatDateString(
+            date
+          )} đã qua.`
+        );
+        return;
+      }
     }
 
     setSelectedSlot({ date, time });
@@ -263,7 +231,7 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
             </thead>
 
             <tbody>
-              {times.map((time, index) => (
+              {times.slice(0, -1).map((time, index) => (
                 <tr key={index}>
                   <td className={cx("timeColumn")}>{time}</td>
                   {daysOfWeek.map((day, i) => {

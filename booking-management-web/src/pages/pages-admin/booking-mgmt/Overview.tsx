@@ -181,7 +181,7 @@ function Overview() {
               </tr>
             </thead>
             <tbody>
-              {times.map((time) => (
+              {times.slice(0, -1).map((time) => (
                 <tr key={time}>
                   <td className={cx("time-column")}>{time}</td>
 

@@ -388,7 +388,7 @@
 }
 
 .suggestion-item {
-  padding: 5px;
+  padding: 0 5px;
   transition: background-color 0.3s;
   display: flex;
   justify-content: space-between;
@@ -438,13 +438,6 @@
     display: flex;
     flex-direction: column;
     animation: fadeInModal 0.3s ease-out;
-  }
-
-  .modal-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
   }
 }
 

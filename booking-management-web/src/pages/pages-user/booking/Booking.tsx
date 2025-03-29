@@ -197,16 +197,31 @@ function Booking() {
   ) => {
     const selectedDateTime = new Date(`${selectedDate}T${timeStart}:00`);
     selectedDateTime.setMinutes(selectedDateTime.getMinutes() + 30);
-    const today = new Date();
-    console.log("today", today);
-    if (selectedDateTime < today) {
-      toast.warning(
-        "Bạn không thể đặt lịch lúc này cho ngày " +
-          formatDateString(selectedDate) +
-          " Vui lòng chọn giờ khác hoặc ngày khác! "
-      );
-      return;
+    const now = new Date();
+
+    const isToday = now.toDateString() === selectedDateTime.toDateString();
+    if (isToday) {
+      const minutesNow = now.getHours() * 60 + now.getMinutes();
+      const currentMinutes = Math.ceil(minutesNow / 30) * 30;
+
+      const [hour, minute] = timeStart.split(":").map(Number);
+      const selectedMinutes = hour * 60 + minute;
+
+      if (selectedMinutes < currentMinutes) {
+        toast.warning(`Bạn không thể đặt lịch vào lúc ${timeStart} đã qua.`);
+        return;
+      }
+    } else {
+      if (selectedDateTime < now) {
+        toast.warning(
+          `Bạn không thể đặt lịch họp trong ngày ${formatDateString(
+            selectedDate
+          )} đã qua.`
+        );
+        return;
+      }
     }
+
     setSelectedCell(() => {
       setInfoCellRoom({
         roomInfo: {
@@ -285,7 +300,7 @@ function Booking() {
               </tr>
             </thead>
             <tbody>
-              {times.map((time) => (
+              {times.slice(0, -1).map((time) => (
                 <tr key={time}>
                   <td className={cx("time-column")}>{time}</td>
 
@@ -340,7 +355,10 @@ function Booking() {
                       >
                         {/* Hiển thị tất cả đặt phòng trùng với `time` */}
                         {reservations.map((res) => (
-                          <div className={cx("booked-title")}>
+                          <div
+                            key={res.reservationId}
+                            className={cx("booked-title")}
+                          >
                             <p>{res?.title}</p>
                             <p className={cx("status")}>
                               {res.statusReservation === "PENDING"
