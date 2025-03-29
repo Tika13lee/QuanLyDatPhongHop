@@ -245,7 +245,7 @@ function Service() {
             <IconWrapper icon={MdSearch} color="#fff" size={24} />
           </button>
         </div>
-        <div className={cx("refresh-btn")} onClick={handleRefresh}>
+        <div onClick={handleRefresh}>
           <button>
             <IconWrapper icon={FiRefreshCw} color="#000" size={24} />
           </button>

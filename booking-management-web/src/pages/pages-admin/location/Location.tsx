@@ -13,12 +13,10 @@ import {
   LocationProps2,
 } from "../../../data/data";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
-import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
 function Location() {
-  const dispatch = useDispatch<AppDispatch>();
 
   const [openBranchModal, setOpenBranchModal] = useState(false);
   const [openBuildingModal, setOpenBuildingModal] = useState(false);

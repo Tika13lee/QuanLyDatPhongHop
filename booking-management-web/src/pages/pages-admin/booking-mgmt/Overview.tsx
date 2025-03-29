@@ -14,6 +14,7 @@ import { times } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
+const skipMap: { [roomId: string]: { [time: string]: boolean } } = {};
 function Overview() {
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -185,64 +186,92 @@ function Overview() {
                 <tr key={time}>
                   <td className={cx("time-column")}>{time}</td>
 
-                  {/* Duyệt qua từng phòng */}
                   {rooms.map((room) => {
-                    // Tìm tất cả đặt phòng phù hợp với `time`
-                    const reservations = room.reservationViewDTOS.filter(
-                      (res) => {
-                        const startTime = res.timeStart
-                          .split("T")[1]
-                          .substring(0, 5);
-                        const endTime = res.timeEnd
-                          .split("T")[1]
-                          .substring(0, 5);
+                    // Khởi tạo skipMap nếu chưa có
+                    if (!skipMap[room.roomId]) skipMap[room.roomId] = {};
 
-                        // Kiểm tra `time` có nằm trong khoảng đặt phòng không
-                        return startTime <= time && time < endTime;
+                    // Nếu thời gian này đã được render bởi rowSpan trước đó, thì bỏ qua
+                    if (skipMap[room.roomId][time]) {
+                      return null;
+                    }
+
+                    // Tìm reservation bắt đầu tại khung giờ hiện tại
+                    const reservation = room.reservationViewDTOS.find((res) => {
+                      const startTime = res.timeStart
+                        .split("T")[1]
+                        .substring(0, 5);
+                      return startTime === time;
+                    });
+
+                    if (reservation) {
+                      const start = reservation.timeStart
+                        .split("T")[1]
+                        .substring(0, 5);
+                      const end = reservation.timeEnd
+                        .split("T")[1]
+                        .substring(0, 5);
+                      const startIndex = times.indexOf(start);
+                      const endIndex = times.indexOf(end);
+                      const rowSpan = endIndex - startIndex;
+
+                      // Đánh dấu các khung giờ tiếp theo là đã render (skip)
+                      for (let i = 1; i < rowSpan; i++) {
+                        const nextTime = times[startIndex + i];
+                        skipMap[room.roomId][nextTime] = true;
                       }
-                    );
 
-                    const editBackground: { [key: string]: string } = {
-                      normal: "normal",
-                      pending: "pending",
-                      waiting: "waiting",
-                      checked_in: "checked_in",
-                      completed: "completed",
-                    };
-                    let statusKey =
-                      reservations[0]?.statusReservation.toLocaleLowerCase() ||
-                      "normal";
+                      // Xác định màu nền theo trạng thái
+                      const editBackground: { [key: string]: string } = {
+                        normal: "normal",
+                        pending: "pending",
+                        waiting: "waiting",
+                        checked_in: "checked_in",
+                        completed: "completed",
+                      };
+                      const statusKey =
+                        reservation.statusReservation.toLowerCase() || "normal";
 
+                      return (
+                        <td
+                          key={`${room.roomId}-${time}`}
+                          rowSpan={rowSpan}
+                          className={cx({
+                            booked: true,
+                            [editBackground[statusKey]]:
+                              editBackground[statusKey],
+                          })}
+                          // onClick={() =>
+                          //   toast.warning("Khung giờ này đã được đặt!", {
+                          //     autoClose: 2000,
+                          //   })
+                          // }
+                        >
+                          <div className={cx("booked-title")}>
+                            <p>{reservation.title}</p>
+                            <p className={cx("status")}>
+                              {reservation.statusReservation === "PENDING"
+                                ? "Chờ phê duyệt"
+                                : reservation.statusReservation === "WAITING"
+                                ? "Chờ nhận phòng"
+                                : reservation.statusReservation === "CHECKED_IN"
+                                ? "Đã nhận phòng"
+                                : reservation.statusReservation === "COMPLETED"
+                                ? "Đã hoàn thành"
+                                : "Không nhận phòng"}
+                            </p>
+                          </div>
+                        </td>
+                      );
+                    }
+
+                    // Nếu không có lịch bắt đầu tại thời điểm này, render ô trống
                     return (
                       <td
                         key={`${room.roomId}-${time}`}
-                        className={cx({
-                          booked: reservations.length > 0,
-                          [editBackground[statusKey]]:
-                            editBackground[statusKey],
-                        })}
-                      >
-                        {/* Hiển thị tất cả đặt phòng trùng với `time` */}
-                        {reservations.map((res) => (
-                          <div
-                            className={cx("booked-title")}
-                            onClick={() => handleOpenModal(res.reservationId)}
-                          >
-                            <p>{res?.title}</p>
-                            <p className={cx("status")}>
-                              {res.statusReservation === "PENDING"
-                                ? "Chờ phê duyệt"
-                                : res.statusReservation === "WAITING"
-                                ? "Chờ nhận phòng"
-                                : res.statusReservation === "CHECKED_IN"
-                                ? "Đã nhận phòng"
-                                : res.statusReservation === "COMPLETED"
-                                ? "Đã hoàn thành"
-                                : "Đã hủy"}
-                            </p>
-                          </div>
-                        ))}
-                      </td>
+                        // onClick={() =>
+                        //   handleCellClick(room.roomId + "", room.roomName, time)
+                        // }
+                      ></td>
                     );
                   })}
                 </tr>

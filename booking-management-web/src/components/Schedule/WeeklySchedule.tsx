@@ -24,22 +24,6 @@ const daysOfWeek = [
   "Chủ nhật",
 ];
 
-type FormData = {
-  time: string;
-  timeStart: string;
-  timeEnd: string;
-  note: string;
-  description: string;
-  title: string;
-  frequency: string;
-  timeFinishFrequency: string;
-  bookerId: string;
-  roomId: string;
-  employeeIds: string[];
-  serviceIds: string[];
-  filePaths: string[];
-};
-
 type typeMessage = "error" | "success" | "info" | "warning";
 
 type typeInfoPopup = {
@@ -47,6 +31,8 @@ type typeInfoPopup = {
   type: typeMessage;
   close: boolean;
 };
+
+const skipMap: { [roomId: string]: { [time: string]: boolean } } = {};
 
 const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
   const roomRedux = useSelector((state: RootState) => state.room.selectedRoom);
@@ -234,50 +220,57 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
               {times.slice(0, -1).map((time, index) => (
                 <tr key={index}>
                   <td className={cx("timeColumn")}>{time}</td>
-                  {daysOfWeek.map((day, i) => {
-                    const bookedSchedule = reservations?.find((reservation) => {
-                      // Tách thời gian giờ và phút từ timeStart và timeEnd
-                      const startTime = formatTime(reservation.timeStart);
-                      const endTime = formatTime(reservation.timeEnd);
 
-                      // So sánh thời gian với thời gian trong bảng
+                  {daysOfWeek.map((day, i) => {
+                    const dayKey = weekDates[i];
+                    if (!skipMap[dayKey]) skipMap[dayKey] = {};
+                    if (skipMap[dayKey][time]) return null;
+
+                    const bookedSchedule = reservations?.find((reservation) => {
+                      const startTime = formatTime(reservation.timeStart);
                       return (
-                        reservation.timeStart.split("T")[0] === weekDates[i] &&
-                        startTime <= time &&
-                        endTime > time
+                        reservation.timeStart.split("T")[0] === dayKey &&
+                        startTime === time
                       );
                     });
 
-                    const editBackground: { [key: string]: string } = {
-                      normal: "normal",
-                      pending: "pending",
-                      waiting: "waiting",
-                      checked_in: "checked_in",
-                      completed: "completed",
-                    };
-                    const statusKey =
-                      bookedSchedule?.statusReservation.toLocaleLowerCase() ||
-                      "normal";
+                    if (bookedSchedule) {
+                      const startTime = formatTime(bookedSchedule.timeStart);
+                      const endTime = formatTime(bookedSchedule.timeEnd);
+                      const startIndex = times.indexOf(startTime);
+                      const endIndex = times.indexOf(endTime);
+                      const rowSpan = endIndex - startIndex;
 
-                    return (
-                      <td
-                        key={i}
-                        className={cx("schedule-cell", {
-                          booked: bookedSchedule,
-                          [editBackground[statusKey]]:
-                            editBackground[statusKey],
-                        })}
-                        onClick={() => {
-                          if (bookedSchedule) {
+                      for (let j = 1; j < rowSpan; j++) {
+                        const nextTime = times[startIndex + j];
+                        skipMap[dayKey][nextTime] = true;
+                      }
+
+                      const editBackground = {
+                        normal: "normal",
+                        pending: "pending",
+                        waiting: "waiting",
+                        checked_in: "checked_in",
+                        completed: "completed",
+                      };
+                      const statusKey =
+                        bookedSchedule.statusReservation.toLowerCase() as keyof typeof editBackground;
+
+                      return (
+                        <td
+                          key={i}
+                          rowSpan={rowSpan}
+                          className={cx("schedule-cell", {
+                            booked: true,
+                            [editBackground[statusKey]]:
+                              editBackground[statusKey],
+                          })}
+                          onClick={() => {
                             toast.warning("Khung giờ này đã được đặt!");
-                          } else {
-                            handleCellClick(weekDates[i], time);
-                          }
-                        }}
-                      >
-                        {bookedSchedule ? (
+                          }}
+                        >
                           <div className={cx("booked-title")}>
-                            <p>{bookedSchedule?.title}</p>
+                            <p>{bookedSchedule.title}</p>
                             <p className={cx("status")}>
                               {bookedSchedule.statusReservation === "PENDING"
                                 ? "Chờ phê duyệt"
@@ -292,10 +285,16 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
                                 : ""}
                             </p>
                           </div>
-                        ) : (
-                          ""
-                        )}
-                      </td>
+                        </td>
+                      );
+                    }
+
+                    return (
+                      <td
+                        key={i}
+                        className={cx("schedule-cell")}
+                        onClick={() => handleCellClick(dayKey, time)}
+                      ></td>
                     );
                   })}
                 </tr>

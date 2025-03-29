@@ -8,6 +8,7 @@ import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import PopupNotification from "../../../components/popup/PopupNotification";
+import { formatDateString, getHourMinute } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -143,18 +144,6 @@ function ListApprovalByApprover() {
     setOpenModalReject(false);
   };
 
-  // Hàm format ngày giờ
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toLocaleDateString("vi-VN"),
-      time: date.toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
-
   // đóng mở modal
   const handleShowDetails = (requestForm: RequestFormProps) => {
     setSelectedRequestForm(requestForm);
@@ -263,12 +252,6 @@ function ListApprovalByApprover() {
             </thead>
             <tbody>
               {[...schedulesApprove]?.map((schedule) => {
-                const meetingStart = formatDateTime(
-                  schedule.requestReservation.timeStart
-                );
-                const meetingEnd = formatDateTime(
-                  schedule.requestReservation.timeEnd
-                );
 
                 return (
                   <tr key={schedule.requestFormId}>
@@ -282,9 +265,12 @@ function ListApprovalByApprover() {
                       />
                     </td>
                     <td>{schedule.requestReservation.title}</td>
-                    <td>{meetingStart.date}</td>
                     <td>
-                      {meetingStart.time} - {meetingEnd.time}
+                      {formatDateString(schedule.requestReservation.timeStart)}
+                    </td>
+                    <td>
+                      {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
+                      {getHourMinute(schedule.requestReservation.timeEnd)}
                     </td>
                     <td>{schedule.reservations[0]?.booker.employeeName}</td>
                     <td>
@@ -292,7 +278,10 @@ function ListApprovalByApprover() {
                         ? "Cập nhật"
                         : "Đặt lịch"}
                     </td>
-                    <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
+                    <td>
+                      {formatDateString(schedule.timeRequest)} -{" "}
+                      {getHourMinute(schedule.timeRequest)}
+                    </td>
                     <td>
                       <div
                         className={cx("actions")}

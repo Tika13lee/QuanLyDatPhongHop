@@ -350,7 +350,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     }
 
     if (selectedEmployees.length === 1) {
-      return { isValid: false, message: "Vui lòng chọn thêm người tham gia!" };
+      return { isValid: false, message: "Vui lòng thêm người tham gia!" };
     }
 
     return { isValid: true, message: "" };
@@ -379,14 +379,15 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
     resetData();
 
-    // const response = await postData(updatedFormData, { method: "POST" });
+    const response = await postData(updatedFormData, { method: "POST" });
 
-    // console.log(response);
+    console.log(response);
 
-    // if (response) {
-    //   setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
-    //   setIsModalClose();
-    // }
+    if (response) {
+      setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
+      resetData();
+      setIsModalClose();
+    }
   };
 
   const resetData = () => {

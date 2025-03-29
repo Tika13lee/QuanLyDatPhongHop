@@ -12,6 +12,7 @@ import { AppDispatch } from "../../../app/store";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import {
   FaPlus,
+  FiRefreshCw,
   MdOutlineEdit,
   MdSearch,
 } from "../../../components/icons/icons";
@@ -59,7 +60,6 @@ const Employee = () => {
 
   // lấy ds nhân viên
   useEffect(() => {
-    console.log("load employees");
     dispatch(fetchEmployees());
   }, [dispatch]);
 
@@ -76,32 +76,21 @@ const Employee = () => {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
-  const {
-    data: departmentsOfBranch,
-    loading: departmentsLoading,
-    error: departmentsError,
-  } = useFetch<DepartmentProps[]>(
-    "http://localhost:8080/api/v1/location/getAllBranch"
-  );
+  // Lấy danh sách phòng ban theo chi nhánh
+  useEffect(() => {
+    if (!filters.branchName) return;
 
-  // lấy derpartment
-  // const {
-  //   data: departments,
-  //   loading: departmentLoading,
-  //   error: departmentError,
-  // } = useFetch<DepartmentProps[]>(
-  //   "http://localhost:8080/api/v1/department/getAllDepartments"
-  // );
-
-  // vô hiệu hóa nhân viên
-  const {
-    data: deActiveEmployee,
-    loading: deActiveLoading,
-    error: deActiveError,
-    postData: deActiveData,
-  } = usePost<string[]>(
-    "http://localhost:8080/api/v1/employee/nonActiveEmployee"
-  );
+    fetch(
+      `http://localhost:8080/api/v1/department/getDepartmentByBranchName?branchName=${filters.branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setDepartments(data);
+      })
+      .catch((error) =>
+        console.error("Lỗi khi lấy danh sách phòng ban:", error)
+      );
+  }, [filters.branchName]);
 
   // Hàm xử lý thay đổi trong ô tìm kiếm
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,22 +145,6 @@ const Employee = () => {
     const { name, value } = e.target as HTMLInputElement;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  // Lấy danh sách phòng ban theo chi nhánh
-  useEffect(() => {
-    if (!branchName) return;
-
-    fetch(
-      `http://localhost:8080/api/v1/department/getDepartmentByBranchName?branchName=${branchName}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setDepartments(data);
-      })
-      .catch((error) =>
-        console.error("Lỗi khi lấy danh sách phòng ban:", error)
-      );
-  }, [branchName]);
 
   // Kiểm tra dữ liệu đầu vào
   const validateData = (formData: any) => {
@@ -286,8 +259,6 @@ const Employee = () => {
     });
   };
 
-  console.log("selectedEmployee", selectedEmployee);
-
   const { postData: updateData } = usePost<EmployeeProps>(
     "http://localhost:8080/api/v1/employee/upDateEmployee"
   );
@@ -362,11 +333,6 @@ const Employee = () => {
     setBranchName("");
   };
 
-  // Mở form thêm mới
-  const handleOpenForm = () => {
-    setOpenForm(true);
-  };
-
   // Đóng form
   const handleCloseForm = () => {
     setOpenForm(() => {
@@ -396,7 +362,17 @@ const Employee = () => {
     }
   };
 
-  // Hàm để vô hiệu hóa tài khoản
+  // vô hiệu hóa nhân viên
+  const {
+    data: deActiveEmployee,
+    loading: deActiveLoading,
+    error: deActiveError,
+    postData: deActiveData,
+  } = usePost<string[]>(
+    "http://localhost:8080/api/v1/employee/nonActiveEmployee"
+  );
+
+  // xử lý vô hiệu hóa tài khoản
   const handleDisableAccount = async () => {
     const resp = await deActiveData(isCheck, { method: "PUT" });
 
@@ -416,9 +392,14 @@ const Employee = () => {
     }
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  const handleRefresh = () => {
+    dispatch(fetchEmployees());
+    setFilters({
+      depName: "",
+      isActived: true,
+      branchName: "",
+    });
+    setSearchQuery("");
   };
 
   return (
@@ -428,7 +409,7 @@ const Employee = () => {
         {/* tên, sđt */}
         <div className={cx("search-box")}>
           <input
-            type="text"
+            type="search"
             placeholder="Tìm kiếm nhân viên theo tên, sdt"
             className={cx("search-input")}
             value={searchQuery}
@@ -487,6 +468,11 @@ const Employee = () => {
             <option value="true">Hoạt động</option>
             <option value="false">Không hoạt động</option>
           </select>
+          <div onClick={handleRefresh}>
+            <button>
+              <IconWrapper icon={FiRefreshCw} color="#000" size={20} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -505,7 +491,7 @@ const Employee = () => {
           <button
             type="button"
             className={cx("submit-btn")}
-            onClick={() => handleOpenForm()}
+            onClick={() => setOpenForm(true)}
           >
             Thêm
             <IconWrapper icon={FaPlus} color="#fff" size={18} />
@@ -689,7 +675,7 @@ const Employee = () => {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

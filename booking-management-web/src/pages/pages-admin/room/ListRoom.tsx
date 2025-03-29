@@ -2,7 +2,7 @@ import classNames from "classnames/bind";
 import styles from "./ListRoom.module.scss";
 import { BranchProps, RoomProps2 } from "../../../data/data";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { MdOutlineInfo } from "../../../components/icons/icons";
+import { FiRefreshCw, MdOutlineInfo } from "../../../components/icons/icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useFetch from "../../../hooks/useFetch";
@@ -165,9 +165,15 @@ function ListRoom() {
     }
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  const handleRefresh = () => {
+    fetchRooms(1);
+    setFilters({
+      branch: "",
+      capacity: "",
+      price: "",
+      statusRoom: "",
+    });
+    setSearchQuery("");
   };
 
   return (
@@ -178,7 +184,7 @@ function ListRoom() {
           <div className={cx("form-row")}>
             <div className={cx("form-search")}>
               <input
-                type="text"
+                type="search"
                 placeholder="Tìm kiếm phòng theo tên"
                 value={searchQuery}
                 onChange={handleSearchInputChange}
@@ -245,6 +251,12 @@ function ListRoom() {
             >
               Tìm kiếm
             </button>
+
+            <div onClick={handleRefresh}>
+              <button>
+                <IconWrapper icon={FiRefreshCw} color="#000" size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -354,7 +366,7 @@ function ListRoom() {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

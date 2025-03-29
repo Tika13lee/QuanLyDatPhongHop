@@ -171,17 +171,16 @@
   thead {
     position: sticky;
     top: 0;
-    background: var(--bg-active);
     z-index: 1;
   }
 
   th,
   td {
     padding: 7px;
-    text-align: left;
+    text-align: center;
     border: 1px solid var(--border-color);
-    cursor: pointer;
-    width: 200px;
+    width: 250px;
+    text-align: left;
   }
 
   tr:hover {
@@ -189,10 +188,11 @@
   }
 
   th {
-    background-color: var(--bg-active);
+    background-color: var(--table-color);
     color: var(--color-white);
     font-weight: 500;
     cursor: default;
+    text-align: center;
   }
 
   td:first-child,

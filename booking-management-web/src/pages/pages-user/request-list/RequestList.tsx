@@ -6,6 +6,7 @@ import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
+import { formatDateString, getHourMinute } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -17,18 +18,6 @@ function RequestList() {
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
   const [statusRequestForm, setStatusRequestForm] = useState<string>("");
-
-  // Hàm format ngày giờ
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toLocaleDateString("vi-VN"),
-      time: date.toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
 
   // Lấy danh sách lịch đặt phòng
   const {
@@ -84,7 +73,7 @@ function RequestList() {
           >
             <option value="">Tất cả</option>
             <option value="APPROVED">Đã phê duyệt</option>
-            <option value="PENDING">Đang chờ phê duyệt</option>
+            <option value="PENDING">Chờ phê duyệt</option>
             <option value="REJECTED">Từ chối phê duyệt</option>
           </select>
         </div>
@@ -108,20 +97,17 @@ function RequestList() {
             </thead>
             <tbody>
               {requestList?.map((schedule) => {
-                const meetingStart = formatDateTime(
-                  schedule.requestReservation.timeStart
-                );
-                const meetingEnd = formatDateTime(
-                  schedule.requestReservation.timeEnd
-                );
                 const statusText = getStatusText(schedule.statusRequestForm);
 
                 return (
                   <tr key={schedule.requestFormId}>
                     <td>{schedule.requestReservation.title}</td>
-                    <td>{meetingStart.date}</td>
                     <td>
-                      {meetingStart.time} - {meetingEnd.time}
+                      {formatDateString(schedule.requestReservation.timeStart)}
+                    </td>
+                    <td>
+                      {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
+                      {getHourMinute(schedule.requestReservation.timeEnd)}
                     </td>
 
                     <td>{statusText}</td>
@@ -130,7 +116,10 @@ function RequestList() {
                         ? "Cập nhật"
                         : "Đặt lịch"}
                     </td>
-                    <td>{new Date(schedule.timeRequest).toLocaleString()}</td>
+                    <td>
+                      {formatDateString(schedule.timeRequest)} -{" "}
+                      {getHourMinute(schedule.timeRequest)}
+                    </td>
                     <td>
                       <div
                         className={cx("actions")}
@@ -162,7 +151,7 @@ const getStatusText = (status: string) => {
     case "REJECTED":
       return "Từ chối phê duyệt";
     default:
-      return "Đang chờ phê duyệt";
+      return "Chờ phê duyệt";
   }
 };
 

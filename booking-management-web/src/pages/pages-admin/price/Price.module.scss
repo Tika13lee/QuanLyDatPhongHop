@@ -113,7 +113,6 @@
   thead {
     position: sticky;
     top: 0;
-    background: var(--bg-active);
     z-index: 1;
   }
 
@@ -131,7 +130,7 @@
   }
 
   th {
-    background-color: var(--bg-active);
+    background-color: var(--table-color);
     color: var(--color-white);
     font-weight: 500;
     cursor: default;

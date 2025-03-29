@@ -15,12 +15,6 @@
   background: var(--color-white);
 }
 
-.refresh-btn {
-  cursor: pointer;
-  margin: 0;
-  padding: 0;
-}
-
 .search-box {
   display: flex;
   align-items: center;
@@ -85,16 +79,7 @@
 
 // modal
 .service-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 5;
+  @include modal-overlay;
 }
 
 .service-info {
@@ -197,17 +182,21 @@
   thead {
     position: sticky;
     top: 0;
-    background: var(--bg-active);
     z-index: 1;
   }
 
   th,
   td {
-    padding: 8px;
-    text-align: left;
+    padding: 7px;
+    text-align: center;
     border: 1px solid var(--border-color);
-    width: 200px;
+    width: 250px;
+    text-align: left;
     cursor: pointer;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   tr:hover {
@@ -215,7 +204,7 @@
   }
 
   th {
-    background-color: var(--bg-active);
+    background-color: var(--table-color);
     color: var(--color-white);
     font-weight: 500;
     cursor: default;

@@ -40,15 +40,15 @@
   padding: 0;
   box-sizing: border-box;
 
-  th {
-    padding: 7px;
-    background-color: var(--table-color);
-    color: var(--color-white);
-    border: 1px solid var(--border-color);
-    font-weight: 500;
-    cursor: default;
-    text-align: center;
-  }
+  // th {
+  //   padding: 7px;
+  //   background-color: var(--table-color);
+  //   color: var(--color-white);
+  //   border: 1px solid var(--border-color);
+  //   font-weight: 500;
+  //   cursor: default;
+  //   text-align: center;
+  // }
 
   tbody tr:nth-child(even) {
     background-color: #f9f9f9;

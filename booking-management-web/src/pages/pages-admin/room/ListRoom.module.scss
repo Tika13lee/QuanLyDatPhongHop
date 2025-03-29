@@ -69,19 +69,31 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: var(--bg-active);
-
-    th {
-      color: var(--color-white);
-    }
   }
 
   th,
   td {
-    border: 1px solid var(--border-color);
     padding: 7px;
-    border-bottom: 1px solid var(--border-color);
-    width: 100px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    width: 200px;
+    text-align: left;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  tr:hover {
+    background-color: var(--bg-primary);
+  }
+
+  th {
+    background-color: var(--table-color);
+    color: var(--color-white);
+    font-weight: 500;
+    cursor: default;
+    text-align: center;
   }
 
   th:nth-child(3),
@@ -93,8 +105,9 @@
   }
 
   th:last-child,
-  :last-child {
+  td:last-child {
     width: 30px;
+    text-align: center;
   }
 
   tbody tr:hover {

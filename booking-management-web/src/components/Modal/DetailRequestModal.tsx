@@ -130,26 +130,31 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
             </div>
             <div className={cx("info-row")}>
               <p>
-                <strong>Trạng thái của yêu cầu:</strong>{" "}
+                <strong>Người phê duyệt:</strong>{" "}
+                {requestForm.reservations[0].room.approver.employeeName}
+              </p>
+              <p>{requestForm.reservations[0].room.approver.phone}</p>
+            </div>
+            <div className={cx("info-row")}>
+              <p>
+                <strong>Trạng thái:</strong>{" "}
                 {requestForm.statusRequestForm === "PENDING"
-                  ? "Đang chờ phê duyệt"
+                  ? "Chờ phê duyệt"
                   : requestForm.statusRequestForm === "APPROVED"
                   ? "Đã phê duyệt"
                   : "Từ chối"}
+              </p>
+              <p>
+                <strong>Thời gian phản hồi:</strong>{" "}
+                {requestForm.timeResponse
+                  ? formatDateTime(requestForm.timeResponse).date
+                  : "Chưa có"}
               </p>
             </div>
             <div className={cx("info-row")}>
               <p>
                 <strong>Lý do từ chối:</strong>{" "}
                 {requestForm.reasonReject || "Không có"}
-              </p>
-            </div>
-            <div className={cx("info-row")}>
-              <p>
-                <strong>Thời gian phản hồi:</strong>{" "}
-                {requestForm.timeResponse
-                  ? formatDateTime(requestForm.timeResponse).date
-                  : "Chưa có"}
               </p>
             </div>
           </div>

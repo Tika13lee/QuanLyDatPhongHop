@@ -46,16 +46,31 @@
   width: 100%;
   border-collapse: collapse;
 
-  td {
-    padding: 8px;
-    text-align: left;
-    border: 1px solid var(--border-color);
-    width: 200px;
-    // cursor: pointer;
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
-  tbody tr:hover {
-    background-color: var(--table-hover);
+  th,
+  td {
+    padding: 7px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    width: 250px;
+    text-align: left;
+  }
+
+  tr:hover {
+    background-color: var(--bg-primary);
+  }
+
+  th {
+    background-color: var(--table-color);
+    color: var(--color-white);
+    font-weight: 500;
+    cursor: default;
+    text-align: center;
   }
 
   th:nth-child(4),

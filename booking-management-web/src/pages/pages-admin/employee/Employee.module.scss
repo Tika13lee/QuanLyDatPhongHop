@@ -158,21 +158,31 @@
     border-collapse: collapse;
     background: var(--color-white);
 
-    td {
-      padding: 5px;
-      text-align: left;
-      border: 1px solid var(--border-color);
-      width: 150px;
-    }
-
-    tr:hover {
-      background-color: var(--table-hover);
-    }
-
-    thead th {
+    thead {
       position: sticky;
       top: 0;
       z-index: 1;
+    }
+
+    th,
+    td {
+      padding: 7px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      width: 150px;
+      text-align: left;
+    }
+
+    tr:hover {
+      background-color: var(--bg-primary);
+    }
+
+    th {
+      background-color: var(--table-color);
+      color: var(--color-white);
+      font-weight: 500;
+      cursor: default;
+      text-align: center;
     }
 
     td:first-child,
