@@ -30,7 +30,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId);
     //so sánh ngày checkin
     @Query("SELECT r FROM Reservation r " +
-            "WHERE r.booker.employeeId =?1 and FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?2) order by r.timeStart desc")
+            "WHERE r.booker.employeeId =?1 and FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?2) order by r.timeStart")
     List<Reservation> findReservationCheckInByDay(Long employeeId, Date timeCheckin);
     @Query("SELECT r FROM Reservation r " +
             "where r.booker.employeeId =?1 and r.timeEnd < ?2 order by r.timeStart desc")
