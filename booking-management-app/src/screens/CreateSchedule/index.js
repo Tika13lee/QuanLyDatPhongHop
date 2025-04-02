@@ -15,6 +15,8 @@ import FontAwesome6Icon from "react-native-vector-icons/FontAwesome6";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { renderTime, axiosConfig } from "../../utilities";
 import { useDebounce } from "../../hooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TouchableOpacity } from "react-native";
 
 const style = StyleSheet.create({
   container: {
@@ -85,9 +87,12 @@ export default function CreateSchedule({ navigation, route }) {
   const [timeEnd, setTimeEnd] = useState("30 phút");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [roomsData, setRoomsData] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [inputSearch, setInputSearch] = useState("");
   const debounceValue = useDebounce(inputSearch, 200);
+  const [roomsDataDefault, setRoomsDataDefault] = useState([]);
 
   // info push modal
   const branchOption = {
@@ -110,21 +115,21 @@ export default function CreateSchedule({ navigation, route }) {
     setCapacity,
   };
 
+  const selectedDateOption = {
+    selectedDate,
+    setSelectedDate,
+  };
+
   // fetch data
   const fetchRoomData = async () => {
     try {
-      const selectedDateFormat = selectedDate.toISOString().split("T")[0];
       const timeStartFormat =
         timeStart != ""
-          ? new Date(`${selectedDateFormat}T${`${timeStart}:00`}`).toISOString()
+          ? new Date(`${selectedDate}T${`${timeStart}:00`}`).toISOString()
           : "";
       const timeEndFormat =
         timeEnd != ""
-          ? calculatorTimeEnd(
-              timeStart,
-              timeEnd,
-              selectedDateFormat
-            ).toISOString()
+          ? calculatorTimeEnd(timeStart, timeEnd, selectedDate).toISOString()
           : "";
 
       const res = await axiosConfig().get(
@@ -134,15 +139,18 @@ export default function CreateSchedule({ navigation, route }) {
       );
 
       setRoomsData(res.data);
+      setRoomsDataDefault(res.data);
     } catch (err) {
       console.log(err.response);
     }
   };
 
+  console.log(selectedDate);
+
   // call rooms data first time
   useEffect(() => {
     fetchRoomData();
-  }, [timeStart, timeEnd, branchValue, capacity]);
+  }, [timeStart, timeEnd, branchValue, capacity, selectedDate]);
 
   // filter when search
   useEffect(() => {
@@ -150,16 +158,39 @@ export default function CreateSchedule({ navigation, route }) {
       fetchRoomData();
     } else {
       const regex = new RegExp(debounceValue, "gi");
-      setRoomsData((prev) => prev.filter((room) => room.roomName.match(regex)));
+      setRoomsData((prev) =>
+        roomsDataDefault.filter((room) => room.roomName.match(regex))
+      );
     }
   }, [debounceValue]);
+
+  // lưu tạm thông tin userCurrent
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axiosConfig().get(
+          "/api/v1/employee/getEmployeeByPhone?phone=0914653334"
+        );
+        await AsyncStorage.setItem("current_user", JSON.stringify(res.data));
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, []);
+
+  // xử lý chuyển đến trang đặt phòng
+  const handleTransferScreenRegisterRoom = ({ roomId, roomName }) => {
+    navigation.navigate("InfoRoomRegister", {
+      infoRoom: { roomId: roomId, roomName: roomName },
+    });
+  };
 
   return (
     <DefaultLayout>
       <Header
         leftIcon={"menu"}
         rightIcon={"bell"}
-        handleOnPressRightIcon={() => setIsOpenModal(true)}
+        handleOnPressLeftIcon={() => setIsOpenModal(true)}
       >
         <View style={style.containerFilterSearch}>
           <TextInput
@@ -173,6 +204,65 @@ export default function CreateSchedule({ navigation, route }) {
         </View>
       </Header>
       <View style={style.container}>
+        <View
+          style={{
+            flexDirection: "row",
+            height: 80,
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 10,
+            width: "100%",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              width: 120,
+              height: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#2296f3",
+              borderRadius: 10,
+              flexDirection: "row",
+              gap: 5,
+            }}
+            onPress={() => navigation.navigate("QRScan")}
+          >
+            <MaterialIcons name="qr-code-scanner" size={20} color={"white"} />
+            <Text
+              style={{
+                color: "white",
+                fontSize: 16,
+
+                textDecorationLine: "underline",
+              }}
+            >
+              Check-in
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              minWidth: 180,
+              height: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#2296f3",
+              borderRadius: 10,
+              flexDirection: "row",
+              gap: 5,
+            }}
+          >
+            <MaterialIcons name="calendar-month" size={20} color={"white"} />
+            <Text
+              style={{
+                color: "white",
+                fontSize: 16,
+                textDecorationLine: "underline",
+              }}
+            >
+              Đặt lịch theo ngày
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View style={style.containerListRoom}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             Danh sách phòng
@@ -180,11 +270,17 @@ export default function CreateSchedule({ navigation, route }) {
           <ScrollView
             style={{ marginTop: 10 }}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 230 }}
+            contentContainerStyle={{ paddingBottom: 350 }}
           >
             {roomsData.length != 0 &&
               roomsData.map((roomItem) => (
-                <CardRoom key={roomItem.roomId} roomInfo={roomItem} />
+                <CardRoom
+                  key={roomItem.roomId}
+                  roomInfo={roomItem}
+                  handleRegisterRoom={({ roomId, roomName }) =>
+                    handleTransferScreenRegisterRoom({ roomId, roomName })
+                  }
+                />
               ))}
           </ScrollView>
         </View>
@@ -195,6 +291,7 @@ export default function CreateSchedule({ navigation, route }) {
         timeStartOption={timeStartOption}
         capacityOption={capacityOption}
         timeEndOption={timeEndOption}
+        selectedDateOption={selectedDateOption}
         onCloseModal={() => setIsOpenModal(false)}
         isVisible={isOpenModal}
       />
