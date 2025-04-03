@@ -26,8 +26,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("select r.room from Reservation r where (:timeStart is null) or(r.timeStart < ?1 and r.timeStart> ?2)or(r.timeEnd < ?1 and r.timeEnd >?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2)")
     List<Room> findRoomsByTime(Date timeStart, Date timeEnd);
     //lich cua nhan vien nam trong khoang thoi gian bi trung
-    @Query("select r from Reservation r join r.attendants a where( (:timeStart is null) or(r.timeStart <= ?1 and r.timeStart>= ?2)or(r.timeEnd <= ?1 and r.timeEnd >=?2) or(r.timeStart <= ?1 and r.timeEnd >= ?2)) and a.employeeId = ?3")
+    @Query("select r from Reservation r join r.attendants a " +
+            "where (:timeStart is null or " +
+            "(r.timeStart < ?2 and r.timeEnd > ?1) or " +
+            "(r.timeStart <= ?1 and r.timeEnd >= ?1) or " +
+            "(r.timeStart <= ?2 and r.timeEnd >= ?2) or " +
+            "(r.timeStart <= ?1 and r.timeEnd >= ?2) or " +
+            "(r.timeStart >= ?1 and r.timeEnd <= ?2)) " + // trường hợp lịch mới nằm trong lịch cũ
+            "and a.employeeId = ?3")
     List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId);
+
     //so sánh ngày checkin
     @Query("SELECT r FROM Reservation r " +
             "WHERE r.booker.employeeId =?1 and FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?2) order by r.timeStart")
