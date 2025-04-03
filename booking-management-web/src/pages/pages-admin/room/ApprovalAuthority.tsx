@@ -8,6 +8,7 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { SiFusionauth } from "../../../components/icons/icons";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
 import { FaPlus } from "react-icons/fa";
+import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
 
@@ -23,6 +24,13 @@ function ApprovalAuthority() {
   const [selectedEmployee, setSelectedEmployee] =
     useState<EmployeeProps | null>(null);
 
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<
+    "success" | "error" | "info" | "warning"
+  >("info");
+
   const { data, loading, error } = useFetch<RoomProps[]>(
     "http://localhost:8080/api/v1/room/getRoomNotApprover"
   );
@@ -34,6 +42,7 @@ function ApprovalAuthority() {
     }
   }, [data]);
 
+  // tìm kiếm nhân viên
   useEffect(() => {
     if (!phoneInput.trim()) {
       setSuggestedEmployees([]);
@@ -61,6 +70,7 @@ function ApprovalAuthority() {
     return () => clearTimeout(delay);
   }, [phoneInput]);
 
+  // xử lý chọn nhân viên
   const handleSelectEmployee = (employee: EmployeeProps) => {
     setSelectedEmployee(employee);
     setPhoneInput("");
@@ -68,40 +78,69 @@ function ApprovalAuthority() {
     setShowSuggestions(false);
   };
 
+  // Xử lý sự kiện khi nhấn nút "Lưu"
   const handleSubmit = async () => {
     if (!selectedEmployee) {
-      alert("Vui lòng chọn nhân viên phê duyệt.");
+      setPopupMessage("Vui lòng chọn nhân viên phê duyệt.");
+      setPopupType("error");
+      setIsPopupOpen(true);
       return;
     }
 
     const data = {
       roomId: roomId,
-      employeeId: selectedEmployee.phone,
+      employeePhone: selectedEmployee.phone,
     };
 
     console.log("Data to submit:", data);
+
+    fetch(
+      `http://localhost:8080/api/v1/room/addApproveToRoom?roomId=${data.roomId}&phoneApprover=${data.employeePhone}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPopupMessage("Thêm nhân viên phê duyệt thành công.");
+        setPopupType("success");
+        setIsPopupOpen(true);
+
+        setOpenEmployees(false);
+        setPhoneInput("");
+        setSelectedEmployee(null);
+        setRoomsNotApproved((prevRooms) =>
+          prevRooms.filter((room) => room.roomId !== roomId)
+        );
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setPopupMessage("Có lỗi xảy ra. Vui lòng thử lại.");
+        setPopupType("error");
+        setIsPopupOpen(true);
+      });
   };
 
   return (
     <div className={cx("approval-authority")}>
-      {/* <div className={cx("header")}>
-        <div className={cx("filters")}>
-          <div className={cx("filter-item")}>
-            <label>Chi nhánh:</label>
-            <select>
-              <option value="">-- Chọn chi nhánh --</option>
-            </select>
-          </div>
-
-          <div className={cx("filter-item")}>
-            <label>Nhân viên:</label>
-            <select>
-              <option value="">-- Chọn nhân viên --</option>
-            </select>
-          </div>
+      <div className={cx("header")}>
+        <div className={cx("search")}>
+          <label>Tìm kiếm phòng</label>
+          <input
+            type="text"
+            placeholder="Nhập tên phòng..."
+          />
         </div>
-        <div></div>
-      </div> */}
+      </div>
 
       <div className={cx("room-list")}>
         <table className={cx("room-table")}>
@@ -195,9 +234,32 @@ function ApprovalAuthority() {
                 )}
                 {selectedEmployee && (
                   <div className={cx("selected-employee")}>
-                    <p>{selectedEmployee.employeeName}</p>
-                    <p>{selectedEmployee.phone}</p>
-                    <p>{selectedEmployee.email}</p>
+                    <div>
+                      <img
+                        src={selectedEmployee.avatar}
+                        alt="Avatar"
+                        className={cx("avatar")}
+                        style={{ width: "100px", height: "100px" }}
+                      />
+                    </div>
+                    <div>
+                      <p>
+                        <strong>Tên: </strong>
+                        {selectedEmployee.employeeName}
+                      </p>
+                      <p>
+                        <strong>Số điện thoại: </strong>
+                        {selectedEmployee.phone}
+                      </p>
+                      <p>
+                        <strong>Email: </strong>
+                        {selectedEmployee.email}
+                      </p>
+                      <p>
+                        <strong>Phòng ban: </strong>
+                        {selectedEmployee.department.depName}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -210,6 +272,14 @@ function ApprovalAuthority() {
           </div>
         </div>
       )}
+
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </div>
   );
 }

@@ -17,7 +17,6 @@ import { IoSettingsOutline } from "../../components/icons/icons";
 import { FaPlus } from "../../components/icons/icons";
 import usePost from "../../hooks/usePost";
 import CloseModalButton from "./CloseModalButton";
-import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -59,7 +58,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const [timeEndSchedule, setTimeEndSchedule] = useState<string[]>([]);
   const [selectedStartTime, setSelectedStartTime] = useState<string>(times[0]);
   const [selectedDateEndOfFrequency, setSelectedDateEndOfFrequency] =
-    useState<Date | null>(new Date());
+    useState<Date | null>(new Date(dateSelected ?? new Date().toString()));
   const [valueFrequency, setValueFrequency] = useState<string>("ONE_TIME");
   useState<boolean>(false);
 
