@@ -80,13 +80,14 @@ public class QRCodeGenerator {
         BufferedImage qrImage = ImageIO.read(bis);
 
         // Đường dẫn lưu file PDF
-        String dirPath = System.getProperty("user.dir") + "/QRCodeFiles/";
-        File dir = new File(System.getProperty("user.dir") + "/QRCodeFiles/");
+        String dirPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "QRCodeFiles" + File.separator;
+        File dir = new File(dirPath);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 throw new IOException("Không thể tạo thư mục: " + dir.getAbsolutePath());
             }
         }
+
         String pdfPath = dirPath + fileName;
         // Tạo tài liệu PDF
         PdfWriter writer = new PdfWriter(pdfPath);
