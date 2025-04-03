@@ -1,7 +1,10 @@
 package vn.com.kltn_project_v1.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RoomDTO;
@@ -13,10 +16,14 @@ import vn.com.kltn_project_v1.services.IRoom;
 import vn.com.kltn_project_v1.util.AESUtil;
 import vn.com.kltn_project_v1.util.QRCodeGenerator;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static vn.com.kltn_project_v1.util.QRCodeGenerator.saveQRCodeToPDF;
 
 @RestController
 @RequestMapping("/api/v1/room")
@@ -145,9 +152,19 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             // Tạo QR code chỉ chứa encryptedData
             String base64QRCode = QRCodeGenerator.generateQRCode(encryptedData, 300, 300);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("qrCode", "data:image/png;base64," + base64QRCode);
-            return ResponseEntity.ok(response);
+            //QRCodeGenerator.printQRCodeFromBase64(base64QRCode);
+               // Lưu QR code vào file PDF
+            String pdfPath = saveQRCodeToPDF(base64QRCode, "QRCode_" + roomId + ".pdf");
+
+            // Trả file PDF về để tải xuống
+            File file = new File(pdfPath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())
+                    .body(resource);
+
 
         } catch (Exception e) {
             throw new RuntimeException("Lỗi tạo mã QR", e);

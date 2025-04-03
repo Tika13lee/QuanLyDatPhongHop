@@ -13,5 +13,6 @@ public interface IService {
     Service upDateService(ServiceDTO serviceDTO);
     void deleteService(Long id);
     List<Service> getServiceByName(String name);
+    Service getServiceById(Long id);
 
 }

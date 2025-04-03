@@ -43,6 +43,8 @@ dependencies {
 // https://mvnrepository.com/artifact/commons-codec/commons-codec
     implementation("commons-codec:commons-codec:1.18.0")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    // https://mvnrepository.com/artifact/com.itextpdf/itext7-core
+    implementation("com.itextpdf:itext7-core:9.1.0")
 }
 
 tasks.named('test') {

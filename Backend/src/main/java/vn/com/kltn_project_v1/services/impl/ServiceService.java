@@ -71,4 +71,9 @@ public class ServiceService implements IService {
     public List<Service> getServiceByName(String name) {
         return serviceRepository.findServiceByServiceName(name);
     }
+
+    @Override
+    public Service getServiceById(Long id) {
+        return serviceRepository.findById(id).orElse(null);
+    }
 }
