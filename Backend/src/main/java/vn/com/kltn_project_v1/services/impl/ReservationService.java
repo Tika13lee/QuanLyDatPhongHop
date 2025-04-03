@@ -125,13 +125,18 @@ public class ReservationService implements IReservation {
                 String formattedTime = formatter.format(reservationsInDay.get(0).getTimeStart());
                 if(reservationsInDay.get(0).getRoom().getRoomId() != roomId) {
                     mesResult= "Phòng không đúng, lịch hiện tại của bạn là phòng " + reservationsInDay.get(0).getRoom().getRoomName() + " vào lúc " + formattedTime;
-                    mesResult+= reservationsInDay.stream().map(r ->{
-                         return "\nlịch phòng này vào lúc " + formatter.format(r.getTimeStart());
-                    });
+//                    mesResult+= reservationsInDay.stream().map(r ->{
+//                         return "\nlịch phòng này vào lúc " + formatter.format(r.getTimeStart());
+//                    });
+                    for (int i=1;i<reservationsInDay.size();i++) {
+                        mesResult+="\nlịch phòng này vào lúc " + formatter.format(reservationsInDay.get(i).getTimeStart());
+                    }
                     response.put("message", mesResult);
                 }else {
-                     if(reservationsInDay.get(0).getTimeStart().before(TimeCheckin)){
-                        mesResult = "Chưa đến giờ checkin" + "lịch của bạn vào lúc " + formattedTime;
+                    System.out.println(reservationsInDay.get(0).getTimeStart());
+                    System.out.println(TimeCheckin);
+                     if(!reservationsInDay.get(0).getTimeStart().before(TimeCheckin)){
+                        mesResult = "Chưa đến giờ checkin, " + "lịch của bạn vào lúc " + formattedTime;
                          response.put("message", mesResult);
                     }else {
                         mesResult = "Checkin thành công";

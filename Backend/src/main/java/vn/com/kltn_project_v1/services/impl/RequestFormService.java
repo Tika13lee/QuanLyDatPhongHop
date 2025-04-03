@@ -226,7 +226,10 @@ RequestForm requestForm = new RequestForm();
         RequestForm requestFormUpdate = new RequestForm();
         requestFormUpdate.setTimeRequest(new Date());
         assert requestForm != null;
-        requestFormUpdate.setReservations(new ArrayList<>((Collection) requestForm.getReservations().get(0)));
+        List<Reservation> oneReservationList = new ArrayList<>();
+        oneReservationList.add(requestForm.getReservations().get(0));
+        requestFormUpdate.setReservations(oneReservationList);
+
         requestFormUpdate.setStatusRequestForm(StatusRequestForm.PENDING);
         requestFormUpdate.setTypeRequestForm(TypeRequestForm.UPDATE_RESERVATION);
 
