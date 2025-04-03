@@ -143,9 +143,9 @@
 }
 
 .reject-btn {
-  background-color: #dc3545;
+  background-color: var(--btn-danger);
   &:hover {
-    background-color: #c82333;
+    background-color: var(--btn-danger-hover);
   }
   &:disabled {
     background-color: #ccc;

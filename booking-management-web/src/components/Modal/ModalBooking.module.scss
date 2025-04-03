@@ -356,6 +356,9 @@
   padding: 20px;
   position: relative;
   animation: fadeIn 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   .modal-header {
     display: flex;
@@ -370,30 +373,19 @@
     }
   }
 
-  button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #333;
-
-    &:hover {
-      color: var(--color-error);
-    }
-  }
-
   .modal-body {
     padding: 15px 0;
     display: flex;
     justify-content: space-between;
+    flex: 1;
   }
-  .setting-left,
-  .setting-right {
+
+  .setting-left {
     display: flex;
     flex-direction: column;
     align-items: start;
     margin-bottom: 10px;
-    justify-content: space-around;
+    justify-content: space-between;
   }
 
   .setting-right {

@@ -520,7 +520,7 @@ function Price() {
                       setEndTime(date as Date);
                     }}
                     minDate={startTime}
-                    dateFormat="dd/MM/yyyy"
+                    dateFormat="dd / MM / yyyy"
                     showTimeSelect={false}
                   />
                 </div>

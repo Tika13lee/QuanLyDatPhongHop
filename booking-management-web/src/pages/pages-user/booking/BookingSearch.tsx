@@ -3,19 +3,15 @@ import styles from "./BookingSearch.module.scss";
 import CardRoom from "../../../components/cardRoom/CardRoom";
 import { useEffect, useState } from "react";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import {
-  IoIosArrowDown,
-  IoIosArrowForward,
-  MdSearch,
-} from "../../../components/icons/icons";
+import { MdSearch } from "../../../components/icons/icons";
 import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import axios from "axios";
 import { times } from "../../../utilities";
+import DatePicker from "react-datepicker";
 
 const cx = classNames.bind(styles);
 
-const timeSlots = times;
 const durationOptions = [30, 60, 90, 120, 150, 180, 210, 240];
 
 type DataSearch = {
@@ -25,7 +21,30 @@ type DataSearch = {
   timeEnd: string;
 };
 
+// set lại giờ bắt đầu cho ngày hôm nay
+const generateStartTime = (selectedDate: string) => {
+  const now = new Date();
+  const selected = new Date(selectedDate);
 
+  const isToday = selected.toDateString() === now.toDateString();
+  if (!isToday) return times;
+
+  const threshold = new Date(now.getTime() + 15 * 60 * 1000);
+  const thresholdHour = threshold.getHours();
+  const thresholdMinute = threshold.getMinutes();
+
+  // Làm tròn lên mốc 30 phút
+  const roundedHour = thresholdMinute > 30 ? thresholdHour + 1 : thresholdHour;
+  const roundedMinute =
+    thresholdMinute <= 30 ? (thresholdMinute <= 15 ? "30" : "00") : "00";
+
+  const roundedTime = `${String(roundedHour).padStart(
+    2,
+    "0"
+  )}:${roundedMinute}`;
+
+  return times.filter((time) => time >= roundedTime);
+};
 
 function BookingSearch() {
   // lưu emp hiện tại vào localStorage
@@ -35,76 +54,22 @@ function BookingSearch() {
   );
   localStorage.setItem("currentEmployee", JSON.stringify(data));
 
-  const [locID, setLocID] = useState<number | undefined>(undefined);
-  const [roomsData, setRoomsData] = useState<RoomProps[] | null>(null);
-  const [roomsUseData, setRoomsUseData] = useState<RoomProps[] | null>(null);
-
-  const today = new Date().toISOString().split("T")[0];
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [startTime, setStartTime] = useState(timeSlots[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [startTime, setStartTime] = useState(
+    generateStartTime(selectedDate)[0]
+  );
   const [duration, setDuration] = useState(30);
   const [capacity, setCapacity] = useState<number>(1);
   const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
   const [filterData, setFilterData] = useState<RoomProps[] | null>(null);
   const [searchName, setSearchName] = useState<string>("");
 
-  // dữ liệu tìm kiếm
-  const [dataSearch, setDataSearch] = useState<DataSearch>({
-    branch: "",
-    date: "",
-    timeStart: "",
-    timeEnd: "",
-  });
-
   // Lấy danh sách chi nhánh
   const { data: branches } = useFetch<BranchProps[]>(
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
-
-  // Chỉ cập nhật locID khi data thay đổi
-  useEffect(() => {
-    if (data) {
-      setLocID(data.department.location.locationId);
-    }
-  }, [data]);
-
-  // Gọi API khi locID thay đổi
-  useEffect(() => {
-    if (!locID) return;
-
-    axios
-      .get<RoomProps[]>(
-        `http://localhost:8080/api/v1/room/getRoomsByBranch?locationId=${locID}`
-      )
-      .then((response) => {
-        setRoomsData(response.data);
-      });
-  }, [locID]);
-
-  // Gọi API khi empPhone thay đổi
-  useEffect(() => {
-    if (!empPhone) return;
-
-    axios
-      .get<RoomProps[]>(
-        `http://localhost:8080/api/v1/room/getRoomByEmployee?phone=${empPhone}`
-      )
-      .then((response) => {
-        setRoomsUseData(response.data);
-      });
-  }, [empPhone]);
-
-  // hiển thị tất cả phòng có sẵn
-  const [showAll1, setShowAll1] = useState(false);
-  const visibleRooms1 = showAll1
-    ? roomsData
-    : roomsData?.slice(0, Math.min(5, roomsData.length));
-
-  // hiển thị tất cả phòng đã đặt
-  const [showAll2, setShowAll2] = useState(false);
-  const visibleRooms2 = showAll2
-    ? roomsUseData
-    : roomsUseData?.slice(0, Math.min(5, roomsUseData.length));
 
   // Hàm tính toán thời gian kết thúc
   const calculateEndTime = (
@@ -121,6 +86,16 @@ function BookingSearch() {
 
     return `${endHour}:${endMinute}`;
   };
+
+  // dữ liệu tìm kiếm
+  const [dataSearch, setDataSearch] = useState<DataSearch>({
+    branch: branchName,
+    date: selectedDate,
+    timeStart: "",
+    timeEnd: "",
+  });
+
+  console.log("dataSearch", dataSearch);
 
   // xử lý filter
   const handleFilter = () => {
@@ -162,11 +137,6 @@ function BookingSearch() {
         console.error("Error fetching data:", error);
       });
   };
-
-  // lọc dữ liệu lần đầu theo filter
-  useEffect(() => {
-    handleFilter();
-  }, []);
 
   // Lọc dữ liệu theo tên phòng
   useEffect(() => {
@@ -231,10 +201,15 @@ function BookingSearch() {
           {/* Chọn ngày */}
           <div className={cx("filter-item")}>
             <label>Ngày</label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+            <DatePicker
+              selected={selectedDate ? new Date(selectedDate) : null}
+              onChange={(date) => {
+                if (date) {
+                  setSelectedDate(date.toISOString().split("T")[0]);
+                }
+              }}
+              minDate={new Date()}
+              dateFormat="dd / MM / yyyy"
             />
           </div>
 
@@ -245,11 +220,13 @@ function BookingSearch() {
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
             >
-              {timeSlots.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
+              {generateStartTime(selectedDate)
+                .slice(0, generateStartTime(selectedDate).length - 1)
+                .map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -301,41 +278,11 @@ function BookingSearch() {
                 <CardRoom rooms={filterData ?? []} dataSearch={dataSearch} />
               </div>
             </div>
-          ) : null}
-
-          {/* <div className={cx("room-list-header")}>
-            <h3>Danh sách phòng có sẵn</h3>
-            <div
-              className={cx("view-all")}
-              onClick={() => setShowAll1(!showAll1)}
-            >
-              <p>{showAll1 ? "Thu gọn" : "Xem tất cả"}</p>
-              <IconWrapper
-                icon={showAll1 ? IoIosArrowDown : IoIosArrowForward}
-                color={"#0056B3"}
-              />
+          ) : (
+            <div className={cx("room-list-header")}>
+              <h3>Không có phòng nào phù hợp với yêu cầu của bạn</h3>
             </div>
-          </div>
-          <div className={cx("room-grid")}>
-            <CardRoom rooms={visibleRooms1 ?? []} />
-          </div>
-
-          <div className={cx("room-list-header")}>
-            <h3>Danh sách phòng bạn đã từng đặt</h3>
-            <div
-              className={cx("view-all")}
-              onClick={() => setShowAll2(!showAll2)}
-            >
-              <p>{showAll2 ? "Thu gọn" : "Xem tất cả"}</p>
-              <IconWrapper
-                icon={showAll2 ? IoIosArrowDown : IoIosArrowForward}
-                color={"#0056B3"}
-              />
-            </div>
-          </div>
-          <div className={cx("room-grid")}>
-            <CardRoom rooms={visibleRooms2 ?? []} />
-          </div> */}
+          )}
         </div>
       </div>
     </div>

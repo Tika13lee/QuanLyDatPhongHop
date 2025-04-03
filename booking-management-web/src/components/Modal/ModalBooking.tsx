@@ -54,6 +54,8 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
+  console.log(dateSelected, timeStart, timeEnd);
+
   const [timeEndSchedule, setTimeEndSchedule] = useState<string[]>([]);
   const [selectedStartTime, setSelectedStartTime] = useState<string>(times[0]);
   const [selectedDateEndOfFrequency, setSelectedDateEndOfFrequency] =
@@ -137,7 +139,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     const selectedDate = new Date(dateSelected ?? currentDate);
     const isToday = currentDate.toDateString() === selectedDate.toDateString();
 
-    if (!isToday) return times;
+    if (!isToday) return times.slice(0, times.length - 1);
 
     const minutesNow = currentDate.getHours() * 60 + currentDate.getMinutes();
     const currentMinutes = Math.ceil(minutesNow / 30) * 30;
@@ -708,7 +710,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                       selected={selectedDateEndOfFrequency}
                       onChange={(date) => setSelectedDateEndOfFrequency(date)}
                       minDate={new Date(dateSelected ?? new Date().toString())}
-                      dateFormat="dd/MM/yyyy"
+                      dateFormat="dd / MM / yyyy"
                       disabled={valueFrequency === "ONE_TIME"}
                       maxDate={
                         new Date(new Date().setMonth(new Date().getMonth() + 3))

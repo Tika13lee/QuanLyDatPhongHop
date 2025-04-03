@@ -75,10 +75,10 @@
 }
 
 .copy-btn {
-  background: #ffbb49;
+  background: var(--btn-edit);
 
   &:hover {
-    background: #ffa537;
+    background: var(--btn-edit-hover);
   }
 
   &:disabled {

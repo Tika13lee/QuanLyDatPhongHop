@@ -4,30 +4,38 @@
 :root {
   --text-primary: #212529;
   --text-secondary: #7c7f83;
+  --color-white: #ffffff;
+  --color-error: #c31818;
+
   --bg-sidebar: #e5ebf7;
   --bg-active: #0569d5;
   --bg-hover: #dadee2;
   --bg-primary: #b9d7fc;
-  --color-white: #ffffff;
-  --color-error: #c31818;
-  --btn-main: #0d6efd;
-  --btn-hover: #0c6ed7;
-  --btn-edit: #f39c12;
+
   --tab-hover: #e6e9ef;
   --border-color: #ced4da;
   --border-focus: #007bff;
   --border-error: #dc3545;
+
   --bg-scroll-thumb: #8ab4f8;
   --bg-scroll-track: #f0f0f0;
   --bg-scroll-thumb-hover: #6b9ffb;
+
   --item-hover: aliceblue;
   --item-active: #b8d4f8;
+
+  --btn-main: #0d6efd;
+  --btn-hover: #0c6ed7;
+  --btn-edit: #e8cd56;
+  --btn-edit-hover: #ceae1e;
   --btn-add: #33cc33;
   --btn-add-hover: #179817;
   --btn-danger: #dc3545;
   --btn-danger-hover: #c82333;
+
   --table-color: #548cdc;
   --table-hover: #e6f7ff;
+
   --color-status-pending: #fff8ce;
   --color-status-waiting: #e3f2fd;
   --color-status-checked_in: #fce4ff;
@@ -39,16 +47,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
-  // th {
-  //   padding: 7px;
-  //   background-color: var(--table-color);
-  //   color: var(--color-white);
-  //   border: 1px solid var(--border-color);
-  //   font-weight: 500;
-  //   cursor: default;
-  //   text-align: center;
-  // }
 
   tbody tr:nth-child(even) {
     background-color: #f9f9f9;
@@ -137,6 +135,10 @@ button {
 
 // calendar
 :global {
+  .react-datepicker__tab-loop {
+    position: absolute;
+  }
+
   .react-datepicker {
     font-family: "Segoe UI", sans-serif;
     font-size: 14px;

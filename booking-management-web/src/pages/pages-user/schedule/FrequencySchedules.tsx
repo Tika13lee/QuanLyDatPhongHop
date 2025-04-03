@@ -13,8 +13,6 @@ import {
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
 import DatePicker from "react-datepicker";
 import PopupNotification from "../../../components/popup/PopupNotification";
-import { timeEnd } from "console";
-import { set } from "react-datepicker/dist/date_utils";
 import usePost from "../../../hooks/usePost";
 
 const cx = classNames.bind(styles);
@@ -74,7 +72,9 @@ function FrequencySchedules() {
     error: requestError,
     postData,
   } = usePost(
-    `http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationMany?requestFormId=${selectedSchedule?.requestFormId}&&dayFinishFrequencyNew=${selectedFrequencyEndDate?.toISOString()}`
+    `http://localhost:8080/api/v1/requestForm/createRequestFormUpdateReservationMany?requestFormId=${
+      selectedSchedule?.requestFormId
+    }&&dayFinishFrequencyNew=${selectedFrequencyEndDate?.toISOString()}`
   );
 
   // xử lý lưu chỉnh sửa
@@ -283,7 +283,7 @@ function FrequencySchedules() {
                         onChange={(date) => {
                           if (date) setSelectedFrequencyEndDate(date);
                         }}
-                        dateFormat="dd/MM/yyyy"
+                        dateFormat="dd / MM / yyyy"
                         minDate={
                           selectedSchedule?.reservations?.[0]?.timeStart &&
                           new Date(selectedSchedule.reservations[0].timeStart) >
@@ -369,7 +369,7 @@ function FrequencySchedules() {
                   Hủy
                 </button>
                 <button className={cx("btn-update")} onClick={handleSaveEdit}>
-                  Lưu
+                  Gửi phê duyệt
                 </button>
               </div>
             )}

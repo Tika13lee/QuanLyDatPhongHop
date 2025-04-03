@@ -227,6 +227,7 @@ const RoomDetail = () => {
   };
 
   const [urlQR, setUrlQR] = useState("");
+  const [pdfPath, setPdfPath] = useState("");
 
   const handleCreateQR = () => {
     fetch(
@@ -235,6 +236,17 @@ const RoomDetail = () => {
       .then((res) => res.json())
       .then((data) => {
         setUrlQR(data.qrCode);
+        setPdfPath(data.pdfPath); // Cập nhật đường dẫn file PDF
+
+        // Tải file PDF
+        const link = document.createElement("a");
+        link.href = `http://localhost:8080/files/${encodeURIComponent(
+          data.pdfPath.split("/").pop()
+        )}`;
+        link.download = data.pdfPath.split("/").pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       });
   };
 

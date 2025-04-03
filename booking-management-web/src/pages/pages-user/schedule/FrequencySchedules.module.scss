@@ -125,7 +125,7 @@
   background-color: var(--color-white);
   padding: 20px;
   border-radius: 10px;
-  width: 500px;
+  width: 450px;
   max-width: 90%;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   animation: fadeInModal 0.3s ease-out;
@@ -142,6 +142,14 @@
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+
+    .btn-update {
+      background-color: var(--btn-add);
+
+      &:hover {
+        background-color: var(--btn-add-hover);
+      }
+    }
   }
 
   .modal-header h2 {
@@ -161,10 +169,10 @@
 }
 
 .btn-update {
-  background-color: #e6c449;
+  background-color: var(--btn-edit);
 
   &:hover {
-    background-color: #cac715;
+    background-color: var(--btn-edit-hover);
   }
 
   &:active {
