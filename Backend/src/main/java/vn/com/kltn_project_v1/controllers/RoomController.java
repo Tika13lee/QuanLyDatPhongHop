@@ -152,24 +152,27 @@ public ResponseEntity<?> getRoomsByBranch( @RequestParam Long locationId) {
             // Tạo QR code chỉ chứa encryptedData
             String base64QRCode = QRCodeGenerator.generateQRCode(encryptedData, 300, 300);
 
-            //QRCodeGenerator.printQRCodeFromBase64(base64QRCode);
-               // Lưu QR code vào file PDF
+            // Lưu QR code vào file PDF
             String pdfPath = saveQRCodeToPDF(base64QRCode, "QRCode_" + roomId + ".pdf");
 
-            // Trả file PDF về để tải xuống
+            // Đọc file PDF
             File file = new File(pdfPath);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())
-                    .body(resource);
+            // Trả về cả base64 mã QR và file PDF cho frontend
+            Map<String, Object> response = new HashMap<>();
+            response.put("qrCode", "data:image/png;base64," + base64QRCode);
+            response.put("pdfPath", pdfPath); // Cung cấp đường dẫn file PDF để tải về
 
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
 
         } catch (Exception e) {
             throw new RuntimeException("Lỗi tạo mã QR", e);
         }
     }
+
     @GetMapping("/getRoomNotApprover")
     public ResponseEntity<?> getRoomNotApprover(){
         try {
