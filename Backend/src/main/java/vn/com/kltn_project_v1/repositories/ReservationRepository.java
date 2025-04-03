@@ -33,8 +33,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "(r.timeStart <= ?2 and r.timeEnd >= ?2) or " +
             "(r.timeStart <= ?1 and r.timeEnd >= ?2) or " +
             "(r.timeStart >= ?1 and r.timeEnd <= ?2)) " + // trường hợp lịch mới nằm trong lịch cũ
-            "and a.employeeId = ?3")
-    List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId);
+            "and( r.room.roomId =?4 or a.employeeId = ?3)")
+    List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId,Long roomId);
 
     //so sánh ngày checkin
     @Query("SELECT r FROM Reservation r " +

@@ -178,8 +178,9 @@ public class RequestFormService implements IRequestForm {
             System.out.println(dateStart);
             System.out.println(dateEnd);
             System.out.println(date);
-            System.out.println(reservationRepository.findRoomsByTimeAndAttendant(dateStart, dateEnd, requestFormDTO.getReservationDTO().getBookerId()));
-            reservations.addAll(reservationRepository.findRoomsByTimeAndAttendant(dateStart, dateEnd, requestFormDTO.getReservationDTO().getBookerId()));
+
+            System.out.println(reservationRepository.findRoomsByTimeAndAttendant(dateStart, dateEnd, requestFormDTO.getReservationDTO().getBookerId(), requestFormDTO.getReservationDTO().getRoomId()));
+            reservations.addAll(reservationRepository.findRoomsByTimeAndAttendant(dateStart, dateEnd, requestFormDTO.getReservationDTO().getBookerId(), requestFormDTO.getReservationDTO().getRoomId()));
         });
         return reservations;
     }
