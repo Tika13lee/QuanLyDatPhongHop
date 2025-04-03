@@ -237,7 +237,6 @@ const RoomDetail = () => {
       .then((data) => {
         setUrlQR(data.qrCode);
         setPdfPath(data.pdfPath); // Cập nhật đường dẫn file PDF
-
         // Tải file PDF
         const link = document.createElement("a");
         link.href = `http://localhost:8080/files/${encodeURIComponent(
