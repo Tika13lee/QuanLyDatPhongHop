@@ -286,11 +286,9 @@ function ListRoom() {
                   <td>{room.capacity}</td>
                   <td>{formatCurrencyVND(Number(room.price))}</td>
                   <td>
-                    {Array.isArray(room.approvers) && room.approvers.length > 0
-                      ? room.approvers.map((approver) => (
-                          <span key={approver.id}>{approver.name}, </span>
-                        ))
-                      : "Không có người phê duyệt"}
+                    {room.approver
+                      ? room.approver.name
+                      : "Chưa có người phê duyệt"}
                   </td>
                   <td className={cx("icon-info")}>
                     <Link to={`/admin/room/detail/${room.roomId}`}>
