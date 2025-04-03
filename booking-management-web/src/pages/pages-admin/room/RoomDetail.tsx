@@ -240,7 +240,7 @@ const RoomDetail = () => {
 
         // Tải file PDF
         const link = document.createElement("a");
-        link.href = `http://localhost:8080/files/${encodeURIComponent(
+        link.href = `http://localhost:8080/QRCodeFiles/${encodeURIComponent(
           data.pdfPath.split("/").pop()
         )}`;
         link.download = data.pdfPath.split("/").pop();

@@ -129,10 +129,10 @@ export type RoomProps2 = {
   location: LocationProps2;
   imgs: string[];
   price: string;
-  approvers: {
-    id: number;
+  approver: {
+    phone: string;
     name: string;
-  }[];
+  };
   devices: RoomDeviceProps[];
   reservationDTOS: {
     id: number;

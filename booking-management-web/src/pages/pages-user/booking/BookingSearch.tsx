@@ -95,10 +95,10 @@ function BookingSearch() {
     timeEnd: "",
   });
 
-  console.log("dataSearch", dataSearch);
-
   // xử lý filter
   const handleFilter = () => {
+    if (!startTime) return
+
     const [hour, minute] = startTime.split(":");
     const normalizedStartTime = `${hour.padStart(2, "0")}:${minute}`;
     const endTime = calculateEndTime(
@@ -206,6 +206,14 @@ function BookingSearch() {
               onChange={(date) => {
                 if (date) {
                   setSelectedDate(date.toISOString().split("T")[0]);
+                  const startTimeOptions = generateStartTime(
+                    date.toISOString().split("T")[0]
+                  );
+                  if (startTimeOptions.length > 0) {
+                    setStartTime(startTimeOptions[0]);
+                  } else {
+                    setStartTime("");
+                  }
                 }
               }}
               minDate={new Date()}
@@ -220,13 +228,14 @@ function BookingSearch() {
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
             >
-              {generateStartTime(selectedDate)
-                .slice(0, generateStartTime(selectedDate).length - 1)
-                .map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
+              {generateStartTime(selectedDate).length > 0 &&
+                generateStartTime(selectedDate)
+                  .slice(0, generateStartTime(selectedDate).length - 1)
+                  .map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
             </select>
           </div>
 

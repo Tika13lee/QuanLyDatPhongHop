@@ -51,7 +51,7 @@ function RequestList() {
           <label>Tìm kiếm</label>
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên cuộc họp"
+            placeholder="Nhập tiêu đề cuộc họp"
             className={cx("search-input")}
           />
         </div>
@@ -62,6 +62,19 @@ function RequestList() {
         <div className={cx("search-group")}>
           <label>Ngày bắt đầu</label>
           <input type="date" className={cx("search-input")} />
+        </div>
+        <div className={cx("search-group")}>
+          <label>Loại yêu cầu</label>
+          <select
+            className={cx("search-input")}
+            name="status"
+            value={statusRequestForm}
+            onChange={(e) => setStatusRequestForm(e.target.value)}
+          >
+            <option value="">Tất cả</option>
+            <option value="">Đặt lịch</option>
+            <option value="">Cập nhật</option>
+          </select>
         </div>
         <div className={cx("search-group")}>
           <label>Trạng thái</label>
