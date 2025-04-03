@@ -30,7 +30,6 @@ public class RequestFormService implements IRequestForm {
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
     private final EntityManager entityManager;
-    private RequestFormService self;
     @Override
     public RequestForm createRequestForm(RequestFormDTO requestFormDTO) {
         RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
@@ -60,10 +59,13 @@ public class RequestFormService implements IRequestForm {
                 if(!requestForm.getTypeRequestForm().equals(TypeRequestForm.UPDATE_RESERVATION)){
                     requestForms.add(approveRequestFormCreate(requestForm));
                 }else {
-                    if(requestForm.getReservations().size()==1){
-                        requestForms.add(self.approveRequestFormUpdateOne(requestForm));
+                    RequestForm requestFormOld = requestFormRepository.findRequestFormByReservationId(requestForm.getReservations().get(0).getReservationId()).get(0);
+                    System.out.println(requestFormOld.getReservations().size());
+                    if(requestFormOld.getReservations().size()==1){
+                        requestForms.add(approveRequestFormUpdateOne(requestForm));
                     }else{
-                        requestForms.add(self.approveRequestFormUpdateMany(requestForm));
+                        requestForms.add(approveRequestFormUpdateMany(requestForm,requestFormOld));
+
                     }
                 }
             }
@@ -79,7 +81,6 @@ public class RequestFormService implements IRequestForm {
         });
         return requestFormRepository.save(requestForm);
     }
-    @Transactional
     protected RequestForm approveRequestFormUpdateOne(RequestForm requestForm){
         requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
         requestForm.setTimeResponse(new Date());
@@ -88,36 +89,61 @@ public class RequestFormService implements IRequestForm {
             reservation.setServices(requestForm.getRequestReservation().getServiceIds().stream().map(serviceId -> serviceRepository.findById(serviceId).orElse(null)).toList());
             reservation.setFilePaths(requestForm.getRequestReservation().getFilePaths());
             reservation.setAttendants(requestForm.getRequestReservation().getEmployeeIds().stream().map(employeeId -> employeeRepository.findById(employeeId).orElse(null)).toList());
-            System.out.println(requestForm.getReservations().getClass());
             entityManager.detach(reservation);
             reservationRepository.save(reservation);
         });
         return requestFormRepository.save(requestForm);
     }
-    @Transactional
-    protected RequestForm approveRequestFormUpdateMany(RequestForm requestForm){
-        ArrayList<Date> timeFinishNew = new ArrayList<>();
-        ArrayList<Date> timeFinishOld = (ArrayList<Date>) requestForm.getRequestReservation().getTimeFinishFrequency();
+    protected RequestForm approveRequestFormUpdateMany(RequestForm requestForm, RequestForm requestFormOld){
+        ArrayList<Date> timeFinishNew = new ArrayList<>();// danh sách lịch cần tạo
+        System.out.println("1");
+        List<Date> timeFinishOld = new ArrayList<>(requestForm.getRequestReservation().getTimeFinishFrequency());
+        System.out.println(timeFinishOld.size());
         for (Date date : requestForm.getRequestReservation().getTimeFinishFrequency()){
             LocalDate dayNew = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate dayOld = requestForm.getReservations().get(requestForm.getReservations().size()-1).getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            System.out.println(dayNew);
+            LocalDate dayOld = requestFormOld.getReservations().get(requestFormOld.getReservations().size()-1).getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            System.out.println(dayOld);
             if(dayNew.isAfter(dayOld)){
-                timeFinishNew.add(date);
+                timeFinishNew.add(date);// Thêm ngày mới vào danh sách nếu nó lớn hơn ngày cũ
             }
         }
+
         LocalDate dayNew = requestForm.getRequestReservation().getTimeFinishFrequency().get(requestForm.getRequestReservation().getTimeFinishFrequency().size()-1).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate dayOld = requestForm.getReservations().get(requestForm.getReservations().size()-1).getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        while (!dayNew.plusDays(1).isAfter(dayOld)){
-            requestForm.getReservations().get(requestForm.getReservations().size()-1).setStatusReservation(StatusReservation.CANCELED);
-            requestForm.getReservations().remove(requestForm.getReservations().size()-1);
+        LocalDate dayOld = requestFormOld.getReservations().get(requestFormOld.getReservations().size()-1).getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        System.out.println(dayNew);
+        System.out.println(dayOld);
+        dayNew = dayNew.plusDays(1);
+        while (!dayNew.isAfter(dayOld)){
+            LocalDate finalDayNew = dayNew;
+            System.out.println(dayNew);
+            requestFormOld.getReservations().forEach(r->{
+                if(r.getTimeStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isEqual(finalDayNew)){
+                    r.setStatusReservation(StatusReservation.CANCELED);
+                    reservationRepository.save(r);
+                }
+
+            });
             dayNew = dayNew.plusDays(1);
         }
+
+        requestFormOld.getReservations().forEach(r->{
+            if(!r.equals(requestFormOld.getReservations().get(0))&&!r.getStatusReservation().equals(StatusReservation.CANCELED)) {
+                requestForm.getReservations().add(r);
+            }
+        });
+        System.out.println(timeFinishNew.size());
         if(!timeFinishNew.isEmpty()){
             requestForm.getRequestReservation().setTimeFinishFrequency(timeFinishNew);
             List<Reservation> reservations =  reservationService.createReservation(modelMapper.map(requestForm.getRequestReservation(), ReservationDTO.class));
+            reservations.forEach(reservation -> {
+                reservation.setStatusReservation(StatusReservation.WAITING);
+                reservationRepository.save(reservation);
+            });
             requestForm.getReservations().addAll(reservations);
             requestForm.getRequestReservation().setTimeFinishFrequency(timeFinishOld);
         }
+
         requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
         requestForm.setTimeResponse(new Date());
         return requestFormRepository.save(requestForm);
@@ -199,7 +225,7 @@ RequestForm requestForm = new RequestForm();
 
             }
         });
-        RequestReservation requestReservationOld = requestFormRepository.findRequestFormByReservationId(requestFormDTO.getReservationIds().get(0)).getRequestReservation();
+        RequestReservation requestReservationOld = requestFormRepository.findRequestFormByReservationId(requestFormDTO.getReservationIds().get(0)).get(0).getRequestReservation();
         RequestReservation requestReservation = new RequestReservation();
         requestReservation.setBookerId(requestReservationOld.getBookerId());
         requestReservation.setServiceIds(requestFormDTO.getReservationDTO().getServiceIds());

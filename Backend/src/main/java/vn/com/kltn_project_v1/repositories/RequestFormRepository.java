@@ -7,6 +7,8 @@ import vn.com.kltn_project_v1.model.RequestForm;
 import vn.com.kltn_project_v1.model.StatusRequestForm;
 
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface RequestFormRepository extends JpaRepository<RequestForm, Long> {
     @Query("SELECT r FROM RequestForm r WHERE ( :statusRequestForm is null or r.statusRequestForm = :statusRequestForm) and r.requestReservation.bookerId = :bookerId order by r.timeRequest desc ")
@@ -15,6 +17,6 @@ public interface RequestFormRepository extends JpaRepository<RequestForm, Long> 
     List<RequestForm> findRequestFormByRoomId(long roomId,StatusRequestForm statusRequestForm);
     @Query("SELECT r FROM RequestForm r WHERE  ( :statusRequestForm is null or r.statusRequestForm = :statusRequestForm) ")
     List<RequestForm> findRequestFormByStatusPending(StatusRequestForm statusRequestForm);
-    @Query("select r from RequestForm r join r.reservations res where res.reservationId = :reservationId and r.typeRequestForm != 'UPDATE_RESERVATION'")
-    RequestForm findRequestFormByReservationId(long reservationId);
+    @Query("select r from RequestForm r join r.reservations res where res.reservationId = :reservationId and r.statusRequestForm = 'APPROVED' order by r.timeRequest desc ")
+    List<RequestForm> findRequestFormByReservationId(long reservationId);
 }

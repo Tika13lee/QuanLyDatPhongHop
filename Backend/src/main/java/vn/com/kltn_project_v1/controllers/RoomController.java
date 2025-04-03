@@ -199,4 +199,23 @@ public class RoomController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/files/{fileName:.+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String fileName) {
+        try {
+            // Đọc file từ thư mục static
+            Path filePath = Paths.get("src/main/resources/static/QRCodeFiles", fileName);
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() && resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .contentType(MediaType.APPLICATION_PDF) // Hoặc loại nội dung khác
+                        .body(resource);
+            } else {
+                throw new RuntimeException("File not found");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("File not found: " + e.getMessage());
+        }
+    }
 }
