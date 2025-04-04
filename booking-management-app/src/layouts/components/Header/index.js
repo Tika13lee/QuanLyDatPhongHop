@@ -28,12 +28,16 @@ const styles = StyleSheet.create({
     width: 30,
     alignItems: "center",
     justifyContent: "center",
+    position: "absolute",
+    left: 20,
   },
   iconRightInContainerTitle: {
     height: 30,
     width: 30,
     alignItems: "center",
     justifyContent: "center",
+    position: "absolute",
+    right: 20,
   },
 
   content: {
@@ -53,8 +57,14 @@ const renderHeightHeaderByScreen = (nameScreen, platForm) => {
       case "scheduledeatilroom": {
         return 120;
       }
+      case "timeline": {
+        return 110;
+      }
+      case "roomdetail": {
+        return 110;
+      }
       default: {
-        return 150;
+        return 170;
       }
     }
   } else if (platForm == "android") {
@@ -63,6 +73,12 @@ const renderHeightHeaderByScreen = (nameScreen, platForm) => {
         return 100;
       }
       case "scheduledeatilroom": {
+        return 90;
+      }
+      case "timeline": {
+        return 90;
+      }
+      case "roomdetail": {
         return 90;
       }
       default: {
