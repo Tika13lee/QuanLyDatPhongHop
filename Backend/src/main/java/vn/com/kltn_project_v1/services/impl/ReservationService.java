@@ -87,9 +87,6 @@ public class ReservationService implements IReservation {
 
     @Override
     public List<Reservation> getAllReservationByBooker(String phone, Date dayStart, Date dayEnd) {
-        if (dayStart.getTime()>new Date().getTime()){
-            dayStart=null;
-        }
         return reservationRepository.findReservationsByBookerPhoneAndTime(phone,dayStart,dayEnd);
     }
 
