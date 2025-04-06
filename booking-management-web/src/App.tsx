@@ -28,7 +28,7 @@ import { Home, Login } from "./pages/general";
 import { Provider } from "react-redux";
 import store from "./app/store";
 import ScheduleList from "./pages/pages-user/schedule/ScheduleList";
-
+import Notification from "./pages/pages-user/notification/Notification";
 function App() {
   return (
     <Provider store={store}>
@@ -61,6 +61,7 @@ function App() {
             <Route path="schedule" element={<Schedule />} />
             <Route path="schedulelist" element={<ScheduleList />} />
             <Route path="schedule-frequency" element={<FrequencySchedules />} />
+            <Route path="notification" element={<Notification />} />
           </Route>
         </Routes>
       </Router>
