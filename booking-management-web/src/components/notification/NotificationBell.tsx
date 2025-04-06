@@ -4,11 +4,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import classNames from "classnames/bind";
-import styles from "./Navbar.module.scss";
-import UserAvatarWithMenu from "../UserAvatar/UserAvatarWithMenu";
-
-const cx = classNames.bind(styles);
 
 interface NotificationDTO {
   id: number;
@@ -20,20 +15,15 @@ interface NotificationDTO {
   targetType: string;
 }
 
-const Navbar = () => {
+const NotificationBell = () => {
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
-
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const bellRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-
   // Lấy danh sách thông báo ban đầu
   useEffect(() => {
     axios
@@ -93,28 +83,18 @@ const Navbar = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        bellRef.current &&
-        !bellRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node)
       ) {
-        setShowNotifications(false);
+        setIsOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Đóng mở dropdown thông báo
-  const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
-  };
-
-  // Cập nhật UI khi nhấn vào chuông thông báo
   const handleBellClick = () => {
     setIsOpen(!isOpen);
+    console.log(user);
 
     if (!isOpen && unreadCount > 0 && user?.employeeId) {
       // Cập nhật UI đã đọc
@@ -139,78 +119,54 @@ const Navbar = () => {
   };
 
   return (
-    <div className={cx("navbar-container")}>
-      <div className={cx("navbar")}>
-        <div className={cx("brand")}>
-          <p>
-            <strong>HỆ THỐNG QUẢN LÝ ĐẶT LỊCH HỌP TRỰC TUYẾN</strong>
-          </p>
-        </div>
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={handleBellClick}
+        className="relative p-2 rounded-full hover:bg-blue-100 transition"
+      >
+        <Bell className="w-7 h-7 text-blue-600" />
+        {unreadCount > 0 && !isOpen && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
+            {unreadCount}
+          </span>
+        )}
+      </button>
 
-        <div className={cx("user")}>
-          <div
-            ref={bellRef}
-            className={cx("notification")}
-            onClick={toggleNotifications}
-          >
-            <button
-              onClick={handleBellClick}
-              className="relative p-2 rounded-full hover:bg-blue-100 transition"
-            >
-              <Bell className="w-7 h-7 text-blue-600" />
-              {unreadCount > 0 && !isOpen && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            {isOpen && (
-              <div className="absolute right-0 mt-3 w-80 bg-white border rounded-xl shadow-lg z-10">
-                <div className="p-3 font-semibold border-b text-blue-700">
-                  Thông báo
-                </div>
-                <div className="max-h-60 overflow-y-auto custom-scrollbar">
-                  {notifications.length === 0 ? (
-                    <div className="p-3 text-sm text-gray-500 text-center">
-                      Không có thông báo nào
-                    </div>
-                  ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        className={`px-4 py-2 text-sm border-b cursor-pointer hover:bg-blue-50 transition ${
-                          n.read ? "text-gray-500" : "text-gray-800 font-medium"
-                        }`}
-                      >
-                        {n.message}
-                      </div>
-                    ))
-                  )}
-                </div>
-                <div className="p-2 text-center border-t">
-                  <button
-                    onClick={() => {
-                      navigate("/user/notification");
-                      setIsOpen(false);
-                    }}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    Xem tất cả thông báo →
-                  </button>
-                </div>
+      {isOpen && (
+        <div className="absolute right-0 mt-3 w-80 bg-white border rounded-xl shadow-lg z-10">
+          <div className="p-3 font-semibold border-b text-blue-700">
+            Thông báo
+          </div>
+          <div className="max-h-60 overflow-y-auto custom-scrollbar">
+            {notifications.length === 0 ? (
+              <div className="p-3 text-sm text-gray-500 text-center">
+                Không có thông báo nào
               </div>
+            ) : (
+              notifications.map((n) => (
+                <div
+                  key={n.id}
+                  className={`px-4 py-2 text-sm border-b cursor-pointer hover:bg-blue-50 transition ${
+                    n.read ? "text-gray-500" : "text-gray-800 font-medium"
+                  }`}
+                >
+                  {n.message}
+                </div>
+              ))
             )}
           </div>
-
-          <div className={cx("divider")} />
-          <div>
-            <UserAvatarWithMenu imgUrl="https://i.pravatar.cc/300" />
+          <div className="p-2 text-center border-t">
+            <button
+              onClick={() => navigate("/notifications")}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              Xem tất cả thông báo →
+            </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default Navbar;
+export default NotificationBell;
