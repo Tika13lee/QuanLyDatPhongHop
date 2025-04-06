@@ -384,7 +384,11 @@ const Schedule = () => {
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {morningEvents.map((event) => (
                       <div
-                        className={cx("event-item", event.statusReservation)}
+                        className={cx("event-item", {
+                          "status-pending":
+                            event.statusReservation == "PENDING",
+                          "status-other": event.statusReservation !== "PENDING",
+                        })}
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
@@ -430,7 +434,11 @@ const Schedule = () => {
                   <td key={index} style={{ verticalAlign: "top" }}>
                     {afternoonEvents.map((event) => (
                       <div
-                        className={cx("event-item", event.statusReservation)}
+                        className={cx("event-item", {
+                          "status-pending":
+                            event.statusReservation == "PENDING",
+                          "status-other": event.statusReservation !== "PENDING",
+                        })}
                         key={event.reservationId}
                         onClick={() => handleOpenDetail(event)}
                       >
@@ -459,18 +467,7 @@ const Schedule = () => {
           duyệt
         </div>
         <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "waiting")}></span>Đang chờ nhận
-          phòng
-        </div>
-        <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "check_in")}></span>Đã nhận phòng
-        </div>
-        <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "not_check_in")}></span>Không nhận
-          phòng
-        </div>
-        <div className={cx("legend-item")}>
-          <span className={cx("legend-color", "completed")}></span>Hoàn thành
+          <span className={cx("legend-color", "approval")}></span>Đã phê duyệt
         </div>
       </div>
 

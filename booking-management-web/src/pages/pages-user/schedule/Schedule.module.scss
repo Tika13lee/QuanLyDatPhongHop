@@ -76,31 +76,15 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+}
 
-  &.PENDING {
-    background: var(--color-status-pending);
-    border-left: 5px solid #ffe031;
-  }
-  &.WAITING {
-    background: var(--color-status-waiting);
-    border-left: 5px solid #2196f3;
-  }
-  &.CHECKED_IN {
-    background: var(--color-status-checked_in);
-    border-left: 5px solid #e93fff;
-  }
-  &.COMPLETED {
-    background: var(--color-status-completed);
-    border-left: 5px solid #3bff34;
-  }
-  &.NOT_CHECKED_IN {
-    background: #ffd4d4;
-    border-left: 5px solid #ff3f3f;
-  }
-  &.CANCELED {
-    background: var(--color-status-canceled);
-    border-left: 5px solid #2196f3;
-  }
+.status-pending {
+  background: var(--color-status-pending);
+  border-left: 5px solid #ffe031;
+}
+.status-other {
+  background: var(--color-status-waiting);
+  border-left: 5px solid #2196f3;
 }
 
 // ghi chú màu
@@ -117,7 +101,7 @@
   }
 
   .legend-color {
-    width: 20px;
+    width: 40px;
     height: 12px;
     display: inline-block;
     border: 1px solid #ccc;
@@ -126,24 +110,13 @@
 }
 
 .pending {
-  background-color: var(--color-status-pending);
+  background-color: #ffe031;
 }
 
-.waiting {
-  background-color: var(--color-status-waiting);
+.approval {
+  background-color: #2196f3;
 }
 
-.check_in {
-  background-color: var(--color-status-checked_in);
-}
-
-.not_check_in {
-  background-color: #ffd4d4;
-}
-
-.completed {
-  background-color: var(--color-status-completed);
-}
 
 // table
 .calendar {

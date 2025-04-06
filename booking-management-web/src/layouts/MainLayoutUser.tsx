@@ -123,7 +123,7 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  Danh sách lịch
+                  Lịch một lần
                 </NavLink>
                 <NavLink
                   to="/user/schedule-frequency"
@@ -131,7 +131,7 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  Lịch tần suất
+                  Lịch định kỳ
                 </NavLink>
               </div>
             )}
