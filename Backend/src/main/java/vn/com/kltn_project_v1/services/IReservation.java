@@ -2,6 +2,7 @@ package vn.com.kltn_project_v1.services;
 
 import vn.com.kltn_project_v1.dtos.Overview.ReservationViewDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
+import vn.com.kltn_project_v1.model.Employee;
 import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.StatusReservation;
 
@@ -19,5 +20,7 @@ public interface IReservation {
     List<ReservationViewDTO> getReservationsByBookerPhone(String phone,StatusReservation statusReservation);
     Map<String, Object> checkDataCheckIn(Long roomId, Long employeeId);
     Reservation updateReservation(ReservationDTO reservationDTO);
+    public void inviteMembersNotification(Reservation reservation, List<Employee> employees);
+    public void updateReservationNotification(Reservation reservation, List<Employee> employees);
 
 }

@@ -28,11 +28,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     //lich cua nhan vien nam trong khoang thoi gian bi trung
     @Query("select r from Reservation r join r.attendants a " +
             "where (:timeStart is null or " +
-            "(r.timeStart < ?2 and r.timeEnd > ?1) or " +
-            "(r.timeStart <= ?1 and r.timeEnd >= ?1) or " +
-            "(r.timeStart <= ?2 and r.timeEnd >= ?2) or " +
-            "(r.timeStart <= ?1 and r.timeEnd >= ?2) or " +
-            "(r.timeStart >= ?1 and r.timeEnd <= ?2)) " + // trường hợp lịch mới nằm trong lịch cũ
+            "(r.timeStart < ?2 and r.timeEnd > ?1)) " + // Điều kiện trùng lặp đơn giản hóa
             "and( r.room.roomId =?4 or a.employeeId = ?3)")
     List<Reservation> findRoomsByTimeAndAttendant(Date timeStart, Date timeEnd, Long attendantId,Long roomId);
 

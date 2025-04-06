@@ -78,6 +78,7 @@ public class RequestFormService implements IRequestForm {
         requestForm.getReservations().forEach(reservation -> {
             reservation.setStatusReservation(StatusReservation.WAITING);
             reservationRepository.save(reservation);
+            reservationService.inviteMembersNotification(reservation,reservation.getAttendants());
         });
         return requestFormRepository.save(requestForm);
     }

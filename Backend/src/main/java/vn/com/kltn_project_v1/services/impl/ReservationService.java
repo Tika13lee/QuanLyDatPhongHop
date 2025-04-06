@@ -32,6 +32,7 @@ public class ReservationService implements IReservation {
     private final RoomRepository roomRepository;
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
+    private final NotificationService notificationService;
 
     @Override
     public List<ReservationViewDTO> getAllReservationInRoom(long roomId, Date dayStart, Date dayEnd) {
@@ -161,6 +162,32 @@ public class ReservationService implements IReservation {
         }
         assert reservation != null;
         return reservationRepository.save(reservation);
+    }
+
+    @Override
+    public void inviteMembersNotification(Reservation reservation, List<Employee> employees) {
+        for (Employee employee : employees) {
+            notificationService.notifyUser(
+                    employee,
+                    NotificationType.INVITE_TO_RESERVATION,
+                    "Bạn được mời tham gia cuộc họp: " + reservation.getTitle(),
+                    "reservation",
+                    reservation.getReservationId()
+            );
+        }
+    }
+
+    @Override
+    public void updateReservationNotification(Reservation reservation, List<Employee> employees) {
+        for (Employee employee : employees) {
+            notificationService.notifyUser(
+                    employee,
+                    NotificationType.RESERVATION_UPDATED,
+                    "Lịch họp đã được cập nhật: " + reservation.getTitle(),
+                    "reservation",
+                    reservation.getReservationId()
+            );
+        }
     }
 
 
