@@ -1185,7 +1185,7 @@ export default function InfoRoomRegister({ navigation, route }) {
                 handleOnPopup={() => {
                   setIsOpenModalNotification(false);
                   if (message.status == "success")
-                    navigation.navigate("CreateSchedule");
+                    navigation.navigate("Tabs");
                 }}
                 handleViewDetailError={() => {
                   setIsOpenModalDetailDuplicatedSchedule(true);

@@ -337,7 +337,7 @@ export default function TimeLine({ navigation, route }) {
         >
           <Text style={styles.labelInputContentItem}>Chọn mốc thời gian</Text>
           <FlatList
-            data={renderTime().slice(0, renderTime().length - 1)}
+            data={renderTime()}
             contentContainerStyle={{ paddingBottom: 400 }}
             renderItem={({ item, index }) => (
               <TouchableOpacity

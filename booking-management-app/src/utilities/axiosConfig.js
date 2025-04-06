@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosConfig = (token) => {
   return axios.create({
-    baseURL: "http://172.20.60.155:8080",
+    baseURL: "http:///192.168.191.135:8080",
     timeout: 5000,
     headers: {
       "Content-Type": "application/json",
