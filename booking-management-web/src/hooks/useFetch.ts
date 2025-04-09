@@ -23,8 +23,19 @@ const useFetch = <T>(
       if (!url) return;
 
       setLoading(true);
+
       try {
-        const response = await axios.get<T>(url, options);
+        // Set the token in the headers
+        const token = localStorage.getItem("accessToken");
+        const config: AxiosRequestConfig = {
+          ...options,
+          headers: {
+            ...(options?.headers || {}),
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        };
+
+        const response = await axios.get<T>(url, config);
         if (isMounted) {
           setData(response.data);
           setLoading(false);

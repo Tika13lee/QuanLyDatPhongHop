@@ -12,6 +12,7 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import { formatDateString, getHourMinute } from "../../../utilities";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -228,7 +229,9 @@ function ApprovalList() {
         </div>
       )}
 
-      {Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
+      {loadingReservation ? (
+        <LoadingSpinner />
+      ) : Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -248,7 +251,7 @@ function ApprovalList() {
               </tr>
             </thead>
             <tbody>
-              {[...schedulesApprove]?.reverse().map((schedule) => {
+              {schedulesApprove?.reverse().map((schedule) => {
                 return (
                   <tr key={schedule.requestFormId}>
                     <td className={cx("checkbox")}>

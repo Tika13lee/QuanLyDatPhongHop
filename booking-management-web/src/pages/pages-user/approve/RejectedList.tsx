@@ -7,6 +7,7 @@ import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import { formatDateString, getHourMinute } from "../../../utilities";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -61,7 +62,9 @@ function RejectedList() {
         </div>
       </div>
 
-      {Array.isArray(rejectedList) && rejectedList.length === 0 ? (
+      {loadingRejectedList ? (
+        <LoadingSpinner />
+      ) : Array.isArray(rejectedList) && rejectedList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -80,31 +83,40 @@ function RejectedList() {
               </tr>
             </thead>
             <tbody>
-              {rejectedList?.map((schedule) => {
-                return (
-                  <tr key={schedule.requestFormId}>
-                    <td>{schedule.requestReservation.title}</td>
-                    <td>
-                      {formatDateString(schedule.requestReservation.timeStart)}
-                    </td>
-                    <td>
-                      {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
-                      {getHourMinute(schedule.requestReservation.timeEnd)}
-                    </td>
-                    <td>{schedule.reservations[0].booker.employeeName}</td>
-                    <td>{formatDateString(schedule.timeRequest)}</td>
-                    <td>{formatDateString(schedule.timeResponse)}</td>
-                    <td>
-                      <div
-                        className={cx("actions")}
-                        onClick={() => handleShowDetails(schedule)}
-                      >
-                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {rejectedList &&
+                [...rejectedList]
+                  .sort(
+                    (a, b) =>
+                      new Date(b.timeResponse).getTime() -
+                      new Date(a.timeResponse).getTime()
+                  )
+                  .map((schedule) => {
+                    return (
+                      <tr key={schedule.requestFormId}>
+                        <td>{schedule.requestReservation.title}</td>
+                        <td>
+                          {formatDateString(
+                            schedule.requestReservation.timeStart
+                          )}
+                        </td>
+                        <td>
+                          {getHourMinute(schedule.requestReservation.timeStart)}{" "}
+                          - {getHourMinute(schedule.requestReservation.timeEnd)}
+                        </td>
+                        <td>{schedule.reservations[0].booker.employeeName}</td>
+                        <td>{formatDateString(schedule.timeRequest)}</td>
+                        <td>{formatDateString(schedule.timeResponse)}</td>
+                        <td>
+                          <div
+                            className={cx("actions")}
+                            onClick={() => handleShowDetails(schedule)}
+                          >
+                            <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
             </tbody>
           </table>
         </div>

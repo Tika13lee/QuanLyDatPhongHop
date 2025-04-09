@@ -23,10 +23,11 @@ const uploadImageToCloudinary = async (file: File) => {
 };
 
 // hàm tạo ds thời gian
-const times = Array.from({ length: 23 }, (_, i) => {
-  const hour = Math.floor(i / 2) + 7;
-  const minute = i % 2 === 0 ? "00" : "30";
-  return `${String(hour).padStart(2, "0")}:${minute}`;
+const times = Array.from({ length: ((18 - 7) * 60) / 10 + 1 }, (_, i) => {
+  const totalMinutes = 7 * 60 + i * 10; // Bắt đầu từ 7:00
+  const hour = Math.floor(totalMinutes / 60);
+  const minute = totalMinutes % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 });
 
 // định dạng ngày tháng năm, truyền vào là date
@@ -37,7 +38,7 @@ const formatDateDate = (date: Date) => {
     year: "numeric",
   })
     .format(date)
-    .replace(/\//g, "-");
+    .replace(/\//g, " - ");
 };
 
 // định dang ngày tháng năm, truyền vào là string
@@ -48,7 +49,7 @@ const formatDateString = (date: string) => {
     year: "numeric",
   })
     .format(new Date(date))
-    .replace(/\//g, "-");
+    .replace(/\//g, " - ");
 };
 
 // lấy giờ từ chuỗi thời gian
@@ -62,7 +63,80 @@ const formatCurrencyVND = (amount: number) => {
   return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 };
 
+// kiểm tra thời gian đặt phòng khi click cell
+const validateBookingTime = (
+  selectedDate: string,
+  timeStart: string,
+  showToast: (message: string) => void
+): boolean => {
+  const selectedDateTime = new Date(`${selectedDate}T${timeStart}:00`);
+  selectedDateTime.setMinutes(selectedDateTime.getMinutes() + 30);
+
+  const now = new Date();
+  const isToday = now.toDateString() === selectedDateTime.toDateString();
+
+  if (isToday) {
+    // Thời gian hiện tại + 10 phút
+    const threshold = new Date(now.getTime() + 10 * 60 * 1000);
+
+    // Làm tròn lên mốc 10 phút
+    let minutes = threshold.getMinutes();
+    let roundedMinutes = Math.ceil(minutes / 10) * 10;
+    let hours = threshold.getHours();
+
+    if (roundedMinutes === 60) {
+      roundedMinutes = 0;
+      hours += 1;
+    }
+
+    const roundedThresholdMinutes = hours * 60 + roundedMinutes;
+
+    // Chuyển timeStart thành phút
+    const [hour, minute] = timeStart.split(":").map(Number);
+    const selectedMinutes = hour * 60 + minute;
+
+    if (selectedMinutes < roundedThresholdMinutes) {
+      showToast(
+        `Vui lòng chọn thời gian bắt đầu sau giờ hiện tại!`
+      );
+      return false;
+    }
+  } else {
+    if (selectedDateTime < now) {
+      showToast(
+        `Ngày ${formatDateString(
+          selectedDate
+        )} đã qua. Vui lòng chọn ngày khác!`
+      );
+      return false;
+    }
+  }
+
+  return true;
+};
+
+// hàm tạo ds thời gian bắt đầu cho ngày hôm nay
+const generateStartTime = (selectedDate: string) => {
+  const now = new Date();
+  const selected = new Date(selectedDate);
+
+  const isToday = selected.toDateString() === now.toDateString();
+  if (!isToday) return times;
+
+  // Thời gian hiện tại + 10 phút
+  const threshold = new Date(now.getTime() + 10 * 60 * 1000);
+  const thresholdStr = `${String(threshold.getHours()).padStart(
+    2,
+    "0"
+  )}:${String(threshold.getMinutes()).padStart(2, "0")}`;
+
+  // Giữ lại các mốc >= threshold
+  return times.filter((time) => time >= thresholdStr);
+};
+
 export {
+  generateStartTime,
+  validateBookingTime,
   getHourMinute,
   uploadImageToCloudinary,
   times,

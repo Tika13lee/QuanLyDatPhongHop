@@ -7,6 +7,7 @@ import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import { formatDateString, getHourMinute } from "../../../utilities";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -15,11 +16,6 @@ function ApprovedList() {
   const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState<
-    number | null
-  >(null);
-  const [selectedReservation, setSelectedReservation] =
-    useState<ReservationDetailProps | null>(null);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
 
@@ -31,6 +27,8 @@ function ApprovedList() {
   } = useFetch<RequestFormProps[]>(
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=APPROVED`
   );
+
+  console.log(approvedList);
 
   // Mở modal
   const handleShowDetails = (requestForm: RequestFormProps) => {
@@ -65,7 +63,9 @@ function ApprovedList() {
         </div>
       </div>
 
-      {Array.isArray(approvedList) && approvedList.length === 0 ? (
+      {loadingApprovedList ? (
+        <LoadingSpinner />
+      ) : Array.isArray(approvedList) && approvedList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -84,35 +84,45 @@ function ApprovedList() {
               </tr>
             </thead>
             <tbody>
-              {approvedList?.map((schedule) => {
-                return (
-                  <tr key={schedule.requestFormId}>
-                    <td>{schedule.requestReservation.title}</td>
-                    <td>
-                      {formatDateString(schedule.requestReservation.timeStart)}
-                    </td>
-                    <td>
-                      {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
-                      {getHourMinute(schedule.requestReservation.timeEnd)}
-                    </td>
-                    <td>{schedule.reservations[0].booker.employeeName}</td>
-                    <td>{formatDateString(schedule.timeRequest)}</td>
-                    <td>{formatDateString(schedule.timeResponse)}</td>
-                    <td>
-                      <div
-                        className={cx("actions")}
-                        onClick={() => handleShowDetails(schedule)}
-                      >
-                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {approvedList &&
+                [...approvedList]
+                  .sort(
+                    (a, b) =>
+                      new Date(b.timeResponse).getTime() -
+                      new Date(a.timeResponse).getTime()
+                  )
+                  .map((schedule) => {
+                    return (
+                      <tr key={schedule.requestFormId}>
+                        <td>{schedule.requestReservation.title}</td>
+                        <td>
+                          {formatDateString(
+                            schedule.requestReservation.timeStart
+                          )}
+                        </td>
+                        <td>
+                          {getHourMinute(schedule.requestReservation.timeStart)}{" "}
+                          - {getHourMinute(schedule.requestReservation.timeEnd)}
+                        </td>
+                        <td>{schedule.reservations[0].booker.employeeName}</td>
+                        <td>{formatDateString(schedule.timeRequest)}</td>
+                        <td>{formatDateString(schedule.timeResponse)}</td>
+                        <td>
+                          <div
+                            className={cx("actions")}
+                            onClick={() => handleShowDetails(schedule)}
+                          >
+                            <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
             </tbody>
           </table>
         </div>
       )}
+
       <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

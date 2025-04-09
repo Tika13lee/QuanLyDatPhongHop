@@ -9,6 +9,8 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { formatDateString, getHourMinute } from "../../../utilities";
+import { ClipLoader } from "react-spinners";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -39,6 +41,8 @@ function ListApprovalByApprover() {
   } = useFetch<RequestFormProps[]>(
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=PENDING`
   );
+
+  console.log(requestForm);
 
   const [schedulesApprove, setSchedulesApprove] = useState<RequestFormProps[]>(
     requestForm ?? []
@@ -154,11 +158,6 @@ function ListApprovalByApprover() {
     setSelectedRequestForm(null);
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-  };
-
   return (
     <div className={cx("approve")}>
       <div className={cx("approve-search")}>
@@ -231,7 +230,9 @@ function ListApprovalByApprover() {
         </div>
       )}
 
-      {Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
+      {loadingReservation ? (
+        <LoadingSpinner />
+      ) : Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -251,52 +252,62 @@ function ListApprovalByApprover() {
               </tr>
             </thead>
             <tbody>
-              {[...schedulesApprove]?.map((schedule) => {
-
-                return (
-                  <tr key={schedule.requestFormId}>
-                    <td className={cx("checkbox")}>
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(schedule.requestFormId)}
-                        onChange={() =>
-                          handleCheckboxChange(schedule.requestFormId)
-                        }
-                      />
-                    </td>
-                    <td>{schedule.requestReservation.title}</td>
-                    <td>
-                      {formatDateString(schedule.requestReservation.timeStart)}
-                    </td>
-                    <td>
-                      {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
-                      {getHourMinute(schedule.requestReservation.timeEnd)}
-                    </td>
-                    <td>{schedule.reservations[0]?.booker.employeeName}</td>
-                    <td>
-                      {schedule.typeRequestForm === "UPDATE_RESERVATION"
-                        ? "Cập nhật"
-                        : "Đặt lịch"}
-                    </td>
-                    <td>
-                      {formatDateString(schedule.timeRequest)} -{" "}
-                      {getHourMinute(schedule.timeRequest)}
-                    </td>
-                    <td>
-                      <div
-                        className={cx("actions")}
-                        onClick={() => handleShowDetails(schedule)}
-                      >
-                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {[...schedulesApprove]
+                .sort(
+                  (a, b) =>
+                    new Date(b.timeRequest).getTime() -
+                    new Date(a.timeRequest).getTime()
+                )
+                .map((schedule) => {
+                  return (
+                    <tr key={schedule.requestFormId}>
+                      <td className={cx("checkbox")}>
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(
+                            schedule.requestFormId
+                          )}
+                          onChange={() =>
+                            handleCheckboxChange(schedule.requestFormId)
+                          }
+                        />
+                      </td>
+                      <td>{schedule.requestReservation.title}</td>
+                      <td>
+                        {formatDateString(
+                          schedule.requestReservation.timeStart
+                        )}
+                      </td>
+                      <td>
+                        {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
+                        {getHourMinute(schedule.requestReservation.timeEnd)}
+                      </td>
+                      <td>{schedule.reservations[0]?.booker.employeeName}</td>
+                      <td>
+                        {schedule.typeRequestForm === "UPDATE_RESERVATION"
+                          ? "Cập nhật"
+                          : "Đặt lịch"}
+                      </td>
+                      <td>
+                        {formatDateString(schedule.timeRequest)} -{" "}
+                        {getHourMinute(schedule.timeRequest)}
+                      </td>
+                      <td>
+                        <div
+                          className={cx("actions")}
+                          onClick={() => handleShowDetails(schedule)}
+                        >
+                          <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
       )}
+
       <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -308,7 +319,7 @@ function ListApprovalByApprover() {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

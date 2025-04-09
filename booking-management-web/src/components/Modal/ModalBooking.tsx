@@ -6,6 +6,7 @@ import {
   formatCurrencyVND,
   formatDateDate,
   formatDateString,
+  generateStartTime,
   times,
 } from "../../utilities";
 import DatePicker from "react-datepicker";
@@ -53,8 +54,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   const userCurrent = localStorage.getItem("currentEmployee");
   const user = JSON.parse(userCurrent || "{}");
 
-  console.log(dateSelected, timeStart, timeEnd);
-
   const [timeEndSchedule, setTimeEndSchedule] = useState<string[]>([]);
   const [selectedStartTime, setSelectedStartTime] = useState<string>(times[0]);
   const [selectedDateEndOfFrequency, setSelectedDateEndOfFrequency] =
@@ -86,7 +85,9 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   ]);
 
   useEffect(() => {
-    const filteredTimes = getTimes();
+    const filteredTimes = generateStartTime(
+      dateSelected ?? new Date().toString()
+    ).filter((time) => time <= "17:30");
     if (filteredTimes.length > 0) {
       setSelectedStartTime(filteredTimes[0]);
     }
@@ -96,25 +97,25 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   useEffect(() => {
     if (timeStart) {
       const index = times.findIndex((time) => time === timeStart);
-      setTimeEndSchedule(times.slice(index + 1, times.length));
+      setTimeEndSchedule(times.slice(index + 3, times.length));
       setFormData((prev) => ({
         ...prev,
         reservationDTO: {
           ...prev.reservationDTO,
           timeEnd: new Date(
-            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
+            `${dateSelected ?? new Date().toString()}T${times[index + 3]}`
           ).toISOString(),
         },
       }));
     } else {
       const index = times.findIndex((time) => time === selectedStartTime);
-      setTimeEndSchedule(times.slice(index + 1, times.length));
+      setTimeEndSchedule(times.slice(index + 3, times.length));
       setFormData((prev) => ({
         ...prev,
         reservationDTO: {
           ...prev.reservationDTO,
           timeEnd: new Date(
-            `${dateSelected ?? new Date().toString()}T${times[index + 1]}`
+            `${dateSelected ?? new Date().toString()}T${times[index + 3]}`
           ).toISOString(),
         },
       }));
@@ -130,26 +131,6 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       currentDate.setDate(currentDate.getDate() + 1);
     }
     return dates;
-  };
-
-  // lọc giờ theo ngày hiện tại
-  const getTimes = () => {
-    const currentDate = new Date();
-    const selectedDate = new Date(dateSelected ?? currentDate);
-    const isToday = currentDate.toDateString() === selectedDate.toDateString();
-
-    if (!isToday) return times.slice(0, times.length - 1);
-
-    const minutesNow = currentDate.getHours() * 60 + currentDate.getMinutes();
-    const currentMinutes = Math.ceil(minutesNow / 30) * 30;
-
-    const filteredTimes = times.filter((time) => {
-      const [hour, minute] = time.split(":").map(Number);
-      const timeInMinutes = hour * 60 + minute;
-      return timeInMinutes >= currentMinutes;
-    });
-
-    return filteredTimes.slice(0, filteredTimes.length - 1);
   };
 
   // xử lý cập nhật timeFinsishFrequency
@@ -292,7 +273,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
             `${dateSelected ?? new Date().toString()}T${timeEnd}`
           ).toISOString()
         : new Date(
-            `${dateSelected ?? new Date().toString()}T${times[1]}`
+            `${dateSelected ?? new Date().toString()}T${times[3]}`
           ).toISOString(),
       note: "",
       description: "",
@@ -385,7 +366,8 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     console.log(response);
 
     if (response) {
-      setIsPopupOpen && setIsPopupOpen("Đặt lịch thành công!", "success", true);
+      setIsPopupOpen &&
+        setIsPopupOpen("Gửi phê duyệt thành công!", "success", true);
       resetData();
       setIsModalClose();
     }
@@ -627,15 +609,19 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                           handleInputChange(e);
                         }}
                       >
-                        {getTimes().map((time, index) => (
-                          <option
-                            key={time}
-                            value={time}
-                            selected={index === 0}
-                          >
-                            {time}
-                          </option>
-                        ))}
+                        {generateStartTime(
+                          dateSelected ?? new Date().toString()
+                        )
+                          .filter((time) => time <= "17:30")
+                          .map((time, index) => (
+                            <option
+                              key={time}
+                              value={time}
+                              selected={index === 0}
+                            >
+                              {time}
+                            </option>
+                          ))}
                       </select>
                     )}
                   </div>

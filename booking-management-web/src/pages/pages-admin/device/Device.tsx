@@ -9,6 +9,7 @@ import PopupNotification from "../../../components/popup/PopupNotification";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { FaPlus, MdSearch } from "../../../components/icons/icons";
 import { DeviceProps } from "../../../data/data";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -256,12 +257,8 @@ function Device() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={4} className={cx("loading-message")}>
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
+            {devicesLoading ? (
+              <LoadingSpinner />
             ) : error || !devices || devices.length === 0 ? (
               <tr>
                 <td colSpan={4}>Không có thiết bị nào</td>

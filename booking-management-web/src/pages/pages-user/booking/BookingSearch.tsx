@@ -7,7 +7,7 @@ import { MdSearch } from "../../../components/icons/icons";
 import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import axios from "axios";
-import { times } from "../../../utilities";
+import { generateStartTime, times } from "../../../utilities";
 import DatePicker from "react-datepicker";
 
 const cx = classNames.bind(styles);
@@ -21,38 +21,18 @@ type DataSearch = {
   timeEnd: string;
 };
 
-// set lại giờ bắt đầu cho ngày hôm nay
-const generateStartTime = (selectedDate: string) => {
-  const now = new Date();
-  const selected = new Date(selectedDate);
-
-  const isToday = selected.toDateString() === now.toDateString();
-  if (!isToday) return times;
-
-  const threshold = new Date(now.getTime() + 15 * 60 * 1000);
-  const thresholdHour = threshold.getHours();
-  const thresholdMinute = threshold.getMinutes();
-
-  // Làm tròn lên mốc 30 phút
-  const roundedHour = thresholdMinute > 30 ? thresholdHour + 1 : thresholdHour;
-  const roundedMinute =
-    thresholdMinute <= 30 ? (thresholdMinute <= 15 ? "30" : "00") : "00";
-
-  const roundedTime = `${String(roundedHour).padStart(
-    2,
-    "0"
-  )}:${roundedMinute}`;
-
-  return times.filter((time) => time >= roundedTime);
-};
-
 function BookingSearch() {
   // lưu emp hiện tại vào localStorage
   const [empPhone, setEmpPhone] = useState<string>("0914653334");
   const { data, loading, error } = useFetch<EmployeeProps>(
     `http://localhost:8080/api/v1/employee/getEmployeeByPhone?phone=${empPhone}`
   );
-  localStorage.setItem("currentEmployee", JSON.stringify(data));
+  console.log(data);
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem("currentEmployee", JSON.stringify(data));
+    }
+  }, [data]);
 
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -97,7 +77,7 @@ function BookingSearch() {
 
   // xử lý filter
   const handleFilter = () => {
-    if (!startTime) return
+    if (!startTime) return;
 
     const [hour, minute] = startTime.split(":");
     const normalizedStartTime = `${hour.padStart(2, "0")}:${minute}`;
@@ -230,7 +210,7 @@ function BookingSearch() {
             >
               {generateStartTime(selectedDate).length > 0 &&
                 generateStartTime(selectedDate)
-                  .slice(0, generateStartTime(selectedDate).length - 1)
+                  .filter((time) => time <= "17:30")
                   .map((time) => (
                     <option key={time} value={time}>
                       {time}

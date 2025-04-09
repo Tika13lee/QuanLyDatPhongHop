@@ -2,7 +2,11 @@ import React from "react";
 import classNames from "classnames/bind";
 import styles from "./DetailRequestModal.module.scss";
 import { RequestFormProps } from "../../data/data";
-import { formatCurrencyVND } from "../../utilities";
+import {
+  formatCurrencyVND,
+  formatDateString,
+  getHourMinute,
+} from "../../utilities";
 import CloseModalButton from "./CloseModalButton";
 
 const cx = classNames.bind(styles);
@@ -18,27 +22,27 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
   onClose,
   requestForm,
 }) => {
-  // Hàm format ngày giờ
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toLocaleDateString("vi-VN"),
-      time: date.toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
+  // // Hàm format ngày giờ
+  // const formatDateTime = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   return {
+  //     date: date.toLocaleDateString("vi-VN"),
+  //     time: date.toLocaleTimeString("vi-VN", {
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //     }),
+  //   };
+  // };
 
   if (!isOpen || !requestForm) return null;
 
-  const meetingStart = formatDateTime(requestForm.requestReservation.timeStart);
-  const meetingEnd = formatDateTime(requestForm.requestReservation.timeEnd);
-  const timeEndFrequency = formatDateTime(
-    requestForm.requestReservation.timeFinishFrequency[
-      requestForm.requestReservation.timeFinishFrequency.length - 1
-    ]
-  );
+  // const meetingStart = formatDateTime(requestForm.requestReservation.timeStart);
+  // const meetingEnd = formatDateTime(requestForm.requestReservation.timeEnd);
+  // const timeEndFrequency = formatDateTime(
+  //   requestForm.requestReservation.timeFinishFrequency[
+  //     requestForm.requestReservation.timeFinishFrequency.length - 1
+  //   ]
+  // );
 
   return (
     <div className={cx("modal-overlay")} onClick={onClose}>
@@ -54,10 +58,13 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
             </div>
             <div className={cx("info-row")}>
               <p>
-                <strong>Ngày:</strong> {meetingStart.date}
+                <strong>Ngày:</strong>{" "}
+                {formatDateString(requestForm.requestReservation.timeStart)}
               </p>
               <p>
-                <strong>Giờ:</strong> {meetingStart.time} - {meetingEnd.time}
+                <strong>Giờ:</strong>{" "}
+                {getHourMinute(requestForm.requestReservation.timeStart)} -{" "}
+                {getHourMinute(requestForm.requestReservation.timeEnd)}
               </p>
             </div>
             <div className={cx("info-row")}>
@@ -73,7 +80,12 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
                 <strong>Thời gian kết thúc:</strong>{" "}
                 {requestForm.requestReservation.frequency === "ONE_TIME"
                   ? "Không có"
-                  : timeEndFrequency.date}
+                  : formatDateString(
+                      requestForm.requestReservation.timeFinishFrequency[
+                        requestForm.requestReservation.timeFinishFrequency
+                          .length - 1
+                      ]
+                    )}
               </p>
             </div>
             <div className={cx("info-row")}>
@@ -147,7 +159,7 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
               <p>
                 <strong>Thời gian phản hồi:</strong>{" "}
                 {requestForm.timeResponse
-                  ? formatDateTime(requestForm.timeResponse).date
+                  ? formatDateString(requestForm.timeResponse)
                   : "Chưa có"}
               </p>
             </div>

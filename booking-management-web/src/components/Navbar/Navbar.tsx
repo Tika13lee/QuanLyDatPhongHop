@@ -10,7 +10,7 @@ import UserAvatarWithMenu from "../UserAvatar/UserAvatarWithMenu";
 
 const cx = classNames.bind(styles);
 
-interface NotificationDTO {
+type NotificationDTO = {
   id: number;
   type: string;
   message: string;
@@ -18,7 +18,7 @@ interface NotificationDTO {
   createdAt: string;
   targetId: number;
   targetType: string;
-}
+};
 
 const Navbar = () => {
   const userCurrent = localStorage.getItem("currentEmployee");
@@ -26,7 +26,6 @@ const Navbar = () => {
 
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLDivElement>(null);
@@ -36,6 +35,7 @@ const Navbar = () => {
 
   // Lấy danh sách thông báo ban đầu
   useEffect(() => {
+    if (!user?.employeeId) return;
     axios
       .get<NotificationDTO[]>(
         `http://localhost:8080/api/v1/notification/getAllNotification?employeeId=${user.employeeId}`
@@ -97,7 +97,7 @@ const Navbar = () => {
         bellRef.current &&
         !bellRef.current.contains(event.target as Node)
       ) {
-        setShowNotifications(false);
+        setIsOpen(false);
       }
     };
 
@@ -106,11 +106,6 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  // Đóng mở dropdown thông báo
-  const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
-  };
 
   // Cập nhật UI khi nhấn vào chuông thông báo
   const handleBellClick = () => {
@@ -148,53 +143,42 @@ const Navbar = () => {
         </div>
 
         <div className={cx("user")}>
-          <div
-            ref={bellRef}
-            className={cx("notification")}
-            onClick={toggleNotifications}
-          >
-            <button
-              onClick={handleBellClick}
-              className="relative p-2 rounded-full hover:bg-blue-100 transition"
-            >
-              <Bell className="w-7 h-7 text-blue-600" />
+          <div ref={bellRef} className={cx("notification")}>
+            <button onClick={handleBellClick} className={cx("bell-button")}>
+              <Bell className={cx("bell-icon")} />
               {unreadCount > 0 && !isOpen && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
-                  {unreadCount}
-                </span>
+                <span className={cx("badge")}>{unreadCount}</span>
               )}
             </button>
 
             {isOpen && (
-              <div className="absolute right-0 mt-3 w-80 bg-white border rounded-xl shadow-lg z-10">
-                <div className="p-3 font-semibold border-b text-blue-700">
-                  Thông báo
-                </div>
-                <div className="max-h-60 overflow-y-auto custom-scrollbar">
+              <div className={cx("dropdown")} ref={dropdownRef}>
+                <div className={cx("dropdown-header")}>Thông báo</div>
+                <div className={cx("dropdown-list")}>
                   {notifications.length === 0 ? (
-                    <div className="p-3 text-sm text-gray-500 text-center">
+                    <div className={cx("empty-message")}>
                       Không có thông báo nào
                     </div>
                   ) : (
                     notifications.map((n) => (
                       <div
                         key={n.id}
-                        className={`px-4 py-2 text-sm border-b cursor-pointer hover:bg-blue-50 transition ${
-                          n.read ? "text-gray-500" : "text-gray-800 font-medium"
-                        }`}
+                        className={cx("notification-item", {
+                          read: n.read,
+                        })}
                       >
                         {n.message}
                       </div>
                     ))
                   )}
                 </div>
-                <div className="p-2 text-center border-t">
+                <div className={cx("dropdown-footer")}>
                   <button
                     onClick={() => {
                       navigate("/user/notification");
                       setIsOpen(false);
                     }}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    className={cx("view-all-button")}
                   >
                     Xem tất cả thông báo →
                   </button>

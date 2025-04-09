@@ -5,6 +5,7 @@ import UserAvatar from "./UserAvatar";
 import {} from "react-icons/bs";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
+import Profile from "../Profile/Profile";
 
 const cx = classNames.bind(styles);
 
@@ -49,7 +50,10 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
         <div ref={menuRef} className={cx("dropdown-menu")}>
           <div
             className={cx("dropdown-item")}
-            onClick={() => setIsProfileOpen(true)}
+            onClick={() => {
+              setIsProfileOpen(true);
+              setIsMenuOpen(false);
+            }}
           >
             <span>Hồ sơ cá nhân</span>
           </div>
@@ -66,21 +70,7 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
         </div>
       )}
 
-      {isProfileOpen && (
-        <div
-          className={cx("popup-overlay")}
-          onClick={() => setIsProfileOpen(false)}
-        >
-          <div
-            className={cx("popup-content")}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2>Hồ sơ cá nhân</h2>
-            <p>Thông tin chi tiết về người dùng</p>
-            <button onClick={() => setIsProfileOpen(false)}>Đóng</button>
-          </div>
-        </div>
-      )}
+      {isProfileOpen && <Profile onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
 };

@@ -26,11 +26,22 @@ const usePost = <T>(url: string): PostResult<T> => {
     setError(null);
 
     try {
+      // Set the token in the headers
+      const token = localStorage.getItem("accessToken");
+
+      const finalConfig: AxiosRequestConfig = {
+        ...config,
+        headers: {
+          ...(config?.headers || {}),
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      };
+
       const response = await axios({
         method: method,
         url: url,
         data: body,
-        ...config,
+        ...finalConfig,
       });
       setData(response.data);
       return response;

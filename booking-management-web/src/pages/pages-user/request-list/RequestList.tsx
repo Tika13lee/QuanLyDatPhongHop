@@ -7,6 +7,7 @@ import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import { formatDateString, getHourMinute } from "../../../utilities";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -92,7 +93,9 @@ function RequestList() {
         </div>
       </div>
 
-      {Array.isArray(requestList) && requestList.length === 0 ? (
+      {loadingRequestList ? (
+        <LoadingSpinner />
+      ) : Array.isArray(requestList) && requestList.length === 0 ? (
         <p className={cx("no-schedule-message")}>Không có form yêu cầu nào</p>
       ) : (
         <div className={cx("schedule-list")}>

@@ -14,6 +14,7 @@ import CloseModalButton from "../../../components/Modal/CloseModalButton";
 import DatePicker from "react-datepicker";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import usePost from "../../../hooks/usePost";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -83,6 +84,7 @@ function FrequencySchedules() {
       setPopupMessage("Đã hết hạn chỉnh sửa!");
       setPopupType("error");
       setIsPopupOpen(true);
+
       return;
     }
 

@@ -61,19 +61,23 @@ const Schedule = () => {
   // Cập nhật danh sách ngày trong tuần
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
+  const endOfDay = new Date(daysOfWeek[6]);
+  endOfDay.setHours(23, 59, 59, 999);
+  const dayEndISO = endOfDay.toISOString();
+
   // Lấy danh sách lịch đặt phòng theo tuần
   const { data, loading, error } = useFetch<ReservationDetailProps[]>(
     `http://localhost:8080/api/v1/reservation/getAllReservationByBooker?phone=${
       user.phone
-    }&dayStart=${new Date(daysOfWeek[0]).toISOString()}&dayEnd=${new Date(
-      daysOfWeek[6]
-    ).toISOString()}`
+    }&dayStart=${new Date(daysOfWeek[0]).toISOString()}&dayEnd=${dayEndISO}`
   );
 
   useEffect(() => {
     if (!data) return;
     setReservations(data);
   }, [data]);
+
+  console.log("Lịch đặt phòng: ", reservations);
 
   // Chuyển đổi dữ liệu lịch để hiển thị
   const formattedEvents = reservations?.map((event) => ({
@@ -443,7 +447,15 @@ const Schedule = () => {
                         onClick={() => handleOpenDetail(event)}
                       >
                         <p>
-                          <span style={{ color: "red" }}>●</span>{" "}
+                          {event.frequency === "ONE_TIME" ? (
+                            <span style={{ color: "red" }}>●</span>
+                          ) : (
+                            <IconWrapper
+                              icon={TbRepeat}
+                              size={12}
+                              color="blue"
+                            />
+                          )}{" "}
                           {event.timeStartEnd}
                         </p>
                         <p>
@@ -476,24 +488,31 @@ const Schedule = () => {
         <div className={cx("modal-overlay")}>
           <div className={cx("modal")}>
             <CloseModalButton onClick={handleCloseDetail} />
-            <button
-              className={cx("btn-update")}
-              onClick={() => {
-                if (new Date(selectedSchedule.timeStart) < new Date()) {
-                  setPopupMessage(
-                    `Lịch này đã qua, không được phép chỉnh sửa!`
-                  );
-                  setPopupType("error");
-                  setIsPopupOpen(true);
-                  return;
-                }
-                setIsEdit(true);
-              }}
-              disabled={selectedSchedule.booker.employeeId !== user.employeeId}
-            >
-              <IconWrapper icon={FaEdit} size={16} color="white" />
-              Chỉnh sửa
-            </button>
+            <div className={cx("modal-header")}>
+              <button
+                className={cx("btn-update")}
+                onClick={() => {
+                  if (selectedSchedule.booker.employeeId !== user.employeeId) {
+                    setPopupMessage(`Bạn không được phép chỉnh sửa lịch này!`);
+                    setPopupType("error");
+                    setIsPopupOpen(true);
+                    return;
+                  }
+                  setIsEdit(true);
+                }}
+                disabled={new Date(selectedSchedule.timeStart) < new Date()}
+              >
+                <IconWrapper icon={FaEdit} size={16} color="white" />
+                Chỉnh sửa
+              </button>
+              <button
+                className={cx("btn-delete")}
+                disabled={new Date(selectedSchedule.timeStart) < new Date()}
+              >
+                <IconWrapper icon={FaEdit} size={16} color="white" />
+                Hủy lịch
+              </button>
+            </div>
             <h3>Chi tiết lịch</h3>
 
             <div className={cx("modal-content")}>

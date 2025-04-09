@@ -4,13 +4,10 @@ import styles from "./WeeklySchedule.module.scss";
 import { toast, ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { EmployeeProps, RoomProps, ServiceProps } from "../../data/data";
-import useFetch from "../../hooks/useFetch";
-import usePost from "../../hooks/usePost";
+import { RoomProps } from "../../data/data";
 import PopupNotification from "../popup/PopupNotification";
-import { formatDateString, times } from "../../utilities";
+import { times, validateBookingTime } from "../../utilities";
 import ModalBooking from "../Modal/ModalBooking";
-import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -31,8 +28,6 @@ type typeInfoPopup = {
   type: typeMessage;
   close: boolean;
 };
-
-const skipMap: { [roomId: string]: { [time: string]: boolean } } = {};
 
 const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
   const roomRedux = useSelector((state: RootState) => state.room.selectedRoom);
@@ -91,33 +86,8 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
   const handleCellClick = (date: string, time: string) => {
     console.log(date, time);
 
-    const selectedDateTime = new Date(`${date}T${time}:00`);
-    const now = new Date();
-
-    const isToday = selectedDateTime.toDateString() === now.toDateString();
-
-    if (isToday) {
-      const minutesNow = now.getHours() * 60 + now.getMinutes();
-      const currentMinutes = Math.ceil(minutesNow / 30) * 30;
-
-      const [hour, minute] = time.split(":").map(Number);
-      const selectedMinutes = hour * 60 + minute;
-
-      if (selectedMinutes < currentMinutes) {
-        toast.warning(`Bạn không thể đặt lịch vào lúc ${time} đã qua.`);
-        return;
-      }
-    } else {
-      if (selectedDateTime < now) {
-        toast.warning(
-          `Bạn không thể đặt lịch họp trong ngày ${formatDateString(
-            date
-          )} đã qua.`
-        );
-        return;
-      }
-    }
-
+    const isValidTime = validateBookingTime(date, time, toast.warning);
+    if (!isValidTime) return;
     setSelectedSlot({ date, time });
     setIsModalOpen(true);
   };
@@ -217,88 +187,109 @@ const WeeklySchedule = ({ roomId }: { roomId?: string }) => {
             </thead>
 
             <tbody>
-              {times.slice(0, -1).map((time, index) => (
-                <tr key={index}>
-                  <td className={cx("timeColumn")}>{time}</td>
+              {(() => {
+                const skipMap: { [day: string]: { [time: string]: boolean } } =
+                  {};
 
-                  {daysOfWeek.map((day, i) => {
-                    const dayKey = weekDates[i];
-                    if (!skipMap[dayKey]) skipMap[dayKey] = {};
-                    if (skipMap[dayKey][time]) return null;
+                return times
+                  .filter((time) => time <= "17:30")
+                  .map((time, index) => (
+                    <tr key={index}>
+                      <td className={cx("timeColumn")}>{time}</td>
 
-                    const bookedSchedule = reservations?.find((reservation) => {
-                      const startTime = formatTime(reservation.timeStart);
-                      return (
-                        reservation.timeStart.split("T")[0] === dayKey &&
-                        startTime === time
-                      );
-                    });
+                      {daysOfWeek.map((day, i) => {
+                        const dayKey = weekDates[i]; // ví dụ: "2025-04-13"
+                        if (!skipMap[dayKey]) skipMap[dayKey] = {};
+                        if (skipMap[dayKey][time]) return null;
 
-                    if (bookedSchedule) {
-                      const startTime = formatTime(bookedSchedule.timeStart);
-                      const endTime = formatTime(bookedSchedule.timeEnd);
-                      const startIndex = times.indexOf(startTime);
-                      const endIndex = times.indexOf(endTime);
-                      const rowSpan = endIndex - startIndex;
+                        const bookedSchedule = reservations?.find(
+                          (reservation) => {
+                            const startTime = formatTime(reservation.timeStart);
+                            return (
+                              reservation.timeStart.split("T")[0] === dayKey &&
+                              startTime === time
+                            );
+                          }
+                        );
 
-                      for (let j = 1; j < rowSpan; j++) {
-                        const nextTime = times[startIndex + j];
-                        skipMap[dayKey][nextTime] = true;
-                      }
+                        if (bookedSchedule) {
+                          const startTime = formatTime(
+                            bookedSchedule.timeStart
+                          );
+                          const endTime = formatTime(bookedSchedule.timeEnd);
+                          const startIndex = times.indexOf(startTime);
+                          const endIndex = times.indexOf(endTime);
 
-                      const editBackground = {
-                        normal: "normal",
-                        pending: "pending",
-                        waiting: "waiting",
-                        checked_in: "checked_in",
-                        completed: "completed",
-                      };
-                      const statusKey =
-                        bookedSchedule.statusReservation.toLowerCase() as keyof typeof editBackground;
+                          if (
+                            startIndex === -1 ||
+                            endIndex === -1 ||
+                            endIndex <= startIndex
+                          )
+                            return null;
 
-                      return (
-                        <td
-                          key={i}
-                          rowSpan={rowSpan}
-                          className={cx("schedule-cell", {
-                            booked: true,
-                            [editBackground[statusKey]]:
-                              editBackground[statusKey],
-                          })}
-                          onClick={() => {
-                            toast.warning("Khung giờ này đã được đặt!");
-                          }}
-                        >
-                          <div className={cx("booked-title")}>
-                            <p>{bookedSchedule.title}</p>
-                            <p className={cx("status")}>
-                              {bookedSchedule.statusReservation === "PENDING"
-                                ? "Chờ phê duyệt"
-                                : bookedSchedule.statusReservation === "WAITING"
-                                ? "Chờ nhận phòng"
-                                : bookedSchedule.statusReservation ===
-                                  "CHECKED_IN"
-                                ? "Đã nhận phòng"
-                                : bookedSchedule.statusReservation ===
-                                  "COMPLETED"
-                                ? "Đã hoàn thành"
-                                : ""}
-                            </p>
-                          </div>
-                        </td>
-                      );
-                    }
+                          const rowSpan = endIndex - startIndex;
 
-                    return (
-                      <td
-                        key={i}
-                        className={cx("schedule-cell")}
-                        onClick={() => handleCellClick(dayKey, time)}
-                      ></td>
-                    );
-                  })}
-                </tr>
-              ))}
+                          for (let j = 1; j < rowSpan; j++) {
+                            const nextTime = times[startIndex + j];
+                            skipMap[dayKey][nextTime] = true;
+                          }
+
+                          const editBackground = {
+                            normal: "normal",
+                            pending: "pending",
+                            waiting: "waiting",
+                            checked_in: "checked_in",
+                            completed: "completed",
+                          };
+                          const statusKey =
+                            bookedSchedule.statusReservation.toLowerCase() as keyof typeof editBackground;
+
+                          return (
+                            <td
+                              key={i}
+                              rowSpan={rowSpan}
+                              className={cx("schedule-cell", {
+                                booked: true,
+                                [editBackground[statusKey]]:
+                                  editBackground[statusKey],
+                              })}
+                              onClick={() => {
+                                toast.warning("Khung giờ này đã được đặt!");
+                              }}
+                            >
+                              <div className={cx("booked-title")}>
+                                <p>{bookedSchedule.title}</p>
+                                <p className={cx("status")}>
+                                  {bookedSchedule.statusReservation ===
+                                  "PENDING"
+                                    ? "Chờ phê duyệt"
+                                    : bookedSchedule.statusReservation ===
+                                      "WAITING"
+                                    ? "Chờ nhận phòng"
+                                    : bookedSchedule.statusReservation ===
+                                      "CHECKED_IN"
+                                    ? "Đã nhận phòng"
+                                    : bookedSchedule.statusReservation ===
+                                      "COMPLETED"
+                                    ? "Đã hoàn thành"
+                                    : ""}
+                                </p>
+                              </div>
+                            </td>
+                          );
+                        }
+
+                        return (
+                          <td
+                            key={i}
+                            className={cx("schedule-cell")}
+                            onClick={() => handleCellClick(dayKey, time)}
+                          ></td>
+                        );
+                      })}
+                    </tr>
+                  ));
+              })()}
             </tbody>
           </table>
 
