@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.Room;
+import vn.com.kltn_project_v1.model.Service;
 import vn.com.kltn_project_v1.model.StatusReservation;
 
 import java.util.Date;
@@ -47,5 +48,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r " +
             "WHERE  FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?1) order by r.timeStart desc")
     List<Reservation> findReservationsInDay(Date timeCheckin);
+    @Query("select s.serviceName, count(s) from Reservation r join r.services s where r.timeStart between ?1 and ?2 group by s.serviceName")
+    List<Object[]> statisticalService(Date timeStart, Date timeEnd);
+    @Query("select r.room.location.building.branch.branchName, count(r), sum(r.total),count(distinct r.room.roomId)  from Reservation r where r.timeStart between ?1 and ?2 group by r.room.location.building.branch.branchName")
+    List<Object[]> statisticalBranchData(Date timeStart, Date timeEnd);
+    @Query("select FUNCTION('DATE', r.timeStart), count(r), sum(r.total) from Reservation r where r.timeStart between ?1 and ?2 group by FUNCTION('DATE', r.timeStart)")
+    List<Object[]> statisticalDaily(Date timeStart, Date timeEnd);
+    @Query("select r.room.roomName, count(r), sum(r.total) from Reservation r where r.timeStart between ?1 and ?2 group by r.room.roomName")
+    List<Object[]> statisticalRoom(Date timeStart, Date timeEnd);
 
 }

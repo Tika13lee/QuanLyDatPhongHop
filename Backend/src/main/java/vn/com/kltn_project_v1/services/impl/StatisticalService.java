@@ -1,0 +1,88 @@
+package vn.com.kltn_project_v1.services.impl;
+
+import lombok.RequiredArgsConstructor;
+import vn.com.kltn_project_v1.dtos.statistical.DataStatisticalDTO;
+import vn.com.kltn_project_v1.repositories.ReservationRepository;
+import vn.com.kltn_project_v1.services.IStatistical;
+
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
+@org.springframework.stereotype.Service
+public class StatisticalService implements IStatistical {
+    private final ReservationRepository reservationRepository;
+    @Override
+    public Map<String, Integer> getStatisticalService(Date startDate, Date endDate) {
+        List<Object[]> services = reservationRepository.statisticalService(startDate, endDate);
+
+        // Bước 1: Convert sang Map và sort giảm dần theo số lượng
+        Map<String, Integer> allServices = services.stream()
+                .collect(Collectors.toMap(
+                        s -> (String) s[0],
+                        s -> ((Number) s[1]).intValue(),
+                        Integer::sum
+                ));
+
+        // Bước 2: Lấy 5 service đầu tiên
+        Map<String, Integer> top5 = allServices.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(5)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new // giữ thứ tự
+                ));
+
+        // Bước 3: Gộp các service còn lại thành "Khác"
+        int otherTotal = allServices.entrySet().stream()
+                .filter(entry -> !top5.containsKey(entry.getKey()))
+                .mapToInt(Map.Entry::getValue)
+                .sum();
+
+        if (otherTotal > 0) {
+            top5.put("Khác", otherTotal);
+        }
+
+        return top5;
+    }
+
+    @Override
+    public List<DataStatisticalDTO> getBranchData(Date startDate, Date endDate) {
+        List<Object[]> branchData = reservationRepository.statisticalBranchData(startDate, endDate);
+        return branchData.stream()
+                .map(data -> new DataStatisticalDTO(
+                        (String) data[0], // tên chi nhánh
+                        ((Number) data[2]).intValue(), // số lượng đặt phòng
+                        ((Number) data[1]).intValue(), // tổng tiền
+                        ((Number) data[3]).intValue() // số lượng phòng
+                ))
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<DataStatisticalDTO> statisticalDaily(Date startDate, Date endDate) {
+        List<Object[]> dailyData = reservationRepository.statisticalDaily(startDate, endDate);
+        return dailyData.stream()
+                .map(data -> new DataStatisticalDTO(
+                        ( data[0].toString()), // ngày
+                        ((Number) data[2]).intValue(), // số lượng đặt phòng
+                        ((Number) data[1]).intValue() // tổng tiền
+                ))
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<DataStatisticalDTO> statisticalRoom(Date startDate, Date endDate) {
+        List<Object[]> roomData = reservationRepository.statisticalRoom(startDate, endDate);
+        return roomData.stream()
+                .map(data -> new DataStatisticalDTO(
+                        (String) data[0], // tên phòng
+                        ((Number) data[2]).intValue(), // số lượng đặt phòng
+                        ((Number) data[1]).intValue() // tổng tiền
+                ))
+                .collect(Collectors.toList());
+    }
+}

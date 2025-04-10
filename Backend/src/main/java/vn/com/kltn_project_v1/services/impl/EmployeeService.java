@@ -35,7 +35,7 @@ public class EmployeeService implements IEmployee {
             return null;
         }
         String encodedPassword = passwordEncoder.encode("1111");
-        accountRepository.save(accountRepository.save(new Account(employeeDTO.getPhone(),encodedPassword, Role.USER)));
+        accountRepository.save(accountRepository.save(new Account(employeeDTO.getPhone(),encodedPassword,employeeDTO.getRole())));
         Employee employee = ConvertToEntity(employeeDTO);
 
         return employeeRepository.save(employee);

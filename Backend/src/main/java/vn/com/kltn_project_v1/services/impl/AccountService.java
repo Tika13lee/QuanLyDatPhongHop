@@ -20,7 +20,6 @@ public class AccountService implements IAccount {
     @Override
     public String login(String userName, String password) {
         Account account = accountRepository.findAccountByUserName(userName).orElse(null);
-        System.out.println(passwordEncoder.encode(password) + " " + passwordEncoder.matches(password, account.getPassword())  + " " + password  + " " + userName  + " " + account.getUsername()  + " " + account.getAuthorities());
         if (account == null) {
             return "Tài khoản không tồn tại";
         }
