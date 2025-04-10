@@ -14,7 +14,7 @@ public class DataStatisticalDTO {
     private int price;
     private int quantityReservation;
     private int quantityRoom;
-
+    private int quantityService;
     public DataStatisticalDTO(String name, int price, int quantityReservation) {
         this.name = name;
         this.price = price;

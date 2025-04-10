@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IStatistical {
-    Map<String,Integer> getStatisticalService(Date startDate, Date endDate);
+    List<DataStatisticalDTO> getStatisticalService(Date startDate, Date endDate);
 
     List<DataStatisticalDTO> getBranchData(Date startDate, Date endDate);
 

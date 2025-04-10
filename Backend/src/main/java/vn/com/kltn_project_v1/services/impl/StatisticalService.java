@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class StatisticalService implements IStatistical {
     private final ReservationRepository reservationRepository;
     @Override
-    public Map<String, Integer> getStatisticalService(Date startDate, Date endDate) {
+    public List<DataStatisticalDTO> getStatisticalService(Date startDate, Date endDate) {
         List<Object[]> services = reservationRepository.statisticalService(startDate, endDate);
 
         // Bước 1: Convert sang Map và sort giảm dần theo số lượng
@@ -47,8 +47,18 @@ public class StatisticalService implements IStatistical {
         if (otherTotal > 0) {
             top5.put("Khác", otherTotal);
         }
+        // Bước 4: Chuyển đổi sang List<DataStatisticalDTO>
+        return top5.entrySet().stream()
+                .map(entry -> new DataStatisticalDTO(
+                        entry.getKey(), // tên dịch vụ
+                        0, // số lượng
+                        0, // tổng tiền (không có thông tin này trong kết quả)
+                        0, // số lượng phòng (không có thông tin này trong kết quả)
+                        entry.getValue()
+                ))
+                .collect(Collectors.toList());
 
-        return top5;
+
     }
 
     @Override
@@ -59,7 +69,8 @@ public class StatisticalService implements IStatistical {
                         (String) data[0], // tên chi nhánh
                         ((Number) data[2]).intValue(), // số lượng đặt phòng
                         ((Number) data[1]).intValue(), // tổng tiền
-                        ((Number) data[3]).intValue() // số lượng phòng
+                        ((Number) data[3]).intValue(), // số lượng phòng
+                        0 // số lượng dịch vụ (không có thông tin này trong kết quả)
                 ))
                 .collect(Collectors.toList());
     }
