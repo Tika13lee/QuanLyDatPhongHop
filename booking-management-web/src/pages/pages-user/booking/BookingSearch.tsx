@@ -6,8 +6,7 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdSearch } from "../../../components/icons/icons";
 import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
-import axios from "axios";
-import { generateStartTime, times } from "../../../utilities";
+import { generateStartTime, generateStartTime2 } from "../../../utilities";
 import DatePicker from "react-datepicker";
 
 const cx = classNames.bind(styles);
@@ -37,9 +36,8 @@ function BookingSearch() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [startTime, setStartTime] = useState(
-    generateStartTime(selectedDate)[0]
-  );
+  const { filteredTimes, adjustedDate } = generateStartTime2(selectedDate);
+  const [startTime, setStartTime] = useState(filteredTimes[0]);
   const [duration, setDuration] = useState(30);
   const [capacity, setCapacity] = useState<number>(1);
   const [branchName, setBranchName] = useState<string>("TP. Hồ Chí Minh");
@@ -67,10 +65,28 @@ function BookingSearch() {
     return `${endHour}:${endMinute}`;
   };
 
+  // lấy duration còn lại
+  const getAvailableDurations = (
+    startTime: string,
+    endTime: string = "18:00"
+  ): number[] => {
+    const getMinutesFromHHMM = (hhmm: string): number => {
+      const [hours, minutes] = hhmm.split(":").map(Number);
+      return hours * 60 + minutes;
+    };
+
+    const startMinutes = getMinutesFromHHMM(startTime);
+    const endMinutes = getMinutesFromHHMM(endTime);
+    const maxDuration = endMinutes - startMinutes;
+
+    // Lọc các duration còn phù hợp
+    return durationOptions.filter((duration) => duration <= maxDuration);
+  };
+
   // dữ liệu tìm kiếm
   const [dataSearch, setDataSearch] = useState<DataSearch>({
     branch: branchName,
-    date: selectedDate,
+    date: adjustedDate,
     timeStart: "",
     timeEnd: "",
   });
@@ -84,17 +100,17 @@ function BookingSearch() {
     const endTime = calculateEndTime(
       normalizedStartTime,
       duration,
-      selectedDate
+      adjustedDate
     );
     const timeStart = new Date(
-      `${selectedDate}T${normalizedStartTime}`
+      `${adjustedDate}T${normalizedStartTime}`
     ).toISOString();
 
-    const timeEnd = new Date(`${selectedDate}T${endTime}`).toISOString();
+    const timeEnd = new Date(`${adjustedDate}T${endTime}`).toISOString();
 
     console.log(
       branchName,
-      new Date(selectedDate).toISOString(),
+      new Date(adjustedDate).toISOString(),
       timeStart,
       timeEnd,
       capacity
@@ -108,7 +124,7 @@ function BookingSearch() {
         setFilterData(data);
         setDataSearch({
           branch: branchName,
-          date: selectedDate,
+          date: adjustedDate,
           timeStart: startTime,
           timeEnd: endTime,
         });
@@ -137,6 +153,7 @@ function BookingSearch() {
           });
       } else {
         handleFilter();
+        console.log(1);
       }
     }, 500);
 
@@ -182,15 +199,15 @@ function BookingSearch() {
           <div className={cx("filter-item")}>
             <label>Ngày</label>
             <DatePicker
-              selected={selectedDate ? new Date(selectedDate) : null}
+              selected={adjustedDate ? new Date(adjustedDate) : null}
               onChange={(date) => {
                 if (date) {
                   setSelectedDate(date.toISOString().split("T")[0]);
-                  const startTimeOptions = generateStartTime(
+                  const startTimeOptions = generateStartTime2(
                     date.toISOString().split("T")[0]
                   );
-                  if (startTimeOptions.length > 0) {
-                    setStartTime(startTimeOptions[0]);
+                  if (startTimeOptions.filteredTimes.length > 0) {
+                    setStartTime(startTimeOptions.filteredTimes[0]);
                   } else {
                     setStartTime("");
                   }
@@ -208,8 +225,8 @@ function BookingSearch() {
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
             >
-              {generateStartTime(selectedDate).length > 0 &&
-                generateStartTime(selectedDate)
+              {filteredTimes.length > 0 &&
+                filteredTimes
                   .filter((time) => time <= "17:30")
                   .map((time) => (
                     <option key={time} value={time}>
@@ -226,7 +243,7 @@ function BookingSearch() {
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
             >
-              {durationOptions.map((minutes) => (
+              {getAvailableDurations(startTime).map((minutes) => (
                 <option key={minutes} value={minutes}>
                   {minutes} phút
                 </option>

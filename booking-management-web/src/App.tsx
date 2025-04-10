@@ -11,6 +11,7 @@ import {
   Room,
   RoomDetail,
   Service,
+  Statistical,
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
 import {
@@ -48,6 +49,7 @@ function App() {
             <Route path="service" element={<Service />} />
             <Route path="price" element={<Price />} />
             <Route path="employee" element={<Employee />} />
+            <Route path="statistics" element={<Statistical />} />
           </Route>
 
           <Route path="/user" element={<MainLayoutUser />}>

@@ -9,103 +9,111 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
+import useFetch from "../../../hooks/useFetch";
+import { BranchProps } from "../../../data/data";
 
 const cx = classNames.bind(styles);
 
-interface Meeting {
-  title: string;
-  time: string;
-  participants: string[];
-  room: string;
-}
-const meetingStats = [
-  { day: "Thứ 2", count: 3 },
-  { day: "Thứ 3", count: 5 },
-  { day: "Thứ 4", count: 2 },
-  { day: "Thứ 5", count: 6 },
-  { day: "Thứ 6", count: 4 },
-  { day: "Thứ 7", count: 1 },
+const todayMeetings = 30;
+const todayCost = 15000000;
+const todayRooms = 10;
+
+// truyền id chi nhánh
+const phongBanData = [
+  { name: "P.KD", chiPhi: 5000000, soCuocHop: 22 },
+  { name: "P.NS", chiPhi: 4000000, soCuocHop: 2 },
+  { name: "P.KT", chiPhi: 6000000, soCuocHop: 12 },
+  { name: "IT", chiPhi: 6000000, soCuocHop: 14 },
+  { name: "Kế toán", chiPhi: 6000000, soCuocHop: 10 },
+  { name: "P.KT", chiPhi: 6000000, soCuocHop: 9 },
+  { name: "P.KT", chiPhi: 6000000, soCuocHop: 2 },
+  { name: "P.KT", chiPhi: 6000000, soCuocHop: 3 },
 ];
 
 const Dashboard = () => {
-  const [meetingsToday, setMeetingsToday] = useState<number>(0);
-  const [upcomingMeetings, setUpcomingMeetings] = useState<Meeting[]>([]);
-  const [activeUsers, setActiveUsers] = useState<number>(0);
-  const [popularRoom, setPopularRoom] = useState<string>("");
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
-  useEffect(() => {
-    // Mock dữ liệu
-    setMeetingsToday(8);
-    setActiveUsers(23);
-    setPopularRoom("Phòng họp A");
-
-    setUpcomingMeetings([
-      {
-        title: "Họp dự án Alpha",
-        time: "10:30 - 11:30",
-        participants: ["Minh", "Anh", "Trang"],
-        room: "Phòng họp A",
-      },
-      {
-        title: "Họp phòng Nhân sự",
-        time: "14:00 - 15:00",
-        participants: ["Loan", "Tú"],
-        room: "Phòng họp B",
-      },
-    ]);
-  }, []);
+  // lấy chi nhánh
+  const {
+    data: branchs,
+    loading: branchsLoading,
+    error: branchsError,
+  } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
+  );
 
   return (
     <div className={cx("dashboard")}>
-      <h1 className={cx("title")}>Bảng điều khiển</h1>
-      <div className={cx("stats")}>
-        <div className={cx("card")}>
-          <h3>Cuộc họp hôm nay</h3>
-          <p>{meetingsToday}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Người dùng hoạt động</h3>
-          <p>{activeUsers}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Phòng phổ biến</h3>
-          <p>{popularRoom}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Phòng phổ biến</h3>
-          <p>{popularRoom}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Phòng phổ biến</h3>
-          <p>{popularRoom}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Phòng phổ biến</h3>
-          <p>{popularRoom}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Phòng phổ biến</h3>
-          <p>{popularRoom}</p>
-        </div>
-        <div className={cx("card")}>
-          <h3>Phòng phổ biến</h3>
-          <p>{popularRoom}</p>
+      <div className={cx("header")}>
+        <h2>Dữ liệu trong ngày</h2>
+        <div className={cx("summaryCards")}>
+          <div className={cx("summaryCard")}>
+            <h3>Tổng số cuộc họp</h3>
+            <p>{todayMeetings}</p>
+          </div>
+          <div className={cx("summaryCard")}>
+            <h3>Số lịch hoàn thành</h3>
+            <p>{todayMeetings}</p>
+          </div>
+          <div className={cx("summaryCard")}>
+            <h3>Số lịch đã hủy</h3>
+            <p>{todayMeetings}</p>
+          </div>
+          <div className={cx("summaryCard")}>
+            <h3>Tổng chi phí</h3>
+            <p>{todayCost.toLocaleString()} VNĐ</p>
+          </div>
+          <div className={cx("summaryCard")}>
+            <h3>Phòng đang sử dụng</h3>
+            <p>{todayRooms}</p>
+          </div>
+          <div className={cx("summaryCard")}>
+            <h3>Số lượt truy cập</h3>
+            <p>{todayRooms}</p>
+          </div>
         </div>
       </div>
 
-      <div className={cx("chartContainer")}>
-        <h2>Thống kê cuộc họp trong tuần</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={meetingStats}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+      <div className={cx("card")}>
+        <div className={cx("cardHeader")}>
+          <h2>
+            Chi phí và số cuộc họp theo phòng ban của 1 chi nhánh trong 1 ngày
+          </h2>
+          <select
+            value={selectedBranch}
+            onChange={(e) => setSelectedBranch(e.target.value)}
           >
+            {branchs?.map((branch) => (
+              <option key={branch.branchId} value={branch.branchId}>
+                {branch.branchName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={phongBanData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis />
+            <XAxis dataKey="name" />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
             <Tooltip />
-            <Bar dataKey="count" fill="#0070f3" radius={[4, 4, 0, 0]} />
+            <Legend />
+            <Bar
+              yAxisId="left"
+              dataKey="chiPhi"
+              fill="#82ca9d"
+              name="Chi phí"
+              barSize={30}
+            />
+            <Bar
+              yAxisId="right"
+              dataKey="soCuocHop"
+              fill="#ffc658"
+              name="Số cuộc họp"
+              barSize={30}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

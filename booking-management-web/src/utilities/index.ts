@@ -96,9 +96,7 @@ const validateBookingTime = (
     const selectedMinutes = hour * 60 + minute;
 
     if (selectedMinutes < roundedThresholdMinutes) {
-      showToast(
-        `Vui lòng chọn thời gian bắt đầu sau giờ hiện tại!`
-      );
+      showToast(`Vui lòng chọn thời gian bắt đầu sau giờ hiện tại!`);
       return false;
     }
   } else {
@@ -134,7 +132,50 @@ const generateStartTime = (selectedDate: string) => {
   return times.filter((time) => time >= thresholdStr);
 };
 
+const generateStartTime2 = (selectedDate: string) => {
+  const now = new Date();
+  let selected = new Date(selectedDate);
+
+  // Kiểm tra nếu là hôm nay
+  const isToday = selected.toDateString() === now.toDateString();
+
+  if (isToday) {
+    const afterFiveThirty =
+      now.getHours() > 17 || (now.getHours() === 17 && now.getMinutes() >= 30);
+
+    if (afterFiveThirty) {
+      // Ép selectedDate thành ngày mai nếu đã quá 17:30
+      selected.setDate(selected.getDate() + 1);
+    }
+  }
+
+  // Sau khi chỉnh, kiểm tra lại có phải hôm nay không
+  const isStillToday = selected.toDateString() === now.toDateString();
+
+  let filteredTimes: string[];
+  if (!isStillToday) {
+    // Ngày khác hôm nay → giữ nguyên toàn bộ times
+    filteredTimes = times;
+  } else {
+    // Ngày là hôm nay → lọc từ now + 10 phút
+    const threshold = new Date(now.getTime() + 10 * 60 * 1000);
+    const thresholdStr = `${String(threshold.getHours()).padStart(
+      2,
+      "0"
+    )}:${String(threshold.getMinutes()).padStart(2, "0")}`;
+
+    filteredTimes = times.filter((time) => time >= thresholdStr);
+  }
+
+  // Trả về cả danh sách thời gian hợp lệ và ngày đã điều chỉnh
+  return {
+    filteredTimes,
+    adjustedDate: selected.toISOString().split("T")[0], // trả về dạng YYYY-MM-DD
+  };
+};
+
 export {
+  generateStartTime2, 
   generateStartTime,
   validateBookingTime,
   getHourMinute,

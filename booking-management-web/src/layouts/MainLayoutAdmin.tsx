@@ -81,7 +81,7 @@ const MainLayoutAdmin = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  DS phê duyệt
+                  DS yêu cầu
                 </NavLink>
               </div>
             )}
@@ -129,7 +129,7 @@ const MainLayoutAdmin = () => {
               cx("sidebar-item", { active: isActive })
             }
           >
-            QL Giá
+            QL Bảng Giá
           </NavLink>
 
           <NavLink
@@ -150,14 +150,14 @@ const MainLayoutAdmin = () => {
             Cài Đặt Thiết Lập
           </NavLink> */}
 
-          {/* <NavLink
+          <NavLink
             to="/admin/statistics"
             className={({ isActive }) =>
               cx("sidebar-item", { active: isActive })
             }
           >
             Thống Kê
-          </NavLink> */}
+          </NavLink>
         </div>
 
         <div className={cx("outlet-container")}>

@@ -52,7 +52,7 @@ const MainLayoutUser = () => {
               onClick={() => setIsApprovedOpen(!isApprovedOpen)}
             >
               <span className={cx({ "booking-open": isApprovedOpen })}>
-                Quản lý phê duyệt
+                Quản lý yêu cầu
               </span>
               <IconWrapper
                 icon={!isApprovedOpen ? IoIosArrowForward : IoIosArrowDown}
@@ -76,7 +76,7 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  DS đã phê duyệt
+                  DS đồng ý
                 </NavLink>
 
                 <NavLink
@@ -85,7 +85,7 @@ const MainLayoutUser = () => {
                     cx("dropdown-item", { active: isActive })
                   }
                 >
-                  DS đã từ chối
+                  DS từ chối
                 </NavLink>
               </div>
             )}

@@ -9,8 +9,10 @@ import Device from "./device/Device";
 import Service from "./service/Serivice";
 import ApprovalList from "./booking-mgmt/ApprovalList";
 import Price from "./price/Price";
+import Statistical from "./statistical/Statistical";
 
 export {
+  Statistical,
   Price,
   ApprovalList,
   Service,

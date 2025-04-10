@@ -528,6 +528,7 @@ const Employee = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleFilePicture}
+                  disabled={selectedEmployee ? true : false}
                 />
               </div>
             </div>
@@ -540,6 +541,7 @@ const Employee = () => {
                 placeholder="Email"
                 value={formData.email || ""}
                 onChange={handleInputChange}
+                disabled={selectedEmployee ? true : false}
               />
             </div>
 
