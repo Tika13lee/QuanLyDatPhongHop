@@ -9,16 +9,42 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../app/store";
 import { fetchLocations } from "../features/locationSlice";
 import { fetchDevices } from "../features/deviceSlice";
+import axios from "axios";
+import { EmployeeProps } from "../data/data";
+import { setUser } from "../features/userSlice";
 
 const cx = classNames.bind(styles);
 
 const MainLayoutAdmin = () => {
+  // Lấy thông tin sdt người dùng từ localStorage
+  const currentUserPhone = JSON.parse(localStorage.getItem("userPhone")!);
+
   const dispatch = useDispatch<AppDispatch>();
   const { locations, loading, error } = useSelector(
     (state: RootState) => state.location
   );
 
   const { devices } = useSelector((state: RootState) => state.device);
+
+  const fetchUserData = async () => {
+    try {
+      const phone = currentUserPhone; // Số điện thoại người dùng
+      const response = await axios.get<EmployeeProps>(
+        `http://localhost:8080/api/v1/employee/getEmployeeByPhone`,
+        { params: { phone } }
+      );
+
+      // Lưu dữ liệu vào localStorage, redux
+      dispatch(setUser(response.data));
+      localStorage.setItem("currentUser", JSON.stringify(response.data));
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     if (locations.length === 0) {

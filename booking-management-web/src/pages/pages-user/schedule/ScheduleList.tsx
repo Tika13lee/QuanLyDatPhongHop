@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import axios from "axios";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { FiRefreshCw } from "react-icons/fi";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
@@ -92,8 +94,7 @@ const transformData = (rawData: RequestForm[]): DayEvents[] => {
 };
 
 const ScheduleList = () => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
 
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [expandedDays, setExpandedDays] = useState<string[]>([]);
@@ -104,7 +105,7 @@ const ScheduleList = () => {
   useEffect(() => {
     axios
       .get<RequestForm[]>(
-        `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}`
+        `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}`
       )
       .then((res) => {
         const filteredData = res.data.filter(

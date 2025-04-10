@@ -8,12 +8,13 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import { formatDateString, getHourMinute } from "../../../utilities";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
 function RequestList() {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequestForm, setSelectedRequestForm] =
@@ -27,8 +28,8 @@ function RequestList() {
     error: errorRequestList,
   } = useFetch<RequestFormProps[]>(
     statusRequestForm
-      ? `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}&statusRequestForm=${statusRequestForm}`
-      : `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}`
+      ? `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}&statusRequestForm=${statusRequestForm}`
+      : `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}`
   );
 
   // Mở modal

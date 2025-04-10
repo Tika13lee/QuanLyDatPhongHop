@@ -3,6 +3,8 @@ import styles from "./Notification.module.scss";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
@@ -17,14 +19,13 @@ type NotificationDTO = {
 };
 
 const Notification: React.FC = () => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
 
   useEffect(() => {
     axios
       .get<NotificationDTO[]>(
-        `http://localhost:8080/api/v1/notification/getAllNotification?employeeId=${user.employeeId}`
+        `http://localhost:8080/api/v1/notification/getAllNotification?employeeId=${user?.employeeId}`
       )
       .then((res) => {
         setNotifications(res.data);

@@ -88,7 +88,7 @@ export type EmployeeProps = {
     location: LocationProps;
   };
   account: {
-    role: boolean;
+    role: string;
   };
 };
 

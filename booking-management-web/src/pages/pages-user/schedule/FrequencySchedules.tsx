@@ -14,13 +14,13 @@ import CloseModalButton from "../../../components/Modal/CloseModalButton";
 import DatePicker from "react-datepicker";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import usePost from "../../../hooks/usePost";
-import { set } from "react-datepicker/dist/date_utils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
 function FrequencySchedules() {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
   const [eventsByDay, setEventsByDay] = useState<RequestFormProps[]>([]);
   const [openModalDetail, setOpenModalDetail] = useState(false);
   const [selectedSchedule, setSelectedSchedule] =
@@ -40,7 +40,7 @@ function FrequencySchedules() {
   useEffect(() => {
     axios
       .get<RequestFormProps[]>(
-        `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user.employeeId}`
+        `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}`
       )
       .then((res) => {
         const filteredData = res.data.filter(

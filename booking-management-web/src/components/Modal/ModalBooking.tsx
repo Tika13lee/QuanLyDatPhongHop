@@ -18,6 +18,8 @@ import { IoSettingsOutline } from "../../components/icons/icons";
 import { FaPlus } from "../../components/icons/icons";
 import usePost from "../../hooks/usePost";
 import CloseModalButton from "./CloseModalButton";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 
 const cx = classNames.bind(styles);
 
@@ -51,8 +53,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
   dataRoomByBranch,
   setIsPopupOpen,
 }) => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
 
   const [timeEndSchedule, setTimeEndSchedule] = useState<string[]>([]);
   const [selectedStartTime, setSelectedStartTime] = useState<string>(times[0]);
@@ -81,7 +82,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
     []
   );
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeProps[]>([
-    user,
+    user as EmployeeProps,
   ]);
 
   useEffect(() => {
@@ -375,6 +376,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
 
   const resetData = () => {
     setSelectedServices([]);
+    if (!user) return;
     setSelectedEmployees([user]);
   };
 
@@ -1040,7 +1042,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                                   className={cx("employee-item")}
                                 >
                                   {emp.employeeName} - {emp.phone}
-                                  {emp.employeeId === user.employeeId ? (
+                                  {emp.employeeId === user?.employeeId ? (
                                     <span>(Bạn)</span>
                                   ) : (
                                     <button

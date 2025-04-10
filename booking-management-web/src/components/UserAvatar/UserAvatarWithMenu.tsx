@@ -6,6 +6,7 @@ import {} from "react-icons/bs";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import Profile from "../Profile/Profile";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +21,7 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // đóng mở menu
   const toggleMenu = useCallback(() => {
@@ -64,7 +66,14 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
             <span>Ngôn ngữ</span>
           </div>
           <div className={cx("dropdown-divider")} />
-          <div className={cx("dropdown-item")}>
+          <div
+            className={cx("dropdown-item")}
+            onClick={() => {
+              localStorage.removeItem("userPhone");
+              localStorage.removeItem("currentUser");
+              navigate("/");
+            }}
+          >
             <span>Đăng xuất</span>
           </div>
         </div>

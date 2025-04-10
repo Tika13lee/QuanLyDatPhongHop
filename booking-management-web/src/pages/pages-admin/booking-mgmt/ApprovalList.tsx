@@ -17,8 +17,6 @@ import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 const cx = classNames.bind(styles);
 
 function ApprovalList() {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);

@@ -19,12 +19,13 @@ import { FaEdit, FaPlus, TbRepeat } from "../../../components/icons/icons";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
 const Schedule = () => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekStart, setWeekStart] = useState(
@@ -68,7 +69,7 @@ const Schedule = () => {
   // Lấy danh sách lịch đặt phòng theo tuần
   const { data, loading, error } = useFetch<ReservationDetailProps[]>(
     `http://localhost:8080/api/v1/reservation/getAllReservationByBooker?phone=${
-      user.phone
+      user?.phone
     }&dayStart=${new Date(daysOfWeek[0]).toISOString()}&dayEnd=${dayEndISO}`
   );
 
@@ -492,7 +493,7 @@ const Schedule = () => {
               <button
                 className={cx("btn-update")}
                 onClick={() => {
-                  if (selectedSchedule.booker.employeeId !== user.employeeId) {
+                  if (selectedSchedule.booker.employeeId !== user?.employeeId) {
                     setPopupMessage(`Bạn không được phép chỉnh sửa lịch này!`);
                     setPopupType("error");
                     setIsPopupOpen(true);
@@ -884,7 +885,7 @@ const Schedule = () => {
                                   className={cx("employee-item")}
                                 >
                                   {emp.employeeName} - {emp.phone}
-                                  {emp.employeeId === user.employeeId ? (
+                                  {emp.employeeId === user?.employeeId ? (
                                     <span>(Bạn)</span>
                                   ) : (
                                     <button

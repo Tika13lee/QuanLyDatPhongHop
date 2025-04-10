@@ -18,30 +18,28 @@ import {
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
 import { BranchProps } from "../../../data/data";
+import { formatDateString } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
-const tiLeDichVu = [
-  { name: "Nước suối", value: 240 },
-  { name: "Xịt thơm phòng", value: 180 },
-  { name: "Trái cây", value: 120 },
-  { name: "Hoa quả", value: 90 },
-  { name: "Bánh trái", value: 60 },
+const colors = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7f50",
+  "#a0522d",
+  "#d2691e",
 ];
 
-const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#a0522d"];
-
-// truyền tháng được chọn
-const chiNhanhData = [
-  { name: "Chi nhánh 1", chiPhi: 15000000, soCuocHop: 22, soPhong: 8 },
-  { name: "Chi nhánh 2", chiPhi: 18000000, soCuocHop: 28, soPhong: 12 },
-  { name: "Chi nhánh 3", chiPhi: 12000000, soCuocHop: 19, soPhong: 7 },
-  { name: "Chi nhánh 4", chiPhi: 12000000, soCuocHop: 19, soPhong: 10 },
-  { name: "Chi nhánh 5", chiPhi: 12000000, soCuocHop: 19, soPhong: 6 },
-];
+type StatisticalBranchData = {
+  name: string;
+  price: number;
+  quantityReservation: number;
+  quantityRoom: number;
+};
 
 // truyền id chi nhánh và tháng
-const phongBanData = [
+const phongData = [
   { name: "P.KD", chiPhi: 5000000, soCuocHop: 22 },
   { name: "P.NS", chiPhi: 4000000, soCuocHop: 2 },
   { name: "P.KT", chiPhi: 6000000, soCuocHop: 12 },
@@ -51,14 +49,6 @@ const phongBanData = [
   { name: "P.KT", chiPhi: 6000000, soCuocHop: 2 },
   { name: "P.KT", chiPhi: 6000000, soCuocHop: 3 },
 ];
-
-const chiPhiTheoNgay = Array.from({ length: 31 }, (_, i) => ({
-  name: `${i + 1}`,
-  chiPhi: Math.floor(5000000 + Math.random() * 10000000),
-  hienThi: parseFloat(
-    (Math.floor(5000000 + Math.random() * 10000000) / 1000000).toFixed(2)
-  ),
-}));
 
 // truyền năm
 const chiPhiTheoThang = [
@@ -77,12 +67,20 @@ const chiPhiTheoThang = [
 ];
 
 function Statistical() {
+  const currentMonth = new Date().getMonth() + 1;
   const [selectedYear, setSelectedYear] = useState(2024);
-  const [selectedMonth, setSelectedMonth] = useState(1);
+  const [selectedMonthPrice, setSelectedMonthPrice] = useState(
+    currentMonth.toString()
+  );
 
-  const [selectedMonthBranch, setSelectedMonthBranch] = useState("1");
+  const [selectedMonthService, setSelectedMonthService] = useState(
+    currentMonth.toString()
+  );
+  const [selectedMonthBranch, setSelectedMonthBranch] = useState(
+    currentMonth.toString()
+  );
 
-  const [selectedBranch, setSelectedBarnch] = useState<string>("");
+  const [selectedBranch, setSelectedBarnch] = useState<string>("1");
   const [selectedMonthDept, setSelectedMonthDept] = useState("1");
 
   // lấy chi nhánh
@@ -94,21 +92,76 @@ function Statistical() {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
+  // lấy ngày đầu tháng và cuối tháng
+  const getMonthDateRange = (month: string) => {
+    const year = new Date().getFullYear();
+    const monthIndex = parseInt(month, 10) - 1;
+
+    const startDate = new Date(year, monthIndex, 1);
+    const endDate = new Date(year, monthIndex + 1, 0);
+
+    return { startDate, endDate };
+  };
+
+  const { data: tiLeDichVu } = useFetch<[]>(
+    `http://localhost:8080/api/v1/statistical/statisticalService?startDate=${getMonthDateRange(
+      selectedMonthService
+    ).startDate.toISOString()}&endDate=${getMonthDateRange(
+      selectedMonthService
+    ).endDate.toISOString()}`
+  );
+
+  const { data: chiNhanhData } = useFetch<StatisticalBranchData[]>(
+    `http://localhost:8080/api/v1/statistical/statisticalBranchData?startDate=${getMonthDateRange(
+      selectedMonthBranch
+    ).startDate.toISOString()}&endDate=${getMonthDateRange(
+      selectedMonthBranch
+    ).endDate.toISOString()}`
+  );
+
+  const { data: chiPhiTheoNgay } = useFetch<[]>(
+    `http://localhost:8080/api/v1/statistical/statisticalDaily?startDate=${getMonthDateRange(
+      selectedMonthPrice
+    ).startDate.toISOString()}&endDate=${getMonthDateRange(
+      selectedMonthPrice
+    ).endDate.toISOString()}`
+  );
+
+  const { data: phongData } = useFetch<[]>(
+    `http://localhost:8080/api/v1/statistical/statisticalRoom?startDate=${getMonthDateRange(
+      selectedMonthPrice
+    ).startDate.toISOString()}&endDate=${getMonthDateRange(
+      selectedMonthPrice
+    ).endDate.toISOString()}&branchId=${selectedBranch}`
+  );
+
   return (
     <div className={cx("statistical")}>
       <div className={cx("charts-container")}>
         <div className={cx("card-pie")}>
-          <h2>Tỉ lệ sử dụng dịch vụ </h2>
+          <div className={cx("cardHeader")}>
+            <h2>Tỉ lệ sử dụng dịch vụ </h2>
+            <select
+              value={selectedMonthService}
+              onChange={(e) => setSelectedMonthService(e.target.value)}
+            >
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  Tháng {i + 1}
+                </option>
+              ))}
+            </select>
+          </div>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
-                data={tiLeDichVu}
-                dataKey="value"
+                data={tiLeDichVu ?? []}
+                dataKey="quantityService"
                 nameKey="name"
                 outerRadius={100}
                 label
               >
-                {tiLeDichVu.map((entry, index) => (
+                {tiLeDichVu?.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={colors[index % colors.length]}
@@ -135,7 +188,7 @@ function Statistical() {
             </select>
           </div>
           <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={chiNhanhData}>
+            <BarChart data={chiNhanhData ?? []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis yAxisId="left" />
@@ -146,9 +199,9 @@ function Statistical() {
                     const data = payload[0].payload;
                     return (
                       <div className={cx("custom-tooltip")}>
-                        <strong>{`${data.name} - ${data.soPhong} phòng`}</strong>
-                        <p>Chi phí: {data.chiPhi.toLocaleString()} VNĐ</p>
-                        <p>Số cuộc họp: {data.soCuocHop}</p>
+                        <strong>{`${data.name} - ${data.quantityRoom} phòng`}</strong>
+                        <p>Chi phí: {data.price.toLocaleString()} VNĐ</p>
+                        <p>Số cuộc họp: {data.quantityReservation}</p>
                       </div>
                     );
                   }
@@ -159,14 +212,14 @@ function Statistical() {
               <Legend />
               <Bar
                 yAxisId="left"
-                dataKey="chiPhi"
+                dataKey="price"
                 fill="#82ca9d"
                 name="Chi phí"
                 barSize={30}
               />
               <Bar
                 yAxisId="right"
-                dataKey="soCuocHop"
+                dataKey="quantityReservation"
                 fill="#ffc658"
                 name="Số cuộc họp"
                 barSize={30}
@@ -178,7 +231,7 @@ function Statistical() {
 
       <div className={cx("card")}>
         <div className={cx("cardHeader")}>
-          <h2>Chi phí & số cuộc họp theo phòng ban</h2>
+          <h2>Chi phí & số cuộc họp theo phòng</h2>
           <select
             value={selectedBranch}
             onChange={(e) => setSelectedBarnch(e.target.value)}
@@ -207,7 +260,7 @@ function Statistical() {
           </select>
         </div>
         <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={phongBanData}>
+          <BarChart data={phongData ?? []}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis yAxisId="left" />
@@ -237,8 +290,8 @@ function Statistical() {
           <div className={cx("cardHeader")}>
             <h2>Tổng chi phí trong tháng (theo ngày)</h2>
             <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              value={selectedMonthPrice}
+              onChange={(e) => setSelectedMonthPrice(e.target.value)}
             >
               {Array.from({ length: 12 }, (_, i) => (
                 <option key={i + 1} value={i + 1}>
@@ -248,24 +301,67 @@ function Statistical() {
             </select>
           </div>
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={chiPhiTheoNgay}>
+            <LineChart data={chiPhiTheoNgay ?? []}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" interval={3} angle={-30} textAnchor="end" />
+
+              <XAxis
+                dataKey="name"
+                interval={3}
+                angle={-30}
+                textAnchor="end"
+                tickFormatter={(value: string) => {
+                  return value.slice(-2);
+                }}
+              />
+
+              {/* Trục Y bên trái cho chi phí */}
               <YAxis
+                yAxisId="left"
                 tickFormatter={(value) =>
                   `${(Number(value) / 1000000).toFixed(1)}tr`
                 }
               />
-              <Tooltip
-                formatter={(value: number | string) =>
-                  `${(Number(value) / 1000000).toFixed(1)} triệu`
-                }
+
+              {/* Trục Y bên phải cho số cuộc họp */}
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                tickFormatter={(value) => `${value} cuộc`}
               />
+
+              <Tooltip
+                labelFormatter={(label: string) => {
+                  return `${formatDateString(label)}`;
+                }}
+                formatter={(value: number | string, name: string) => {
+                  if (name === "price") {
+                    return `${(Number(value) / 1000000).toFixed(1)} triệu VNĐ`;
+                  }
+                  if (name === "quantityReservation") {
+                    return `${value} cuộc họp`;
+                  }
+                  return value;
+                }}
+              />
+
+              {/* Đường chi phí */}
               <Line
+                yAxisId="left"
                 type="monotone"
-                dataKey="chiPhi"
+                dataKey="price"
                 stroke="#8884d8"
                 dot={false}
+                name="Chi phí"
+              />
+
+              {/* Đường số cuộc họp */}
+              <Line
+                yAxisId="right"
+                type="basis"
+                dataKey="quantityReservation"
+                stroke="#82ca9d"
+                dot={false}
+                name="Số cuộc họp"
               />
             </LineChart>
           </ResponsiveContainer>

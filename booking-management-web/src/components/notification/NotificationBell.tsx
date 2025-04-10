@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 
 interface NotificationDTO {
   id: number;
@@ -16,8 +18,7 @@ interface NotificationDTO {
 }
 
 const NotificationBell = () => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,7 +29,7 @@ const NotificationBell = () => {
   useEffect(() => {
     axios
       .get<NotificationDTO[]>(
-        `http://localhost:8080/api/v1/notification/getAllNotification?employeeId=${user.employeeId}`
+        `http://localhost:8080/api/v1/notification/getAllNotification?employeeId=${user?.employeeId}`
       )
       .then((res) => {
         setNotifications(res.data);

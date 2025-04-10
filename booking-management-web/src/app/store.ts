@@ -4,6 +4,7 @@ import authReducer from "../features/authSlice";
 import locationReducer from "../features/locationSlice";
 import deviceReducer from "../features/deviceSlice";
 import employeeReducer from "../features/employeeSlice";
+import userReducer from "../features/userSlice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     location: locationReducer,
     device: deviceReducer,
     employee: employeeReducer,
+    user: userReducer,
   },
 });
 

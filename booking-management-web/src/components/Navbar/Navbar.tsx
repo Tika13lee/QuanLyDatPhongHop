@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,6 +7,8 @@ import SockJS from "sockjs-client";
 import classNames from "classnames/bind";
 import styles from "./Navbar.module.scss";
 import UserAvatarWithMenu from "../UserAvatar/UserAvatarWithMenu";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 
 const cx = classNames.bind(styles);
 
@@ -21,8 +23,10 @@ type NotificationDTO = {
 };
 
 const Navbar = () => {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  // Lấy thông tin người dùng từ localStorage
+  const user = JSON.parse(localStorage.getItem("currentUser")!);
+
+  console.log(user);
 
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -189,7 +193,7 @@ const Navbar = () => {
 
           <div className={cx("divider")} />
           <div>
-            <UserAvatarWithMenu imgUrl="https://i.pravatar.cc/300" />
+            <UserAvatarWithMenu imgUrl={user?.avatar ?? ""} />
           </div>
         </div>
       </div>

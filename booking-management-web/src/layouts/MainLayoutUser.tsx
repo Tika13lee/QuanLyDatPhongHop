@@ -3,15 +3,49 @@ import styles from "./MainLayoutUser.module.scss";
 import Navbar from "../components/Navbar/Navbar";
 import { Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconWrapper from "../components/icons/IconWrapper";
 import { IoIosArrowDown, IoIosArrowForward } from "../components/icons/icons";
+import useFetch from "../hooks/useFetch";
+import { EmployeeProps } from "../data/data";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { set } from "react-datepicker/dist/date_utils";
+import { setUser } from "../features/userSlice";
 
 const cx = classNames.bind(styles);
 
 const MainLayoutUser = () => {
+  // Lấy thông tin sdt người dùng từ localStorage
+  const currentUserPhone = JSON.parse(localStorage.getItem("userPhone")!);
+  const [userData, setUserData] = useState<EmployeeProps | null>(null);
+
+  const dispatch = useDispatch();
+
   const [isApprovedOpen, setIsApprovedOpen] = useState(true);
   const [isScheduleOpen, setIsScheduleOpen] = useState(true);
+
+  const fetchUserData = async () => {
+    try {
+      const phone = currentUserPhone; // Số điện thoại người dùng
+      const response = await axios.get<EmployeeProps>(
+        `http://localhost:8080/api/v1/employee/getEmployeeByPhone`,
+        { params: { phone } }
+      );
+
+      setUserData(response.data);
+
+      // Lưu dữ liệu vào localStorage, redux
+      dispatch(setUser(response.data));
+      localStorage.setItem("currentUser", JSON.stringify(response.data));
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <div className={cx("main-layout-user")}>
@@ -46,50 +80,52 @@ const MainLayoutUser = () => {
             Lịch sử đặt lịch
           </NavLink>
 
-          <div className={cx("dropdown")}>
-            <div
-              className={cx("dropdown-header")}
-              onClick={() => setIsApprovedOpen(!isApprovedOpen)}
-            >
-              <span className={cx({ "booking-open": isApprovedOpen })}>
-                Quản lý yêu cầu
-              </span>
-              <IconWrapper
-                icon={!isApprovedOpen ? IoIosArrowForward : IoIosArrowDown}
-                color={isApprovedOpen ? "#212529" : "#7c7f83"}
-              />
-            </div>
-            {isApprovedOpen && (
-              <div className={cx("dropdown-menu")}>
-                <NavLink
-                  to="/user/approve"
-                  className={({ isActive }) =>
-                    cx("dropdown-item", { active: isActive })
-                  }
-                >
-                  DS cần phê duyệt
-                </NavLink>
-
-                <NavLink
-                  to="/user/approved"
-                  className={({ isActive }) =>
-                    cx("dropdown-item", { active: isActive })
-                  }
-                >
-                  DS đồng ý
-                </NavLink>
-
-                <NavLink
-                  to="/user/rejected"
-                  className={({ isActive }) =>
-                    cx("dropdown-item", { active: isActive })
-                  }
-                >
-                  DS từ chối
-                </NavLink>
+          {userData?.account.role === "APPROVER" && (
+            <div className={cx("dropdown")}>
+              <div
+                className={cx("dropdown-header")}
+                onClick={() => setIsApprovedOpen(!isApprovedOpen)}
+              >
+                <span className={cx({ "booking-open": isApprovedOpen })}>
+                  Quản lý yêu cầu
+                </span>
+                <IconWrapper
+                  icon={!isApprovedOpen ? IoIosArrowForward : IoIosArrowDown}
+                  color={isApprovedOpen ? "#212529" : "#7c7f83"}
+                />
               </div>
-            )}
-          </div>
+              {isApprovedOpen && (
+                <div className={cx("dropdown-menu")}>
+                  <NavLink
+                    to="/user/approve"
+                    className={({ isActive }) =>
+                      cx("dropdown-item", { active: isActive })
+                    }
+                  >
+                    DS cần phê duyệt
+                  </NavLink>
+
+                  <NavLink
+                    to="/user/approved"
+                    className={({ isActive }) =>
+                      cx("dropdown-item", { active: isActive })
+                    }
+                  >
+                    DS đồng ý
+                  </NavLink>
+
+                  <NavLink
+                    to="/user/rejected"
+                    className={({ isActive }) =>
+                      cx("dropdown-item", { active: isActive })
+                    }
+                  >
+                    DS từ chối
+                  </NavLink>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className={cx("dropdown")}>
             <div

@@ -3,19 +3,107 @@ import styles from "./Login.module.scss";
 import { useState } from "react";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { IoEyeOffOutline, IoEyeOutline } from "../../../components/icons/icons";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../app/store";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
 
+type JwtPayloadProp = {
+  sub: string;
+  exp: number;
+  iat: number;
+  role: string;
+  userName: string;
+  [key: string]: any;
+};
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Đăng nhập được gửi!");
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!userName || !password) {
+      alert("Vui lòng nhập tên đăng nhập và mật khẩu.");
+      return;
+    }
+
+    console.log(userName, password);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/account/login",
+        {
+          userName,
+          password,
+        }
+      );
+
+      setPopupMessage("Đăng nhập thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      console.log("Đăng nhập thành công:", response.data);
+
+      const accessToken = response.data;
+
+      // Giải mã token để lấy thông tin user
+      const decoded = jwtDecode<JwtPayloadProp>(accessToken);
+      console.log("Decoded JWT:", decoded);
+
+      // Lưu thông tin user vào localStorage hoặc Redux store
+      localStorage.setItem("userPhone", JSON.stringify(decoded.userName));
+
+      // Điều hướng
+      if (decoded.role === "ADMIN") {
+        navigate("/admin");
+      } else if (decoded.role === "USER" || decoded.role === "APPROVER") {
+        navigate("/user");
+      } else {
+        setPopupMessage("Vai trò không hợp lệ.");
+        setPopupType("error");
+        setIsPopupOpen(true);
+      }
+    } catch (error: any) {
+      console.error("Lỗi đăng nhập:", error);
+
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+
+        if (status === 401) {
+          setPopupMessage("Mật khẩu không đúng. Vui lòng thử lại.");
+        } else if (status === 404) {
+          setPopupMessage("Tài khoản không tồn tại.");
+        } else {
+          setPopupMessage("Đã xảy ra lỗi không xác định.");
+        }
+
+        setPopupType("error");
+        setIsPopupOpen(true);
+      } else {
+        alert("Không thể kết nối đến máy chủ.");
+      }
+    }
   };
 
   return (
@@ -24,12 +112,14 @@ const Login = () => {
         <h2 className={cx("title")}>Đăng Nhập</h2>
 
         <div className={cx("inputGroup")}>
-          <label htmlFor="username">Tên đăng nhập</label>
+          <label htmlFor="userName">Tên đăng nhập</label>
           <input
-            id="username"
+            id="userName"
             className={cx("input")}
             type="text"
-            placeholder="Nhập tên đăng nhập"
+            placeholder="Nhập số điện thoại"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
           />
         </div>
 
@@ -41,6 +131,8 @@ const Login = () => {
               className={cx("input")}
               type={showPassword ? "text" : "password"}
               placeholder="Nhập mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <span className={cx("toggleIcon")} onClick={togglePassword}>
               <IconWrapper
@@ -66,6 +158,14 @@ const Login = () => {
           Đăng Nhập
         </button>
       </form>
+
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </div>
   );
 };

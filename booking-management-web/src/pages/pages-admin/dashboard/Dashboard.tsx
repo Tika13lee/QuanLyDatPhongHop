@@ -35,6 +35,24 @@ const phongBanData = [
 const Dashboard = () => {
   const [selectedBranch, setSelectedBranch] = useState<string>("");
 
+  const now = new Date();
+  const start = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,
+    0,
+    0
+  );
+  const end = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59
+  );
+
   // lấy chi nhánh
   const {
     data: branchs,
@@ -42,6 +60,11 @@ const Dashboard = () => {
     error: branchsError,
   } = useFetch<BranchProps[]>(
     "http://localhost:8080/api/v1/location/getAllBranch"
+  );
+
+  const { data: timeData } = useFetch<[]>(
+    // `http://localhost:8080/api/v1/statistical/statisticalService?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
+    `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=2025-04-01T17:00:00.000Z&endDate=2025-04-30T17:00:00.000Z`
   );
 
   return (
@@ -74,6 +97,49 @@ const Dashboard = () => {
             <p>{todayRooms}</p>
           </div>
         </div>
+      </div>
+
+      <div className={cx("card")}>
+        <h2>Chi phí & số cuộc họp theo giờ</h2>
+
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={timeData ?? []}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="time" />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
+            <Tooltip
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className={cx("custom-tooltip")}>
+                      <p>Chi phí: {data.total.toLocaleString()} VNĐ</p>
+                      <p>Số cuộc họp: {data.count}</p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+
+            <Legend />
+            <Bar
+              yAxisId="left"
+              dataKey="total"
+              fill="#82ca9d"
+              name="Chi phí"
+              barSize={30}
+            />
+            <Bar
+              yAxisId="right"
+              dataKey="count"
+              fill="#ffc658"
+              name="Số cuộc họp"
+              barSize={30}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       <div className={cx("card")}>

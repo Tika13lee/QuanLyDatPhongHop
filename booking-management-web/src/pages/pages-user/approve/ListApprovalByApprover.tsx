@@ -11,12 +11,13 @@ import PopupNotification from "../../../components/popup/PopupNotification";
 import { formatDateString, getHourMinute } from "../../../utilities";
 import { ClipLoader } from "react-spinners";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
 function ListApprovalByApprover() {
-  const userCurrent = localStorage.getItem("currentEmployee");
-  const user = JSON.parse(userCurrent || "{}");
+  const user = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,7 +40,7 @@ function ListApprovalByApprover() {
     loading: loadingReservation,
     error: errorReservation,
   } = useFetch<RequestFormProps[]>(
-    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user.employeeId}&statusRequestForm=PENDING`
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING`
   );
 
   console.log(requestForm);
