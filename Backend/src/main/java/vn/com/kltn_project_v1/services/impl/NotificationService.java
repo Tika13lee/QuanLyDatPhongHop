@@ -17,7 +17,6 @@ public class NotificationService implements INotification {
     private final NotificationRepository repo;
     private final SimpMessagingTemplate messagingTemplate;
     private final ModelMapper modelMapper;
-    private final INotification notificationService;
     @Override
     public void notifyUser(Employee employee, NotificationType type, String message, String targetType, Long targetId) {
         Notification n = new Notification();
@@ -44,7 +43,7 @@ public class NotificationService implements INotification {
     }
     @Override
     public void approveNotification(RequestForm requestForm, Employee approver) {
-            notificationService.notifyUser(
+            notifyUser(
                     approver,
                     NotificationType.APPROVAL_REQUEST,
                     "Thông báo có yêu cầu cần phê duyệt :" + requestForm.getRequestReservation().getTitle(),
