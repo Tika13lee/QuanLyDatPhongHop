@@ -2,10 +2,12 @@ package vn.com.kltn_project_v1.services.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.com.kltn_project_v1.dtos.EmployeeDTO;
 import vn.com.kltn_project_v1.model.Account;
 import vn.com.kltn_project_v1.model.Employee;
+import vn.com.kltn_project_v1.model.Role;
 import vn.com.kltn_project_v1.repositories.AccountRepository;
 import vn.com.kltn_project_v1.repositories.DepartmentRepository;
 import vn.com.kltn_project_v1.repositories.EmployeeRepository;
@@ -24,13 +26,16 @@ public class EmployeeService implements IEmployee {
     private ModelMapper modelMapper;
     @Autowired
     private DepartmentRepository departmentRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Override
     public Employee createEmployee(EmployeeDTO employeeDTO) {
         Employee employee1 = employeeRepository.findEmployeeByPhone(employeeDTO.getPhone()).orElse(null);
         if(employee1 != null){
             return null;
         }
-        accountRepository.save(accountRepository.save(new Account(employeeDTO.getPhone(),"1111",false)));
+        String encodedPassword = passwordEncoder.encode("1111");
+        accountRepository.save(accountRepository.save(new Account(employeeDTO.getPhone(),encodedPassword, Role.USER)));
         Employee employee = ConvertToEntity(employeeDTO);
 
         return employeeRepository.save(employee);

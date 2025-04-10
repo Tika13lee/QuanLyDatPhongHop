@@ -27,17 +27,17 @@ public class Account implements UserDetails {
     @Column(columnDefinition = "")
     @JsonIgnore
     private String password;
-    @Column(columnDefinition = "boolean default false")
-    private boolean role; // true: admin, false: user
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @JsonIgnore
     @ToString.Exclude
     @OneToOne(mappedBy = "account")
     private Employee employee;
-
+    private boolean isFirstLogin;
     public Account() {
     }
 
-    public Account(String userName, String password, boolean role) {
+    public Account(String userName, String password, Role role) {
         this.userName = userName;
         this.password = password;
         this.role = role;
@@ -47,12 +47,12 @@ public class Account implements UserDetails {
     @JsonIgnore
     // roleEntity -> roleImpl
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of((GrantedAuthority) () -> "ROLE_" + (role ? "ADMIN" : "USER"));
+        return List.of((GrantedAuthority) () -> "ROLE_" + role.name().toUpperCase());
     }
     @Override
     @JsonIgnore
     public String getPassword() {
-        return "";
+        return password;
     }
 
     @Override

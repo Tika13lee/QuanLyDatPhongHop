@@ -22,16 +22,16 @@ public class SecurityConfig {
         return userName -> accountRepository.findAccountByUserName(userName)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "khong tim thay ten tai khoan = "+userName));
+                                "khong tim thay ten tai khoan :"+userName));
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

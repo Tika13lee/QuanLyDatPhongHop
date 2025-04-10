@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.com.kltn_project_v1.model.Role;
 
 @Getter
 @Setter
@@ -16,5 +17,5 @@ public class EmployeeDTO {
     private String employeeName;
     private String avatar;
     private Long departmentId;
-    private Boolean role;
+    private Role role;
 }
