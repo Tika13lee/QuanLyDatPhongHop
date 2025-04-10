@@ -5,4 +5,5 @@ public enum NotificationType {
     RESERVATION_UPDATED,
     RESERVATION_CANCELLED,
     CHECKIN_REMINDER,
+    APPROVAL_REQUEST,
 }

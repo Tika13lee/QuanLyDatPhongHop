@@ -56,5 +56,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Object[]> statisticalDaily(Date timeStart, Date timeEnd);
     @Query("select r.room.roomName, count(r), sum(r.total) from Reservation r where r.timeStart between ?1 and ?2 group by r.room.roomName")
     List<Object[]> statisticalRoom(Date timeStart, Date timeEnd);
+    @Query("""
+    select 
+           FUNCTION('HOUR', r.timeStart),
+           FUNCTION('MINUTE', r.timeStart),
+           count(r),
+           sum(r.total)
+    from Reservation r
+    where r.timeStart between ?1 and ?2
+    group by 
+             FUNCTION('HOUR', r.timeStart),
+             FUNCTION('MINUTE', r.timeStart)
+""")
+    List<Object[]> fullStatistical(Date timeStart, Date timeEnd);
+
 
 }

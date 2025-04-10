@@ -14,4 +14,6 @@ public interface IStatistical {
     List<DataStatisticalDTO> statisticalDaily(Date startDate, Date endDate);
 
     List<DataStatisticalDTO> statisticalRoom(Date startDate, Date endDate);
+
+    List<Map<String, Object>> statisticalChart24h(Date dayStart, Date dayEnd);
 }

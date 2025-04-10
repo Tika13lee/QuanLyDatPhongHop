@@ -5,9 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import vn.com.kltn_project_v1.dtos.NotificationDTO;
-import vn.com.kltn_project_v1.model.Employee;
-import vn.com.kltn_project_v1.model.Notification;
-import vn.com.kltn_project_v1.model.NotificationType;
+import vn.com.kltn_project_v1.model.*;
 import vn.com.kltn_project_v1.repositories.NotificationRepository;
 import vn.com.kltn_project_v1.services.INotification;
 
@@ -19,6 +17,7 @@ public class NotificationService implements INotification {
     private final NotificationRepository repo;
     private final SimpMessagingTemplate messagingTemplate;
     private final ModelMapper modelMapper;
+    private final INotification notificationService;
     @Override
     public void notifyUser(Employee employee, NotificationType type, String message, String targetType, Long targetId) {
         Notification n = new Notification();
@@ -42,6 +41,16 @@ public class NotificationService implements INotification {
     @Override
     public Long countUnreadNotifications(Long employeeId) {
         return repo.countByEmployeeEmployeeIdAndReadFalse(employeeId);
+    }
+    @Override
+    public void approveNotification(RequestForm requestForm, Employee approver) {
+            notificationService.notifyUser(
+                    approver,
+                    NotificationType.APPROVAL_REQUEST,
+                    "Thông báo có yêu cầu cần phê duyệt :" + requestForm.getRequestReservation().getTitle(),
+                    "requestForm",
+                    requestForm.getRequestFormId()
+            );
     }
 
     @Override

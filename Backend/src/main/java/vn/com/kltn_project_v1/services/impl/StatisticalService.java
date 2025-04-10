@@ -5,10 +5,7 @@ import vn.com.kltn_project_v1.dtos.statistical.DataStatisticalDTO;
 import vn.com.kltn_project_v1.repositories.ReservationRepository;
 import vn.com.kltn_project_v1.services.IStatistical;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -96,4 +93,29 @@ public class StatisticalService implements IStatistical {
                 ))
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<Map<String, Object>> statisticalChart24h(Date dayStart, Date dayEnd) {
+        List<Object[]> result = reservationRepository.fullStatistical(dayStart, dayEnd);
+
+        // Khởi tạo map theo phút trong 24h
+        Map<String, Map<String, Object>> fullMap = new LinkedHashMap<>();
+
+        // Gán dữ liệu có thật vào map
+        for (Object[] row : result) {
+            int hour = (int) row[0];
+            int minute = (int) row[1];
+            long count = ((Number) row[2]).longValue();
+            long total = ((Number) row[3]).longValue();
+
+            String key = String.format("%02d:%02d", hour, minute);
+            fullMap.put(key, Map.of(
+                    "time", key,
+                    "count", count,
+                    "total", total
+            ));
+        }
+
+        return new ArrayList<>(fullMap.values());
+    }
+
 }

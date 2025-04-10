@@ -9,6 +9,7 @@ import vn.com.kltn_project_v1.dtos.RequestFormDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.model.*;
 import vn.com.kltn_project_v1.repositories.*;
+import vn.com.kltn_project_v1.services.INotification;
 import vn.com.kltn_project_v1.services.IRequestForm;
 import vn.com.kltn_project_v1.services.IReservation;
 
@@ -30,6 +31,7 @@ public class RequestFormService implements IRequestForm {
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
     private final EntityManager entityManager;
+    private final INotification notificationService;
     @Override
     public RequestForm createRequestForm(RequestFormDTO requestFormDTO) {
         RequestReservation requestReservation = modelMapper.map(requestFormDTO.getReservationDTO(), RequestReservation.class);
@@ -39,6 +41,7 @@ public class RequestFormService implements IRequestForm {
         requestForm.setTypeRequestForm(requestFormDTO.getTypeRequestForm());
         List<Reservation> reservations =  reservationService.createReservation(modelMapper.map(requestForm.getRequestReservation(), ReservationDTO.class));
         requestForm.setReservations(reservations);
+        notificationService.approveNotification(requestForm, employeeRepository.findById(requestFormDTO.getReservationDTO().getBookerId()).orElse(null));
         return requestFormRepository.save(requestForm);
     }
     @Override
@@ -78,8 +81,9 @@ public class RequestFormService implements IRequestForm {
         requestForm.getReservations().forEach(reservation -> {
             reservation.setStatusReservation(StatusReservation.WAITING);
             reservationRepository.save(reservation);
-            reservationService.inviteMembersNotification(reservation,reservation.getAttendants());
+
         });
+        reservationService.inviteMembersNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getAttendants());
         return requestFormRepository.save(requestForm);
     }
     protected RequestForm approveRequestFormUpdateOne(RequestForm requestForm){
@@ -93,6 +97,7 @@ public class RequestFormService implements IRequestForm {
             entityManager.detach(reservation);
             reservationRepository.save(reservation);
         });
+        reservationService.updateReservationNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getAttendants());
         return requestFormRepository.save(requestForm);
     }
     protected RequestForm approveRequestFormUpdateMany(RequestForm requestForm, RequestForm requestFormOld){
@@ -147,6 +152,8 @@ public class RequestFormService implements IRequestForm {
 
         requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
         requestForm.setTimeResponse(new Date());
+        reservationService.updateReservationNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getAttendants());
+
         return requestFormRepository.save(requestForm);
     }
     @Override
@@ -298,6 +305,6 @@ RequestForm requestForm = new RequestForm();
         requestReservationRepository.save(requestReservation);
         requestFormUpdate.setRequestReservation(requestReservation);
         return requestFormRepository.save(requestFormUpdate);
-
     }
+
 }
