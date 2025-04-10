@@ -54,8 +54,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Object[]> statisticalBranchData(Date timeStart, Date timeEnd);
     @Query("select FUNCTION('DATE', r.timeStart), count(r), sum(r.total) from Reservation r where r.timeStart between ?1 and ?2 group by FUNCTION('DATE', r.timeStart)")
     List<Object[]> statisticalDaily(Date timeStart, Date timeEnd);
-    @Query("select r.room.roomName, count(r), sum(r.total) from Reservation r where r.timeStart between ?1 and ?2 group by r.room.roomName")
-    List<Object[]> statisticalRoom(Date timeStart, Date timeEnd);
+    @Query("select r.room.roomName, count(r), sum(r.total) from Reservation r where (r.timeStart between ?1 and ?2) and r.room.location.building.branch.branchName = ?3  group by r.room.roomName")
+    List<Object[]> statisticalRoom(Date timeStart, Date timeEnd,Long branchId);
     @Query("""
     select 
            FUNCTION('HOUR', r.timeStart),

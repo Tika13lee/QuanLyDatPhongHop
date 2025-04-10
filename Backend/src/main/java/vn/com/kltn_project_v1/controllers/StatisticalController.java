@@ -27,8 +27,8 @@ public class StatisticalController {
             return ResponseEntity.ok(statisticalService.statisticalDaily(startDate, endDate));
         }
         @GetMapping("/statisticalRoom")
-        public ResponseEntity<?> getStatisticalRoom(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date endDate) {
-            return ResponseEntity.ok(statisticalService.statisticalRoom(startDate, endDate));
+        public ResponseEntity<?> getStatisticalRoom(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date endDate, @RequestParam Long branchId){
+            return ResponseEntity.ok(statisticalService.statisticalRoom(startDate, endDate, branchId));
         }
         @GetMapping("/statisticalChart24h")
         public ResponseEntity<?> getStatisticalChart24h(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date endDate) {

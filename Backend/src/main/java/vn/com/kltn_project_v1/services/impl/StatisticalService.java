@@ -83,8 +83,8 @@ public class StatisticalService implements IStatistical {
                 .collect(Collectors.toList());
     }
     @Override
-    public List<DataStatisticalDTO> statisticalRoom(Date startDate, Date endDate) {
-        List<Object[]> roomData = reservationRepository.statisticalRoom(startDate, endDate);
+    public List<DataStatisticalDTO> statisticalRoom(Date startDate, Date endDate, Long branchId) {
+        List<Object[]> roomData = reservationRepository.statisticalRoom(startDate, endDate,branchId);
         return roomData.stream()
                 .map(data -> new DataStatisticalDTO(
                         (String) data[0], // tên phòng
