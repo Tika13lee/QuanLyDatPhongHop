@@ -1,4 +1,4 @@
-.container {
+.login-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7,14 +7,17 @@
   padding: 1rem;
 }
 
-.form {
+.login-form {
   background: var(--color-white);
-  padding: 2.5rem 2rem;
+  padding: 20px ;
   border-radius: 5px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 1200px;
   animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  // gap: 40px;
+  border: 15px solid #254d96;
 }
 
 @keyframes fadeIn {
@@ -28,117 +31,129 @@
   }
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: var(--text-primary);
-  font-weight: 700;
-  font-size: 28px;
-  letter-spacing: 0.5px;
-}
-
-.inputGroup {
-  margin-bottom: 1.5rem;
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 16px;
-  }
-
-  .input {
-    width: 100%;
-    padding: 0.8rem 4rem 0.8rem 1rem;
-    border: 1px solid #dfe6e9;
-    border-radius: 5px;
-    font-size: 13px;
-    background-color: #fdfdfd;
-    transition: border-color 0.3s ease, box-shadow 0.2s;
-
-    &::placeholder {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    &:focus {
-      border-color: var(--border-focus);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-    }
-  }
-}
-
-.passwordWrapper {
-  position: relative;
-}
-
-.toggleIcon {
-  position: absolute;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.3s;
-
-  &:hover {
-    color: var(--text-primary);
-  }
-}
-
-.passwordGroup {
-  position: relative;
-}
-
-.optionsRow {
+.form {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 1.5rem;
-  font-size: 12.5px;
-  color: var(--text-primary);
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox {
-  accent-color: var(--border-focus);
-  width: 14px;
-  height: 14px;
-}
-
-.forgotLink {
-  color: var(--border-focus);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-
-  &:hover {
-    color: var(--bg-active);
-  }
-}
-
-.submitButton {
   width: 100%;
-  padding: 0.85rem;
-  background: var(--btn-main);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s;
+  padding: 0 40px;
+  border-left: 1px solid var(--border-color);
 
-  &:hover {
-    background: var(--btn-hover);
+  .title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.5px;
+  }
+
+  .inputGroup {
+    margin-bottom: 1.5rem;
+    width: 100%;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 16px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 0.8rem 4rem 0.8rem 1rem;
+      border: 1px solid #dfe6e9;
+      border-radius: 5px;
+      font-size: 13px;
+      background-color: #fdfdfd;
+      transition: border-color 0.3s ease, box-shadow 0.2s;
+
+      &::placeholder {
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+
+      &:focus {
+        border-color: var(--border-focus);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      }
+    }
+  }
+
+  .passwordWrapper {
+    position: relative;
+  }
+
+  .toggleIcon {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+
+  .passwordGroup {
+    position: relative;
+  }
+
+  .optionsRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 12.5px;
+    color: var(--text-primary);
+  }
+
+  .checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox {
+    accent-color: var(--border-focus);
+    width: 14px;
+    height: 14px;
+  }
+
+  .forgotLink {
+    color: var(--border-focus);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--bg-active);
+    }
+  }
+
+  .submitButton {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--btn-main);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s;
+
+    &:hover {
+      background: var(--btn-hover);
+    }
   }
 }

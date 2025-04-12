@@ -31,9 +31,9 @@ const Login = () => {
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
-    "info"
-  );
+  const [popupType, setPopupType] = useState<
+    "success" | "error" | "info" | "warning"
+  >("info");
 
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -43,8 +43,17 @@ const Login = () => {
     e.preventDefault();
 
     // Kiểm tra dữ liệu đầu vào
-    if (!userName || !password) {
-      alert("Vui lòng nhập tên đăng nhập và mật khẩu.");
+    if (!userName) {
+      setPopupMessage("Vui lòng nhập tên đăng nhập.");
+      setPopupType("warning");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    if (!password) {
+      setPopupMessage("Vui lòng nhập mật khẩu.");
+      setPopupType("warning");
+      setIsPopupOpen(true);
       return;
     }
 
@@ -66,6 +75,8 @@ const Login = () => {
       console.log("Đăng nhập thành công:", response.data);
 
       const accessToken = response.data;
+      // Lưu accessToken vào localStorage
+      localStorage.setItem("accessToken", accessToken);
 
       // Giải mã token để lấy thông tin user
       const decoded = jwtDecode<JwtPayloadProp>(accessToken);
@@ -107,57 +118,66 @@ const Login = () => {
   };
 
   return (
-    <div className={cx("container")}>
-      <form className={cx("form")} onSubmit={handleSubmit}>
-        <h2 className={cx("title")}>Đăng Nhập</h2>
+    <div className={cx("login-container")}>
+      <div className={cx("login-form")}>
+        <img
+          className={cx("logo")}
+          src="https://res.cloudinary.com/drfbxuss6/image/upload/v1744446582/Booking_w1cmz7.png"
+          alt="Logo"
+          height={500}
+          width={700}
+        />
+        <form className={cx("form")} onSubmit={handleSubmit}>
+          <h2 className={cx("title")}>Đăng Nhập</h2>
 
-        <div className={cx("inputGroup")}>
-          <label htmlFor="userName">Tên đăng nhập</label>
-          <input
-            id="userName"
-            className={cx("input")}
-            type="text"
-            placeholder="Nhập số điện thoại"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-          />
-        </div>
-
-        <div className={cx("inputGroup", "passwordGroup")}>
-          <label htmlFor="password">Mật khẩu</label>
-          <div className={cx("passwordWrapper")}>
+          <div className={cx("inputGroup")}>
+            <label htmlFor="userName">Tên đăng nhập</label>
             <input
-              id="password"
+              id="userName"
               className={cx("input")}
-              type={showPassword ? "text" : "password"}
-              placeholder="Nhập mật khẩu"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              placeholder="Nhập số điện thoại"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
-            <span className={cx("toggleIcon")} onClick={togglePassword}>
-              <IconWrapper
-                icon={showPassword ? IoEyeOutline : IoEyeOffOutline}
-                color="#000"
-                size={20}
-              />
-            </span>
           </div>
-        </div>
 
-        <div className={cx("optionsRow")}>
-          <label className={cx("checkboxLabel")}>
-            <input type="checkbox" className={cx("checkbox")} />
-            Ghi nhớ đăng nhập
-          </label>
-          <a href="#" className={cx("forgotLink")}>
-            Quên mật khẩu?
-          </a>
-        </div>
+          <div className={cx("inputGroup", "passwordGroup")}>
+            <label htmlFor="password">Mật khẩu</label>
+            <div className={cx("passwordWrapper")}>
+              <input
+                id="password"
+                className={cx("input")}
+                type={showPassword ? "text" : "password"}
+                placeholder="Nhập mật khẩu"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <span className={cx("toggleIcon")} onClick={togglePassword}>
+                <IconWrapper
+                  icon={showPassword ? IoEyeOutline : IoEyeOffOutline}
+                  color="#000"
+                  size={20}
+                />
+              </span>
+            </div>
+          </div>
 
-        <button type="submit" className={cx("submitButton")}>
-          Đăng Nhập
-        </button>
-      </form>
+          <div className={cx("optionsRow")}>
+            <label className={cx("checkboxLabel")}>
+              <input type="checkbox" className={cx("checkbox")} />
+              Ghi nhớ đăng nhập
+            </label>
+            <a href="#" className={cx("forgotLink")}>
+              Quên mật khẩu?
+            </a>
+          </div>
+
+          <button type="submit" className={cx("submitButton")}>
+            Đăng Nhập
+          </button>
+        </form>
+      </div>
 
       {/* Hiển thị thông báo popup */}
       <PopupNotification

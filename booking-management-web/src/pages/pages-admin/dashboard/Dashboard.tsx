@@ -10,31 +10,28 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ComposedChart,
+  Line,
+  Sector,
+  Pie,
+  Cell,
+  PieChart,
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
 import { BranchProps } from "../../../data/data";
+import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
-const todayMeetings = 30;
-const todayCost = 15000000;
-const todayRooms = 10;
-
-// truyền id chi nhánh
-const phongBanData = [
-  { name: "P.KD", chiPhi: 5000000, soCuocHop: 22 },
-  { name: "P.NS", chiPhi: 4000000, soCuocHop: 2 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 12 },
-  { name: "IT", chiPhi: 6000000, soCuocHop: 14 },
-  { name: "Kế toán", chiPhi: 6000000, soCuocHop: 10 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 9 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 2 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 3 },
+const statusScheduleData = [
+  { name: "Đã hoàn thành", value: 400 },
+  { name: "Đã hủy", value: 300 },
+  { name: "Không nhận phòng", value: 300 },
 ];
 
-const Dashboard = () => {
-  const [selectedBranch, setSelectedBranch] = useState<string>("");
+const COLORS = ["#00C49F", "#FF8042", "#8884d8"];
 
+const Dashboard = () => {
   const now = new Date();
   const start = new Date(
     now.getFullYear(),
@@ -53,48 +50,95 @@ const Dashboard = () => {
     59
   );
 
-  // lấy chi nhánh
-  const {
-    data: branchs,
-    loading: branchsLoading,
-    error: branchsError,
-  } = useFetch<BranchProps[]>(
-    "http://localhost:8080/api/v1/location/getAllBranch"
+  const { data: timeData } = useFetch<[]>(
+    `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
+    // `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=2025-04-01T17:00:00.000Z&endDate=2025-04-30T17:00:00.000Z`
   );
 
-  const { data: timeData } = useFetch<[]>(
-    // `http://localhost:8080/api/v1/statistical/statisticalService?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
-    `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=2025-04-01T17:00:00.000Z&endDate=2025-04-30T17:00:00.000Z`
-  );
+  console.log(statusScheduleData);
 
   return (
     <div className={cx("dashboard")}>
       <div className={cx("header")}>
         <h2>Dữ liệu trong ngày</h2>
-        <div className={cx("summaryCards")}>
-          <div className={cx("summaryCard")}>
-            <h3>Tổng số cuộc họp</h3>
-            <p>{todayMeetings}</p>
+        <div className={cx("headerData")}>
+          <div className={cx("summaryCards")}>
+            <div className={cx("summaryCard-wrap")}>
+              <div className={cx("summaryCard")}>
+                <div>
+                  <h3>
+                    <span className={cx("symbol")}>📅</span>Tổng số lịch đã đặt
+                  </h3>
+                  <p>
+                    30 <small>cuộc họp</small>
+                  </p>
+                </div>
+              </div>
+              <div className={cx("summaryCard")}>
+                <h3>
+                  <span className={cx("symbol")}>✅</span>Số lịch hoàn thành
+                </h3>
+                <p>
+                  30 <small>cuộc họp</small>
+                </p>
+              </div>
+            </div>
+            <div className={cx("summaryCard-wrap")}>
+              <div className={cx("summaryCard")}>
+                <h3>
+                  <span className={cx("symbol")}>❌</span>Số lịch đã hủy
+                </h3>
+                <p>
+                  30 <small>cuộc họp</small>
+                </p>
+              </div>
+              <div className={cx("summaryCard")}>
+                <h3>
+                  <span className={cx("symbol")}>💲</span>Tổng chi phí
+                </h3>
+                <p>
+                  500000 <small>VND</small>
+                </p>
+              </div>
+            </div>
           </div>
-          <div className={cx("summaryCard")}>
-            <h3>Số lịch hoàn thành</h3>
-            <p>{todayMeetings}</p>
-          </div>
-          <div className={cx("summaryCard")}>
-            <h3>Số lịch đã hủy</h3>
-            <p>{todayMeetings}</p>
-          </div>
-          <div className={cx("summaryCard")}>
-            <h3>Tổng chi phí</h3>
-            <p>{todayCost.toLocaleString()} VNĐ</p>
-          </div>
-          <div className={cx("summaryCard")}>
-            <h3>Phòng đang sử dụng</h3>
-            <p>{todayRooms}</p>
-          </div>
-          <div className={cx("summaryCard")}>
-            <h3>Số lượt truy cập</h3>
-            <p>{todayRooms}</p>
+          <div className={cx("card")}>
+            <h2>Tỉ lệ trạng thái lịch</h2>
+
+            {statusScheduleData && statusScheduleData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={230}>
+                <PieChart>
+                  <Pie
+                    data={statusScheduleData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={80}
+                    innerRadius={60}
+                    isAnimationActive={true}
+                    label={({ percent, name }) => {
+                      return `${name} (${(percent * 100).toFixed(0)}%)`;
+                    }}
+                  >
+                    {statusScheduleData?.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div
+                style={{
+                  height: "230px",
+                }}
+                className={cx("no-data")}
+              >
+                Không có dữ liệu
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -102,86 +146,62 @@ const Dashboard = () => {
       <div className={cx("card")}>
         <h2>Chi phí & số cuộc họp theo giờ</h2>
 
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={timeData ?? []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
-            <Tooltip
-              content={({ active, payload, label }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <div className={cx("custom-tooltip")}>
-                      <p>Chi phí: {data.total.toLocaleString()} VNĐ</p>
-                      <p>Số cuộc họp: {data.count}</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
+        {timeData && timeData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={450}>
+            <ComposedChart data={timeData}>
+              <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis yAxisId="left" />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                allowDecimals={false}
+                domain={[0, "dataMax + 1"]}
+                tickFormatter={(value) => `${value}`}
+              />
 
-            <Legend />
-            <Bar
-              yAxisId="left"
-              dataKey="total"
-              fill="#82ca9d"
-              name="Chi phí"
-              barSize={30}
-            />
-            <Bar
-              yAxisId="right"
-              dataKey="count"
-              fill="#ffc658"
-              name="Số cuộc họp"
-              barSize={30}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+              <Tooltip
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className={cx("custom-tooltip")}>
+                        <p>Chi phí: {formatCurrencyVND(data.total)}</p>
+                        <p>Số cuộc họp: {data.count}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
 
-      <div className={cx("card")}>
-        <div className={cx("cardHeader")}>
-          <h2>
-            Chi phí và số cuộc họp theo phòng ban của 1 chi nhánh trong 1 ngày
-          </h2>
-          <select
-            value={selectedBranch}
-            onChange={(e) => setSelectedBranch(e.target.value)}
-          >
-            {branchs?.map((branch) => (
-              <option key={branch.branchId} value={branch.branchId}>
-                {branch.branchName}
-              </option>
-            ))}
-          </select>
-        </div>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={phongBanData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
-            <Tooltip />
-            <Legend />
-            <Bar
-              yAxisId="left"
-              dataKey="chiPhi"
-              fill="#82ca9d"
-              name="Chi phí"
-              barSize={30}
-            />
-            <Bar
-              yAxisId="right"
-              dataKey="soCuocHop"
-              fill="#ffc658"
-              name="Số cuộc họp"
-              barSize={30}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+              <Legend />
+              <Bar
+                yAxisId="left"
+                dataKey="total"
+                fill="#82ca9d"
+                name="Chi phí"
+                barSize={30}
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="count"
+                stroke="#EA4335"
+                strokeWidth={2}
+                dot={{ r: 5 }}
+                activeDot={{ r: 3, stroke: "#333" }}
+                connectNulls={true}
+                legendType="line"
+                name="Số cuộc họp"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className={cx("no-data")}>
+            <p>Hôm nay không có cuộc họp nào</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -15,10 +15,13 @@ import {
   Legend,
   LineChart,
   Line,
+  AreaChart,
+  Area,
+  ComposedChart,
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
 import { BranchProps } from "../../../data/data";
-import { formatDateString } from "../../../utilities";
+import { formatCurrencyVND, formatDateString } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -38,18 +41,6 @@ type StatisticalBranchData = {
   quantityRoom: number;
 };
 
-// truyền id chi nhánh và tháng
-const phongData = [
-  { name: "P.KD", chiPhi: 5000000, soCuocHop: 22 },
-  { name: "P.NS", chiPhi: 4000000, soCuocHop: 2 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 12 },
-  { name: "IT", chiPhi: 6000000, soCuocHop: 14 },
-  { name: "Kế toán", chiPhi: 6000000, soCuocHop: 10 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 9 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 2 },
-  { name: "P.KT", chiPhi: 6000000, soCuocHop: 3 },
-];
-
 // truyền năm
 const chiPhiTheoThang = [
   { name: "Tháng 1", chiPhi: 280000000 },
@@ -66,6 +57,12 @@ const chiPhiTheoThang = [
   { name: "Tháng 12", chiPhi: 400000000 },
 ];
 
+const data = [
+  { name: "Hoàn thành", value: 24 },
+  { name: "Đã huỷ", value: 6 },
+];
+const COLORS = ["#00C49F", "#FF8042"];
+
 function Statistical() {
   const currentMonth = new Date().getMonth() + 1;
   const [selectedYear, setSelectedYear] = useState(2024);
@@ -81,7 +78,9 @@ function Statistical() {
   );
 
   const [selectedBranch, setSelectedBarnch] = useState<string>("1");
-  const [selectedMonthDept, setSelectedMonthDept] = useState("1");
+  const [selectedMonthDept, setSelectedMonthDept] = useState(
+    currentMonth.toString()
+  );
 
   // lấy chi nhánh
   const {
@@ -129,15 +128,59 @@ function Statistical() {
 
   const { data: phongData } = useFetch<[]>(
     `http://localhost:8080/api/v1/statistical/statisticalRoom?startDate=${getMonthDateRange(
-      selectedMonthPrice
+      selectedMonthDept
     ).startDate.toISOString()}&endDate=${getMonthDateRange(
-      selectedMonthPrice
+      selectedMonthDept
     ).endDate.toISOString()}&branchId=${selectedBranch}`
   );
 
   return (
     <div className={cx("statistical")}>
+      <div className={cx("summaryCards")}>
+        <div className={cx("summaryCard")}>
+          <h3>
+            <span className={cx("symbol")}>👥</span>Tổng số nhân viên
+          </h3>
+          <p>
+            30 <small>người</small>
+          </p>
+        </div>
+        <div className={cx("summaryCard")}>
+          <h3>
+            <span className={cx("symbol")}>🧑‍🔧</span>Tổng số dịch vụ
+          </h3>
+          <p>
+            30 <small>dịch vụ</small>
+          </p>
+        </div>
+        <div className={cx("summaryCard")}>
+          <h3>
+            <span className={cx("symbol")}>🖥️</span>Tổng số thiết bị
+          </h3>
+          <p>
+            30 <small>thiết bị</small>
+          </p>
+        </div>
+        <div className={cx("summaryCard")}>
+          <h3>
+            <span className={cx("symbol")}>🌐</span>Tổng số chi nhánh
+          </h3>
+          <p>
+            5 <small>chi nhánh</small>
+          </p>
+        </div>
+        <div className={cx("summaryCard")}>
+          <h3>
+            <span className={cx("symbol")}>🏢</span>Số lượng phòng
+          </h3>
+          <p>
+            30 <small>phòng</small>
+          </p>
+        </div>
+      </div>
+
       <div className={cx("charts-container")}>
+        {/* Tỉ lệ sử dụng dịch vụ  */}
         <div className={cx("card-pie")}>
           <div className={cx("cardHeader")}>
             <h2>Tỉ lệ sử dụng dịch vụ </h2>
@@ -152,30 +195,42 @@ function Statistical() {
               ))}
             </select>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
-              <Pie
-                data={tiLeDichVu ?? []}
-                dataKey="quantityService"
-                nameKey="name"
-                outerRadius={100}
-                label
-              >
-                {tiLeDichVu?.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={colors[index % colors.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          {tiLeDichVu && tiLeDichVu.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={tiLeDichVu ?? []}
+                  dataKey="quantityService"
+                  nameKey="name"
+                  outerRadius={100}
+                  label
+                >
+                  {tiLeDichVu?.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colors[index % colors.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: "300px",
+              }}
+              className={cx("no-data")}
+            >
+              Không có dữ liệu
+            </div>
+          )}
         </div>
 
+        {/* Tổng chi phí & số cuộc họp của mỗi chi nhánh */}
         <div className={cx("card")}>
           <div className={cx("cardHeader")}>
-            <h2>Chi phí & số cuộc họp theo chi nhánh của 1 tháng</h2>
+            <h2>Tổng chi phí & số cuộc họp của mỗi chi nhánh</h2>
             <select
               value={selectedMonthBranch}
               onChange={(e) => setSelectedMonthBranch(e.target.value)}
@@ -187,51 +242,76 @@ function Statistical() {
               ))}
             </select>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={chiNhanhData ?? []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip
-                content={({ active, payload, label }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                      <div className={cx("custom-tooltip")}>
-                        <strong>{`${data.name} - ${data.quantityRoom} phòng`}</strong>
-                        <p>Chi phí: {data.price.toLocaleString()} VNĐ</p>
-                        <p>Số cuộc họp: {data.quantityReservation}</p>
-                      </div>
-                    );
-                  }
-                  return null;
+          {chiNhanhData && chiNhanhData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={330}>
+              <BarChart
+                data={chiNhanhData ?? []}
+                margin={{
+                  top: 10,
+                  right: 0,
+                  left: 20,
+                  bottom: 0,
                 }}
-              />
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis
+                  yAxisId="left"
+                  tickFormatter={(value) =>
+                    `${(Number(value) / 1000000).toFixed(1)}tr`
+                  }
+                />
+                <YAxis yAxisId="right" orientation="right" />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className={cx("custom-tooltip")}>
+                          <strong>{`${data.name} - ${data.quantityRoom} phòng`}</strong>
+                          <p>Chi phí: {formatCurrencyVND(data.price)}</p>
+                          <p>Số cuộc họp: {data.quantityReservation}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
 
-              <Legend />
-              <Bar
-                yAxisId="left"
-                dataKey="price"
-                fill="#82ca9d"
-                name="Chi phí"
-                barSize={30}
-              />
-              <Bar
-                yAxisId="right"
-                dataKey="quantityReservation"
-                fill="#ffc658"
-                name="Số cuộc họp"
-                barSize={30}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+                <Legend />
+                <Bar
+                  yAxisId="left"
+                  dataKey="price"
+                  fill="#82ca9d"
+                  name="Chi phí"
+                  barSize={30}
+                />
+                <Bar
+                  yAxisId="right"
+                  dataKey="quantityReservation"
+                  fill="#ffc658"
+                  name="Số cuộc họp"
+                  barSize={30}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: "330px",
+              }}
+              className={cx("no-data")}
+            >
+              Không có dữ liệu
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Chi phí & số cuộc họp của mỗi phòng */}
       <div className={cx("card")}>
         <div className={cx("cardHeader")}>
-          <h2>Chi phí & số cuộc họp theo phòng</h2>
+          <h2>Chi phí & số cuộc họp của mỗi phòng</h2>
           <select
             value={selectedBranch}
             onChange={(e) => setSelectedBarnch(e.target.value)}
@@ -259,33 +339,72 @@ function Statistical() {
             ))}
           </select>
         </div>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={phongData ?? []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
-            <Tooltip />
-            <Legend />
-            <Bar
-              yAxisId="left"
-              dataKey="chiPhi"
-              fill="#82ca9d"
-              name="Chi phí"
-              barSize={30}
-            />
-            <Bar
-              yAxisId="right"
-              dataKey="soCuocHop"
-              fill="#ffc658"
-              name="Số cuộc họp"
-              barSize={30}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {phongData && phongData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={450}>
+            <ComposedChart
+              data={phongData}
+              margin={{
+                top: 10,
+                right: 0,
+                left: 20,
+                bottom: 0,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis
+                yAxisId="left"
+                tickFormatter={(value) =>
+                  `${(Number(value) / 1000000).toFixed(1)}tr`
+                }
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                allowDecimals={false}
+              />
+              <Tooltip
+                formatter={(value: number | string, name: string) => {
+                  if (name === "Chi phí") {
+                    return [`${formatCurrencyVND(value as number)}`, "Chi phí"];
+                  }
+                  if (name === "Số cuộc họp") {
+                    return [`${value} cuộc họp`, "Số cuộc họp"];
+                  }
+                  return [value, name];
+                }}
+              />
+              <Legend />
+              <Bar
+                yAxisId="left"
+                dataKey="price"
+                fill="#82ca9d"
+                name="Chi phí"
+                barSize={25}
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="quantityReservation"
+                stroke="#ff7300"
+                name="Số cuộc họp"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        ) : (
+          <div
+            style={{
+              height: "450px",
+            }}
+            className={cx("no-data")}
+          >
+            Không có dữ liệu
+          </div>
+        )}
       </div>
 
       <div className={cx("charts-container")}>
+        {/* Tổng chi phí trong tháng (theo ngày) */}
         <div className={cx("card")}>
           <div className={cx("cardHeader")}>
             <h2>Tổng chi phí trong tháng (theo ngày)</h2>
@@ -300,71 +419,88 @@ function Statistical() {
               ))}
             </select>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={chiPhiTheoNgay ?? []}>
-              <CartesianGrid strokeDasharray="3 3" />
 
-              <XAxis
-                dataKey="name"
-                interval={3}
-                angle={-30}
-                textAnchor="end"
-                tickFormatter={(value: string) => {
-                  return value.slice(-2);
+          {chiPhiTheoNgay && chiPhiTheoNgay.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart
+                data={chiPhiTheoNgay ?? []}
+                margin={{
+                  top: 10,
+                  right: 0,
+                  left: 0,
+                  bottom: 0,
                 }}
-              />
+              >
+                <CartesianGrid strokeDasharray="3 3" />
 
-              {/* Trục Y bên trái cho chi phí */}
-              <YAxis
-                yAxisId="left"
-                tickFormatter={(value) =>
-                  `${(Number(value) / 1000000).toFixed(1)}tr`
-                }
-              />
+                <XAxis
+                  dataKey="name"
+                  interval={2}
+                  // angle={-30}
+                  textAnchor="end"
+                  tickFormatter={(value: string) => {
+                    return value.slice(-2);
+                  }}
+                />
 
-              {/* Trục Y bên phải cho số cuộc họp */}
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                tickFormatter={(value) => `${value} cuộc`}
-              />
-
-              <Tooltip
-                labelFormatter={(label: string) => {
-                  return `${formatDateString(label)}`;
-                }}
-                formatter={(value: number | string, name: string) => {
-                  if (name === "price") {
-                    return `${(Number(value) / 1000000).toFixed(1)} triệu VNĐ`;
+                {/* Trục Y bên trái cho chi phí */}
+                <YAxis
+                  yAxisId="left"
+                  tickFormatter={(value) =>
+                    `${(Number(value) / 1000000).toFixed(1)}tr`
                   }
-                  if (name === "quantityReservation") {
-                    return `${value} cuộc họp`;
-                  }
-                  return value;
-                }}
-              />
+                />
 
-              {/* Đường chi phí */}
-              <Line
-                yAxisId="left"
-                type="monotone"
-                dataKey="price"
-                stroke="#8884d8"
-                dot={false}
-                name="Chi phí"
-              />
+                {/* Trục Y bên phải cho số cuộc họp */}
+                <YAxis yAxisId="right" orientation="right" />
 
-              {/* Đường số cuộc họp */}
-              <Line
-                yAxisId="right"
-                type="basis"
-                dataKey="quantityReservation"
-                stroke="#82ca9d"
-                dot={false}
-                name="Số cuộc họp"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+                <Tooltip
+                  labelFormatter={(label: string) => {
+                    return `${formatDateString(label)}`;
+                  }}
+                  formatter={(value: number | string, name: string) => {
+                    if (name === "Chi phí") {
+                      return `${formatCurrencyVND(value as number)} `;
+                    }
+                    if (name === "Số cuộc họp") {
+                      return `${value} cuộc họp`;
+                    }
+                    return value;
+                  }}
+                />
+                <Legend />
+
+                {/* Đường chi phí */}
+                <Line
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="price"
+                  stroke="#8884d8"
+                  dot={false}
+                  name="Chi phí"
+                />
+
+                {/* Đường số cuộc họp */}
+                <Line
+                  yAxisId="right"
+                  type="basis"
+                  dataKey="quantityReservation"
+                  stroke="#82ca9d"
+                  dot={false}
+                  name="Số cuộc họp"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: "300px",
+              }}
+              className={cx("no-data")}
+            >
+              Không có dữ liệu
+            </div>
+          )}
         </div>
 
         <div className={cx("card")}>
@@ -379,7 +515,7 @@ function Statistical() {
               <option value={2025}>2025</option>
             </select>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chiPhiTheoThang}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" minTickGap={10} />
