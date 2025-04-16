@@ -70,6 +70,17 @@
   &::-webkit-scrollbar-thumb:hover {
     background: var(--bg-scroll-thumb-hover);
   }
+
+  button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 7px 10px;
+    border-radius: 5px;
+    color: var(--color-white);
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+  }
 }
 
 html {
@@ -122,16 +133,16 @@ input {
   }
 }
 
-button {
-  cursor: pointer;
-  border: none;
-  outline: none;
-  padding: 7px 10px;
-  border-radius: 5px;
-  color: var(--color-white);
-  font-size: 14px;
-  transition: all 0.3s ease-in-out;
-}
+// button {
+//   cursor: pointer;
+//   border: none;
+//   outline: none;
+//   padding: 7px 10px;
+//   border-radius: 5px;
+//   color: var(--color-white);
+//   font-size: 14px;
+//   transition: all 0.3s ease-in-out;
+// }
 
 // calendar
 :global {
@@ -215,7 +226,7 @@ button {
 // modal
 @mixin modal-overlay {
   position: fixed;
-  z-index: 5;
+  z-index: 7;
   left: 0;
   top: 0;
   width: 100%;

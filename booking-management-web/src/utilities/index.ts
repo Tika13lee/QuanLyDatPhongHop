@@ -75,7 +75,18 @@ const validateBookingTime = (
   const now = new Date();
   const isToday = now.toDateString() === selectedDateTime.toDateString();
 
+  // Nếu là hôm nay
   if (isToday) {
+    // kiểm tra nếu đã quá 17:30
+    const afterFiveThirty =
+      now.getHours() > 17 || (now.getHours() === 17 && now.getMinutes() >= 30);
+    if (afterFiveThirty) {
+      showToast(
+        `Đã hết thời gian đặt lịch cho hôm nay. Vui lòng chọn ngày tiếp theo!`
+      );
+      return false;
+    }
+
     // Thời gian hiện tại + 10 phút
     const threshold = new Date(now.getTime() + 10 * 60 * 1000);
 
@@ -104,7 +115,7 @@ const validateBookingTime = (
       showToast(
         `Ngày ${formatDateString(
           selectedDate
-        )} đã qua. Vui lòng chọn ngày khác!`
+        )} đã qua. Vui lòng chọn ngày tiếp theo!`
       );
       return false;
     }
@@ -175,7 +186,7 @@ const generateStartTime2 = (selectedDate: string) => {
 };
 
 export {
-  generateStartTime2, 
+  generateStartTime2,
   generateStartTime,
   validateBookingTime,
   getHourMinute,

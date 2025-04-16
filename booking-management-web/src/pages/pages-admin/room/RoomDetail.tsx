@@ -9,6 +9,7 @@ import { DeviceProps, RoomDeviceProps } from "../../../data/data";
 import { FaPlus } from "react-icons/fa";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
+import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
@@ -426,7 +427,8 @@ const RoomDetail = () => {
                   <strong>Sức chứa:</strong> {roomDetail?.capacity} người
                 </p>
                 <p>
-                  <strong>Giá:</strong> ${roomDetail?.price}
+                  <strong>Giá:</strong>
+                  {formatCurrencyVND(Number(roomDetail?.price))}
                 </p>
               </div>
               {/* loại, trạng thái */}

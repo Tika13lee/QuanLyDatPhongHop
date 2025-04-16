@@ -586,7 +586,7 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
                   <input
                     type="text"
                     name="time"
-                    value={formatDateString(
+                    defaultValue={formatDateString(
                       dateSelected ?? new Date().toString()
                     )}
                     disabled

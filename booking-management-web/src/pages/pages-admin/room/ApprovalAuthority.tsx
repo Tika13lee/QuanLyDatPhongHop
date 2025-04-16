@@ -1,11 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovalAuthority.module.scss";
-import { EmployeeProps, RoomProps } from "../../../data/data";
+import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
 import { use, useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import { formatCurrencyVND } from "../../../utilities";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { SiFusionauth } from "../../../components/icons/icons";
+import { FiRefreshCw, SiFusionauth } from "../../../components/icons/icons";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
 import { FaPlus } from "react-icons/fa";
 import PopupNotification from "../../../components/popup/PopupNotification";
@@ -23,6 +23,8 @@ function ApprovalAuthority() {
   const [roomId, setRoomId] = useState<number>(0);
   const [selectedEmployee, setSelectedEmployee] =
     useState<EmployeeProps | null>(null);
+
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -130,15 +132,50 @@ function ApprovalAuthority() {
       });
   };
 
+  // Lấy danh sách chi nhánh
+  const {
+    data: branchs,
+    loading: branchsLoading,
+    error: branchsError,
+  } = useFetch<BranchProps[]>(
+    "http://localhost:8080/api/v1/location/getAllBranch"
+  );
+
   return (
     <div className={cx("approval-authority")}>
       <div className={cx("header")}>
         <div className={cx("search")}>
-          <label>Tìm kiếm phòng</label>
-          <input
-            type="text"
-            placeholder="Nhập tên phòng..."
-          />
+          <span>Tên phòng</span>
+          <input type="text" placeholder="Nhập tên phòng..." />
+        </div>
+        <div className={cx("search")}>
+          <span>Chi nhánh</span>
+          <select
+            name="branch"
+            id="branch"
+            value={selectedBranch}
+            onChange={(e) => setSelectedBranch(e.target.value)}
+          >
+            <option value="" disabled>
+              Chọn chi nhánh
+            </option>
+            {branchsLoading ? (
+              <option>Loading...</option>
+            ) : branchsError ? (
+              <option>Error loading branches</option>
+            ) : (
+              branchs?.map((branch) => (
+                <option key={branch.branchId} value={branch.branchName}>
+                  {branch.branchName}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+        <div>
+          <button>
+            <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
+          </button>
         </div>
       </div>
 

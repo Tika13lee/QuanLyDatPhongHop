@@ -20,6 +20,7 @@ function RequestList() {
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
   const [statusRequestForm, setStatusRequestForm] = useState<string>("");
+  const [searchTitle, setSearchTitle] = useState<string>("");
 
   // Lấy danh sách lịch đặt phòng
   const {
@@ -44,7 +45,10 @@ function RequestList() {
     selectedRequestForm && setSelectedRequestForm(null);
   };
 
-  console.log("selectedRequestForm", selectedRequestForm);
+  // Lọc danh sách yêu cầu theo tiêu đề
+  const filteredRequestList = requestList?.filter((schedule) =>
+    schedule.requestReservation.title.toLowerCase().includes(searchTitle)
+  );
 
   return (
     <div className={cx("booking-list")}>
@@ -55,12 +59,14 @@ function RequestList() {
             type="text"
             placeholder="Nhập tiêu đề cuộc họp"
             className={cx("search-input")}
+            value={searchTitle}
+            onChange={(e) => setSearchTitle(e.target.value.toLowerCase())}
           />
         </div>
-        <div className={cx("search-group")}>
+        {/* <div className={cx("search-group")}>
           <label>Ngày gửi</label>
           <input type="date" className={cx("search-input")} />
-        </div>
+        </div> */}
         <div className={cx("search-group")}>
           <label>Ngày bắt đầu</label>
           <input type="date" className={cx("search-input")} />
@@ -113,7 +119,7 @@ function RequestList() {
               </tr>
             </thead>
             <tbody>
-              {requestList?.map((schedule) => {
+              {filteredRequestList?.map((schedule) => {
                 const statusText = getStatusText(schedule.statusRequestForm);
 
                 return (
@@ -152,6 +158,7 @@ function RequestList() {
           </table>
         </div>
       )}
+
       <DetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

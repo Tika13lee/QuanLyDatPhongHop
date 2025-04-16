@@ -23,36 +23,6 @@ function Service() {
     "info"
   );
 
-  const handleRefresh = () => {
-    setSearchValue("");
-    setServiceList(services || []);
-  };
-
-  // hàm xử lý tìm kiếm
-  const handleSearch = async () => {
-    if (!searchValue.trim()) {
-      setServiceList(services || []);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `http://localhost:8080/api/v1/service/getServiceByName?name=${encodeURIComponent(
-          searchValue
-        )}`
-      );
-      if (!res.ok) throw new Error("Lỗi tìm kiếm");
-
-      const data = await res.json();
-      setServiceList(Array.isArray(data) ? data : [data]);
-    } catch (err) {
-      console.error("Lỗi khi tìm kiếm dịch vụ:", err);
-      setPopupMessage("Không tìm thấy dịch vụ phù hợp.");
-      setPopupType("error");
-      setIsPopupOpen(true);
-    }
-  };
-
   const {
     data: services,
     loading,
@@ -63,6 +33,11 @@ function Service() {
 
   const [serviceList, setServiceList] = useState<ServiceProps[]>(
     services || []
+  );
+
+  // Lọc danh sách dịch vụ theo tên
+  const filteredServicetList = serviceList?.filter((service) =>
+    service.serviceName.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   const [formData, setFormData] = useState({
@@ -219,11 +194,6 @@ function Service() {
     setSelectedService(null);
   };
 
-  // Hàm mở form thêm mới
-  const handleOpenForm = () => {
-    setOpenForm(true);
-  };
-
   // Hàm đóng form
   const handleCloseForm = () => {
     setOpenForm(false);
@@ -241,13 +211,18 @@ function Service() {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-          <button onClick={handleSearch}>
+          <button>
             <IconWrapper icon={MdSearch} color="#fff" size={24} />
           </button>
         </div>
-        <div onClick={handleRefresh}>
+        <div
+          onClick={() => {
+            setSearchValue("");
+            setServiceList(services || []);
+          }}
+        >
           <button>
-            <IconWrapper icon={FiRefreshCw} color="#000" size={24} />
+            <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
           </button>
         </div>
       </div>
@@ -259,7 +234,7 @@ function Service() {
           <button
             type="button"
             className={cx("submit-btn")}
-            onClick={() => handleOpenForm()}
+            onClick={() => setOpenForm(true)}
           >
             Thêm
             <IconWrapper icon={FaPlus} color="#fff" size={18} />
@@ -349,12 +324,16 @@ function Service() {
                   Đang tải dữ liệu...
                 </td>
               </tr>
-            ) : error || !services || services.length === 0 ? (
+            ) : error ||
+              !filteredServicetList ||
+              filteredServicetList.length === 0 ? (
               <tr>
-                <td colSpan={4}>Không có dịch vụ nào</td>
+                <td colSpan={4} style={{ textAlign: "center" }}>
+                  Không có dịch vụ nào
+                </td>
               </tr>
             ) : (
-              serviceList.map((service, index) => (
+              filteredServicetList.map((service, index) => (
                 <tr
                   key={service.serviceId}
                   onClick={() => handleEditService(service)}

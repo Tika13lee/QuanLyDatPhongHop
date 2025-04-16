@@ -25,7 +25,7 @@ import {
   ListApprovalByApprover,
   FrequencySchedules,
 } from "./pages/pages-user";
-import { Home, Login } from "./pages/general";
+import { Login } from "./pages/general";
 import { Provider } from "react-redux";
 import store from "./app/store";
 import ScheduleList from "./pages/pages-user/schedule/ScheduleList";
@@ -68,8 +68,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<BookingSearch />} />
-            <Route path="booking" element={<Booking />} />
+            <Route index element={<Booking />} />
+            <Route path="search" element={<BookingSearch />} />
             <Route path="booking-list" element={<RequestList />} />
             <Route path="detail/:id" element={<ViewSchedule />} />
             <Route path="approve" element={<ListApprovalByApprover />} />

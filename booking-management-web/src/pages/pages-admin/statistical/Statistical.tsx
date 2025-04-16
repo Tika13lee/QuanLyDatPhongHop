@@ -15,9 +15,8 @@ import {
   Legend,
   LineChart,
   Line,
-  AreaChart,
-  Area,
   ComposedChart,
+  ReferenceLine,
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
 import { BranchProps } from "../../../data/data";
@@ -26,12 +25,16 @@ import { formatCurrencyVND, formatDateString } from "../../../utilities";
 const cx = classNames.bind(styles);
 
 const colors = [
-  "#8884d8",
-  "#82ca9d",
-  "#ffc658",
-  "#ff7f50",
-  "#a0522d",
-  "#d2691e",
+  "#8dd1e1", // xanh dương nhạt
+  "#a4de6c", // xanh lá tươi
+  "#ffbb28", // vàng cam
+  "#83a6ed", // xanh tím
+  "#ff8042", // cam rực
+  "#d0ed57", // vàng xanh
+  "#b8860b", // nâu vàng đậm
+  "#20b2aa", // teal
+  "#6495ed", // xanh cornflower
+  "#dda0dd", // tím pastel
 ];
 
 type StatisticalBranchData = {
@@ -57,11 +60,9 @@ const chiPhiTheoThang = [
   { name: "Tháng 12", chiPhi: 400000000 },
 ];
 
-const data = [
-  { name: "Hoàn thành", value: 24 },
-  { name: "Đã huỷ", value: 6 },
-];
-const COLORS = ["#00C49F", "#FF8042"];
+const avg =
+  chiPhiTheoThang.reduce((acc, item) => acc + Number(item.chiPhi), 0) /
+  chiPhiTheoThang.length;
 
 function Statistical() {
   const currentMonth = new Date().getMonth() + 1;
@@ -199,11 +200,13 @@ function Statistical() {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={tiLeDichVu ?? []}
+                  data={tiLeDichVu}
                   dataKey="quantityService"
                   nameKey="name"
                   outerRadius={100}
-                  label
+                  label={({ percent, name }) => {
+                    return `${name} (${(percent * 100).toFixed(0)}%)`;
+                  }}
                 >
                   {tiLeDichVu?.map((entry, index) => (
                     <Cell
@@ -516,11 +519,30 @@ function Statistical() {
             </select>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chiPhiTheoThang}>
+            <BarChart
+              data={chiPhiTheoThang}
+              margin={{
+                top: 20,
+                right: 50,
+                left: 20,
+                bottom: 5,
+              }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" minTickGap={10} />
               <YAxis />
               <Tooltip />
+              <ReferenceLine
+                y={avg}
+                stroke="red"
+                strokeDasharray="3 3"
+                label={{
+                  value: "Trung bình",
+                  position: "insideTopRight",
+                  fill: "red",
+                }}
+              />
+
               <Bar dataKey="chiPhi" fill="#FFCCFF" barSize={24} />
             </BarChart>
           </ResponsiveContainer>

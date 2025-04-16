@@ -21,16 +21,16 @@
   border: 1px solid var(--border-color);
   border-radius: 5px;
   width: 300px;
-
+  
   input {
+    height: 33px;
     border: none;
     border-radius: 5px;
     font-size: 14px;
-    height: 35px;
   }
 
   button {
-    height: 35px;
+    height: 33px;
     padding: 0 10px;
     background: var(--btn-add);
     color: var(--color-white);

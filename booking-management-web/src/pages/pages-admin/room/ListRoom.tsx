@@ -16,7 +16,7 @@ function ListRoom() {
   const [rooms, setRooms] = useState<RoomProps2[]>([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const pageSize = 9;
+  const pageSize = 10;
   const [searchQuery, setSearchQuery] = useState("");
   // Thời gian trễ gọi API (Debouncing)
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(

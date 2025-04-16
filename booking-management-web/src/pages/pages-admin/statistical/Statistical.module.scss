@@ -12,7 +12,7 @@
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
-  margin: 10px 0;
+  // margin: 10px 0;
 }
 
 .summaryCard {
@@ -35,7 +35,7 @@
   p {
     font-size: 30px;
     font-weight: 600;
-    color: #3dcf2c;
+    color: #2e69f1;
     margin: 0;
     text-align: right;
 
@@ -47,7 +47,7 @@
   }
 
   .symbol {
-    font-size: 30px;
+    font-size: 20px;
   }
 }
 
@@ -60,11 +60,9 @@
 
 .card-pie,
 .card {
-  // flex: 1;
-  min-width: 450px;
+  min-width: 500px;
   background-color: #fff;
   border-radius: 7px;
-  // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border: 1px solid #ccc;
   padding: 16px;
 

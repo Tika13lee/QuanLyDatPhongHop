@@ -6,11 +6,9 @@ import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import IconWrapper from "../components/icons/IconWrapper";
 import { IoIosArrowDown, IoIosArrowForward } from "../components/icons/icons";
-import useFetch from "../hooks/useFetch";
 import { EmployeeProps } from "../data/data";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { set } from "react-datepicker/dist/date_utils";
 import { setUser } from "../features/userSlice";
 
 const cx = classNames.bind(styles);
@@ -59,16 +57,16 @@ const MainLayoutUser = () => {
               cx("sidebar-item", { active: isActive })
             }
           >
-            Tổng quan
+            Đặt lịch họp
           </NavLink>
 
           <NavLink
-            to="/user/booking"
+            to="/user/search"
             className={({ isActive }) =>
               cx("sidebar-item", { active: isActive })
             }
           >
-            Đặt lịch họp
+            Tìm phòng
           </NavLink>
 
           <NavLink

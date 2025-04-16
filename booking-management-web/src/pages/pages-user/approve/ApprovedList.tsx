@@ -19,6 +19,7 @@ function ApprovedList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Lấy danh sách lịch đặt phòng đã phê duyệt
   const {
@@ -29,7 +30,16 @@ function ApprovedList() {
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED`
   );
 
-  console.log(approvedList);
+  // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+  const filteredRequestList = approvedList?.filter((form) => {
+    const titleMatch = form.requestReservation.title
+      .toLowerCase()
+      .includes(searchQuery);
+    const nameBookerMatch = form.reservations[0].booker.employeeName
+      .toLowerCase()
+      .includes(searchQuery);
+    return titleMatch || nameBookerMatch;
+  });
 
   // Mở modal
   const handleShowDetails = (requestForm: RequestFormProps) => {
@@ -50,25 +60,41 @@ function ApprovedList() {
           <label>Tìm kiếm</label>
           <input
             type="text"
-            placeholder="Tên phòng, tiêu đề cuộc họp, tên người đặt"
+            placeholder="Nhập tiêu đề, người đặt"
             className={cx("search-input")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
           />
         </div>
         <div className={cx("search-row")}>
-          <label>Ngày bắt đầu</label>
+          <label>Thời gian</label>
           <input type="date" className={cx("search-input")} />
         </div>
         <div className={cx("search-row")}>
-          <label>Ngày gửi</label>
-          <input type="date" className={cx("search-input")} />
+          <label>Chọn phòng</label>
+          <select className={cx("search-input")}>
+            <option value="all">Tất cả</option>
+            <option value="room1">Phòng 1</option>
+            <option value="room2">Phòng 2</option>
+            <option value="room3">Phòng 3</option>
+          </select>
+        </div>
+        <div className={cx("search-row")}>
+          <label>Loại yêu cầu</label>
+          <select className={cx("search-input")}>
+            <option value="all">Tất cả</option>
+            <option value="room1">Đặt phòng</option>
+            <option value="room2">Cập nhật</option>
+          </select>
         </div>
       </div>
 
       {loadingApprovedList ? (
         <LoadingSpinner />
-      ) : Array.isArray(approvedList) && approvedList.length === 0 ? (
+      ) : Array.isArray(filteredRequestList) &&
+        filteredRequestList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
-          Bạn không có lịch cần phê duyệt
+          Bạn không có lịch đã phê duyệt
         </p>
       ) : (
         <div className={cx("schedule-list")}>
@@ -85,8 +111,8 @@ function ApprovedList() {
               </tr>
             </thead>
             <tbody>
-              {approvedList &&
-                [...approvedList]
+              {filteredRequestList &&
+                [...filteredRequestList]
                   .sort(
                     (a, b) =>
                       new Date(b.timeResponse).getTime() -

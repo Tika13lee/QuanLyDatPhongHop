@@ -9,10 +9,11 @@ import {
   typeRoom,
 } from "../../../data/data";
 import usePost from "../../../hooks/usePost";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { uploadImageToCloudinary } from "../../../utilities";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
 const cx = classNames.bind(styles);
 
@@ -22,9 +23,6 @@ const CreateRoom = () => {
   const [selectedBranch, setSelectedBranch] = useState<string>();
   const [selectedBuilding, setSelectedBuilding] = useState<string>();
   const [selectedFloor, setSelectedFloor] = useState<string>();
-  const roomNameRef = useRef<HTMLInputElement>(null);
-  const capacityRef = useRef<HTMLInputElement>(null);
-  const priceRef = useRef<HTMLInputElement>(null);
   const [filesImage, setFilesImage] = useState<File[]>([]);
 
   // popup thông báo
@@ -81,6 +79,11 @@ const CreateRoom = () => {
 
   // lấy ds tầng theo tòa nhà
   useEffect(() => {
+    setFloors([]);
+    setSelectedFloor(" ");
+
+    if (selectedBuilding === " " || !selectedBranch) return;
+
     if (
       selectedBuilding !== " " &&
       selectedBuilding !== undefined &&
@@ -97,49 +100,7 @@ const CreateRoom = () => {
         })
         .catch((error) => console.error("Lỗi khi lấy danh sách tầng:", error));
     }
-  }, [selectedBuilding]);
-
-  // Xử lý thay đổi tòa nhà
-  const handleBuildingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const buildingId = e.target.value;
-
-    const selectedOption = e.target.selectedOptions[0];
-    const buildingName =
-      selectedOption.getAttribute("data-buildingname")?.toString() || "";
-
-    setSelectedBuilding(buildingId);
-    // setRoomData((prev) => ({
-    //   ...prev,
-    //   location: {
-    //     ...prev.location,
-    //     building: {
-    //       ...prev.location.building,
-    //       buildingName: buildingName,
-    //     },
-    //   },
-    // }));
-  };
-
-  // Xử lý thay đổi input branch
-  const handleBranchChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
-  ) => {
-    setSelectedBranch(e.target.value);
-
-    // setRoomData((prev) => ({
-    //   ...prev,
-    //   location: {
-    //     ...prev.location,
-    //     building: {
-    //       ...prev.location.building,
-    //       branch: {
-    //         ...prev.location.building.branch,
-    //         branchName: e.target.value || "",
-    //       },
-    //     },
-    //   },
-    // }));
-  };
+  }, [selectedBuilding, selectedBranch]);
 
   // Xử lý thay đổi input floor
   const handleFloorChange = (
@@ -193,10 +154,6 @@ const CreateRoom = () => {
     });
   };
 
-  useEffect(() => {
-    console.log("Files:", filesImage);
-  }, [filesImage]);
-
   // Xử lý chọn ảnh
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files !== null) {
@@ -226,9 +183,9 @@ const CreateRoom = () => {
     //   return { isValid: false, message: "Vui lòng chọn tòa nhà!" };
     // }
 
-    // if (!roomData.location.floor) {
-    //   return { isValid: false, message: "Vui lòng chọn tầng!" };
-    // }
+    if (!roomData.location.locationId) {
+      return { isValid: false, message: "Vui lòng chọn vị trí!" };
+    }
 
     if (!roomData.roomName) {
       return { isValid: false, message: "Vui lòng nhập tên phòng!" };
@@ -236,10 +193,18 @@ const CreateRoom = () => {
 
     if (!roomData.capacity) {
       return { isValid: false, message: "Vui lòng nhập sức chứa!" };
+    } else if (Number(roomData.capacity) < 1) {
+      return { isValid: false, message: "Sức chứa phải lớn hơn 0!" };
+    } else if (Number.isInteger(Number(roomData.capacity)) === false) {
+      return { isValid: false, message: "Sức chứa phải là số nguyên!" };
     }
 
     if (!roomData.price) {
       return { isValid: false, message: "Vui lòng nhập giá!" };
+    } else if (Number(roomData.price) < 1) {
+      return { isValid: false, message: "Giá phải lớn hơn 0!" };
+    } else if (Number.isInteger(Number(roomData.price)) === false) {
+      return { isValid: false, message: "Giá phải là số nguyên!" };
     }
 
     if (!roomData.typeRoom) {
@@ -296,6 +261,7 @@ const CreateRoom = () => {
         setPopupMessage("Phòng đã được tạo thành công!");
         setPopupType("success");
         setIsPopupOpen(true);
+        resetData();
       } else {
         setPopupMessage("Lỗi khi gửi dữ liệu! Vui lòng thử lại.");
         setPopupType("error");
@@ -308,9 +274,24 @@ const CreateRoom = () => {
     }
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  // reset data
+  const resetData = () => {
+    setRoomData({
+      roomName: "",
+      capacity: "",
+      price: "",
+      location: {
+        locationId: "",
+      },
+      typeRoom: "",
+      statusRoom: "",
+      room_deviceDTOS: [],
+      imgs: [],
+    });
+    setSelectedBranch("");
+    setSelectedBuilding("");
+    setSelectedFloor("");
+    setFilesImage([]);
   };
 
   return (
@@ -322,7 +303,11 @@ const CreateRoom = () => {
             <div className={cx("cover")}>
               <h3>Bước 1: Chọn vị trí</h3>
               <div className={cx("form-row")}>
-                <select name="branch" onChange={handleBranchChange}>
+                <select
+                  name="branch"
+                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  value={selectedBranch}
+                >
                   <option value="">Chọn chi nhánh</option>
                   {branchs?.map((branch) => (
                     <option key={branch.branchId} value={branch.branchName}>
@@ -335,7 +320,10 @@ const CreateRoom = () => {
                 <select
                   defaultValue={""}
                   name="building"
-                  onChange={handleBuildingChange}
+                  onChange={(e) => {
+                    setSelectedBuilding(e.target.value);
+                  }}
+                  value={selectedBuilding}
                 >
                   <option value="" selected={"" === selectedBuilding}>
                     Chọn tòa nhà
@@ -362,15 +350,17 @@ const CreateRoom = () => {
                   <option value="" selected={"" === selectedFloor}>
                     Chọn tầng
                   </option>
-                  {floors.map((floor) => (
-                    <option
-                      key={floor.locationId}
-                      value={floor.locationId}
-                      selected={floor.floor === selectedFloor}
-                    >
-                      {floor.floor}
-                    </option>
-                  ))}
+                  {floors &&
+                    floors.length > 0 &&
+                    floors.map((floor) => (
+                      <option
+                        key={floor.locationId}
+                        value={floor.locationId}
+                        selected={floor.floor === selectedFloor}
+                      >
+                        {floor.floor}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
@@ -382,84 +372,33 @@ const CreateRoom = () => {
                 <div className={cx("form-input")}>
                   <label>Tên phòng:</label>
                   <input
-                    ref={roomNameRef}
                     type="text"
                     placeholder="Nhập tên phòng..."
                     name="roomName"
                     value={roomData.roomName}
                     onChange={handleChange}
-                    onBlur={(e) => {
-                      if (e.target.value === "") {
-                        setPopupMessage("Vui lòng nhập tên phòng");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        roomNameRef.current?.focus();
-                      }
-                    }}
                   />
                 </div>
                 <div className={cx("form-input")}>
                   <label>Sức chứa:</label>
                   <input
-                    ref={capacityRef}
                     type="number"
                     placeholder="Nhập sức chứa..."
                     name="capacity"
                     value={roomData.capacity}
                     onChange={handleChange}
                     min={1}
-                    onBlur={(e) => {
-                      if (e.target.value === "") {
-                        setPopupMessage("Vui lòng nhập sức chứa");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        capacityRef.current?.focus();
-                      } else if (Number(e.target.value) < 1) {
-                        setPopupMessage("Sức chứa phải lớn hơn 0");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        capacityRef.current?.focus();
-                      } else if (
-                        Number.isInteger(Number(e.target.value)) === false
-                      ) {
-                        setPopupMessage("Sức chứa phải là số nguyên");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        capacityRef.current?.focus();
-                      }
-                    }}
                   />
                 </div>
                 <div className={cx("form-input")}>
                   <label>Giá:</label>
                   <input
-                    ref={priceRef}
                     type="number"
                     placeholder="Nhập giá..."
                     name="price"
                     value={roomData.price}
                     onChange={handleChange}
                     min={1}
-                    onBlur={(e) => {
-                      if (e.target.value === "") {
-                        setPopupMessage("Vui lòng nhập giá");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        priceRef.current?.focus();
-                      } else if (Number(e.target.value) < 1) {
-                        setPopupMessage("Giá phải lớn hơn 0");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        priceRef.current?.focus();
-                      } else if (
-                        Number.isInteger(Number(e.target.value)) === false
-                      ) {
-                        setPopupMessage("Giá phải là số nguyên");
-                        setPopupType("error");
-                        setIsPopupOpen(true);
-                        priceRef.current?.focus();
-                      }
-                    }}
                   />
                 </div>
               </div>
@@ -519,47 +458,57 @@ const CreateRoom = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {devices?.map((device, index) => {
-                        const selectedDevice = roomData.room_deviceDTOS.find(
-                          (d) => d.deviceName === device.deviceName
-                        );
-                        return (
-                          <tr key={index}>
-                            <td>
-                              <input
-                                type="checkbox"
-                                className={cx("checkbox")}
-                                checked={!!selectedDevice}
-                                onChange={(e) =>
-                                  handleDeviceChange(
-                                    device.deviceName,
-                                    e.target.checked
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>{device.deviceName}</td>
-                            <td>
-                              <input
-                                type="number"
-                                min="1"
-                                className={cx("device-quantity")}
-                                placeholder="Số lượng"
-                                value={
-                                  selectedDevice ? selectedDevice.quantity : ""
-                                }
-                                onChange={(e) =>
-                                  handleDeviceChange(
-                                    device.deviceName,
-                                    true,
-                                    Number(e.target.value)
-                                  )
-                                }
-                              />
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {(devices ? devices.length : 0) === 0 ? (
+                        <tr>
+                          <td colSpan={3} className={cx("no-data")}>
+                            Không có thiết bị nào
+                          </td>
+                        </tr>
+                      ) : (
+                        devices?.map((device, index) => {
+                          const selectedDevice = roomData.room_deviceDTOS.find(
+                            (d) => d.deviceName === device.deviceName
+                          );
+                          return (
+                            <tr key={index}>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  className={cx("checkbox")}
+                                  checked={!!selectedDevice}
+                                  onChange={(e) =>
+                                    handleDeviceChange(
+                                      device.deviceName,
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td>{device.deviceName}</td>
+                              <td>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  className={cx("device-quantity")}
+                                  placeholder="Số lượng"
+                                  value={
+                                    selectedDevice
+                                      ? selectedDevice.quantity
+                                      : ""
+                                  }
+                                  onChange={(e) =>
+                                    handleDeviceChange(
+                                      device.deviceName,
+                                      true,
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -584,7 +533,7 @@ const CreateRoom = () => {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

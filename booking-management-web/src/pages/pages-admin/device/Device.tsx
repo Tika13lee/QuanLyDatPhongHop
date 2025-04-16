@@ -7,7 +7,7 @@ import { useState } from "react";
 import { fetchDevices } from "../../../features/deviceSlice";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { FaPlus, MdSearch } from "../../../components/icons/icons";
+import { FaPlus, FiRefreshCw, MdSearch } from "../../../components/icons/icons";
 import { DeviceProps } from "../../../data/data";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 
@@ -16,6 +16,14 @@ const cx = classNames.bind(styles);
 function Device() {
   const dispatch = useDispatch<AppDispatch>();
   const [openForm, setOpenForm] = useState(false);
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   // Lấy dữ liệu devices từ Redux Store
   const {
@@ -23,6 +31,11 @@ function Device() {
     loading: devicesLoading,
     error: devicesError,
   } = useSelector((state: RootState) => state.device);
+
+  // Lọc danh sách thiết bị theo tên
+  const filteredDeviceList = devices?.filter((device) =>
+    device.deviceName.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   // thêm device
   const { data, loading, error, postData } = usePost<DeviceProps[]>(
@@ -39,13 +52,6 @@ function Device() {
     description: "",
   });
   const [selectedDevice, setSelectedDevice] = useState<DeviceProps | null>();
-
-  // popup thông báo
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState<"success" | "error" | "info">(
-    "info"
-  );
 
   // Hàm xử lý khi thay đổi input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,11 +156,6 @@ function Device() {
     setSelectedDevice(null);
   };
 
-  // Hàm mở form thêm mới
-  const handleOpenForm = () => {
-    setOpenForm(true);
-  };
-
   // Hàm đóng form
   const handleCloseForm = () => {
     setOpenForm(false);
@@ -162,19 +163,24 @@ function Device() {
     resetForm();
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-  };
-
   return (
     <div className={cx("device-container")}>
       {/* Tìm kiếm */}
       <div className={cx("search-container")}>
         <div className={cx("search-box")}>
-          <input type="search" placeholder="Tìm kiếm theo tên thiết bị" />
+          <input
+            type="search"
+            placeholder="Tìm kiếm theo tên thiết bị"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value.toLowerCase())}
+          />
           <button>
             <IconWrapper icon={MdSearch} color="#fff" size={24} />
+          </button>
+        </div>
+        <div>
+          <button onClick={() => dispatch(fetchDevices())}>
+            <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
           </button>
         </div>
       </div>
@@ -186,7 +192,7 @@ function Device() {
           <button
             type="button"
             className={cx("submit-btn")}
-            onClick={() => handleOpenForm()}
+            onClick={() => setOpenForm(true)}
           >
             Thêm
             <IconWrapper icon={FaPlus} color="#fff" size={18} />
@@ -257,14 +263,12 @@ function Device() {
             </tr>
           </thead>
           <tbody>
-            {devicesLoading ? (
-              <LoadingSpinner />
-            ) : error || !devices || devices.length === 0 ? (
+            {error || !filteredDeviceList || filteredDeviceList.length === 0 ? (
               <tr>
                 <td colSpan={4}>Không có thiết bị nào</td>
               </tr>
             ) : (
-              devices.map((device, index) => (
+              filteredDeviceList.map((device, index) => (
                 <tr
                   key={device.deviceId}
                   onClick={() => handleEditDevice(device)}
@@ -284,7 +288,7 @@ function Device() {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

@@ -4,13 +4,15 @@ import CloseModalButton from "../Modal/CloseModalButton";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import { useState } from "react";
 import IconWrapper from "../icons/IconWrapper";
-import { IoIosArrowBack } from "../icons/icons";
+import { AiOutlineEdit, IoIosArrowBack } from "../icons/icons";
 import { uploadImageToCloudinary } from "../../utilities";
 import usePost from "../../hooks/usePost";
 import { EmployeeProps } from "../../data/data";
 import PopupNotification from "../popup/PopupNotification";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
+import { set } from "react-datepicker/dist/date_utils";
+import { setUser, updateUser } from "../../features/userSlice";
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +21,7 @@ type ProfileProps = {
 };
 
 const Profile = ({ onClose }: ProfileProps) => {
+  const dispatch = useDispatch();
   // lấy user từ redux
   const user = useSelector((state: RootState) => state.user);
 
@@ -27,6 +30,8 @@ const Profile = ({ onClose }: ProfileProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string>(user?.avatar || "");
   const [name, setName] = useState<string>(user?.employeeName || "");
   const [email, setEmail] = useState<string>(user?.email || "");
+  const [isEditPassword, setIsEditPassword] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -84,7 +89,11 @@ const Profile = ({ onClose }: ProfileProps) => {
         ...user,
         ...updatedUser,
       };
-      localStorage.setItem("currentEmployee", JSON.stringify(updatedUserData));
+
+      // Cập nhật thông tin người dùng trong Redux
+
+      dispatch(updateUser(updatedUserData));
+      localStorage.setItem("currentUser", JSON.stringify(updatedUserData));
 
       resetData();
     } else {
@@ -104,6 +113,8 @@ const Profile = ({ onClose }: ProfileProps) => {
     setEmail(user.email);
     setAvatarFile(null);
     setIsEditMode(false);
+    setIsEditPassword(false);
+    setPassword("");
   };
 
   return (
@@ -119,10 +130,27 @@ const Profile = ({ onClose }: ProfileProps) => {
         {/* header */}
         {isEditMode ? (
           <div className={cx("profile-header")}>
-            <button onClick={() => setIsEditMode(!isEditMode)}>
+            <button
+              onClick={() => {
+                setIsEditMode(false);
+                setIsEditPassword(false);
+              }}
+            >
               <IconWrapper icon={IoIosArrowBack} />
             </button>
             <h3 className={cx("profile-title")}>Cập nhật thông tin</h3>
+          </div>
+        ) : isEditPassword ? (
+          <div className={cx("profile-header")}>
+            <button
+              onClick={() => {
+                setIsEditMode(false);
+                setIsEditPassword(false);
+              }}
+            >
+              <IconWrapper icon={IoIosArrowBack} />
+            </button>
+            <h3 className={cx("profile-title")}>Cập nhật mật khẩu</h3>
           </div>
         ) : (
           <div className={cx("profile-header")}>
@@ -168,6 +196,45 @@ const Profile = ({ onClose }: ProfileProps) => {
               />
             </div>
           </div>
+        ) : isEditPassword ? (
+          <div className={cx("profile-content")}>
+            <div className={cx("profile-avatar")}>
+              <img
+                src="https://i.pinimg.com/736x/6b/da/ec/6bdaec3058be514f5a78db077db30434.jpg"
+                width={170}
+                // height={100}
+                alt="lock"
+              />
+            </div>
+            <div>
+              <label className={cx("profile-label")}>Mật khẩu cũ</label>
+              <input
+                className={cx("profile-input")}
+                type="text"
+                placeholder="Nhập mật khẩu cũ"
+              />
+            </div>
+            <div>
+              <label className={cx("profile-label")}>Mật khẩu mới</label>
+              <input
+                className={cx("profile-input")}
+                type="text"
+                placeholder="Nhập mật khẩu mới"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className={cx("profile-label")}>
+                Xác nhận mật khẩu mới
+              </label>
+              <input
+                className={cx("profile-input")}
+                type="text"
+                placeholder="Nhập lại mật khẩu mới"
+              />
+            </div>
+          </div>
         ) : (
           <div className={cx("profile-content")}>
             <div className={cx("profile-avatar")}>
@@ -194,6 +261,15 @@ const Profile = ({ onClose }: ProfileProps) => {
                   {user.department.location.building.branch.branchName}
                 </span>
               </div>
+              <div className={cx("profile-info-item")}>
+                <p>Mật khẩu</p>
+                <div className={cx("profile-password")}>
+                  <span>********</span>
+                  <button onClick={() => setIsEditPassword(true)}>
+                    <IconWrapper icon={AiOutlineEdit} size={16} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -207,6 +283,13 @@ const Profile = ({ onClose }: ProfileProps) => {
             <button className={cx("update-btn")} onClick={handleUpdateProfile}>
               Lưu
             </button>
+          </div>
+        ) : isEditPassword ? (
+          <div className={cx("profile-footer")}>
+            <button className={cx("cancel-btn")} onClick={resetData}>
+              Huỷ
+            </button>
+            <button className={cx("update-btn")}>Lưu</button>
           </div>
         ) : (
           <div className={cx("profile-footer")}>

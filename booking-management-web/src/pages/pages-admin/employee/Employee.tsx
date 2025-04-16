@@ -470,7 +470,7 @@ const Employee = () => {
           </select>
           <div onClick={handleRefresh}>
             <button>
-              <IconWrapper icon={FiRefreshCw} color="#000" size={20} />
+              <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={16} />
             </button>
           </div>
         </div>

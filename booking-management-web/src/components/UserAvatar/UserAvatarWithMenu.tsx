@@ -71,10 +71,11 @@ const UserAvatarWithMenu: React.FC<AvatarWithMenuProps> = ({
             onClick={() => {
               localStorage.removeItem("userPhone");
               localStorage.removeItem("currentUser");
+              localStorage.removeItem("accessToken");
               navigate("/");
             }}
           >
-            <span>Đăng xuất</span>
+            <span style={{ color: "#dc3545" }}>Đăng xuất</span>
           </div>
         </div>
       )}

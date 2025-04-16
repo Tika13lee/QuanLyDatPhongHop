@@ -17,13 +17,15 @@ import {
   IoEyeOffSharp,
   IoEyeSharp,
   IoEyeOutline,
-  IoEyeOffOutline
+  IoEyeOffOutline,
 } from "react-icons/io5";
 import { FiRefreshCw } from "react-icons/fi";
 import { TbRepeat } from "react-icons/tb";
 import { SiFusionauth } from "react-icons/si";
+import { AiOutlineEdit } from "react-icons/ai";
 
 export {
+  AiOutlineEdit,
   IoEyeOffOutline,
   IoEyeOutline,
   IoEyeSharp,

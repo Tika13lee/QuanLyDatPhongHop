@@ -9,7 +9,6 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { MdOutlineInfo } from "../../../components/icons/icons";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { formatDateString, getHourMinute } from "../../../utilities";
-import { ClipLoader } from "react-spinners";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
@@ -26,6 +25,7 @@ function ListApprovalByApprover() {
     useState<RequestFormProps | null>(null);
   const [reasonReject, setReasonReject] = useState<string>("");
   const [openModalReject, setOpenModalReject] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -42,8 +42,6 @@ function ListApprovalByApprover() {
   } = useFetch<RequestFormProps[]>(
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING`
   );
-
-  console.log(requestForm);
 
   const [schedulesApprove, setSchedulesApprove] = useState<RequestFormProps[]>(
     requestForm ?? []
@@ -159,6 +157,17 @@ function ListApprovalByApprover() {
     setSelectedRequestForm(null);
   };
 
+  // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+  const filteredRequestList = schedulesApprove?.filter((form) => {
+    const titleMatch = form.requestReservation.title
+      .toLowerCase()
+      .includes(searchQuery);
+    const nameBookerMatch = form.reservations[0].booker.employeeName
+      .toLowerCase()
+      .includes(searchQuery);
+    return titleMatch || nameBookerMatch;
+  });
+
   return (
     <div className={cx("approve")}>
       <div className={cx("approve-search")}>
@@ -169,6 +178,8 @@ function ListApprovalByApprover() {
               type="text"
               placeholder="Tiêu đề cuộc họp, tên người đặt"
               className={cx("search-input")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
             />
           </div>
           <div className={cx("search-group")}>
@@ -176,8 +187,13 @@ function ListApprovalByApprover() {
             <input type="date" className={cx("search-input")} />
           </div>
           <div className={cx("search-group")}>
-            <label>Ngày gửi</label>
-            <input type="date" className={cx("search-input")} />
+            <label>Chọn phòng</label>
+            <select className={cx("search-input")}>
+              <option value="all">Tất cả</option>
+              <option value="room1">Phòng 1</option>
+              <option value="room2">Phòng 2</option>
+              <option value="room3">Phòng 3</option>
+            </select>
           </div>
           <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
         </div>
@@ -233,7 +249,7 @@ function ListApprovalByApprover() {
 
       {loadingReservation ? (
         <LoadingSpinner />
-      ) : Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
+      ) : Array.isArray(filteredRequestList) && filteredRequestList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -253,7 +269,7 @@ function ListApprovalByApprover() {
               </tr>
             </thead>
             <tbody>
-              {[...schedulesApprove]
+              {[...filteredRequestList]
                 .sort(
                   (a, b) =>
                     new Date(b.timeRequest).getTime() -

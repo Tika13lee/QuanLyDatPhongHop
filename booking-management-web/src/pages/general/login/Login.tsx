@@ -57,8 +57,6 @@ const Login = () => {
       return;
     }
 
-    console.log(userName, password);
-
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/account/login",
@@ -71,8 +69,6 @@ const Login = () => {
       setPopupMessage("Đăng nhập thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
-
-      console.log("Đăng nhập thành công:", response.data);
 
       const accessToken = response.data;
       // Lưu accessToken vào localStorage
@@ -112,7 +108,9 @@ const Login = () => {
         setPopupType("error");
         setIsPopupOpen(true);
       } else {
-        alert("Không thể kết nối đến máy chủ.");
+        setPopupMessage("Không thể kết nối đến máy chủ.");
+        setPopupType("error");
+        setIsPopupOpen(true);
       }
     }
   };

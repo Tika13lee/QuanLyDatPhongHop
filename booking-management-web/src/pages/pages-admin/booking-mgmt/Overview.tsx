@@ -293,9 +293,9 @@ function Overview() {
             </tbody>
           </table>
         ) : (
-          <p className={cx("no-rooms")}>
-            Không có phòng nào cho chi nhánh này.
-          </p>
+          <div className={cx("no-rooms")}>
+            <p>Chi nhánh này chưa có phòng</p>
+          </div>
         )}
       </div>
 

@@ -1,8 +1,6 @@
 import classNames from "classnames/bind";
 import styles from "./Dashboard.module.scss";
-import { useEffect, useState } from "react";
 import {
-  BarChart,
   Bar,
   XAxis,
   YAxis,
@@ -12,24 +10,22 @@ import {
   Legend,
   ComposedChart,
   Line,
-  Sector,
   Pie,
   Cell,
   PieChart,
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
-import { BranchProps } from "../../../data/data";
 import { formatCurrencyVND } from "../../../utilities";
 
 const cx = classNames.bind(styles);
 
 const statusScheduleData = [
   { name: "Đã hoàn thành", value: 400 },
-  { name: "Đã hủy", value: 300 },
-  { name: "Không nhận phòng", value: 300 },
+  { name: "Đã hủy", value: 100 },
+  { name: "Không nhận phòng", value: 200 },
 ];
 
-const COLORS = ["#00C49F", "#FF8042", "#8884d8"];
+const colors = ["#4CAF50", "#F44336", "#9E9E9E"];
 
 const Dashboard = () => {
   const now = new Date();
@@ -54,8 +50,6 @@ const Dashboard = () => {
     `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
     // `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=2025-04-01T17:00:00.000Z&endDate=2025-04-30T17:00:00.000Z`
   );
-
-  console.log(statusScheduleData);
 
   return (
     <div className={cx("dashboard")}>
@@ -109,11 +103,12 @@ const Dashboard = () => {
               <ResponsiveContainer width="100%" height={230}>
                 <PieChart>
                   <Pie
+                    key={JSON.stringify(statusScheduleData)}
                     data={statusScheduleData}
                     dataKey="value"
                     nameKey="name"
                     outerRadius={80}
-                    innerRadius={60}
+                    innerRadius={50}
                     isAnimationActive={true}
                     label={({ percent, name }) => {
                       return `${name} (${(percent * 100).toFixed(0)}%)`;
@@ -122,7 +117,7 @@ const Dashboard = () => {
                     {statusScheduleData?.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
+                        fill={colors[index % colors.length]}
                       />
                     ))}
                   </Pie>
@@ -198,7 +193,12 @@ const Dashboard = () => {
             </ComposedChart>
           </ResponsiveContainer>
         ) : (
-          <div className={cx("no-data")}>
+          <div
+            style={{
+              height: "230px",
+            }}
+            className={cx("no-data")}
+          >
             <p>Hôm nay không có cuộc họp nào</p>
           </div>
         )}

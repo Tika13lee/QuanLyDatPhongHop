@@ -10,7 +10,6 @@
   padding: 20px;
   border-radius: 5px;
   width: 470px;
-  height: 450px;
   animation: fadeInModal 0.3s ease-out;
 }
 
@@ -50,7 +49,7 @@
   flex-direction: column;
   gap: 15px;
   padding: 20px 0;
-  height: 325px;
+  height: 345px;
 
   .profile-avatar {
     display: flex;
@@ -72,16 +71,39 @@
       flex: 1;
     }
   }
+
+  .profile-password {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-primary);
+
+    button {
+      padding: 3px 7px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: var(--bg-hover);
+      }
+    }
+  }
 }
 
 // footer
-.profile-footer{
+.profile-footer {
   margin-top: 10px;
   display: flex;
   gap: 20px;
   justify-content: flex-end;
 
-  .cancel-btn, 
+  .cancel-btn,
   .update-btn {
     width: 20%;
   }

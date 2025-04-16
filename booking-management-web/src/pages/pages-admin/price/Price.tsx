@@ -94,7 +94,9 @@ function Price() {
       const duplicatePrices: PriceTableProps[] = await fetchCheckApply();
       console.log(duplicatePrices);
       if (!duplicatePrices) {
-        alert("Lỗi khi kiểm tra thời gian.");
+        setPopupMessage("Lỗi khi kiểm tra thời gian áp dụng.");
+        setPopupType("error");
+        setIsPopupOpen(true);
         setIsCheckApply(false);
       } else {
         console.log(duplicatePrices);
@@ -111,13 +113,19 @@ function Price() {
               price.timeStart
             )} đến ${formatDateString(price.timeEnd)}\n`;
           });
-          alert("Thời gian này đã trùng với: \n" + response);
+          setPopupMessage(
+            "Thời gian này đã trùng với bảng giá khác." + response
+          );
+          setPopupType("error");
+          setIsPopupOpen(true);
           setIsCheckApply(false);
         }
       }
     } else {
       console.log(isCheckApply);
-      alert("Vui lòng chọn thời gian bắt đầu và kết thúc.");
+      setPopupMessage("Vui lòng chọn thời gian bắt đầu.");
+      setPopupType("error");
+      setIsPopupOpen(true);
 
       setIsCheckApply(false);
     }
@@ -150,7 +158,9 @@ function Price() {
 
       handleCloseAddModal();
     } else {
-      alert("Lỗi khi thêm bảng giá.");
+      setPopupMessage("Thêm bảng giá thất bại.");
+      setPopupType("error");
+      setIsPopupOpen(true);
     }
 
     console.log(updateNewPriceData);
@@ -232,7 +242,9 @@ function Price() {
   // Áp dụng bảng giá
   const handleActivePrice = async () => {
     if (isCheck.length === 0) {
-      alert("Vui lòng chọn ít nhất một bảng giá.");
+      setPopupMessage("Vui lòng chọn bảng giá để áp dụng.");
+      setPopupType("error");
+      setIsPopupOpen(true);
       return;
     }
 
@@ -310,7 +322,7 @@ function Price() {
               setDateValue(e.target.value);
             }}
           />
-          <div className={cx("refresh-btn")}>
+          <div>
             <button
               type="button"
               onClick={(e) => {
@@ -318,7 +330,7 @@ function Price() {
                 setDateValue("");
               }}
             >
-              <IconWrapper icon={FiRefreshCw} size={20} />
+              <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={16} />
             </button>
           </div>
         </div>

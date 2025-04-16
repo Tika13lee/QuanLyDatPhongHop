@@ -1,11 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovalList.module.scss";
 import { useEffect, useState } from "react";
-import {
-  RequestFormProps,
-  ReservationDetailProps,
-  ReservationProps,
-} from "../../../data/data";
+import { RequestFormProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -17,13 +13,13 @@ import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 const cx = classNames.bind(styles);
 
 function ApprovalList() {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
   const [reasonReject, setReasonReject] = useState<string>("");
   const [openModalReject, setOpenModalReject] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -155,6 +151,16 @@ function ApprovalList() {
     setSelectedRequestForm(null);
   };
 
+  // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+  const filteredRequestList = schedulesApprove?.filter((form) => {
+    const titleMatch = form.requestReservation.title
+      .toLowerCase()
+      .includes(searchQuery);
+    const nameBookerMatch = form.reservations[0].booker.employeeName
+      .toLowerCase()
+      .includes(searchQuery);
+    return titleMatch || nameBookerMatch;
+  });
   return (
     <div className={cx("approve-list")}>
       <div className={cx("approve-search")}>
@@ -165,6 +171,8 @@ function ApprovalList() {
               type="text"
               placeholder="Tiêu đề cuộc họp, tên người đặt"
               className={cx("search-input")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
             />
           </div>
           <div className={cx("search-group")}>
@@ -229,7 +237,8 @@ function ApprovalList() {
 
       {loadingReservation ? (
         <LoadingSpinner />
-      ) : Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
+      ) : Array.isArray(filteredRequestList) &&
+        filteredRequestList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -249,7 +258,7 @@ function ApprovalList() {
               </tr>
             </thead>
             <tbody>
-              {schedulesApprove?.reverse().map((schedule) => {
+              {filteredRequestList?.map((schedule) => {
                 return (
                   <tr key={schedule.requestFormId}>
                     <td className={cx("checkbox")}>

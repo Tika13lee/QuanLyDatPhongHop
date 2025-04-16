@@ -78,8 +78,6 @@ const Schedule = () => {
     setReservations(data);
   }, [data]);
 
-  console.log("Lịch đặt phòng: ", reservations);
-
   // Chuyển đổi dữ liệu lịch để hiển thị
   const formattedEvents = reservations?.map((event) => ({
     ...event,

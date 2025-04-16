@@ -272,7 +272,9 @@ function Booking() {
       {/* Bảng lịch */}
       <div className={cx("schedule-container")}>
         {rooms.length == 0 ? (
-          <p>Đang tải danh sách phòng...</p>
+          <div className={cx("no-rooms")}>
+            <p>Chi nhánh này chưa có phòng</p>
+          </div>
         ) : rooms && rooms.length > 0 ? (
           <table className={cx("schedule-table")}>
             <thead>
@@ -284,122 +286,120 @@ function Booking() {
               </tr>
             </thead>
             <tbody>
-              {
-                (() => {
-                  const skipMap: {
-                    [roomId: string]: { [time: string]: boolean };
-                  } = {};
+              {(() => {
+                const skipMap: {
+                  [roomId: string]: { [time: string]: boolean };
+                } = {};
 
-                  return times
-                    .filter((time) => time <= "17:30")
-                    .map((time) => (
-                      <tr key={time}>
-                        <td className={cx("time-column")}>{time}</td>
+                return times
+                  .filter((time) => time <= "17:30")
+                  .map((time) => (
+                    <tr key={time}>
+                      <td className={cx("time-column")}>{time}</td>
 
-                        {rooms.map((room) => {
-                          if (!skipMap[room.roomId]) skipMap[room.roomId] = {};
+                      {rooms.map((room) => {
+                        if (!skipMap[room.roomId]) skipMap[room.roomId] = {};
 
-                          if (skipMap[room.roomId][time]) return null;
+                        if (skipMap[room.roomId][time]) return null;
 
-                          const reservation = room.reservationViewDTOS.find(
-                            (res) => {
-                              const startTime = res.timeStart
-                                .split("T")[1]
-                                .substring(0, 5);
-                              return startTime === time;
-                            }
-                          );
-
-                          if (reservation) {
-                            const start = reservation.timeStart
+                        const reservation = room.reservationViewDTOS.find(
+                          (res) => {
+                            const startTime = res.timeStart
                               .split("T")[1]
                               .substring(0, 5);
-                            const end = reservation.timeEnd
-                              .split("T")[1]
-                              .substring(0, 5);
-                            const startIndex = times.indexOf(start);
-                            const endIndex = times.indexOf(end);
+                            return startTime === time;
+                          }
+                        );
 
-                            // Bảo vệ khi index không tồn tại
-                            if (
-                              startIndex === -1 ||
-                              endIndex === -1 ||
-                              endIndex <= startIndex
-                            )
-                              return null;
+                        if (reservation) {
+                          const start = reservation.timeStart
+                            .split("T")[1]
+                            .substring(0, 5);
+                          const end = reservation.timeEnd
+                            .split("T")[1]
+                            .substring(0, 5);
+                          const startIndex = times.indexOf(start);
+                          const endIndex = times.indexOf(end);
 
-                            const rowSpan = endIndex - startIndex;
+                          // Bảo vệ khi index không tồn tại
+                          if (
+                            startIndex === -1 ||
+                            endIndex === -1 ||
+                            endIndex <= startIndex
+                          )
+                            return null;
 
-                            for (let i = 1; i < rowSpan; i++) {
-                              const nextTime = times[startIndex + i];
-                              skipMap[room.roomId][nextTime] = true;
-                            }
+                          const rowSpan = endIndex - startIndex;
 
-                            const editBackground: { [key: string]: string } = {
-                              normal: "normal",
-                              pending: "pending",
-                              waiting: "waiting",
-                              checked_in: "checked_in",
-                              completed: "completed",
-                            };
-                            const statusKey =
-                              reservation.statusReservation.toLowerCase() ||
-                              "normal";
-
-                            return (
-                              <td
-                                key={`${room.roomId}-${time}`}
-                                rowSpan={rowSpan}
-                                className={cx({
-                                  booked: true,
-                                  [editBackground[statusKey]]:
-                                    editBackground[statusKey],
-                                })}
-                                onClick={() =>
-                                  toast.warning("Khung giờ này đã được đặt!", {
-                                    autoClose: 2000,
-                                  })
-                                }
-                              >
-                                <div className={cx("booked-title")}>
-                                  <p>{reservation.title}</p>
-                                  <p className={cx("status")}>
-                                    {reservation.statusReservation === "PENDING"
-                                      ? "Chờ phê duyệt"
-                                      : reservation.statusReservation ===
-                                        "WAITING"
-                                      ? "Chờ nhận phòng"
-                                      : reservation.statusReservation ===
-                                        "CHECKED_IN"
-                                      ? "Đã nhận phòng"
-                                      : reservation.statusReservation ===
-                                        "COMPLETED"
-                                      ? "Đã hoàn thành"
-                                      : "Không nhận phòng"}
-                                  </p>
-                                </div>
-                              </td>
-                            );
+                          for (let i = 1; i < rowSpan; i++) {
+                            const nextTime = times[startIndex + i];
+                            skipMap[room.roomId][nextTime] = true;
                           }
 
-                          // Render ô trống nếu không có reservation
+                          const editBackground: { [key: string]: string } = {
+                            normal: "normal",
+                            pending: "pending",
+                            waiting: "waiting",
+                            checked_in: "checked_in",
+                            completed: "completed",
+                          };
+                          const statusKey =
+                            reservation.statusReservation.toLowerCase() ||
+                            "normal";
+
                           return (
                             <td
                               key={`${room.roomId}-${time}`}
+                              rowSpan={rowSpan}
+                              className={cx({
+                                booked: true,
+                                [editBackground[statusKey]]:
+                                  editBackground[statusKey],
+                              })}
                               onClick={() =>
-                                handleCellClick(
-                                  room.roomId + "",
-                                  room.roomName,
-                                  time
-                                )
+                                toast.warning("Khung giờ này đã được đặt!", {
+                                  autoClose: 2000,
+                                })
                               }
-                            ></td>
+                            >
+                              <div className={cx("booked-title")}>
+                                <p>{reservation.title}</p>
+                                <p className={cx("status")}>
+                                  {reservation.statusReservation === "PENDING"
+                                    ? "Chờ phê duyệt"
+                                    : reservation.statusReservation ===
+                                      "WAITING"
+                                    ? "Chờ nhận phòng"
+                                    : reservation.statusReservation ===
+                                      "CHECKED_IN"
+                                    ? "Đã nhận phòng"
+                                    : reservation.statusReservation ===
+                                      "COMPLETED"
+                                    ? "Đã hoàn thành"
+                                    : "Không nhận phòng"}
+                                </p>
+                              </div>
+                            </td>
                           );
-                        })}
-                      </tr>
-                    ));
-                })()
-              }
+                        }
+
+                        // Render ô trống nếu không có reservation
+                        return (
+                          <td
+                            key={`${room.roomId}-${time}`}
+                            onClick={() =>
+                              handleCellClick(
+                                room.roomId + "",
+                                room.roomName,
+                                time
+                              )
+                            }
+                          ></td>
+                        );
+                      })}
+                    </tr>
+                  ));
+              })()}
             </tbody>
           </table>
         ) : (

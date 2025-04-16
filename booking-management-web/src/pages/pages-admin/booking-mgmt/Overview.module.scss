@@ -47,6 +47,16 @@
 }
 
 // Lịch theo tuần
+.no-rooms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 16px;
+  color: var(--text-primary);
+  padding: 20px 0;
+}
+
 .schedule-container {
   border: 1px solid var(--border-color);
   overflow: auto;

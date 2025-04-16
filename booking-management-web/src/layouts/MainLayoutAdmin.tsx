@@ -23,7 +23,6 @@ const MainLayoutAdmin = () => {
   const { locations, loading, error } = useSelector(
     (state: RootState) => state.location
   );
-
   const { devices } = useSelector((state: RootState) => state.device);
 
   const fetchUserData = async () => {
@@ -57,8 +56,6 @@ const MainLayoutAdmin = () => {
       dispatch(fetchDevices());
     }
   }, [dispatch, devices.length]);
-
-  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   const [isBookingOpen, setIsBookingOpen] = useState(true);
 

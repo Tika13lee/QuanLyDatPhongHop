@@ -26,8 +26,6 @@ const Navbar = () => {
   // Lấy thông tin người dùng từ localStorage
   const user = JSON.parse(localStorage.getItem("currentUser")!);
 
-  console.log(user);
-
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -192,9 +190,7 @@ const Navbar = () => {
           </div>
 
           <div className={cx("divider")} />
-          <div>
-            <UserAvatarWithMenu imgUrl={user?.avatar ?? ""} />
-          </div>
+          <UserAvatarWithMenu imgUrl={user?.avatar ?? ""} />
         </div>
       </div>
     </div>

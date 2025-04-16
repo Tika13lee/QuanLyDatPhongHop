@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   background-color: var(--bg-primary);
-  padding: 5px 0 0;
+  padding: 5px 0;
   width: 100%;
   border: 1px solid var(--bg-primary);
 }
@@ -17,17 +17,17 @@
   margin: 0 auto;
 }
 
-.divider {
-  width: 1px;
-  height: 35px;
-  background-color: #8c8e95;
-}
-
 // user
 .user {
   display: flex;
   align-items: center;
   gap: 15px;
+
+  .divider {
+    width: 1px;
+    height: 36px;
+    background-color: #8c8e95;
+  }
 }
 
 .notification {

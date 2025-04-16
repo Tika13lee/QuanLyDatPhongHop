@@ -67,7 +67,7 @@ function RejectedList() {
         <LoadingSpinner />
       ) : Array.isArray(rejectedList) && rejectedList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
-          Bạn không có lịch cần phê duyệt
+          Bạn không có lịch đã từ chối
         </p>
       ) : (
         <div className={cx("schedule-list")}>
