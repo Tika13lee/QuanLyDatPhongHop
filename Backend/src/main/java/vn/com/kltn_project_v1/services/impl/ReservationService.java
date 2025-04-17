@@ -193,24 +193,6 @@ public class ReservationService implements IReservation {
                 reservation.setStatusReservation(StatusReservation.CANCELED);
                 reservationRepository.save(reservation);
                 reservations.add(reservation);
-                if(!reservation.getFrequency().equals(Frequency.ONE_TIME)){
-                    RequestForm requestForm = requestFormRepository.findRequestFormByReservationId(reservationId).get(0);
-                    Date timeStart = reservation.getTimeStart();
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(timeStart);
-                    cal.set(Calendar.HOUR_OF_DAY, 0);
-                    cal.set(Calendar.MINUTE, 0);
-                    cal.set(Calendar.SECOND, 1);
-                    cal.set(Calendar.MILLISECOND, 0);
-
-                    Date dayStart = cal.getTime();
-
-// Xoá tất cả các phần tử trong list sau thời điểm dayStart
-                    List<Date> finishList = requestForm.getRequestReservation().getTimeFinishFrequency();
-                    finishList.removeIf(date -> date.after(dayStart));
-                    requestForm.getRequestReservation().setTimeFinishFrequency(finishList);
-                    requestFormRepository.save(requestForm);
-                }
                 if(reservation.getAttendants() != null) {
                     for (Employee employee : reservation.getAttendants()) {
                         notificationService.notifyUser(
