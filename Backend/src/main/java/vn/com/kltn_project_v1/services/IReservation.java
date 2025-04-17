@@ -22,5 +22,6 @@ public interface IReservation {
     Reservation updateReservation(ReservationDTO reservationDTO);
     public void inviteMembersNotification(Reservation reservation, List<Employee> employees);
     public void updateReservationNotification(Reservation reservation, List<Employee> employees);
-
+    public List<Reservation> cancelReservation (List<Long> reservationIds);
+    public List<Reservation> cancelReservationFrequency (List<Long> reservationIds);
 }

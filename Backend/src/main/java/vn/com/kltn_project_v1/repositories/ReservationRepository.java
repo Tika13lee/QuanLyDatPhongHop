@@ -1,6 +1,7 @@
 package vn.com.kltn_project_v1.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -69,6 +70,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
              FUNCTION('MINUTE', r.timeStart)
 """)
     List<Object[]> fullStatistical(Date timeStart, Date timeEnd);
-
-
 }

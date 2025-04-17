@@ -7,10 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import vn.com.kltn_project_v1.dtos.Overview.ReservationViewDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.model.*;
-import vn.com.kltn_project_v1.repositories.EmployeeRepository;
-import vn.com.kltn_project_v1.repositories.ReservationRepository;
-import vn.com.kltn_project_v1.repositories.RoomRepository;
-import vn.com.kltn_project_v1.repositories.ServiceRepository;
+import vn.com.kltn_project_v1.repositories.*;
 import vn.com.kltn_project_v1.services.IReservation;
 
 import java.text.SimpleDateFormat;
@@ -18,10 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
@@ -33,7 +27,7 @@ public class ReservationService implements IReservation {
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
     private final NotificationService notificationService;
-
+    private final RequestFormRepository requestFormRepository;
     @Override
     public List<ReservationViewDTO> getAllReservationInRoom(long roomId, Date dayStart, Date dayEnd) {
         List<Reservation> reservations = reservationRepository.findReservationsByRoomRoomIdAndTime(roomId, dayStart, dayEnd);
@@ -188,6 +182,79 @@ public class ReservationService implements IReservation {
                     reservation.getReservationId()
             );
         }
+    }
+
+    @Override
+    public List<Reservation> cancelReservation(List<Long> reservationIds) {
+        List<Reservation> reservations = new ArrayList<>();
+        reservationIds.forEach(reservationId -> {
+            Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
+            if (reservation != null) {
+                reservation.setStatusReservation(StatusReservation.CANCELED);
+                reservationRepository.save(reservation);
+                reservations.add(reservation);
+                if(!reservation.getFrequency().equals(Frequency.ONE_TIME)){
+                    RequestForm requestForm = requestFormRepository.findRequestFormByReservationId(reservationId).get(0);
+                    Date timeStart = reservation.getTimeStart();
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(timeStart);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 1);
+                    cal.set(Calendar.MILLISECOND, 0);
+
+                    Date dayStart = cal.getTime();
+
+// Xoá tất cả các phần tử trong list sau thời điểm dayStart
+                    List<Date> finishList = requestForm.getRequestReservation().getTimeFinishFrequency();
+                    finishList.removeIf(date -> date.after(dayStart));
+                    requestForm.getRequestReservation().setTimeFinishFrequency(finishList);
+                    requestFormRepository.save(requestForm);
+                }
+                if(reservation.getAttendants() != null) {
+                    for (Employee employee : reservation.getAttendants()) {
+                        notificationService.notifyUser(
+                                employee,
+                                NotificationType.RESERVATION_CANCELLED,
+                                "Cuộc họp đã bị hủy: " + reservation.getTitle(),
+                                "reservation",
+                                reservation.getReservationId()
+                        );
+                    }
+                }
+            }
+        });
+        return reservations;
+    }
+
+    @Override
+    public List<Reservation> cancelReservationFrequency(List<Long> requestFormIds) {
+        List<Reservation> reservations = new ArrayList<>();
+        requestFormIds.forEach(requestFormId -> {
+            RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
+            if (requestForm != null) {
+                requestFormRepository.save(requestForm);
+                if(requestForm.getReservations() != null) {
+                    for (Reservation reservation : requestForm.getReservations()) {
+                        reservation.setStatusReservation(StatusReservation.CANCELED);
+                        reservationRepository.save(reservation);
+                        reservations.add(reservation);
+                        if(reservation.getAttendants() != null) {
+                            for (Employee employee : reservation.getAttendants()) {
+                                notificationService.notifyUser(
+                                        employee,
+                                        NotificationType.RESERVATION_CANCELLED,
+                                        "Cuộc họp đã bị hủy: " + reservation.getTitle(),
+                                        "reservation",
+                                        reservation.getReservationId()
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        return reservations;
     }
 
 

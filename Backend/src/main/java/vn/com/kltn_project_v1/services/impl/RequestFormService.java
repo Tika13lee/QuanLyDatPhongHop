@@ -307,4 +307,15 @@ RequestForm requestForm = new RequestForm();
         return requestFormRepository.save(requestFormUpdate);
     }
 
+    @Override
+    public List<RequestForm> cancelRequestForm(List<Long> requestFormIds) {
+        requestFormIds.forEach(requestFormId -> {
+            RequestForm requestForm = requestFormRepository.findById(requestFormId).orElse(null);
+            if (requestForm != null) {
+                requestForm.setStatusRequestForm(StatusRequestForm.CANCELLED);
+                requestFormRepository.save(requestForm);
+            }
+        });
+        return requestFormRepository.findAllById(requestFormIds);
+    }
 }

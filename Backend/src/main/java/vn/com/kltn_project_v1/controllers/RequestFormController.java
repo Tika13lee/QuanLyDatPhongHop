@@ -106,4 +106,12 @@ public class RequestFormController {
             return ResponseEntity.ok(e.toString());
         }
     }
+    @PostMapping("/cancelRequestForm")
+    public ResponseEntity<?> cancelRequestForm(@RequestBody List<Long> requestFormIds) {
+        try {
+            return ResponseEntity.ok(requestFormService.cancelRequestForm(requestFormIds));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.toString());
+        }
+    }
 }

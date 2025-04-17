@@ -122,5 +122,21 @@ public class ReservationController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PostMapping("/cancelReservation")
+    public ResponseEntity<?> cancelReservation(@RequestBody List<Long> reservationIds){
+        try {
+            return ResponseEntity.ok(reservationService.cancelReservation(reservationIds));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PostMapping("/cancelReservationFrequency")
+    public ResponseEntity<?> cancelReservationFrequency(@RequestBody List<Long> reservationIds){
+        try {
+            return ResponseEntity.ok(reservationService.cancelReservationFrequency(reservationIds));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

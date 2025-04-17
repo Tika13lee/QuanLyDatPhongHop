@@ -21,4 +21,5 @@ public interface IRequestForm {
     List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO);
     RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO);
     RequestForm createRequestFormUpdateReservationMany(Long requestFormId, Date dayFisnishFrequencyNew);
+    List<RequestForm> cancelRequestForm(List<Long> requestFormIds);
 }
