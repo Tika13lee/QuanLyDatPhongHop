@@ -42,6 +42,7 @@ public class AccountService implements IAccount {
             return "Mật khẩu không đúng";
         }
         account.setPassword(passwordEncoder.encode(newPassword));
+        account.setFirstLogin(false);
         accountRepository.save(account);
         return "Đổi mật khẩu thành công";
     }
