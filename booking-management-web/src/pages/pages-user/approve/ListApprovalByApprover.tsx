@@ -1,7 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./ListApprovalByApprover.module.scss";
 import { useEffect, useState } from "react";
-import { RequestFormProps } from "../../../data/data";
+import { RequestFormProps, RoomProps } from "../../../data/data";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
@@ -50,6 +50,15 @@ function ListApprovalByApprover() {
   useEffect(() => {
     setSchedulesApprove(requestForm ?? []);
   }, [requestForm]);
+
+  // lấy danh sách phòng của người phê duyệt
+  const {
+    data: roomList,
+    loading: loadingRoom,
+    error: errorRoom,
+  } = useFetch<RoomProps[]>(
+    `http://localhost:8080/api/v1/room/getRoomByApprover?EmployeeId=${user?.employeeId}`
+  );
 
   // Xử lý chọn/bỏ chọn item
   const handleCheckboxChange = (id: number) => {
@@ -190,9 +199,15 @@ function ListApprovalByApprover() {
             <label>Chọn phòng</label>
             <select className={cx("search-input")}>
               <option value="all">Tất cả</option>
-              <option value="room1">Phòng 1</option>
-              <option value="room2">Phòng 2</option>
-              <option value="room3">Phòng 3</option>
+              {roomList && roomList.length > 0 ? (
+                roomList.map((room) => (
+                  <option key={room.roomId} value={room.roomName}>
+                    {room.roomName}
+                  </option>
+                ))
+              ) : (
+                <option value="all">Không có phòng nào</option>
+              )}
             </select>
           </div>
           <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
@@ -249,7 +264,8 @@ function ListApprovalByApprover() {
 
       {loadingReservation ? (
         <LoadingSpinner />
-      ) : Array.isArray(filteredRequestList) && filteredRequestList.length === 0 ? (
+      ) : Array.isArray(filteredRequestList) &&
+        filteredRequestList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>

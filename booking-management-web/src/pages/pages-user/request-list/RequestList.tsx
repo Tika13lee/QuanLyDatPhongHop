@@ -119,41 +119,45 @@ function RequestList() {
               </tr>
             </thead>
             <tbody>
-              {filteredRequestList?.map((schedule) => {
-                const statusText = getStatusText(schedule.statusRequestForm);
+              {filteredRequestList
+                ?.filter((request) => request.statusRequestForm !== "CANCELLED")
+                .map((schedule) => {
+                  const statusText = getStatusText(schedule.statusRequestForm);
 
-                return (
-                  <tr key={schedule.requestFormId}>
-                    <td>{schedule.requestReservation.title}</td>
-                    <td>
-                      {formatDateString(schedule.requestReservation.timeStart)}
-                    </td>
-                    <td>
-                      {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
-                      {getHourMinute(schedule.requestReservation.timeEnd)}
-                    </td>
+                  return (
+                    <tr key={schedule.requestFormId}>
+                      <td>{schedule.requestReservation.title}</td>
+                      <td>
+                        {formatDateString(
+                          schedule.requestReservation.timeStart
+                        )}
+                      </td>
+                      <td>
+                        {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
+                        {getHourMinute(schedule.requestReservation.timeEnd)}
+                      </td>
 
-                    <td>{statusText}</td>
-                    <td>
-                      {schedule.typeRequestForm === "UPDATE_RESERVATION"
-                        ? "Cập nhật"
-                        : "Đặt lịch"}
-                    </td>
-                    <td>
-                      {formatDateString(schedule.timeRequest)} -{" "}
-                      {getHourMinute(schedule.timeRequest)}
-                    </td>
-                    <td>
-                      <div
-                        className={cx("actions")}
-                        onClick={() => handleShowDetails(schedule)}
-                      >
-                        <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      <td>{statusText}</td>
+                      <td>
+                        {schedule.typeRequestForm === "UPDATE_RESERVATION"
+                          ? "Cập nhật"
+                          : "Đặt lịch"}
+                      </td>
+                      <td>
+                        {formatDateString(schedule.timeRequest)} -{" "}
+                        {getHourMinute(schedule.timeRequest)}
+                      </td>
+                      <td>
+                        <div
+                          className={cx("actions")}
+                          onClick={() => handleShowDetails(schedule)}
+                        >
+                          <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

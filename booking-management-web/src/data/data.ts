@@ -89,6 +89,7 @@ export type EmployeeProps = {
   };
   account: {
     role: string;
+    firstLogin?: boolean;
   };
 };
 
@@ -104,10 +105,7 @@ export type RoomProps = {
   // price: PriceProps;
   price?: number;
   priceValue?: number;
-  approvers: {
-    id: number;
-    name: string;
-  }[];
+  approvers?: EmployeeProps;
   devices: RoomDeviceProps[];
   reservationDTOS: {
     id: number;

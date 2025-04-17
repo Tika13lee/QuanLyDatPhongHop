@@ -78,7 +78,7 @@ const Login = () => {
       const decoded = jwtDecode<JwtPayloadProp>(accessToken);
       console.log("Decoded JWT:", decoded);
 
-      // Lưu thông tin user vào localStorage hoặc Redux store
+      // Lưu thông tin user vào localStorage
       localStorage.setItem("userPhone", JSON.stringify(decoded.userName));
 
       // Điều hướng

@@ -10,6 +10,8 @@ import { EmployeeProps } from "../data/data";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser } from "../features/userSlice";
+import Profile from "../components/Profile/Profile";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -41,12 +43,22 @@ const MainLayoutUser = () => {
     }
   };
 
+
   useEffect(() => {
     fetchUserData();
   }, []);
 
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean | undefined>(
+    userData?.account.firstLogin
+  );
+
+  useEffect(() => {
+    setIsProfileOpen(userData?.account.firstLogin);
+  }, [userData?.account.firstLogin]);
+
   return (
     <div className={cx("main-layout-user")}>
+      {isProfileOpen && <Profile onClose={() => setIsProfileOpen(false)} />}
       <Navbar />
       <div className={cx("content")}>
         <div className={cx("sidebar")}>

@@ -13,6 +13,23 @@
   animation: fadeInModal 0.3s ease-out;
 }
 
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: color 0.3s;
+
+  &:hover {
+    color: var(--color-error);
+  }
+}
+
 // header
 .profile-header {
   display: flex;
@@ -92,6 +109,25 @@
       &:hover {
         background-color: var(--bg-hover);
       }
+    }
+  }
+
+  .passwordWrapper {
+    position: relative;
+  }
+
+  .toggleIcon {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--text-primary);
     }
   }
 }

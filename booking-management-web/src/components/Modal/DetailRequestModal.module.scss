@@ -10,7 +10,7 @@
   padding: 20px;
   max-width: 90%;
   width: 900px;
-  height: 530px;
+  height: 550px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   position: relative;
   animation: fadeInModal 0.3s ease-out;
@@ -34,6 +34,23 @@
   p {
     font-size: 16px;
     margin: 8px 0;
+  }
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+
+  &:hover {
+    background-color: #b02a37;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 }
 
@@ -89,7 +106,6 @@
     align-items: center;
   }
 
-
   li {
     margin: 4px 10px;
     border-radius: 6px;
@@ -97,4 +113,3 @@
     color: var(--text-primary);
   }
 }
-

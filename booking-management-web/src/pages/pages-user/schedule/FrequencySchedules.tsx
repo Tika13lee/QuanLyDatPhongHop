@@ -109,6 +109,36 @@ function FrequencySchedules() {
     }
   };
 
+  const { postData: cancelReservationFrequency } = usePost<string[]>(
+    "http://localhost:8080/api/v1/reservation/cancelReservationFrequency"
+  );
+
+  const handleCancelSchedule = async () => {
+    const listRequestFormId = [selectedSchedule?.requestFormId];
+    const response = await cancelReservationFrequency(listRequestFormId, {
+      method: "POST",
+    });
+    if (response) {
+      setPopupMessage("Hủy yêu cầu thành công");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      // Cập nhật lại danh sách lịch
+      const updatedEventsByDay = eventsByDay.filter(
+        (event) => event.requestFormId !== selectedSchedule?.requestFormId
+      );
+      setEventsByDay(updatedEventsByDay);
+
+      setSelectedSchedule(null);
+      setOpenModalDetail(false);
+    } else {
+      setPopupMessage("Hủy yêu cầu thất bại");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+    handleCloseModalDetail();
+  };
+
   return (
     <div className={cx("frequency-schedules")}>
       <div className={cx("filter-bar")}>
@@ -229,6 +259,14 @@ function FrequencySchedules() {
               >
                 <IconWrapper icon={FaEdit} size={16} color="white" />
                 Chỉnh sửa
+              </button>
+              <button
+                className={cx("btn-cancel")}
+                onClick={handleCancelSchedule}
+                disabled={selectedSchedule?.statusRequestForm === "PENDING"}
+              >
+                <IconWrapper icon={FaEdit} size={16} color="white" />
+                Hủy lịch
               </button>
               <h2>Chi tiết lịch</h2>
             </div>

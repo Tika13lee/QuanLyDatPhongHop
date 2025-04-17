@@ -12,6 +12,7 @@ import { fetchDevices } from "../features/deviceSlice";
 import axios from "axios";
 import { EmployeeProps } from "../data/data";
 import { setUser } from "../features/userSlice";
+import Profile from "../components/Profile/Profile";
 
 const cx = classNames.bind(styles);
 
@@ -19,11 +20,14 @@ const MainLayoutAdmin = () => {
   // Lấy thông tin sdt người dùng từ localStorage
   const currentUserPhone = JSON.parse(localStorage.getItem("userPhone")!);
 
+  console.log("currentUserPhone", currentUserPhone);
+
   const dispatch = useDispatch<AppDispatch>();
   const { locations, loading, error } = useSelector(
     (state: RootState) => state.location
   );
   const { devices } = useSelector((state: RootState) => state.device);
+  const [userData, setUserData] = useState<EmployeeProps | null>(null);
 
   const fetchUserData = async () => {
     try {
@@ -59,8 +63,19 @@ const MainLayoutAdmin = () => {
 
   const [isBookingOpen, setIsBookingOpen] = useState(true);
 
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean | undefined>(
+    userData?.account.firstLogin
+  );
+
+  console.log(isProfileOpen);
+
+  useEffect(() => {
+    setIsProfileOpen(userData?.account.firstLogin);
+  }, [userData?.account.firstLogin]);
+
   return (
     <div className={cx("main-layout-admin")}>
+      {isProfileOpen && <Profile onClose={() => setIsProfileOpen(false)} />}
       <Navbar />
       <div className={cx("content")}>
         <div className={cx("sidebar")}>

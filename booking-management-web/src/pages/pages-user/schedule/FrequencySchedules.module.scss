@@ -187,6 +187,7 @@
 
 .btn-cancel {
   background-color: #dc3545;
+  margin-left: 20px;
 
   &:hover {
     background-color: #b02a37;
@@ -194,6 +195,11 @@
 
   &:active {
     transform: scale(0.95);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./DetailRequestModal.module.scss";
 import { RequestFormProps } from "../../data/data";
@@ -8,6 +8,9 @@ import {
   getHourMinute,
 } from "../../utilities";
 import CloseModalButton from "./CloseModalButton";
+import PopupNotification from "../popup/PopupNotification";
+import usePost from "../../hooks/usePost";
+import { on } from "events";
 
 const cx = classNames.bind(styles);
 
@@ -22,32 +25,51 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
   onClose,
   requestForm,
 }) => {
-  // // Hàm format ngày giờ
-  // const formatDateTime = (dateString: string) => {
-  //   const date = new Date(dateString);
-  //   return {
-  //     date: date.toLocaleDateString("vi-VN"),
-  //     time: date.toLocaleTimeString("vi-VN", {
-  //       hour: "2-digit",
-  //       minute: "2-digit",
-  //     }),
-  //   };
-  // };
+  // popup thông báo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<
+    "success" | "error" | "info" | "warning"
+  >("info");
+
+  const { postData: cancelRequestForm } = usePost<string[]>(
+    "http://localhost:8080/api/v1/requestForm/cancelRequestForm"
+  );
 
   if (!isOpen || !requestForm) return null;
 
-  // const meetingStart = formatDateTime(requestForm.requestReservation.timeStart);
-  // const meetingEnd = formatDateTime(requestForm.requestReservation.timeEnd);
-  // const timeEndFrequency = formatDateTime(
-  //   requestForm.requestReservation.timeFinishFrequency[
-  //     requestForm.requestReservation.timeFinishFrequency.length - 1
-  //   ]
-  // );
+  // hủy yêu cầu
+  const handleCancelSchedule = async () => {
+    const listRequestFormId = [requestForm.requestFormId];
+
+    console.log("listRequestFormId", listRequestFormId);
+
+    const response = await cancelRequestForm(listRequestFormId, {
+      method: "POST",
+    });
+
+    if (response) {
+      setPopupMessage("Hủy yêu cầu thành công");
+      setPopupType("success");
+      setIsPopupOpen(true);
+    } else {
+      setPopupMessage("Hủy yêu cầu thất bại");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
 
   return (
     <div className={cx("modal-overlay")} onClick={onClose}>
       <div className={cx("modal")} onClick={(e) => e.stopPropagation()}>
         <CloseModalButton onClick={onClose} />
+        <button
+          className={cx("btn-cancel")}
+          disabled={requestForm.statusRequestForm !== "PENDING"}
+          onClick={handleCancelSchedule}
+        >
+          Hủy yêu cầu
+        </button>
         <h3>Thông tin chi tiết yêu cầu</h3>
         <div className={cx("modal-content")}>
           <div className={cx("info-left")}>
@@ -212,6 +234,14 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </div>
   );
 };

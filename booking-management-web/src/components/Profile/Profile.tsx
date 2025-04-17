@@ -2,17 +2,22 @@ import classNames from "classnames/bind";
 import styles from "./Profile.module.scss";
 import CloseModalButton from "../Modal/CloseModalButton";
 import UserAvatar from "../UserAvatar/UserAvatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconWrapper from "../icons/IconWrapper";
-import { AiOutlineEdit, IoIosArrowBack } from "../icons/icons";
+import {
+  AiOutlineEdit,
+  IoEyeOffOutline,
+  IoEyeOutline,
+  IoIosArrowBack,
+} from "../icons/icons";
 import { uploadImageToCloudinary } from "../../utilities";
 import usePost from "../../hooks/usePost";
 import { EmployeeProps } from "../../data/data";
 import PopupNotification from "../popup/PopupNotification";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { set } from "react-datepicker/dist/date_utils";
 import { setUser, updateUser } from "../../features/userSlice";
+import { on } from "events";
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +37,9 @@ const Profile = ({ onClose }: ProfileProps) => {
   const [email, setEmail] = useState<string>(user?.email || "");
   const [isEditPassword, setIsEditPassword] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -104,6 +112,83 @@ const Profile = ({ onClose }: ProfileProps) => {
     }
   };
 
+  const { postData: changePassword } = usePost(
+    "http://localhost:8080/api/v1/account/changePassword"
+  );
+
+  // xử lý thay đổi mật khẩu
+  const handleChangePassword = async () => {
+    // kiểm tra dữ liệu đầu vào
+    if (!password) {
+      setPopupMessage("Vui lòng nhập mật khẩu cũ!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    if (!newPassword) {
+      setPopupMessage("Vui lòng nhập mật khẩu mới!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    if (!confirmNewPassword) {
+      setPopupMessage("Vui lòng xác nhận mật khẩu mới!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    // Kiểm tra mật khẩu mới và xác nhận mật khẩu mới
+    if (newPassword !== confirmNewPassword) {
+      setPopupMessage("Mật khẩu mới không khớp!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+      return;
+    }
+
+    const formData = {
+      userName: user?.phone,
+      password: password,
+      newPassword: newPassword,
+    };
+
+    console.log("formData", formData);
+
+    const response = await changePassword(formData, { method: "POST" });
+
+    if (response) {
+      setPopupMessage("Cập nhật mật khẩu thành công!");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      // Cập nhật isFirstLogin trong localStorage
+      if (user) {
+        const updatedUser = {
+          ...user,
+          account: { ...user.account, firstLogin: false },
+        };
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        dispatch(updateUser(updatedUser));
+      }
+
+      resetData();
+    } else {
+      setPopupMessage("Mật khẩu cũ không chính xác!");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+    onClose();
+  };
+
+  useEffect(() => {
+    if (user?.account.firstLogin) {
+      setIsEditPassword(true);
+      setPassword("1111");
+    }
+  }, []);
+
   if (!user) return null;
 
   // reset data
@@ -120,12 +205,16 @@ const Profile = ({ onClose }: ProfileProps) => {
   return (
     <div className={cx("profile-modal")}>
       <div className={cx("modal")}>
-        <CloseModalButton
+        <button
+          className={cx("close-btn")}
           onClick={() => {
             resetData();
             onClose();
           }}
-        />
+          disabled={user?.account.firstLogin}
+        >
+          ✖
+        </button>
 
         {/* header */}
         {isEditMode ? (
@@ -147,6 +236,7 @@ const Profile = ({ onClose }: ProfileProps) => {
                 setIsEditMode(false);
                 setIsEditPassword(false);
               }}
+              disabled={user?.account.firstLogin}
             >
               <IconWrapper icon={IoIosArrowBack} />
             </button>
@@ -201,38 +291,71 @@ const Profile = ({ onClose }: ProfileProps) => {
             <div className={cx("profile-avatar")}>
               <img
                 src="https://i.pinimg.com/736x/6b/da/ec/6bdaec3058be514f5a78db077db30434.jpg"
-                width={170}
+                width={120}
                 // height={100}
                 alt="lock"
               />
+              {user?.account.firstLogin && (
+                <p>Bạn phải đổi mật khẩu ở lần đăng nhập đầu tiên</p>
+              )}
             </div>
             <div>
               <label className={cx("profile-label")}>Mật khẩu cũ</label>
               <input
                 className={cx("profile-input")}
-                type="text"
+                type="password"
                 placeholder="Nhập mật khẩu cũ"
-              />
-            </div>
-            <div>
-              <label className={cx("profile-label")}>Mật khẩu mới</label>
-              <input
-                className={cx("profile-input")}
-                type="text"
-                placeholder="Nhập mật khẩu mới"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
+              <label className={cx("profile-label")}>Mật khẩu mới</label>
+              <div className={cx("passwordWrapper")}>
+                <input
+                  id="password"
+                  className={cx("profile-input")}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nhập mật khẩu mới"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <span
+                  className={cx("toggleIcon")}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <IconWrapper
+                    icon={showPassword ? IoEyeOutline : IoEyeOffOutline}
+                    color="#000"
+                    size={20}
+                  />
+                </span>
+              </div>
+            </div>
+            <div>
               <label className={cx("profile-label")}>
                 Xác nhận mật khẩu mới
               </label>
-              <input
-                className={cx("profile-input")}
-                type="text"
-                placeholder="Nhập lại mật khẩu mới"
-              />
+              <div className={cx("passwordWrapper")}>
+                <input
+                  id="password"
+                  className={cx("profile-input")}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nhập lại mật khẩu mới"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                />
+                <span
+                  className={cx("toggleIcon")}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <IconWrapper
+                    icon={showPassword ? IoEyeOutline : IoEyeOffOutline}
+                    color="#000"
+                    size={20}
+                  />
+                </span>
+              </div>
             </div>
           </div>
         ) : (
@@ -289,7 +412,9 @@ const Profile = ({ onClose }: ProfileProps) => {
             <button className={cx("cancel-btn")} onClick={resetData}>
               Huỷ
             </button>
-            <button className={cx("update-btn")}>Lưu</button>
+            <button className={cx("update-btn")} onClick={handleChangePassword}>
+              Lưu
+            </button>
           </div>
         ) : (
           <div className={cx("profile-footer")}>

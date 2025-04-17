@@ -330,6 +330,44 @@ const Schedule = () => {
     }
   };
 
+  const { postData: cancelSchedule } = usePost<string[]>(
+    "http://localhost:8080/api/v1/reservation/cancelReservation"
+  );
+
+  console.log("selectedSchedule", selectedSchedule?.reservationId);
+
+  // hủy lịch
+  const handleCancelSchedule = async () => {
+    if (!selectedSchedule) return;
+
+    const listReservationId = [selectedSchedule.reservationId];
+
+    console.log("listReservationId", listReservationId);
+
+    const response = await cancelSchedule(listReservationId, {
+      method: "POST",
+    });
+
+    if (response) {
+      setPopupMessage("Hủy lịch thành công");
+      setPopupType("success");
+      setIsPopupOpen(true);
+
+      setReservations((prev: ReservationDetailProps[]) =>
+        prev.filter(
+          (schedule) =>
+            schedule.reservationId !== selectedSchedule.reservationId
+        )
+      );
+
+      setIsModalOpenDetail(false);
+    } else {
+      setPopupMessage("Hủy lịch thất bại");
+      setPopupType("error");
+      setIsPopupOpen(true);
+    }
+  };
+
   return (
     <div className={cx("schedule")}>
       <div className={cx("header")}>
@@ -506,7 +544,11 @@ const Schedule = () => {
               </button>
               <button
                 className={cx("btn-delete")}
-                disabled={new Date(selectedSchedule.timeStart) < new Date()}
+                disabled={
+                  new Date(selectedSchedule.timeStart) < new Date() ||
+                  selectedSchedule.statusReservation === "PENDING"
+                }
+                onClick={handleCancelSchedule}
               >
                 <IconWrapper icon={FaEdit} size={16} color="white" />
                 Hủy lịch

@@ -1,7 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovalList.module.scss";
 import { useEffect, useState } from "react";
-import { RequestFormProps } from "../../../data/data";
+import { RequestFormProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -176,12 +176,14 @@ function ApprovalList() {
             />
           </div>
           <div className={cx("search-group")}>
-            <label>Ngày bắt đầu </label>
+            <label>Thời gian </label>
             <input type="date" className={cx("search-input")} />
           </div>
           <div className={cx("search-group")}>
-            <label>Ngày gửi</label>
-            <input type="date" className={cx("search-input")} />
+            <label>Chọn phòng</label>
+            <select className={cx("search-input")}>
+              <option value="all">Tất cả</option>
+            </select>
           </div>
           <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
         </div>

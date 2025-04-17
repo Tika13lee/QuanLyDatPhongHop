@@ -1,7 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovedList.module.scss";
 import { useState } from "react";
-import { RequestFormProps, ReservationDetailProps } from "../../../data/data";
+import {
+  RequestFormProps,
+  ReservationDetailProps,
+  RoomProps,
+} from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
@@ -28,6 +32,15 @@ function ApprovedList() {
     error: errorApprovedList,
   } = useFetch<RequestFormProps[]>(
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED`
+  );
+
+  // lấy danh sách phòng của người phê duyệt
+  const {
+    data: roomList,
+    loading: loadingRoom,
+    error: errorRoom,
+  } = useFetch<RoomProps[]>(
+    `http://localhost:8080/api/v1/room/getRoomByApprover?EmployeeId=${user?.employeeId}`
   );
 
   // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
@@ -74,9 +87,15 @@ function ApprovedList() {
           <label>Chọn phòng</label>
           <select className={cx("search-input")}>
             <option value="all">Tất cả</option>
-            <option value="room1">Phòng 1</option>
-            <option value="room2">Phòng 2</option>
-            <option value="room3">Phòng 3</option>
+            {roomList && roomList.length > 0 ? (
+              roomList.map((room) => (
+                <option key={room.roomId} value={room.roomName}>
+                  {room.roomName}
+                </option>
+              ))
+            ) : (
+              <option value="all">Không có phòng nào</option>
+            )}
           </select>
         </div>
         <div className={cx("search-row")}>
