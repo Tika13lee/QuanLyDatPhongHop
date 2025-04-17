@@ -23,4 +23,14 @@ public class AccountController {
          }
          return ResponseEntity.ok(token);
      }
+        @PostMapping("/changePassword")
+        public ResponseEntity<?> changePassword(@RequestBody AccountDTO account) {
+            String result = accountService.changePassword(account.getUserName(), account.getPassword(), account.getNewPassword());
+            if (result.equals("Tài khoản không tồn tại")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            } else if (result.equals("Mật khẩu không đúng")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+            }
+            return ResponseEntity.ok(result);
+        }
 }

@@ -31,4 +31,18 @@ public class AccountService implements IAccount {
         );
     return jwtTokenUtil.generateToken(account);
     }
+
+    @Override
+    public String changePassword(String userName, String oldPassword, String newPassword) {
+        Account account = accountRepository.findAccountByUserName(userName).orElse(null);
+        if (account == null) {
+            return "Tài khoản không tồn tại";
+        }
+        if(!passwordEncoder.matches(oldPassword, account.getPassword())){
+            return "Mật khẩu không đúng";
+        }
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+        return "Đổi mật khẩu thành công";
+    }
 }
