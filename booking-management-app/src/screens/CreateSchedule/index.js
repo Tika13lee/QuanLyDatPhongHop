@@ -155,7 +155,7 @@ export default function CreateSchedule({ navigation, route }) {
     if (debounceValue == "") {
       fetchRoomData();
     } else {
-      const regex = new RegExp(debounceValue, "gi");
+      const regex = new RegExp(debounceValue, "giu");
       setRoomsData((prev) =>
         roomsDataDefault.filter((room) => room.roomName.match(regex))
       );

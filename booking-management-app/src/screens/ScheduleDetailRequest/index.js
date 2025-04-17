@@ -21,7 +21,6 @@ import {
   transferTimeToMinutes,
   formatUTC7,
 } from "../../utilities";
-import { Popup } from "../../components";
 
 const styles = StyleSheet.create({
   container: { width: "100%", padding: 10, backgroundColor: "white" },
@@ -33,7 +32,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   containerImage: {
-    width: "20%",
+    width: "30%",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -43,10 +42,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
   },
-  groupInfo: { width: "80%", height: "100%" },
+  groupInfo: { width: "70%", height: "100%" },
   title: {
     fontSize: 15,
-    width: 85,
+    width: 80,
   },
   info: { fontSize: 15, fontWeight: "500" },
   informationItem: {
@@ -70,129 +69,49 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function ScheduleDetailRoom({ navigation, route }) {
-  const { reservationId: reservationData, employeeId } = route.params;
-  const [reservationId, setReservationId] = useState(reservationData ?? "1");
+export default function ScheduleDetailRequest({ navigation, route }) {
+  const infoScheduleRequest = route?.params?.infoScheduleRequest;
   const [schedule, setSchedule] = useState("");
   const [listService, setListService] = useState([]);
   const [listParticipant, setListParticipant] = useState([]);
   const [isOpenModalService, setIsOpenModalService] = useState(false);
   const [isOpenModalAttendant, setIsOpenModalAttendant] = useState(false);
   const [isOpenModalDocument, setIsOpenModalDocument] = useState(false);
-  const [clock, setClock] = useState({
-    second: 20,
-    minutes: 1,
-    hour: 0,
-  });
-  const [isOpenPopup, setIsOpenPopup] = useState({
-    warning: false,
-    success: false,
-  });
 
-  const imageUrl =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc9APxkj0xClmrU3PpMZglHQkx446nQPG6lA&s";
-
-  const fetchSchedule = async () => {
-    try {
-      const res = await axiosConfig().get(
-        `/api/v1/reservation/getReservationById?reservationId=${Number(
-          reservationId
-        )}`
-      );
-      const listServiceData = res.data.services.map((itemService) => ({
-        serviceId: itemService.serviceId,
-        serviceName: itemService.serviceName,
-        servicePrice: itemService.priceService.value,
-      }));
-      const listParticipant = res.data.attendants.map((itemAttendant) => ({
-        attendantId: itemAttendant.employeeId,
-        attendantName: itemAttendant.employeeName,
-        attendantPhone: itemAttendant.phone,
-      }));
-      setSchedule(res.data);
-      setListService(listServiceData);
-      setListParticipant(listParticipant);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  console.log("info", route.params.infoScheduleRequest);
 
   useEffect(() => {
-    fetchSchedule();
+    setListService(
+      infoScheduleRequest.services.map((item) => {
+        return {
+          serviceName: item.serviceName,
+          servicePrice: item.priceService.value,
+        };
+      })
+    );
+    setListParticipant(
+      infoScheduleRequest.attendants.map((item) => {
+        return {
+          attendantName: item.employeeName,
+          attendantPhone: item.phone,
+        };
+      })
+    );
   }, []);
-
-  // tạo đồng hồ đếm ngược
-  useEffect(() => {
-    const timeInterval = setInterval(() => {
-      setClock((prev) => {
-        if (prev.hour === 0 && prev.minutes === 0 && prev.second === 0) {
-          clearInterval(timeInterval);
-          return prev;
-        }
-
-        let hour = prev.hour;
-        let minutes = prev.minutes;
-        let second = prev.second - 1;
-
-        if (second < 0) {
-          second = 59;
-          minutes -= 1;
-        }
-
-        if (minutes < 0) {
-          minutes = 59;
-          hour -= 1;
-        }
-
-        return { hour, minutes, second };
-      });
-    }, 1000);
-
-    return () => clearInterval(timeInterval);
-  }, []);
-
-  // thông báo khi hết giờ
-  useEffect(() => {
-    if (clock.hour == 0 && clock.minutes == 0 && clock.second == 0) {
-      setIsOpenPopup((prev) => ({ ...prev, success: true }));
-    }
-  }, [clock]);
-
-  // xử lý khi rời phòng sớm
-  const handleLeavingRoom = () => {
-    const currentTime = new Date();
-    const currentDate = currentTime.toISOString().split("T")[0];
-    const timeEnd = formatUTC7(schedule.timeEnd); // 10:00
-    const timeEndFormat = new Date(`${currentDate}T${timeEnd}:00`)
-      .toISOString()
-      .split("T")[1];
-    // const result =
-    //   transferTimeToMinutes(currentTime.toISOString().split("T")[1]) -
-    //   transferTimeToMinutes(timeEndFormat);
-    const result = -1;
-    if (result < 0) {
-      setIsOpenPopup((prev) => ({ ...prev, warning: true }));
-    }
-  };
 
   return (
     <DefaultLayout>
-      <Header nameScreen="scheduledeatilroom"></Header>
+      <Header
+        nameScreen="scheduledetailrequest"
+        leftIcon={"chevron-left"}
+        handleOnPressLeftIcon={() => navigation.goBack("")}
+      ></Header>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{
           paddingBottom: 100,
         }}
       >
-        <View
-          style={{ width: "100%", alignItems: "flex-end", marginBottom: 10 }}
-        >
-          <Text style={styles.titleTimeHeader}>
-            Thời gian còn lại: {clock.hour < 10 ? `0${clock.hour}` : clock.hour}
-            :{clock.minutes < 10 ? `0${clock.minutes}` : clock.minutes}:
-            {clock.second < 10 ? `0${clock.second}` : clock.second}
-          </Text>
-        </View>
         <Card style={styles.cardHeader}>
           <View style={styles.contentCard}>
             <View style={styles.groupInfo}>
@@ -206,7 +125,9 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               >
                 <Text style={styles.title}>Người đặt: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.booker.employeeName : ""}
+                  {infoScheduleRequest
+                    ? infoScheduleRequest.booker.employeeName
+                    : ""}
                 </Text>
               </View>
               <View
@@ -219,7 +140,7 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               >
                 <Text style={styles.title}>Id lịch: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.reservationId : ""}
+                  {infoScheduleRequest ? infoScheduleRequest.reservationId : ""}
                 </Text>
               </View>
               <View
@@ -232,7 +153,7 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               >
                 <Text style={styles.title}>Tên phòng: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.room.roomName : ""}
+                  {infoScheduleRequest ? infoScheduleRequest.room.roomName : ""}
                 </Text>
               </View>
               <View
@@ -245,7 +166,9 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               >
                 <Text style={styles.title}>Giá phòng: </Text>
                 <Text style={styles.info}>
-                  {schedule ? formatPrice(schedule.room.priceValue) : ""}
+                  {infoScheduleRequest
+                    ? formatPrice(infoScheduleRequest.room.priceValue)
+                    : ""}
                 </Text>
               </View>
               <View
@@ -258,12 +181,33 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               >
                 <Text style={styles.title}>Ngày đặt: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.time.toString().split("T")[0] : ""}
+                  {infoScheduleRequest
+                    ? infoScheduleRequest.time
+                        .toString()
+                        .split("T")[0]
+                        .split("-")
+                        .reverse()
+                        .join("-")
+                    : ""}
                 </Text>
               </View>
             </View>
             <View style={styles.containerImage}>
-              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <Text
+                style={[styles.title, { textAlign: "center", marginBottom: 7 }]}
+              >
+                Trạng thái
+              </Text>
+              <Text
+                style={[
+                  styles.info,
+                  { color: "red", textDecorationLine: "underline" },
+                ]}
+              >
+                {infoScheduleRequest
+                  ? infoScheduleRequest.statusReservation
+                  : ""}
+              </Text>
             </View>
           </View>
         </Card>
@@ -284,20 +228,34 @@ export default function ScheduleDetailRoom({ navigation, route }) {
           <View style={{ width: "100%" }}>
             <View style={styles.informationItem}>
               <Text style={styles.title}>Tiêu đề: </Text>
-              <Text style={styles.info}>{schedule ? schedule.title : ""}</Text>
+              <Text style={styles.info}>
+                {infoScheduleRequest ? infoScheduleRequest.title : ""}
+              </Text>
             </View>
             <View style={[styles.informationItem, { gap: 0, height: 55 }]}>
               <View style={{ width: "50%" }}>
                 <Text style={styles.title}>Thời gian: </Text>
                 <Text style={styles.info}>
-                  {schedule ? formatUTC7(schedule.timeStart) : ""} -{" "}
-                  {schedule ? formatUTC7(schedule.timeEnd) : ""}
+                  {infoScheduleRequest
+                    ? formatUTC7(infoScheduleRequest.timeStart)
+                    : ""}{" "}
+                  -{" "}
+                  {infoScheduleRequest
+                    ? formatUTC7(infoScheduleRequest.timeEnd)
+                    : ""}
                 </Text>
               </View>
               <View style={{ width: "50%" }}>
                 <Text style={styles.title}>Ngày họp: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.timeStart.toString().split("T")[0] : ""}
+                  {infoScheduleRequest
+                    ? infoScheduleRequest.timeStart
+                        .toString()
+                        .split("T")[0]
+                        .split("-")
+                        .reverse()
+                        .join("-")
+                    : ""}
                 </Text>
               </View>
             </View>
@@ -305,40 +263,56 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               <View style={{ width: "60%", flexDirection: "row" }}>
                 <Text style={styles.title}>Loại phòng: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.room.typeRoom : ""}
+                  {infoScheduleRequest ? infoScheduleRequest.room.typeRoom : ""}
                 </Text>
               </View>
               <View style={{ width: "40%", flexDirection: "row" }}>
                 <Text style={styles.title}>Sức chứa: </Text>
                 <Text style={styles.info}>
-                  {schedule ? schedule.room.capacity : ""}
+                  {infoScheduleRequest ? infoScheduleRequest.room.capacity : ""}
                 </Text>
               </View>
             </View>
             <View style={styles.informationItem}>
               <Text style={styles.title}>Ghi chú: </Text>
-              <Text style={styles.info}>{schedule ? schedule.note : ""}</Text>
+              <Text style={styles.info}>
+                {infoScheduleRequest ? infoScheduleRequest.note : ""}
+              </Text>
             </View>
             <View style={styles.informationItem}>
               <Text style={styles.title}>Mô tả: </Text>
               <Text numberOfLines={1} ellipsizeMode="tail" style={styles.info}>
-                {schedule ? schedule.description : ""}
+                {infoScheduleRequest ? infoScheduleRequest.description : ""}
               </Text>
             </View>
             <View style={styles.informationItem}>
-              <Text style={[styles.title, { width: 200 }]}>
+              <Text style={[styles.title, { width: 160 }]}>
                 Thời gian nhận phòng:{" "}
               </Text>
               <Text style={styles.info}>
-                {schedule ? formatUTC7(schedule.timeCheckIn) : ""}
+                {infoScheduleRequest.timeCheckIn != null
+                  ? formatUTC7(infoScheduleRequest.timeCheckIn)
+                  : "Chưa cập nhật"}
               </Text>
             </View>
             <View style={styles.informationItem}>
-              <Text style={[styles.title, { width: 200 }]}>
+              <Text style={[styles.title, { width: 160 }]}>
                 Thời gian trả phòng:{" "}
               </Text>
               <Text style={styles.info}>
-                {schedule ? formatUTC7(schedule.timeCheckOut) : ""}
+                {infoScheduleRequest.timeCheckOut != null
+                  ? formatUTC7(infoScheduleRequest.timeCheckOut)
+                  : "Chưa cập nhật"}
+              </Text>
+            </View>
+            <View style={styles.informationItem}>
+              <Text style={[styles.title, { width: 160 }]}>
+                Thời gian huỷ:{" "}
+              </Text>
+              <Text style={styles.info}>
+                {infoScheduleRequest.timeCancel != null
+                  ? formatUTC7(infoScheduleRequest.timeCancel)
+                  : "Chưa cập nhật"}
               </Text>
             </View>
             <View
@@ -415,23 +389,6 @@ export default function ScheduleDetailRoom({ navigation, route }) {
             </View>
           </View>
         </Card>
-
-        {/** Button checkout */}
-        <Button
-          style={{
-            width: 150,
-            height: 40,
-            borderRadius: 10,
-            backgroundColor: "cyan",
-            marginTop: 20,
-            alignSelf: "center",
-          }}
-          onPress={() => handleLeavingRoom()}
-        >
-          <Text style={{ fontSize: 16, color: "white", fontWeight: "bold" }}>
-            Rời phòng
-          </Text>
-        </Button>
       </ScrollView>
       <Modal
         transparent={true}
@@ -477,11 +434,22 @@ export default function ScheduleDetailRoom({ navigation, route }) {
               <MaterialIcons name="close" size={20} color={"black"} />
             </Pressable>
             <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 15 }}>
-              Danh sách dịch vụ
+              Danh sách tài liệu
             </Text>
+            {infoScheduleRequest.documents == 0 && (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text>Không có tài liệu</Text>
+              </View>
+            )}
             <FlatList
               style={{ marginTop: 45, paddingHorizontal: 25 }}
-              data={schedule.filePaths}
+              data={infoScheduleRequest.filePaths}
               renderItem={({ item }, index) => (
                 <View
                   key={index}
@@ -504,7 +472,7 @@ export default function ScheduleDetailRoom({ navigation, route }) {
                   </Text>
                 </View>
               )}
-              keyExtractor={(item) => item.serviceId}
+              keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
             />
           </View>
@@ -558,6 +526,17 @@ export default function ScheduleDetailRoom({ navigation, route }) {
             <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 14 }}>
               Danh sách dịch vụ
             </Text>
+            {listService.length == 0 && (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text>Không có dịch vụ</Text>
+              </View>
+            )}
             <FlatList
               style={{ marginTop: 10, paddingHorizontal: 25 }}
               data={listService}
@@ -588,7 +567,7 @@ export default function ScheduleDetailRoom({ navigation, route }) {
                   </Text>
                 </View>
               )}
-              keyExtractor={(item) => item.serviceId}
+              keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
             />
           </View>
@@ -682,41 +661,12 @@ export default function ScheduleDetailRoom({ navigation, route }) {
                   </Text>
                 </View>
               )}
-              keyExtractor={(item) => item.attendantId}
+              keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
             />
           </View>
         </View>
       </Modal>
-
-      {/* Popup*/}
-      <Popup
-        isOpen={isOpenPopup.warning}
-        title={"Thông báo"}
-        content={"Bạn có chắc muốn rời phòng sớm không?"}
-        status={"warning"}
-        handleOnPopup={(type) => {
-          if (type == "Hủy") {
-            setIsOpenPopup((prev) => ({ ...prev, warning: false }));
-          } else if (type == "OK") {
-            setIsOpenPopup((prev) => ({ ...prev, warning: false }));
-            navigation.navigate("CreateSchedule");
-          }
-        }}
-        titleButtonReject={"Hủy"}
-        titleButtonAccept={"OK"}
-      />
-      <Popup
-        isOpen={isOpenPopup.success}
-        title={"Thông báo"}
-        content={"Thời gian họp đã kết thúc\nVui lòng xác nhận rời phòng."}
-        status={"success"}
-        handleOnPopup={(type) => {
-          setIsOpenPopup((prev) => ({ ...prev, success: false }));
-          navigation.navigate("CreateSchedule");
-        }}
-        titleButtonAccept={"Rời phòng"}
-      />
     </DefaultLayout>
   );
 }

@@ -115,15 +115,25 @@ const findTimeFitToRegisterRoom = () => {
           `${currentDate}T${timeNestedCurrent.time}:00`
         ).toLocaleTimeString()
       ) - transferTimeToMinutes(currentTime.toLocaleTimeString());
-    console.log(index);
-    console.log(result);
     if (index <= renderTime().length - 2) {
       if (result >= 15) return renderTime()[index].time;
       else return renderTime()[index + 1].time;
     } else {
       return "0"; // 0 đại diện cho việc quá giờ đặt phòng
     }
+  } else {
+    return 0; // nếu không tìm thấy thời gian
   }
+};
+
+const formatUTC7 = (time) => {
+  const temp = new Date(time)
+    .toLocaleString("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    })
+    .split(",")[0];
+  const [hour, minutes, second] = temp.split(":").map(Number);
+  return `${hour}:${minutes > 10 ? minutes : "00"}`;
 };
 
 export {
@@ -136,4 +146,5 @@ export {
   formatDayOfWeek,
   transferTimeToMinutes,
   findTimeFitToRegisterRoom,
+  formatUTC7,
 };
