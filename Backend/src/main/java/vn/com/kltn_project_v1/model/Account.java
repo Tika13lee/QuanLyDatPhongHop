@@ -37,10 +37,11 @@ public class Account implements UserDetails {
     public Account() {
     }
 
-    public Account(String userName, String password, Role role) {
+    public Account(String userName, String password, Role role,boolean isFirstLogin) {
         this.userName = userName;
         this.password = password;
         this.role = role;
+        this.isFirstLogin = isFirstLogin;
     }
 
     @Override
