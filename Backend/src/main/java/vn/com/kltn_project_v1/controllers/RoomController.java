@@ -218,4 +218,12 @@ public class RoomController {
             throw new RuntimeException("File not found: " + e.getMessage());
         }
     }
+    @GetMapping("/getRoomByApprover")
+    public ResponseEntity<?> getRoomByApprover(@RequestParam Long EmployeeId) {
+        try {
+            return ResponseEntity.ok(roomService.getRoomByApproverId(EmployeeId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

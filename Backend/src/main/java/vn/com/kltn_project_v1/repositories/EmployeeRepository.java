@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import vn.com.kltn_project_v1.model.Employee;
+import vn.com.kltn_project_v1.model.Role;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @Query("select e from Employee e where (:depName ='' or e.department.depName = :depName) and e.isActived = :isActived and (:branchName ='' or e.department.location.building.branch.branchName = :branchName)")
     List<Employee> findEmployeeByDepartmentOrActivedOrBranch(String depName, boolean isActived, String branchName);
+    List<Employee> findEmployeesByAccount_Role(Role account_role);
 }

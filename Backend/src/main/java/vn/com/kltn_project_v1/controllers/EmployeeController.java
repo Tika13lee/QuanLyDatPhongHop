@@ -54,4 +54,8 @@ public class EmployeeController {
     public ResponseEntity<?> getEmployeeByDepartmentOrActivedOrBranch(@RequestParam(defaultValue = "") String depName, @RequestParam(defaultValue = "true") boolean isActived, @RequestParam(defaultValue = "") String branchName) {
         return ResponseEntity.ok(employeeService.getEmployeeByDepartmentOrActivedOrBranch(depName, isActived, branchName));
     }
+    @GetMapping("/getEmployeeByRole")
+    public ResponseEntity<?> getEmployeeByRole(@RequestParam String roleName) {
+        return ResponseEntity.ok(employeeService.getEmployeeByRole(roleName));
+    }
 }

@@ -13,4 +13,5 @@ public interface IEmployee {
     public List<Employee> getAllEmployee();
     public List<Employee> getEmployeeByPhoneOrName(String phoneOrName);
     public List<Employee> getEmployeeByDepartmentOrActivedOrBranch(String depName, boolean isActived, String branchName);
+    public List<Employee> getEmployeeByRole(String roleName);
 }

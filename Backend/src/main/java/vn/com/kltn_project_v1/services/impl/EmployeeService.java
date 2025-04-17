@@ -90,6 +90,12 @@ public class EmployeeService implements IEmployee {
         return employeeRepository.findEmployeeByDepartmentOrActivedOrBranch(depName, isActived, branchName);
     }
 
+    @Override
+    public List<Employee> getEmployeeByRole(String roleName) {
+        Role role = Role.valueOf(roleName);
+        return employeeRepository.findEmployeesByAccount_Role(role);
+    }
+
     Employee ConvertToEntity(EmployeeDTO employeeDTO){
         Employee employee = modelMapper.map(employeeDTO, Employee.class);
         employee.setDepartment(departmentRepository.findById(employeeDTO.getDepartmentId()).orElse(null));
