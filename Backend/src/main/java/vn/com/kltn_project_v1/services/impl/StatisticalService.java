@@ -2,6 +2,7 @@ package vn.com.kltn_project_v1.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import vn.com.kltn_project_v1.dtos.statistical.DataStatisticalDTO;
+import vn.com.kltn_project_v1.model.StatusReservation;
 import vn.com.kltn_project_v1.repositories.ReservationRepository;
 import vn.com.kltn_project_v1.services.IStatistical;
 
@@ -116,6 +117,18 @@ public class StatisticalService implements IStatistical {
         }
 
         return new ArrayList<>(fullMap.values());
+    }
+    @Override
+    public int countReservationByDate(Date date) {
+        return reservationRepository.countReservationByDate(date);
+    }
+    @Override
+    public int countReservationByDateAndStatus(Date timeCancel, StatusReservation statusReservation) {
+        return reservationRepository.countReservationByDateAndStatus(timeCancel, statusReservation);
+    }
+    @Override
+    public int countReservationByDateAndStatusCheckin(Date timeCheckin, StatusReservation statusReservation) {
+        return reservationRepository.countReservationByDateAndStatusCheckin(timeCheckin, statusReservation);
     }
 
 }

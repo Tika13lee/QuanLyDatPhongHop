@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findReservationsByRoomRoomId(Long roomId);
-    @Query("select r from Reservation r where r.room.roomId = ?1 and r.timeStart between ?2 and ?3 ")
+    @Query("select r from Reservation r where r.room.roomId = ?1 and r.timeStart between ?2 and ?3 and r.statusReservation != 'CANCELED'")
     List<Reservation> findReservationsByRoomRoomIdAndTime(Long roomId, Date timeStart, Date timeEnd);
     @Query("SELECT DISTINCT r.room FROM Reservation r WHERE r.booker.phone = ?1")
     List<Room> findDistinctRoomsByBookerPhone(String phone);
@@ -70,4 +70,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
              FUNCTION('MINUTE', r.timeStart)
 """)
     List<Object[]> fullStatistical(Date timeStart, Date timeEnd);
+
+    @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?1) ")
+    int countReservationByDate(Date date);
+    @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeCancel) = FUNCTION('DATE', ?1) and r.statusReservation = ?2 ")
+    int countReservationByDateAndStatus(Date timeCancel, StatusReservation statusReservation);
+    @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeCheckin) = FUNCTION('DATE', ?1) and r.statusReservation = ?2 ")
+    int countReservationByDateAndStatusCheckin(Date timeCheckin, StatusReservation statusReservation);
 }

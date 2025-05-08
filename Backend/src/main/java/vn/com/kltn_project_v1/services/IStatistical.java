@@ -1,6 +1,7 @@
 package vn.com.kltn_project_v1.services;
 
 import vn.com.kltn_project_v1.dtos.statistical.DataStatisticalDTO;
+import vn.com.kltn_project_v1.model.StatusReservation;
 
 import java.util.Date;
 import java.util.List;
@@ -17,4 +18,10 @@ public interface IStatistical {
     List<DataStatisticalDTO> statisticalRoom(Date startDate, Date endDate, Long branchId);
 
     List<Map<String, Object>> statisticalChart24h(Date dayStart, Date dayEnd);
+
+    int countReservationByDate(Date date);
+
+    int countReservationByDateAndStatus(Date timeCancel, StatusReservation statusReservation);
+
+    int countReservationByDateAndStatusCheckin(Date timeCheckin, StatusReservation statusReservation);
 }

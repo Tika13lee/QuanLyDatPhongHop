@@ -201,6 +201,7 @@ public class ReservationService implements IReservation {
             Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
             if (reservation != null) {
                 reservation.setStatusReservation(StatusReservation.CANCELED);
+                reservation.setTimeCancel(new Date());
                 reservationRepository.save(reservation);
                 reservations.add(reservation);
                 if(reservation.getAttendants() != null) {

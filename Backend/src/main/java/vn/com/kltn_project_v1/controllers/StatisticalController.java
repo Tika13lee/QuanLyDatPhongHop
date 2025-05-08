@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.com.kltn_project_v1.model.StatusReservation;
 import vn.com.kltn_project_v1.services.IStatistical;
 
 import java.util.Date;
@@ -33,6 +34,18 @@ public class StatisticalController {
         @GetMapping("/statisticalChart24h")
         public ResponseEntity<?> getStatisticalChart24h(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date endDate) {
             return ResponseEntity.ok(statisticalService.statisticalChart24h(startDate, endDate));
+        }
+        @GetMapping("/countReservationByDate")
+           public ResponseEntity<?> countReservationByDate(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date) {
+                return ResponseEntity.ok(statisticalService.countReservationByDate(date));
+            }
+        @GetMapping("/countReservationByDateAndStatus")
+        public ResponseEntity<?> countReservationByDateAndStatus(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date) {
+            return ResponseEntity.ok(statisticalService.countReservationByDateAndStatus(date, StatusReservation.CANCELED));
+        }
+        @GetMapping("/countReservationByDateAndStatusCheckin")
+        public ResponseEntity<?> countReservationByDateAndStatusCheckin(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date) {
+            return ResponseEntity.ok(statisticalService.countReservationByDateAndStatus(date, StatusReservation.CHECKED_IN));
         }
 
 }
