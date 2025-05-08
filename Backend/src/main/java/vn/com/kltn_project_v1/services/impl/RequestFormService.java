@@ -83,6 +83,7 @@ public class RequestFormService implements IRequestForm {
             reservationRepository.save(reservation);
 
         });
+        reservationService.bookerReservationNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getBooker());
         reservationService.inviteMembersNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getAttendants());
         return requestFormRepository.save(requestForm);
     }
@@ -176,16 +177,37 @@ public class RequestFormService implements IRequestForm {
     }
 
     @Override
-    public List<RequestForm> getRequestFormByBookerId(Long bookerId, StatusRequestForm statusRequestForm) {
-        return requestFormRepository.findRequestFormByBookerId(bookerId, statusRequestForm);
+    public List<RequestForm> getRequestFormByBookerId(Long bookerId, StatusRequestForm statusRequestForm, TypeRequestForm typeRequestForm, Date dayStart) {
+        List<RequestForm> requestForms = requestFormRepository.findRequestFormByBookerId(bookerId, statusRequestForm,typeRequestForm);
+        if (dayStart != null) {
+            requestForms.removeIf(requestForm -> {
+                LocalDate day = requestForm.getTimeRequest().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                return !day.isEqual(dayStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            });
+        }
+        return requestForms;
     }
 
     @Override
-    public List<RequestForm> getRequestFormByApproverId(Long approverId, StatusRequestForm statusRequestForm) {
+    public List<RequestForm> getRequestFormByApproverId(Long approverId, StatusRequestForm statusRequestForm, TypeRequestForm typeRequestForm, Date dayStart, Long roomId) {
+
         ArrayList<RequestForm> requestForms = new ArrayList<>();
-        roomRepository.findRoomsByApproverId(approverId).forEach(room -> {
-            requestForms.addAll(requestFormRepository.findRequestFormByRoomId(room.getRoomId(), statusRequestForm));
-        });
+        if (roomId != null) {
+            Room room = roomRepository.findById(roomId).orElse(null);
+            if (room != null) {
+                requestForms.addAll(requestFormRepository.findRequestFormByRoomId(room.getRoomId(), statusRequestForm, typeRequestForm));
+            }
+        }else {
+            roomRepository.findRoomsByApproverId(approverId).forEach(room -> {
+                requestForms.addAll(requestFormRepository.findRequestFormByRoomId(room.getRoomId(), statusRequestForm, typeRequestForm));
+            });
+        }
+        if (dayStart != null) {
+            requestForms.removeIf(requestForm -> {
+                LocalDate day = requestForm.getTimeRequest().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                return !day.isEqual(dayStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            });
+        }
         return requestForms;
     }
 

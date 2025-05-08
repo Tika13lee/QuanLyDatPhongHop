@@ -12,7 +12,6 @@ public class Application {
          PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         SpringApplication.run(Application.class, args);
 
-        System.out.println(passwordEncoder.encode("1111"));
 
     }
 

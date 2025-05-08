@@ -3,6 +3,7 @@ package vn.com.kltn_project_v1.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class Room {
     @JoinColumn(name = "priceRoomId")
     @JsonIgnore
     private PriceRoom priceRoom;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> imgs;
     @ManyToOne
     @JoinColumn(name = "approverId")

@@ -3,7 +3,6 @@ package vn.com.kltn_project_v1.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import vn.com.kltn_project_v1.dtos.Overview.ReservationViewDTO;
 import vn.com.kltn_project_v1.dtos.ReservationDTO;
 import vn.com.kltn_project_v1.model.*;
@@ -169,6 +168,17 @@ public class ReservationService implements IReservation {
                     reservation.getReservationId()
             );
         }
+    }
+    @Override
+    public void bookerReservationNotification(Reservation reservation, Employee employee) {
+            notificationService.notifyUser(
+                    employee,
+                    NotificationType.RESERVATION_REQUEST,
+                    "Bạn đã đặt lịch họp: " + reservation.getTitle() + " vào lúc " + reservation.getTimeStart() + " thành công",
+                    "reservation",
+                    reservation.getReservationId()
+            );
+
     }
 
     @Override

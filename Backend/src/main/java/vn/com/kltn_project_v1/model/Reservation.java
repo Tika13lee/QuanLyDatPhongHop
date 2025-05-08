@@ -24,7 +24,7 @@ public class Reservation {
     private Date timeCheckOut;
     private Date timeCancel;
     private String note;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> filePaths;
     private String description;
     private String title;

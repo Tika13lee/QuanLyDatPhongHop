@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.com.kltn_project_v1.dtos.RequestFormDTO;
 import vn.com.kltn_project_v1.model.Reservation;
 import vn.com.kltn_project_v1.model.StatusRequestForm;
+import vn.com.kltn_project_v1.model.TypeRequestForm;
 import vn.com.kltn_project_v1.services.IRequestForm;
 
 import java.util.ArrayList;
@@ -67,17 +68,17 @@ public class RequestFormController {
         }
     }
     @GetMapping("/getRequestFormByBookerId")
-    public ResponseEntity<?> getRequestFormByBookerId(@RequestParam Long bookerId, @RequestParam(required = false) StatusRequestForm statusRequestForm) {
+    public ResponseEntity<?> getRequestFormByBookerId(@RequestParam Long bookerId, @RequestParam(required = false) StatusRequestForm statusRequestForm, @RequestParam(required = false) TypeRequestForm typeRequestForm, @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart) {
         try {
-            return ResponseEntity.ok(requestFormService.getRequestFormByBookerId(bookerId, statusRequestForm));
+            return ResponseEntity.ok(requestFormService.getRequestFormByBookerId(bookerId, statusRequestForm,typeRequestForm,dayStart));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }
     }
     @GetMapping("/getRequestFormByApproverId")
-    public ResponseEntity<?> getRequestFormByApproverId(@RequestParam Long approverId, @RequestParam(required = false) StatusRequestForm statusRequestForm) {
+    public ResponseEntity<?> getRequestFormByApproverId(@RequestParam Long approverId, @RequestParam(required = false) StatusRequestForm statusRequestForm, @RequestParam(required = false) TypeRequestForm typeRequestForm, @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayStart, @RequestParam (required = false) Long roomId) {
         try {
-            return ResponseEntity.ok(requestFormService.getRequestFormByApproverId(approverId, statusRequestForm));
+            return ResponseEntity.ok(requestFormService.getRequestFormByApproverId(approverId, statusRequestForm,typeRequestForm,dayStart,roomId));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }

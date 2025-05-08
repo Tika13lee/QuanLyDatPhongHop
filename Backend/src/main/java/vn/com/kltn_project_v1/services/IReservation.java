@@ -21,6 +21,9 @@ public interface IReservation {
     Map<String, Object> checkDataCheckIn(Long roomId, Long employeeId);
     Reservation updateReservation(ReservationDTO reservationDTO);
     public void inviteMembersNotification(Reservation reservation, List<Employee> employees);
+
+    void bookerReservationNotification(Reservation reservation, Employee employee);
+
     public void updateReservationNotification(Reservation reservation, List<Employee> employees);
     public List<Reservation> cancelReservation (List<Long> reservationIds);
     public List<Reservation> cancelReservationFrequency (List<Long> reservationIds);
