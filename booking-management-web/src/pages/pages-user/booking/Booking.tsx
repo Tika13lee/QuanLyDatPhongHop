@@ -11,6 +11,7 @@ import {
 } from "../../../utilities";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { toast, ToastContainer } from "react-toastify";
+import ChatModal from "../../../components/chatBox/chatModal";
 
 const cx = classNames.bind(styles);
 
@@ -50,6 +51,7 @@ function Booking() {
     listRoomInfo: [],
   });
   const [rooms, setRooms] = useState<RoomViewProps[]>([]);
+  const [open, setOpen] = useState(false);
 
   // thông báo popup
   const [infoPopup, setInfoPopup] = useState<typeInfoPopup>({
@@ -235,7 +237,12 @@ function Booking() {
             ))}
           </select>
         </div>
-
+        <div className={cx("row-container")}>
+          <ChatModal open={open} onClose={() => setOpen(false)} />
+          <button className="chat-toggle-btn" onClick={() => setOpen(true)}>
+            💬
+          </button>
+        </div>
         <div className={cx("row-container")}>
           {/* Chọn ngày */}
           <div className={cx("filterContainer")}>
