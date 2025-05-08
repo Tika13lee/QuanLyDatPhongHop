@@ -29,16 +29,31 @@ export default function Profile({ navigation, route }) {
   const [modalPassword, setModalPassword] = useState(false);
   const [modalHistory, setModalHistory] = useState(false);
   const [user, setUser] = useState({});
+  const [token, setToken] = useState("");
   const getUser = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem("current_user");
+      const jsonValue = await AsyncStorage.getItem("userCurrent");
+      const token = await AsyncStorage.getItem("token");
+
       if (jsonValue != null) {
         const user = JSON.parse(jsonValue);
+        console.log(user);
         setUser(user);
+      }
+      if (token != null) {
+        setToken(token);
       }
     } catch (error) {
       console.error("Error reading user:", error);
     }
+  };
+  const handleUpdateProfile = async (user) => {
+    await AsyncStorage.setItem("userCurrent", JSON.stringify(user));
+    setUser(user);
+  };
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userCurrent");
+    navigation.navigate("Login");
   };
 
   useEffect(() => {
@@ -136,6 +151,12 @@ export default function Profile({ navigation, route }) {
               }}
             >
               <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("HistoryReservation", {
+                    phone: user.phone,
+                    bookerId: user.employeeId,
+                  });
+                }}
                 style={{
                   padding: 7,
                   backgroundColor: "#3C72DB",
@@ -160,6 +181,7 @@ export default function Profile({ navigation, route }) {
                 <Text style={{ textAlign: "center" }}>Cập nhật</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={handleLogout}
                 style={{
                   padding: 10,
                   backgroundColor: "red",
@@ -181,6 +203,7 @@ export default function Profile({ navigation, route }) {
       >
         <ModelUpdateProfile
           data={user}
+          handleUpdateProfile={handleUpdateProfile}
           closeModal={() => {
             setModalUpdate(false);
           }}
@@ -193,6 +216,8 @@ export default function Profile({ navigation, route }) {
         }}
       >
         <ModalChangePasswordProfile
+          token={token}
+          userName={user.phone}
           data={user}
           closeModal={() => {
             setModalPassword(false);
