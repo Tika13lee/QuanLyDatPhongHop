@@ -120,15 +120,15 @@ public class StatisticalService implements IStatistical {
     }
     @Override
     public int countReservationByDate(Date date) {
-        return reservationRepository.countReservationByDate(date);
+        return reservationRepository.statisticalReservationInDay(date);
     }
     @Override
     public int countReservationByDateAndStatus(Date timeCancel, StatusReservation statusReservation) {
-        return reservationRepository.countReservationByDateAndStatus(timeCancel, statusReservation);
+        return reservationRepository.statisticalReservationCancelInDay(timeCancel, statusReservation);
     }
     @Override
     public int countReservationByDateAndStatusCheckin(Date timeCheckin, StatusReservation statusReservation) {
-        return reservationRepository.countReservationByDateAndStatusCheckin(timeCheckin, statusReservation);
+        return reservationRepository.statisticalReservationFinishInDay(timeCheckin, statusReservation);
     }
 
 }

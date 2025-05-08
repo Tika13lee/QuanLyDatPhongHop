@@ -72,9 +72,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Object[]> fullStatistical(Date timeStart, Date timeEnd);
 
     @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeStart) = FUNCTION('DATE', ?1) ")
-    int countReservationByDate(Date date);
+    int statisticalReservationInDay(Date date);
     @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeCancel) = FUNCTION('DATE', ?1) and r.statusReservation = ?2 ")
-    int countReservationByDateAndStatus(Date timeCancel, StatusReservation statusReservation);
-    @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeCheckin) = FUNCTION('DATE', ?1) and r.statusReservation = ?2 ")
-    int countReservationByDateAndStatusCheckin(Date timeCheckin, StatusReservation statusReservation);
+    int statisticalReservationCancelInDay(Date timeCancel, StatusReservation statusReservation);
+    @Query("select count(r) from Reservation r where FUNCTION('DATE', r.timeCheckIn) = FUNCTION('DATE', ?1) and r.statusReservation = ?2 ")
+    int statisticalReservationFinishInDay(Date timeCheckin, StatusReservation statusReservation);
 }

@@ -26,10 +26,11 @@ public class OpenAiService implements IOpenAi {
         String prompt = """
         Bạn là trợ lý AI giúp đặt phòng họp nội bộ. 
         Người dùng nhắn: "%s"
+        Bạn cần phân tích câu nhắn của người dùng và xác định ý định (intent) và các thực thể (entities) trong câu nhắn đó.
+        Các ý định (intent) có thể là:
         Trả về JSON gồm: intent (ví dụ: "book_reservation", "check_schedule","cancel_reservation","update_reservation",info_reservation","software_function" và "other")
-  
         và các entity như "date", "reservation", "room","requestForm"  nếu có.
-        mẫu Json trả về 
+        ví dụ Json trả về, bạn lấy thông tin phân tích ở trên để thêm vào những thuộc tinhs trong entity chứ không phải lấy dưới ví dụ
         {
             "intent": "book_reservation",
             "entities": {
@@ -42,7 +43,7 @@ public class OpenAiService implements IOpenAi {
         {
             "intent": "check_schedule",
             "entities": {
-                "time": "2025-03-22T08:00:00.000Z",
+             "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
         }
         {
             "intent": "cancel_reservation",
@@ -78,6 +79,22 @@ public class OpenAiService implements IOpenAi {
             "entities": {
                 ""
         }
+        ví dụ :
+        người dùng hỏi "xem lịch họp ngày hôm nay"
+        bạn phải xem thử ngày hôm nay là ngày nào rồi trả về json như sau:
+        {
+            "intent": "check_schedule",
+            "entities": {
+                "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", format date ở đây là của ngày hôm nay 
+        }
+        là dựa theo mẫu trên để trả về JSON chứ không phải là lấy mẫu trên rồi trả về JSON.
+        Các intent có thể là:
+        "book_reservation" là đặt phòng
+        "check_schedule" là kiểm tra lịch
+        "cancel_reservation" là hủy đặt phòng
+        "update_reservation" là cập nhật đặt phòng
+        "info_reservation" là thông tin đặt phòng
+        rồi các thông tin người dùng cung cấp thế vào mẫu để trả vào json để tôi gọi api
         software_function là các phần của phan mem nay vi du nhu: update_reservation chỉ có thể cập nhập thành viên, diịch vụ, tiêu đề, tài liệu thôi, hoặc laf thời gian đặt sẽ cách nhau 10p.
         "other" là các câu hỏi không liên quan đến phần mềm này.
         Nếu không có entity nào thì trả về null
