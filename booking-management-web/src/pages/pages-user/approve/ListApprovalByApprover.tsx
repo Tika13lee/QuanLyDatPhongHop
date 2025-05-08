@@ -26,6 +26,10 @@ function ListApprovalByApprover() {
   const [reasonReject, setReasonReject] = useState<string>("");
   const [openModalReject, setOpenModalReject] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
+  const [startDate, setStartDate] = useState<string>("");
+  const [typeRequestForm, setTypeRequestForm] = useState<string>("");
+  const [selectedRoom, setSelectedRoom] = useState<string>("all");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -40,12 +44,22 @@ function ListApprovalByApprover() {
     loading: loadingReservation,
     error: errorReservation,
   } = useFetch<RequestFormProps[]>(
-    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING`
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING&reload=${reloadTrigger}`
   );
 
   const [schedulesApprove, setSchedulesApprove] = useState<RequestFormProps[]>(
     requestForm ?? []
   );
+
+  useEffect(() => {
+    const handleReload = () => {
+      setReloadTrigger((prev) => prev + 1);
+    };
+    window.addEventListener("requestForm:changed", handleReload);
+    return () => {
+      window.removeEventListener("requestForm:changed", handleReload);
+    };
+  }, []);
 
   useEffect(() => {
     setSchedulesApprove(requestForm ?? []);
@@ -86,7 +100,7 @@ function ListApprovalByApprover() {
     const resp = await approvalForm(selectedItems, { method: "POST" });
 
     if (resp) {
-      setPopupMessage("Lịch đã được phê duyệt thành công!");
+      setPopupMessage("Yêu cầu đã được phê duyệt thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
 
@@ -193,21 +207,44 @@ function ListApprovalByApprover() {
           </div>
           <div className={cx("search-group")}>
             <label>Ngày bắt đầu </label>
-            <input type="date" className={cx("search-input")} />
+            <input
+              type="date"
+              className={cx("search-input")}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+            />
           </div>
           <div className={cx("search-group")}>
             <label>Chọn phòng</label>
-            <select className={cx("search-input")}>
+            <select
+              className={cx("search-input")}
+              value={selectedRoom}
+              onChange={(e) => setSelectedRoom(e.target.value)}
+            >
               <option value="all">Tất cả</option>
               {roomList && roomList.length > 0 ? (
                 roomList.map((room) => (
-                  <option key={room.roomId} value={room.roomName}>
-                    {room.roomName}
+                  <option key={room.roomId} value={room.roomId}>
+                    Phòng {room.roomName}
                   </option>
                 ))
               ) : (
                 <option value="all">Không có phòng nào</option>
               )}
+            </select>
+          </div>
+          <div className={cx("search-group")}>
+            <label>Loại yêu cầu</label>
+            <select
+              className={cx("search-input")}
+              name="typeRequestForm"
+              value={typeRequestForm}
+              onChange={(e) => setTypeRequestForm(e.target.value)}
+            >
+              <option value="">Tất cả</option>
+              <option value="">Đặt lịch</option>
+              <option value="UPDATE_RESERVATION">Cập nhật</option>
             </select>
           </div>
           <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
@@ -221,7 +258,7 @@ function ListApprovalByApprover() {
             onClick={handleApprove}
             disabled={selectedItems.length === 0}
           >
-            ✔ Phê Duyệt
+            ✔ Chấp nhận
           </button>
           <button
             className={cx("btn-action", "reject-btn")}

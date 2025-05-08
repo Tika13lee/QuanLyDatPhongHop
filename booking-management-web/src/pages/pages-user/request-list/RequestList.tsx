@@ -1,11 +1,11 @@
 import classNames from "classnames/bind";
 import styles from "./RequestList.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RequestFormProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { MdOutlineInfo } from "../../../components/icons/icons";
+import { FiRefreshCw, MdOutlineInfo } from "../../../components/icons/icons";
 import { formatDateString, getHourMinute } from "../../../utilities";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 import { useSelector } from "react-redux";
@@ -20,7 +20,10 @@ function RequestList() {
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
   const [statusRequestForm, setStatusRequestForm] = useState<string>("");
-  const [searchTitle, setSearchTitle] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
+  const [startDate, setStartDate] = useState<string>("");
+  const [typeRequestForm, setTypeRequestForm] = useState<string>("");
 
   // Lấy danh sách lịch đặt phòng
   const {
@@ -29,8 +32,8 @@ function RequestList() {
     error: errorRequestList,
   } = useFetch<RequestFormProps[]>(
     statusRequestForm
-      ? `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}&statusRequestForm=${statusRequestForm}`
-      : `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}`
+      ? `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}&statusRequestForm=${statusRequestForm}&reload=${reloadTrigger}`
+      : `http://localhost:8080/api/v1/requestForm/getRequestFormByBookerId?bookerId=${user?.employeeId}&reload=${reloadTrigger}`
   );
 
   // Mở modal
@@ -46,9 +49,24 @@ function RequestList() {
   };
 
   // Lọc danh sách yêu cầu theo tiêu đề
-  const filteredRequestList = requestList?.filter((schedule) =>
-    schedule.requestReservation.title.toLowerCase().includes(searchTitle)
+  const filteredRequestList = requestList?.filter(
+    (schedule) =>
+      schedule.requestReservation.title.toLowerCase().includes(searchQuery) ||
+      schedule.reservations[0]?.room?.roomName
+        .toLowerCase()
+        .includes(searchQuery)
   );
+
+  // load lại danh sách yêu cầu
+  useEffect(() => {
+    const handleReload = () => {
+      setReloadTrigger((prev) => prev + 1);
+    };
+    window.addEventListener("requestForm:changed", handleReload);
+    return () => {
+      window.removeEventListener("requestForm:changed", handleReload);
+    };
+  }, []);
 
   return (
     <div className={cx("booking-list")}>
@@ -57,31 +75,33 @@ function RequestList() {
           <label>Tìm kiếm</label>
           <input
             type="text"
-            placeholder="Nhập tiêu đề cuộc họp"
+            placeholder="Nhập tên phòng, tiêu đề cuộc họp"
             className={cx("search-input")}
-            value={searchTitle}
-            onChange={(e) => setSearchTitle(e.target.value.toLowerCase())}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
           />
         </div>
-        {/* <div className={cx("search-group")}>
-          <label>Ngày gửi</label>
-          <input type="date" className={cx("search-input")} />
-        </div> */}
         <div className={cx("search-group")}>
           <label>Ngày bắt đầu</label>
-          <input type="date" className={cx("search-input")} />
+          <input
+            type="date"
+            className={cx("search-input")}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            min={new Date().toISOString().split("T")[0]}
+          />
         </div>
         <div className={cx("search-group")}>
           <label>Loại yêu cầu</label>
           <select
             className={cx("search-input")}
-            name="status"
-            value={statusRequestForm}
-            onChange={(e) => setStatusRequestForm(e.target.value)}
+            name="typeRequestForm"
+            value={typeRequestForm}
+            onChange={(e) => setTypeRequestForm(e.target.value)}
           >
             <option value="">Tất cả</option>
             <option value="">Đặt lịch</option>
-            <option value="">Cập nhật</option>
+            <option value="UPDATE_RESERVATION">Cập nhật</option>
           </select>
         </div>
         <div className={cx("search-group")}>
@@ -97,6 +117,11 @@ function RequestList() {
             <option value="PENDING">Chờ phê duyệt</option>
             <option value="REJECTED">Từ chối phê duyệt</option>
           </select>
+        </div>
+        <div style={{ marginTop: "24px" }}>
+          <button>
+            <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
+          </button>
         </div>
       </div>
 

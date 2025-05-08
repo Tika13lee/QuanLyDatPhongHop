@@ -32,6 +32,9 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
     "success" | "error" | "info" | "warning"
   >("info");
 
+  // Lấy thông tin người dùng từ localStorage
+  const user = JSON.parse(localStorage.getItem("currentUser")!);
+
   const { postData: cancelRequestForm } = usePost<string[]>(
     "http://localhost:8080/api/v1/requestForm/cancelRequestForm"
   );
@@ -42,8 +45,6 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
   const handleCancelSchedule = async () => {
     const listRequestFormId = [requestForm.requestFormId];
 
-    console.log("listRequestFormId", listRequestFormId);
-
     const response = await cancelRequestForm(listRequestFormId, {
       method: "POST",
     });
@@ -52,6 +53,7 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
       setPopupMessage("Hủy yêu cầu thành công");
       setPopupType("success");
       setIsPopupOpen(true);
+      window.dispatchEvent(new Event("requestForm:changed"));
     } else {
       setPopupMessage("Hủy yêu cầu thất bại");
       setPopupType("error");
@@ -65,7 +67,10 @@ const DetailRequestModal: React.FC<DetailModalProps> = ({
         <CloseModalButton onClick={onClose} />
         <button
           className={cx("btn-cancel")}
-          disabled={requestForm.statusRequestForm !== "PENDING"}
+          disabled={
+            requestForm.statusRequestForm !== "PENDING" ||
+            requestForm.reservations[0].booker.employeeId !== user.employeeId
+          }
           onClick={handleCancelSchedule}
         >
           Hủy yêu cầu
