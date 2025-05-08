@@ -6,7 +6,7 @@ import DetailModal from "../../../components/Modal/DetailRequestModal";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { MdOutlineInfo } from "../../../components/icons/icons";
+import { FiRefreshCw, MdOutlineInfo } from "../../../components/icons/icons";
 import PopupNotification from "../../../components/popup/PopupNotification";
 import { formatDateString, getHourMinute } from "../../../utilities";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
@@ -14,6 +14,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
+
+type DataSearch = {
+  dayStart: string;
+  roomId: string;
+  typeRequestForm: string;
+};
 
 function ListApprovalByApprover() {
   const user = useSelector((state: RootState) => state.user);
@@ -29,7 +35,7 @@ function ListApprovalByApprover() {
   const [reloadTrigger, setReloadTrigger] = useState<number>(0);
   const [startDate, setStartDate] = useState<string>("");
   const [typeRequestForm, setTypeRequestForm] = useState<string>("");
-  const [selectedRoom, setSelectedRoom] = useState<string>("all");
+  const [selectedRoom, setSelectedRoom] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -52,6 +58,56 @@ function ListApprovalByApprover() {
   );
 
   useEffect(() => {
+    if (requestForm) {
+      // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+      const filteredRequestList = requestForm?.filter((form) => {
+        const titleMatch = form.requestReservation.title
+          .toLowerCase()
+          .includes(searchQuery);
+        const nameBookerMatch = form.reservations[0].booker.employeeName
+          .toLowerCase()
+          .includes(searchQuery);
+        return titleMatch || nameBookerMatch;
+      });
+      setSchedulesApprove(filteredRequestList ?? []);
+    }
+  }, [requestForm, searchQuery, reloadTrigger]);
+
+  // dữ liệu tìm kiếm
+  const [dataSearch, setDataSearch] = useState<DataSearch>({
+    dayStart: "",
+    roomId: "",
+    typeRequestForm: typeRequestForm,
+  });
+
+  useEffect(() => {
+    setDataSearch({
+      dayStart: startDate ? new Date(startDate).toISOString() : "",
+      roomId: selectedRoom,
+      typeRequestForm: typeRequestForm,
+    });
+    console.log("dataSearch", dataSearch);
+
+    // Gọi API với dữ liệu tìm kiếm
+    fetch(
+      `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING&dayStart=${dataSearch.dayStart}&roomId=${dataSearch.roomId}&typeRequestForm=${dataSearch.typeRequestForm}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setSchedulesApprove(data);
+        setDataSearch({
+          dayStart: startDate ? new Date(startDate).toISOString() : "",
+          roomId: selectedRoom,
+          typeRequestForm: typeRequestForm,
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, [startDate, selectedRoom, typeRequestForm]);
+
+  // load lại danh sách yêu cầu khi có sự thay đổi
+  useEffect(() => {
     const handleReload = () => {
       setReloadTrigger((prev) => prev + 1);
     };
@@ -60,10 +116,6 @@ function ListApprovalByApprover() {
       window.removeEventListener("requestForm:changed", handleReload);
     };
   }, []);
-
-  useEffect(() => {
-    setSchedulesApprove(requestForm ?? []);
-  }, [requestForm]);
 
   // lấy danh sách phòng của người phê duyệt
   const {
@@ -180,17 +232,6 @@ function ListApprovalByApprover() {
     setSelectedRequestForm(null);
   };
 
-  // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
-  const filteredRequestList = schedulesApprove?.filter((form) => {
-    const titleMatch = form.requestReservation.title
-      .toLowerCase()
-      .includes(searchQuery);
-    const nameBookerMatch = form.reservations[0].booker.employeeName
-      .toLowerCase()
-      .includes(searchQuery);
-    return titleMatch || nameBookerMatch;
-  });
-
   return (
     <div className={cx("approve")}>
       <div className={cx("approve-search")}>
@@ -211,7 +252,13 @@ function ListApprovalByApprover() {
               type="date"
               className={cx("search-input")}
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setDataSearch({
+                  ...dataSearch,
+                  dayStart: new Date(e.target.value).toISOString(),
+                });
+              }}
               min={new Date().toISOString().split("T")[0]}
             />
           </div>
@@ -220,9 +267,15 @@ function ListApprovalByApprover() {
             <select
               className={cx("search-input")}
               value={selectedRoom}
-              onChange={(e) => setSelectedRoom(e.target.value)}
+              onChange={(e) => {
+                setSelectedRoom(e.target.value);
+                setDataSearch({
+                  ...dataSearch,
+                  roomId: e.target.value,
+                });
+              }}
             >
-              <option value="all">Tất cả</option>
+              <option value="">Tất cả</option>
               {roomList && roomList.length > 0 ? (
                 roomList.map((room) => (
                   <option key={room.roomId} value={room.roomId}>
@@ -230,7 +283,7 @@ function ListApprovalByApprover() {
                   </option>
                 ))
               ) : (
-                <option value="all">Không có phòng nào</option>
+                <option value="">Không có phòng nào</option>
               )}
             </select>
           </div>
@@ -240,14 +293,33 @@ function ListApprovalByApprover() {
               className={cx("search-input")}
               name="typeRequestForm"
               value={typeRequestForm}
-              onChange={(e) => setTypeRequestForm(e.target.value)}
+              onChange={(e) => {
+                setTypeRequestForm(e.target.value);
+                setDataSearch({
+                  ...dataSearch,
+                  typeRequestForm: e.target.value,
+                });
+              }}
             >
               <option value="">Tất cả</option>
-              <option value="">Đặt lịch</option>
+              <option value="RESERVATION_ONETIME">Đặt lịch một lần</option>
+              <option value="RESERVATION_RECURRING">Đặt lịch định kỳ</option>
               <option value="UPDATE_RESERVATION">Cập nhật</option>
             </select>
           </div>
-          <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
+          <div style={{ marginTop: "24px" }}>
+            <button
+              onClick={() => {
+                setReloadTrigger((prev) => prev + 1);
+                setSearchQuery("");
+                setStartDate("");
+                setSelectedRoom("");
+                setTypeRequestForm("");
+              }}
+            >
+              <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
+            </button>
+          </div>
         </div>
 
         <div className={cx("device")}></div>
@@ -301,8 +373,7 @@ function ListApprovalByApprover() {
 
       {loadingReservation ? (
         <LoadingSpinner />
-      ) : Array.isArray(filteredRequestList) &&
-        filteredRequestList.length === 0 ? (
+      ) : Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -322,57 +393,58 @@ function ListApprovalByApprover() {
               </tr>
             </thead>
             <tbody>
-              {[...filteredRequestList]
-                .sort(
-                  (a, b) =>
-                    new Date(b.timeRequest).getTime() -
-                    new Date(a.timeRequest).getTime()
-                )
-                .map((schedule) => {
-                  return (
-                    <tr key={schedule.requestFormId}>
-                      <td className={cx("checkbox")}>
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(
-                            schedule.requestFormId
+              {Array.isArray(schedulesApprove) &&
+                [...schedulesApprove]
+                  .sort(
+                    (a, b) =>
+                      new Date(b.timeRequest).getTime() -
+                      new Date(a.timeRequest).getTime()
+                  )
+                  .map((schedule) => {
+                    return (
+                      <tr key={schedule.requestFormId}>
+                        <td className={cx("checkbox")}>
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(
+                              schedule.requestFormId
+                            )}
+                            onChange={() =>
+                              handleCheckboxChange(schedule.requestFormId)
+                            }
+                          />
+                        </td>
+                        <td>{schedule.requestReservation.title}</td>
+                        <td>
+                          {formatDateString(
+                            schedule.requestReservation.timeStart
                           )}
-                          onChange={() =>
-                            handleCheckboxChange(schedule.requestFormId)
-                          }
-                        />
-                      </td>
-                      <td>{schedule.requestReservation.title}</td>
-                      <td>
-                        {formatDateString(
-                          schedule.requestReservation.timeStart
-                        )}
-                      </td>
-                      <td>
-                        {getHourMinute(schedule.requestReservation.timeStart)} -{" "}
-                        {getHourMinute(schedule.requestReservation.timeEnd)}
-                      </td>
-                      <td>{schedule.reservations[0]?.booker.employeeName}</td>
-                      <td>
-                        {schedule.typeRequestForm === "UPDATE_RESERVATION"
-                          ? "Cập nhật"
-                          : "Đặt lịch"}
-                      </td>
-                      <td>
-                        {formatDateString(schedule.timeRequest)} -{" "}
-                        {getHourMinute(schedule.timeRequest)}
-                      </td>
-                      <td>
-                        <div
-                          className={cx("actions")}
-                          onClick={() => handleShowDetails(schedule)}
-                        >
-                          <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td>
+                          {getHourMinute(schedule.requestReservation.timeStart)}{" "}
+                          - {getHourMinute(schedule.requestReservation.timeEnd)}
+                        </td>
+                        <td>{schedule.reservations[0]?.booker.employeeName}</td>
+                        <td>
+                          {schedule.typeRequestForm === "UPDATE_RESERVATION"
+                            ? "Cập nhật"
+                            : "Đặt lịch"}
+                        </td>
+                        <td>
+                          {formatDateString(schedule.timeRequest)} -{" "}
+                          {getHourMinute(schedule.timeRequest)}
+                        </td>
+                        <td>
+                          <div
+                            className={cx("actions")}
+                            onClick={() => handleShowDetails(schedule)}
+                          >
+                            <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
             </tbody>
           </table>
         </div>
