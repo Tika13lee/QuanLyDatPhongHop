@@ -3,8 +3,6 @@ import styles from "./Login.module.scss";
 import { useState } from "react";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { IoEyeOffOutline, IoEyeOutline } from "../../../components/icons/icons";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../app/store";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -25,7 +23,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   // popup thông báo
@@ -39,6 +36,7 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
+  // xử lý login
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -153,7 +151,7 @@ const Login = () => {
               />
               <span className={cx("toggleIcon")} onClick={togglePassword}>
                 <IconWrapper
-                  icon={showPassword ? IoEyeOutline : IoEyeOffOutline}
+                  icon={showPassword ? IoEyeOffOutline : IoEyeOutline}
                   color="#000"
                   size={20}
                 />

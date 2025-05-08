@@ -227,10 +227,11 @@ function Booking() {
       <ToastContainer />
       <div className={cx("header-container")}>
         {/* Chọn chi nhánh */}
-        <div className={cx("")}>
+        <div>
           <select
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
+            style={{ cursor: "pointer" }}
           >
             {branchs?.map((branch) => (
               <option key={branch.branchId}>{branch.branchName}</option>

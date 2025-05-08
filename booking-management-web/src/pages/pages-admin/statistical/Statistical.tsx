@@ -19,7 +19,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
-import { BranchProps } from "../../../data/data";
+import { BranchProps, EmployeeProps } from "../../../data/data";
 import { formatCurrencyVND, formatDateString } from "../../../utilities";
 
 const cx = classNames.bind(styles);
@@ -83,6 +83,21 @@ function Statistical() {
     currentMonth.toString()
   );
 
+  // lấy nhân viên
+  const { data: employees } = useFetch<[]>(
+    `http://localhost:8080/api/v1/employee/getAllEmployee`
+  );
+
+  // lấy dịch vụ
+  const { data: services } = useFetch<[]>(
+    `http://localhost:8080/api/v1/service/getAllServices`
+  );
+
+  // lấy thiết bị
+  const { data: devices } = useFetch<[]>(
+    `http://localhost:8080/api/v1/device/getAllDevices`
+  );
+
   // lấy chi nhánh
   const {
     data: branchs,
@@ -143,7 +158,7 @@ function Statistical() {
             <span className={cx("symbol")}>👥</span>Tổng số nhân viên
           </h3>
           <p>
-            30 <small>người</small>
+            {employees?.length} <small>người</small>
           </p>
         </div>
         <div className={cx("summaryCard")}>
@@ -151,7 +166,7 @@ function Statistical() {
             <span className={cx("symbol")}>🧑‍🔧</span>Tổng số dịch vụ
           </h3>
           <p>
-            30 <small>dịch vụ</small>
+            {services?.length} <small>dịch vụ</small>
           </p>
         </div>
         <div className={cx("summaryCard")}>
@@ -159,7 +174,7 @@ function Statistical() {
             <span className={cx("symbol")}>🖥️</span>Tổng số thiết bị
           </h3>
           <p>
-            30 <small>thiết bị</small>
+            {devices?.length} <small>thiết bị</small>
           </p>
         </div>
         <div className={cx("summaryCard")}>
@@ -167,7 +182,7 @@ function Statistical() {
             <span className={cx("symbol")}>🌐</span>Tổng số chi nhánh
           </h3>
           <p>
-            5 <small>chi nhánh</small>
+            {branchs?.length} <small>chi nhánh</small>
           </p>
         </div>
         <div className={cx("summaryCard")}>

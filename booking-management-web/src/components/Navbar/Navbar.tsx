@@ -140,7 +140,7 @@ const Navbar = () => {
       <div className={cx("navbar")}>
         <div className={cx("brand")}>
           <p>
-            <strong>HỆ THỐNG QUẢN LÝ ĐẶT LỊCH HỌP TRỰC TUYẾN</strong>
+            <strong>HỆ THỐNG QUẢN LÝ ĐẶT LỊCH HỌP</strong>
           </p>
         </div>
 

@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovedList.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   RequestFormProps,
   ReservationDetailProps,
@@ -9,13 +9,19 @@ import {
 import useFetch from "../../../hooks/useFetch";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { MdOutlineInfo } from "../../../components/icons/icons";
+import { FiRefreshCw, MdOutlineInfo } from "../../../components/icons/icons";
 import { formatDateString, getHourMinute } from "../../../utilities";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
+
+type DataSearch = {
+  dayStart: string;
+  roomId: string;
+  typeRequestForm: string;
+};
 
 function ApprovedList() {
   const user = useSelector((state: RootState) => state.user);
@@ -24,6 +30,12 @@ function ApprovedList() {
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [typeRequestForm, setTypeRequestForm] = useState<string>("");
+  const [selectedRoom, setSelectedRoom] = useState<string>("");
+  const [approvalFormList, setApprovalFormList] = useState<RequestFormProps[]>(
+    []
+  );
 
   // Lấy danh sách lịch đặt phòng đã phê duyệt
   const {
@@ -34,6 +46,55 @@ function ApprovedList() {
     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED`
   );
 
+  useEffect(() => {
+    if (approvedList) {
+      // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+      const filteredRequestList = approvedList?.filter((form) => {
+        const titleMatch = form.requestReservation.title
+          .toLowerCase()
+          .includes(searchQuery);
+        const nameBookerMatch = form.reservations[0].booker.employeeName
+          .toLowerCase()
+          .includes(searchQuery);
+        return titleMatch || nameBookerMatch;
+      });
+      setApprovalFormList(filteredRequestList ?? []);
+    }
+  }, [approvedList, searchQuery]);
+
+  // dữ liệu tìm kiếm
+  const [dataSearch, setDataSearch] = useState<DataSearch>({
+    dayStart: "",
+    roomId: "",
+    typeRequestForm: typeRequestForm,
+  });
+
+  useEffect(() => {
+    setDataSearch({
+      dayStart: startDate ? new Date(startDate).toISOString() : "",
+      roomId: selectedRoom,
+      typeRequestForm: typeRequestForm,
+    });
+    console.log("dataSearch", dataSearch);
+
+    // Gọi API với dữ liệu tìm kiếm
+    fetch(
+      `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED&dayStart=${dataSearch.dayStart}&roomId=${dataSearch.roomId}&typeRequestForm=${dataSearch.typeRequestForm}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setApprovalFormList(data);
+        setDataSearch({
+          dayStart: startDate ? new Date(startDate).toISOString() : "",
+          roomId: selectedRoom,
+          typeRequestForm: typeRequestForm,
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, [startDate, selectedRoom, typeRequestForm]);
+
   // lấy danh sách phòng của người phê duyệt
   const {
     data: roomList,
@@ -42,17 +103,6 @@ function ApprovedList() {
   } = useFetch<RoomProps[]>(
     `http://localhost:8080/api/v1/room/getRoomByApprover?EmployeeId=${user?.employeeId}`
   );
-
-  // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
-  const filteredRequestList = approvedList?.filter((form) => {
-    const titleMatch = form.requestReservation.title
-      .toLowerCase()
-      .includes(searchQuery);
-    const nameBookerMatch = form.reservations[0].booker.employeeName
-      .toLowerCase()
-      .includes(searchQuery);
-    return titleMatch || nameBookerMatch;
-  });
 
   // Mở modal
   const handleShowDetails = (requestForm: RequestFormProps) => {
@@ -81,37 +131,84 @@ function ApprovedList() {
         </div>
         <div className={cx("search-row")}>
           <label>Thời gian</label>
-          <input type="date" className={cx("search-input")} />
+          <input
+            type="date"
+            className={cx("search-input")}
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setDataSearch({
+                ...dataSearch,
+                dayStart: new Date(e.target.value).toISOString(),
+              });
+            }}
+          />
         </div>
         <div className={cx("search-row")}>
           <label>Chọn phòng</label>
-          <select className={cx("search-input")}>
-            <option value="all">Tất cả</option>
+          <select
+            className={cx("search-input")}
+            value={selectedRoom}
+            onChange={(e) => {
+              setSelectedRoom(e.target.value);
+              setDataSearch({
+                ...dataSearch,
+                roomId: e.target.value,
+              });
+            }}
+          >
+            <option value="">Tất cả</option>
             {roomList && roomList.length > 0 ? (
               roomList.map((room) => (
-                <option key={room.roomId} value={room.roomName}>
+                <option key={room.roomId} value={room.roomId}>
                   {room.roomName}
                 </option>
               ))
             ) : (
-              <option value="all">Không có phòng nào</option>
+              <option value="">Không có phòng nào</option>
             )}
           </select>
         </div>
         <div className={cx("search-row")}>
           <label>Loại yêu cầu</label>
-          <select className={cx("search-input")}>
-            <option value="all">Tất cả</option>
-            <option value="room1">Đặt phòng</option>
-            <option value="room2">Cập nhật</option>
+          <select
+            className={cx("search-input")}
+            name="typeRequestForm"
+            value={typeRequestForm}
+            onChange={(e) => {
+              setTypeRequestForm(e.target.value);
+              setDataSearch({
+                ...dataSearch,
+                typeRequestForm: e.target.value,
+              });
+            }}
+          >
+            <option value="">Tất cả</option>
+            <option value="RESERVATION_ONETIME">Đặt lịch một lần</option>
+            <option value="RESERVATION_RECURRING">Đặt lịch định kỳ</option>
+            <option value="UPDATE_RESERVATION">Cập nhật</option>
           </select>
+        </div>
+        <div className={cx("search-row")}>
+          <button onClick={() => {
+            setSearchQuery("");
+            setStartDate("");
+            setSelectedRoom("");
+            setTypeRequestForm("");
+            setDataSearch({
+              dayStart: "",
+              roomId: "",
+              typeRequestForm: "",
+            });
+          }}>
+            <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
+          </button>
         </div>
       </div>
 
       {loadingApprovedList ? (
         <LoadingSpinner />
-      ) : Array.isArray(filteredRequestList) &&
-        filteredRequestList.length === 0 ? (
+      ) : Array.isArray(approvalFormList) && approvalFormList.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch đã phê duyệt
         </p>
@@ -130,8 +227,8 @@ function ApprovedList() {
               </tr>
             </thead>
             <tbody>
-              {filteredRequestList &&
-                [...filteredRequestList]
+              {Array.isArray(approvalFormList) &&
+                [...approvalFormList]
                   .sort(
                     (a, b) =>
                       new Date(b.timeResponse).getTime() -

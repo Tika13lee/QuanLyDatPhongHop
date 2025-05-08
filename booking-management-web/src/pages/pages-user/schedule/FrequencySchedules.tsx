@@ -142,33 +142,22 @@ function FrequencySchedules() {
   return (
     <div className={cx("frequency-schedules")}>
       <div className={cx("filter-bar")}>
-        <div className={cx("filter-month")}>
-          {/* tháng */}
-          <label>Chọn tháng:</label>
-          <select>
-            <option value={0}>Tất cả</option>
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                Tháng {i + 1}
-              </option>
-            ))}
-          </select>
+        <div className={cx("search-group")}>
+          <label>Tìm kiếm</label>
+          <input
+            type="text"
+            placeholder="Nhập tiêu đề cuộc họp, tên phòng"
+            className={cx("search-input")}
+            // value={searchQuery}
+            // onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
+          />
         </div>
         {/* ngày */}
         <div className={cx("filter-date")}>
-          <label>Chọn ngày:</label>
+          <label>Thời gian:</label>
           <input type="date" />
         </div>
-        {/* tên phòng */}
-        <div className={cx("filter-room")}>
-          <label>Chọn phòng:</label>
-          <select>
-            <option value="all">Tất cả</option>
-            <option value="1">Phòng 1</option>
-            <option value="2">Phòng 2</option>
-            <option value="3">Phòng 3</option>
-          </select>
-        </div>
+
         <div className={cx("refresh-btn")}>
           <IconWrapper icon={FiRefreshCw} color="#000" size={24} />
         </div>
@@ -263,7 +252,15 @@ function FrequencySchedules() {
               <button
                 className={cx("btn-cancel")}
                 onClick={handleCancelSchedule}
-                disabled={selectedSchedule?.statusRequestForm === "PENDING"}
+                disabled={
+                  selectedSchedule?.statusRequestForm === "PENDING" ||
+                  new Date(
+                    selectedSchedule?.requestReservation?.timeFinishFrequency[
+                      selectedSchedule?.requestReservation?.timeFinishFrequency
+                        .length - 1
+                    ] + ""
+                  ) < new Date()
+                }
               >
                 <IconWrapper icon={FaEdit} size={16} color="white" />
                 Hủy lịch
@@ -294,7 +291,7 @@ function FrequencySchedules() {
                 </p>
 
                 <p>
-                  <strong>Ngày bắt đầu:</strong>{" "}
+                  <strong>Ngày:</strong>{" "}
                   {selectedSchedule?.reservations[0].timeStart &&
                     selectedSchedule?.reservations[
                       selectedSchedule?.reservations.length - 1
@@ -339,7 +336,7 @@ function FrequencySchedules() {
                 )}
 
                 <p>
-                  <strong>Tần suất:</strong>{" "}
+                  <strong>Định kỳ:</strong>{" "}
                   {selectedSchedule?.reservations[0].frequency === "ONE_TIME"
                     ? "Một lần"
                     : selectedSchedule?.reservations[0].frequency === "DAILY"

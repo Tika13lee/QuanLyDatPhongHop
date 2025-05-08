@@ -6,7 +6,6 @@ export type PriceTableProps = {
   priceName: string;
   active: boolean;
   priceRoom: {
-    
     roomId: number;
     roomName: string;
     value: number;
@@ -34,17 +33,17 @@ export type Reservation = {
   serviceIds: number[];
 };
 
+// branch
+export type BranchProps = {
+  branchId: number;
+  branchName: string;
+};
+
 // building
 export type BuildingProps = {
   buildingId: number;
   buildingName: string;
   branch: BranchProps;
-};
-
-// branch
-export type BranchProps = {
-  branchId: number;
-  branchName: string;
 };
 
 // location
@@ -68,6 +67,7 @@ export type DepartmentProps = {
   location: LocationProps;
 };
 
+// xem lịch của mỗi phòng
 export type RoomViewProps = {
   roomId: number;
   roomName: string;
@@ -82,11 +82,7 @@ export type EmployeeProps = {
   phone: string;
   avatar: string;
   actived: boolean;
-  department: {
-    departmentId: number;
-    depName: string;
-    location: LocationProps;
-  };
+  department: DepartmentProps;
   account: {
     role: string;
     firstLogin?: boolean;
@@ -280,26 +276,3 @@ export type ReservationDetailProps = {
 
   [key: string]: any;
 };
-
-export const devices: DeviceProps[] = [
-  {
-    deviceId: 1,
-    deviceName: "Máy chiếu",
-    description: "Máy chiếu hình ảnh",
-  },
-  {
-    deviceId: 2,
-    deviceName: "Tivi",
-    description: "Tivi 4K",
-  },
-  {
-    deviceId: 3,
-    deviceName: "Bảng trắng",
-    description: "Bảng trắng kích thước lớn",
-  },
-  {
-    deviceId: 4,
-    deviceName: "Hệ thống âm thanh",
-    description: "Hệ thống âm thanh chất lượng cao",
-  },
-];
