@@ -12,6 +12,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import lombok.RequiredArgsConstructor;
 import vn.com.kltn_project_v1.services.IOpenAi;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 @Service
@@ -21,8 +25,10 @@ public class OpenAiService implements IOpenAi {
     private String OPENAI_API_KEY;
 
     private final WebClient webClient;
-
     public String extractIntentAndEntities(String message)  {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd 'tháng' MM 'năm' yyyy 'lúc' HH:mm 'giờ' 'GMT'X");
+        String toDay = now.format(formatter);
         String prompt = """
                     Bạn là trợ lý AI giúp đặt phòng họp nội bộ. 
                     Người dùng nhắn: "%s"
@@ -44,12 +50,12 @@ public class OpenAiService implements IOpenAi {
                     ví dụ :
                     người dùng hỏi "xem lịch họp ngày hôm nay"
                     bạn phải xem thử ngày hôm nay là ngày nào rồi trả về json như sau: (bạn phải phân tichs xem hom nay là ngày nào)
-                    Khi người dùng đề cập đến các cụm từ chỉ thời gian tương đối như "hôm nay", "ngày mai", "thứ [ngày trong tuần] [tuần trước/tuần này/tuần tới]", bạn cần suy luận ra ngày tháng cụ thể tương ứng với thời điểm hiện tại (hiện tại là Thứ Sáu, ngày 09 tháng 05 năm 2025, giờ Việt Nam). Chuẩn hóa ngày tháng theo định dạng ISO 8601: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'` nếu có thể xác định thời điểm cụ thể, hoặc `yyyy-MM-dd` nếu chỉ là ngày.
+                    Khi người dùng đề cập đến các cụm từ chỉ thời gian tương đối như "hôm nay", "ngày mai", "thứ [ngày trong tuần] [tuần trước/tuần này/tuần tới]", bạn cần suy luận ra ngày tháng cụ thể tương ứng với thời điểm hiện tại (hiện tại là %s giờ Việt Nam). Chuẩn hóa ngày tháng theo định dạng ISO 8601: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'` .
                                 
                     {
                         "intent": "check_schedule",
                         "entities": {
-                            "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", format date ở đây là của ngày hôm nay 
+                            "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", format bắt buộc
                     }
                     {
                         "intent": "cancel_reservation",
@@ -99,7 +105,7 @@ public class OpenAiService implements IOpenAi {
                     Nếu không có entity nào thì trả về null
                     Nếu không có intent nào thì trả về null
                     neeus null thi hoi lai người dùng
-                """.formatted(message);
+                """.formatted(message,toDay);
 
         // Gọi API OpenAI
         Map<String, Object> body = Map.of(
