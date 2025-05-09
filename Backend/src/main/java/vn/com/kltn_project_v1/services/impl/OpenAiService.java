@@ -24,83 +24,82 @@ public class OpenAiService implements IOpenAi {
 
     public String extractIntentAndEntities(String message)  {
         String prompt = """
-        Bạn là trợ lý AI giúp đặt phòng họp nội bộ. 
-        Người dùng nhắn: "%s"
-        Bạn cần phân tích câu nhắn của người dùng và xác định ý định (intent) và các thực thể (entities) trong câu nhắn đó.
-        Các ý định (intent) có thể là:
-        Trả về JSON gồm: intent (ví dụ: "book_reservation", "check_schedule","cancel_reservation","update_reservation",info_reservation","software_function" và "other")
-        và các entity như "date", "reservation", "room","requestForm"  nếu có.
-        ví dụ Json trả về, bạn lấy thông tin phân tích ở trên để thêm vào những thuộc tinhs trong entity chứ không phải lấy dưới ví dụ
-        {
-            "intent": "book_reservation",
-            "entities": {
-                "time": "2025-03-22T08:00:00.000Z",
-                "room": "room1",
-                "location": "chi nhanh A, tòa nhà A,tầng 1",
-                "capacity": "10",
-                "typeRoom":"default",
-        }
-        {
-            "intent": "check_schedule",
-            "entities": {
-             "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-        }
-        {
-            "intent": "cancel_reservation",
-            "entities": {
-               "reservation_title": "Họp nội bộ",
-               "time": "2025-03-22T08:00:00.000Z",
-                "room": "room1",
-        }
-        {
-            "intent": "update_reservation",
-            "entities": {
-                "reservation_title": "Họp nội bộ",
-                "time": "2025-03-22T08:00:00.000Z",
-                "room": "room1",
-                "new_time": "2025-03-22T09:00:00.000Z",
-                "new_service": "Dịch vụ A",
-                "attendee": "Nguyễn Văn A, Nguyễn Văn B",
-        }
-        {
-            "intent": "info_reservation",
-            "entities": {
-                "reservation_title": "Họp nội bộ",
-                "time": "2025-03-22T08:00:00.000Z",
-                "room": "room1",
-        }
-        {
-            "intent": "software_function",
-            "entities": {
-                "function_name": "",
-        }
-        {
-            "intent": "other",
-            "entities": {
-                ""
-        }
-        ví dụ :
-        người dùng hỏi "xem lịch họp ngày hôm nay"
-        bạn phải xem thử ngày hôm nay là ngày nào rồi trả về json như sau:
-        {
-            "intent": "check_schedule",
-            "entities": {
-                "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", format date ở đây là của ngày hôm nay 
-        }
-        là dựa theo mẫu trên để trả về JSON chứ không phải là lấy mẫu trên rồi trả về JSON.
-        Các intent có thể là:
-        "book_reservation" là đặt phòng
-        "check_schedule" là kiểm tra lịch
-        "cancel_reservation" là hủy đặt phòng
-        "update_reservation" là cập nhật đặt phòng
-        "info_reservation" là thông tin đặt phòng
-        rồi các thông tin người dùng cung cấp thế vào mẫu để trả vào json để tôi gọi api
-        software_function là các phần của phan mem nay vi du nhu: update_reservation chỉ có thể cập nhập thành viên, diịch vụ, tiêu đề, tài liệu thôi, hoặc laf thời gian đặt sẽ cách nhau 10p.
-        "other" là các câu hỏi không liên quan đến phần mềm này.
-        Nếu không có entity nào thì trả về null
-        Nếu không có intent nào thì trả về null
-        neeus null thi hoi lai người dùng
-    """.formatted(message);
+                    Bạn là trợ lý AI giúp đặt phòng họp nội bộ. 
+                    Người dùng nhắn: "%s"
+                    Bạn cần phân tích câu nhắn của người dùng và xác định ý định (intent) và các thực thể (entities) trong câu nhắn đó.
+                    Các ý định (intent) có thể là:
+                    Trả về JSON gồm: intent (ví dụ: "book_reservation", "check_schedule","cancel_reservation","update_reservation",info_reservation","software_function" và "other")
+                    và các entity như "date", "reservation", "room","requestForm"  nếu có.
+                    ví dụ Json trả về, bạn lấy thông tin phân tích ở trên để thêm vào những thuộc tinhs trong entity chứ không phải lấy dưới ví dụ
+                    {
+                        "intent": "book_reservation",
+                        "entities": {
+                            "time": "2025-03-22T08:00:00.000Z",
+                            "room": "room1",
+                            "location": "chi nhanh A, tòa nhà A,tầng 1",
+                            "capacity": "10",
+                            "typeRoom":"default",
+                    }
+                    
+                    ví dụ :
+                    người dùng hỏi "xem lịch họp ngày hôm nay"
+                    bạn phải xem thử ngày hôm nay là ngày nào rồi trả về json như sau: (bạn phải phân tichs xem hom nay là ngày nào)
+                    Khi người dùng đề cập đến các cụm từ chỉ thời gian tương đối như "hôm nay", "ngày mai", "thứ [ngày trong tuần] [tuần trước/tuần này/tuần tới]", bạn cần suy luận ra ngày tháng cụ thể tương ứng với thời điểm hiện tại (hiện tại là Thứ Sáu, ngày 09 tháng 05 năm 2025, giờ Việt Nam). Chuẩn hóa ngày tháng theo định dạng ISO 8601: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'` nếu có thể xác định thời điểm cụ thể, hoặc `yyyy-MM-dd` nếu chỉ là ngày.
+                                
+                    {
+                        "intent": "check_schedule",
+                        "entities": {
+                            "time": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", format date ở đây là của ngày hôm nay 
+                    }
+                    {
+                        "intent": "cancel_reservation",
+                        "entities": {
+                           "reservation_title": "Họp nội bộ",
+                           "time": "2025-03-22T08:00:00.000Z",
+                            "room": "room1",
+                    }
+                    {
+                        "intent": "update_reservation",
+                        "entities": {
+                            "reservation_title": "Họp nội bộ",
+                            "time": "2025-03-22T08:00:00.000Z",
+                            "room": "room1",
+                            "new_time": "2025-03-22T09:00:00.000Z",
+                            "new_service": "Dịch vụ A",
+                            "attendee": "Nguyễn Văn A, Nguyễn Văn B",
+                    }
+                    {
+                        "intent": "info_reservation",
+                        "entities": {
+                            "reservation_title": "Họp nội bộ",
+                            "time": "2025-03-22T08:00:00.000Z",
+                            "room": "room1",
+                    }
+                    {
+                        "intent": "software_function",
+                        "entities": {
+                            "function_name": "",
+                    }
+                    {
+                        "intent": "other",
+                        "entities": {
+                            ""
+                    }
+                    
+                    là dựa theo mẫu trên để trả về JSON chứ không phải là lấy mẫu trên rồi trả về JSON.
+                    Các intent có thể là:
+                    "book_reservation" là đặt phòng
+                    "check_schedule" là kiểm tra lịch
+                    "cancel_reservation" là hủy đặt phòng
+                    "update_reservation" là cập nhật đặt phòng
+                    "info_reservation" là thông tin đặt phòng
+                    rồi các thông tin người dùng cung cấp thế vào mẫu để trả vào json để tôi gọi api
+                    software_function là các phần của phan mem nay vi du nhu: update_reservation chỉ có thể cập nhập thành viên, diịch vụ, tiêu đề, tài liệu thôi, hoặc laf thời gian đặt sẽ cách nhau 10p.
+                    "other" là các câu hỏi không liên quan đến phần mềm này.
+                    Nếu không có entity nào thì trả về null
+                    Nếu không có intent nào thì trả về null
+                    neeus null thi hoi lai người dùng
+                """.formatted(message);
 
         // Gọi API OpenAI
         Map<String, Object> body = Map.of(
