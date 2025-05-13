@@ -21,6 +21,7 @@ import PopupNotification from "../../../components/popup/PopupNotification";
 import { fetchEmployees } from "../../../features/employeeSlice";
 import { uploadImageToCloudinary } from "../../../utilities";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
+import { set } from "react-datepicker/dist/date_utils";
 
 const cx = classNames.bind(styles);
 
@@ -48,7 +49,7 @@ const Employee = () => {
     phone: "",
     departmentId: "",
     avatar: "",
-    role: "true",
+    role: "",
   });
 
   // popup thông báo
@@ -248,6 +249,7 @@ const Employee = () => {
     setBranchName(
       emp.department?.location?.building?.branch?.branchName || "N/A"
     );
+  
     setSelectedEmployee(emp);
     setFormData({
       employeeName: emp.employeeName,
@@ -556,7 +558,7 @@ const Employee = () => {
               />
             </div>
 
-            {/* vai trò: chờ lấy role từ be */}
+            {/* vai trò */}
             <div className={cx("form-group")}>
               <label>Chọn vai trò</label>
               <select
@@ -564,8 +566,11 @@ const Employee = () => {
                 value={formData.role}
                 onChange={handleInputChange}
               >
-                <option value="true">Admin</option>
-                <option value="false">User</option>
+                <option value="ADMIN">Admin</option>
+                <option value="USER">User</option>
+                {selectedEmployee && (
+                  <option value="APPROVER">Người phê duyệt</option>
+                )}
               </select>
             </div>
 

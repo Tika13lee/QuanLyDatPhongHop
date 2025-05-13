@@ -24,7 +24,6 @@ type DataSearch = {
 
 function ApprovedList() {
   const user = useSelector((state: RootState) => state.user);
-  console.log("user", user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequestForm, setSelectedRequestForm] =
@@ -42,7 +41,7 @@ function ApprovedList() {
     loading: loadingApprovedList,
     error: errorApprovedList,
   } = useFetch<RequestFormProps[]>(
-    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED`
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByStatus?statusRequestForm=APPROVED`
   );
 
   useEffect(() => {

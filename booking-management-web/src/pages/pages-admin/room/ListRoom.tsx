@@ -23,6 +23,21 @@ function ListRoom() {
     null
   );
   const [isSearching, setIsSearching] = useState(false);
+  const [roomPrices, setRoomPrices] = useState<{ [roomId: number]: number }>(
+    {}
+  );
+
+  const fetchRoomPrice = async (roomId: number) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/room/getPriceRoom?roomId=${roomId}`
+      );
+      return res.data;
+    } catch (error) {
+      console.error(`Lỗi khi lấy giá phòng ${roomId}:`, error);
+      return 0;
+    }
+  };
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -69,6 +84,16 @@ function ListRoom() {
         }&size=${pageSize}`
       );
       setRooms(response.data.roomDTOS);
+
+      const prices: { [roomId: number]: number } = {};
+      await Promise.all(
+        response.data.roomDTOS.map(async (room: RoomProps2) => {
+          const price = await fetchRoomPrice(room.roomId);
+          prices[room.roomId] = price;
+        })
+      );
+      setRoomPrices(prices);
+
       setTotalPage(response.data.totalPage);
       setPage(pageNumber);
     } catch (error) {
@@ -114,6 +139,16 @@ function ListRoom() {
 
       const response = await axios.get(searchUrl);
       setRooms(response.data.roomDTOS);
+
+      const prices: { [roomId: number]: number } = {};
+      await Promise.all(
+        response.data.roomDTOS.map(async (room: RoomProps2) => {
+          const price = await fetchRoomPrice(room.roomId);
+          prices[room.roomId] = price;
+        })
+      );
+      setRoomPrices(prices);
+
       setTotalPage(response.data.totalPage);
       setPage(1);
     } catch (error) {
@@ -284,7 +319,12 @@ function ListRoom() {
                       : "Không có thông tin vị trí"}
                   </td>
                   <td>{room.capacity}</td>
-                  <td>{formatCurrencyVND(Number(room.price))}</td>
+                  {/* <td>{formatCurrencyVND(Number(room.price))}</td> */}
+                  <td>
+                    {roomPrices[room.roomId] !== undefined
+                      ? formatCurrencyVND(roomPrices[room.roomId])
+                      : "Đang tải..."}
+                  </td>
                   <td>
                     {room.approver
                       ? room.approver.name

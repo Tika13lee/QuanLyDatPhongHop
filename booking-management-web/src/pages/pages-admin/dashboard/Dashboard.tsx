@@ -61,42 +61,42 @@ const Dashboard = () => {
   });
 
   const today = new Date().toISOString();
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [totalRes, completedRes, canceledRes] = await Promise.all([
-          axios.get(
-            "http://localhost:8080/api/v1/statistical/countReservationByDate",
-            { params: { date: today } }
-          ),
-          axios.get(
-            "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatusCheckin",
-            {
-              params: { date: today },
-            }
-          ),
-          axios.get(
-            "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatus",
-            {
-              params: { date: today },
-            }
-          ),
-          // axios.get("/totalCostByDate", { params: { date: today } }),
-        ]);
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const [totalRes, completedRes, canceledRes] = await Promise.all([
+  //         axios.get(
+  //           "http://localhost:8080/api/v1/statistical/countReservationByDate",
+  //           { params: { date: today } }
+  //         ),
+  //         axios.get(
+  //           "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatusCheckin",
+  //           {
+  //             params: { date: today },
+  //           }
+  //         ),
+  //         axios.get(
+  //           "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatus",
+  //           {
+  //             params: { date: today },
+  //           }
+  //         ),
+  //         // axios.get("/totalCostByDate", { params: { date: today } }),
+  //       ]);
 
-        setStats({
-          total: totalRes.data,
-          completed: completedRes.data,
-          canceled: canceledRes.data,
-          totalCost: 0,
-        });
-      } catch (err) {
-        console.error("Lỗi khi tải dữ liệu thống kê", err);
-      }
-    };
+  //       setStats({
+  //         total: totalRes.data,
+  //         completed: completedRes.data,
+  //         canceled: canceledRes.data,
+  //         totalCost: 0,
+  //       });
+  //     } catch (err) {
+  //       console.error("Lỗi khi tải dữ liệu thống kê", err);
+  //     }
+  //   };
 
-    fetchStats();
-  }, [today]);
+  //   fetchStats();
+  // }, [today]);
 
   return (
     <div className={cx("dashboard")}>

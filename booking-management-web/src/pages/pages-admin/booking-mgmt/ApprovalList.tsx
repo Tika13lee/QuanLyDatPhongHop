@@ -74,29 +74,28 @@ function ApprovalList() {
     typeRequestForm: typeRequestForm,
   });
 
-  // useEffect(() => {
-  //   setDataSearch({
-  //     dayStart: startDate ? new Date(startDate).toISOString() : "",
-  //     typeRequestForm: typeRequestForm,
-  //   });
-  //   console.log("dataSearch", dataSearch);
+  useEffect(() => {
+    setDataSearch({
+      dayStart: startDate ? new Date(startDate).toISOString() : "",
+      typeRequestForm: typeRequestForm,
+    });
 
-  //   // Gọi API với dữ liệu tìm kiếm
-  //   fetch(
-  //     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING&dayStart=${dataSearch.dayStart}&typeRequestForm=${dataSearch.typeRequestForm}`
-  //   )
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setSchedulesApprove(data);
-  //       setDataSearch({
-  //         dayStart: startDate ? new Date(startDate).toISOString() : "",
-  //         typeRequestForm: typeRequestForm,
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //     });
-  // }, [startDate, typeRequestForm]);
+    // Gọi API với dữ liệu tìm kiếm
+    fetch(
+      `http://localhost:8080/api/v1/requestForm/getRequestFormByStatus?statusRequestForm=PENDING&dayRequest=${dataSearch.dayStart}&typeRequestForm=${dataSearch.typeRequestForm}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setSchedulesApprove(data);
+        setDataSearch({
+          dayStart: startDate ? new Date(startDate).toISOString() : "",
+          typeRequestForm: typeRequestForm,
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, [startDate, typeRequestForm]);
 
   // Xử lý chọn/bỏ chọn item
   const handleCheckboxChange = (id: number) => {
@@ -204,17 +203,6 @@ function ApprovalList() {
     setSelectedRequestForm(null);
   };
 
-  // // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
-  // const filteredRequestList = schedulesApprove?.filter((form) => {
-  //   const titleMatch = form.requestReservation.title
-  //     .toLowerCase()
-  //     .includes(searchQuery);
-  //   const nameBookerMatch = form.reservations[0].booker.employeeName
-  //     .toLowerCase()
-  //     .includes(searchQuery);
-  //   return titleMatch || nameBookerMatch;
-  // });
-
   return (
     <div className={cx("approve-list")}>
       <div className={cx("approve-search")}>
@@ -271,6 +259,10 @@ function ApprovalList() {
                 setSearchQuery("");
                 setStartDate("");
                 setTypeRequestForm("");
+                setDataSearch({
+                  dayStart: "",
+                  typeRequestForm: "",
+                });
               }}
             >
               <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />

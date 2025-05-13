@@ -25,6 +25,7 @@ function ApprovalAuthority() {
     useState<EmployeeProps | null>(null);
 
   const [selectedBranch, setSelectedBranch] = useState<string>("");
+  const [searchRoomName, setSearchRoomName] = useState("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -141,12 +142,35 @@ function ApprovalAuthority() {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
+  const filteredRooms = roomsNotApproved.filter((room) => {
+    let matchBranch = true;
+
+    if (selectedBranch) {
+      const loc = room.location;
+
+      if ("building" in loc && typeof loc.building === "object") {
+        matchBranch = loc.building.branch.branchName === selectedBranch;
+      } else {
+        matchBranch = false; // nếu không có building hợp lệ, không thể so sánh
+      }
+    }
+    const matchName = searchRoomName.trim()
+      ? room.roomName.toLowerCase().includes(searchRoomName.toLowerCase())
+      : true;
+    return matchBranch && matchName;
+  });
+
   return (
     <div className={cx("approval-authority")}>
       <div className={cx("header")}>
         <div className={cx("search")}>
           <span>Tên phòng</span>
-          <input type="text" placeholder="Nhập tên phòng..." />
+          <input
+            type="text"
+            placeholder="Nhập tên phòng..."
+            value={searchRoomName}
+            onChange={(e) => setSearchRoomName(e.target.value)}
+          />
         </div>
         <div className={cx("search")}>
           <span>Chi nhánh</span>
@@ -173,7 +197,10 @@ function ApprovalAuthority() {
           </select>
         </div>
         <div>
-          <button>
+          <button onClick={() => {
+            setSelectedBranch("");
+            setSearchRoomName("");
+          }}>
             <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
           </button>
         </div>
@@ -192,12 +219,12 @@ function ApprovalAuthority() {
             </tr>
           </thead>
           <tbody>
-            {roomsNotApproved.length === 0 ? (
+            {filteredRooms.length === 0 ? (
               <tr>
                 <td colSpan={5}>Tất cả các phòng đã có người phê duyệt.</td>
               </tr>
             ) : (
-              roomsNotApproved.map((room, index) => (
+              filteredRooms.map((room, index) => (
                 <tr key={room.roomId}>
                   <td>{index + 1}</td>
                   <td>{room.roomName}</td>

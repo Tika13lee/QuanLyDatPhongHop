@@ -8,6 +8,7 @@ import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { FaPlus, FiRefreshCw, MdSearch } from "../../../components/icons/icons";
 import { formatCurrencyVND } from "../../../utilities";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +16,9 @@ function Service() {
   const [openForm, setOpenForm] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceProps | null>();
   const [searchValue, setSearchValue] = useState("");
+  const [servicePrices, setServicePrices] = useState<{
+    [serviceId: number]: number;
+  }>({});
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -46,12 +50,40 @@ function Service() {
     price: "",
   });
 
+  const fetchServicePrice = async (serviceId: number) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/service/getPriceService?id=${serviceId}`
+      );
+      return res.data;
+    } catch (error) {
+      console.error(`Lỗi khi lấy giá dịch vụ ${serviceId}:`, error);
+      return 0;
+    }
+  };
+
   // render lại danh sách dịch vụ khi có thay đổi
   useEffect(() => {
     if (services) {
       setServiceList(services);
     }
   }, [services]);
+
+  // Lấy giá dịch vụ khi có sự thay đổi trong danh sách dịch vụ
+  useEffect(() => {
+    const fetchPrices = async () => {
+      const prices: { [serviceId: number]: number } = {};
+      for (const service of serviceList) {
+        const price = await fetchServicePrice(service.serviceId);
+        prices[service.serviceId] = price;
+      }
+      setServicePrices(prices);
+    };
+
+    if (serviceList.length > 0) {
+      fetchPrices();
+    }
+  }, [serviceList]);
 
   // Hàm xử lý khi thay đổi input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -342,8 +374,8 @@ function Service() {
                   <td>{service.serviceName}</td>
                   <td>{service.description}</td>
                   <td>
-                    {service.priceService
-                      ? formatCurrencyVND(service.priceService?.value)
+                    {servicePrices[service.serviceId]
+                      ? formatCurrencyVND(servicePrices[service.serviceId])
                       : "Chưa có"}
                   </td>
                 </tr>
