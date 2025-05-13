@@ -121,6 +121,15 @@ const MainLayoutAdmin = () => {
                 >
                   DS yêu cầu
                 </NavLink>
+
+                <NavLink
+                  to="/admin/approved-list"
+                  className={({ isActive }) =>
+                    cx("dropdown-item", { active: isActive })
+                  }
+                >
+                  DS đã phê duyệt
+                </NavLink>
               </div>
             )}
           </div>

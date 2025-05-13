@@ -5,12 +5,18 @@ import { RequestFormProps, RoomProps } from "../../../data/data";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
 import IconWrapper from "../../../components/icons/IconWrapper";
-import { MdOutlineInfo } from "../../../components/icons/icons";
+import { FiRefreshCw, MdOutlineInfo } from "../../../components/icons/icons";
 import DetailModal from "../../../components/Modal/DetailRequestModal";
 import { formatDateString, getHourMinute } from "../../../utilities";
 import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
+import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
+
+type DataSearch = {
+  dayStart: string;
+  typeRequestForm: string;
+};
 
 function ApprovalList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +26,8 @@ function ApprovalList() {
   const [reasonReject, setReasonReject] = useState<string>("");
   const [openModalReject, setOpenModalReject] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [typeRequestForm, setTypeRequestForm] = useState<string>("");
 
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -42,8 +50,53 @@ function ApprovalList() {
   );
 
   useEffect(() => {
-    setSchedulesApprove(requestForm ?? []);
-  }, [requestForm]);
+    if (requestForm) {
+      // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+      const filteredRequestList = requestForm?.filter((form) => {
+        const titleMatch = form.requestReservation.title
+          .toLowerCase()
+          .includes(searchQuery);
+        const nameBookerMatch = form.reservations[0].booker.employeeName
+          .toLowerCase()
+          .includes(searchQuery);
+        const roomNameMatch = form.reservations[0].room.roomName
+          .toLowerCase()
+          .includes(searchQuery);
+        return titleMatch || nameBookerMatch || roomNameMatch;
+      });
+      setSchedulesApprove(filteredRequestList ?? []);
+    }
+  }, [requestForm, searchQuery]);
+
+  // dữ liệu tìm kiếm
+  const [dataSearch, setDataSearch] = useState<DataSearch>({
+    dayStart: "",
+    typeRequestForm: typeRequestForm,
+  });
+
+  // useEffect(() => {
+  //   setDataSearch({
+  //     dayStart: startDate ? new Date(startDate).toISOString() : "",
+  //     typeRequestForm: typeRequestForm,
+  //   });
+  //   console.log("dataSearch", dataSearch);
+
+  //   // Gọi API với dữ liệu tìm kiếm
+  //   fetch(
+  //     `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=PENDING&dayStart=${dataSearch.dayStart}&typeRequestForm=${dataSearch.typeRequestForm}`
+  //   )
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setSchedulesApprove(data);
+  //       setDataSearch({
+  //         dayStart: startDate ? new Date(startDate).toISOString() : "",
+  //         typeRequestForm: typeRequestForm,
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //     });
+  // }, [startDate, typeRequestForm]);
 
   // Xử lý chọn/bỏ chọn item
   const handleCheckboxChange = (id: number) => {
@@ -71,7 +124,7 @@ function ApprovalList() {
     const resp = await approvalForm(selectedItems, { method: "POST" });
 
     if (resp) {
-      setPopupMessage("Lịch đã được phê duyệt thành công!");
+      setPopupMessage("Yêu cầu đã được phê duyệt thành công!");
       setPopupType("success");
       setIsPopupOpen(true);
 
@@ -151,16 +204,17 @@ function ApprovalList() {
     setSelectedRequestForm(null);
   };
 
-  // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
-  const filteredRequestList = schedulesApprove?.filter((form) => {
-    const titleMatch = form.requestReservation.title
-      .toLowerCase()
-      .includes(searchQuery);
-    const nameBookerMatch = form.reservations[0].booker.employeeName
-      .toLowerCase()
-      .includes(searchQuery);
-    return titleMatch || nameBookerMatch;
-  });
+  // // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+  // const filteredRequestList = schedulesApprove?.filter((form) => {
+  //   const titleMatch = form.requestReservation.title
+  //     .toLowerCase()
+  //     .includes(searchQuery);
+  //   const nameBookerMatch = form.reservations[0].booker.employeeName
+  //     .toLowerCase()
+  //     .includes(searchQuery);
+  //   return titleMatch || nameBookerMatch;
+  // });
+
   return (
     <div className={cx("approve-list")}>
       <div className={cx("approve-search")}>
@@ -169,23 +223,60 @@ function ApprovalList() {
             <label>Tìm kiếm</label>
             <input
               type="text"
-              placeholder="Tiêu đề cuộc họp, tên người đặt"
+              placeholder="Tiêu đề cuộc họp, tên người đặt, tên phòng"
               className={cx("search-input")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
             />
           </div>
           <div className={cx("search-group")}>
-            <label>Thời gian </label>
-            <input type="date" className={cx("search-input")} />
+            <label>Ngày bắt đầu </label>
+            <input
+              type="date"
+              className={cx("search-input")}
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setDataSearch({
+                  ...dataSearch,
+                  dayStart: new Date(e.target.value).toISOString(),
+                });
+              }}
+              min={new Date().toISOString().split("T")[0]}
+            />
           </div>
           <div className={cx("search-group")}>
-            <label>Chọn phòng</label>
-            <select className={cx("search-input")}>
-              <option value="all">Tất cả</option>
+            <label>Loại yêu cầu</label>
+            <select
+              className={cx("search-input")}
+              name="typeRequestForm"
+              value={typeRequestForm}
+              onChange={(e) => {
+                setTypeRequestForm(e.target.value);
+                setDataSearch({
+                  ...dataSearch,
+                  typeRequestForm: e.target.value,
+                });
+              }}
+            >
+              <option value="">Tất cả</option>
+              <option value="RESERVATION_ONETIME">Đặt lịch một lần</option>
+              <option value="RESERVATION_RECURRING">Đặt lịch định kỳ</option>
+              <option value="UPDATE_RESERVATION">Cập nhật</option>
             </select>
           </div>
-          <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button>
+          <div style={{ marginTop: "24px" }}>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setStartDate("");
+                setTypeRequestForm("");
+              }}
+            >
+              <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
+            </button>
+          </div>
+          {/* <button className={cx("btn-action", "search-btn")}>Tìm kiếm</button> */}
         </div>
 
         <div className={cx("device")}></div>
@@ -239,8 +330,7 @@ function ApprovalList() {
 
       {loadingReservation ? (
         <LoadingSpinner />
-      ) : Array.isArray(filteredRequestList) &&
-        filteredRequestList.length === 0 ? (
+      ) : Array.isArray(schedulesApprove) && schedulesApprove.length === 0 ? (
         <p className={cx("no-schedule-message")}>
           Bạn không có lịch cần phê duyệt
         </p>
@@ -260,7 +350,7 @@ function ApprovalList() {
               </tr>
             </thead>
             <tbody>
-              {filteredRequestList?.map((schedule) => {
+              {schedulesApprove?.map((schedule) => {
                 return (
                   <tr key={schedule.requestFormId}>
                     <td className={cx("checkbox")}>
@@ -309,6 +399,13 @@ function ApprovalList() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         requestForm={selectedRequestForm}
+      />
+      {/* Hiển thị thông báo popup */}
+      <PopupNotification
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

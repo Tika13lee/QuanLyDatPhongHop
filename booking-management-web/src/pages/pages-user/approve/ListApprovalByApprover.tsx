@@ -25,7 +25,6 @@ function ListApprovalByApprover() {
   const user = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedRequestForm, setSelectedRequestForm] =
     useState<RequestFormProps | null>(null);

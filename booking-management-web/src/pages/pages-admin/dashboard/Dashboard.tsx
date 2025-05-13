@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import useFetch from "../../../hooks/useFetch";
 import { formatCurrencyVND } from "../../../utilities";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -51,6 +53,51 @@ const Dashboard = () => {
     // `http://localhost:8080/api/v1/statistical/statisticalChart24h?startDate=2025-04-01T17:00:00.000Z&endDate=2025-04-30T17:00:00.000Z`
   );
 
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    canceled: 0,
+    totalCost: 0,
+  });
+
+  const today = new Date().toISOString();
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [totalRes, completedRes, canceledRes] = await Promise.all([
+          axios.get(
+            "http://localhost:8080/api/v1/statistical/countReservationByDate",
+            { params: { date: today } }
+          ),
+          axios.get(
+            "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatusCheckin",
+            {
+              params: { date: today },
+            }
+          ),
+          axios.get(
+            "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatus",
+            {
+              params: { date: today },
+            }
+          ),
+          // axios.get("/totalCostByDate", { params: { date: today } }),
+        ]);
+
+        setStats({
+          total: totalRes.data,
+          completed: completedRes.data,
+          canceled: canceledRes.data,
+          totalCost: 0,
+        });
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu thống kê", err);
+      }
+    };
+
+    fetchStats();
+  }, [today]);
+
   return (
     <div className={cx("dashboard")}>
       <div className={cx("header")}>
@@ -64,7 +111,7 @@ const Dashboard = () => {
                     <span className={cx("symbol")}>📅</span>Tổng số lịch đã đặt
                   </h3>
                   <p>
-                    30 <small>cuộc họp</small>
+                    {stats.total} <small>cuộc họp</small>
                   </p>
                 </div>
               </div>
@@ -73,7 +120,7 @@ const Dashboard = () => {
                   <span className={cx("symbol")}>✅</span>Số lịch hoàn thành
                 </h3>
                 <p>
-                  30 <small>cuộc họp</small>
+                {stats.completed} <small>cuộc họp</small>
                 </p>
               </div>
             </div>
@@ -83,7 +130,7 @@ const Dashboard = () => {
                   <span className={cx("symbol")}>❌</span>Số lịch đã hủy
                 </h3>
                 <p>
-                  30 <small>cuộc họp</small>
+                {stats.canceled} <small>cuộc họp</small>
                 </p>
               </div>
               <div className={cx("summaryCard")}>
@@ -91,7 +138,7 @@ const Dashboard = () => {
                   <span className={cx("symbol")}>💲</span>Tổng chi phí
                 </h3>
                 <p>
-                  500000 <small>VND</small>
+                  {formatCurrencyVND(500000)} <small>VND</small>
                 </p>
               </div>
             </div>

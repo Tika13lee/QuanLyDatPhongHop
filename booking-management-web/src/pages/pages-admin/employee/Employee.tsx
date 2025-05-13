@@ -625,11 +625,12 @@ const Employee = () => {
           <thead>
             <tr>
               <th>
-                <input
+                {/* <input
                   type="checkbox"
                   checked={isCheck.length === employees.length}
                   onChange={handleSelectAll}
-                />
+                /> */}
+                Chọn
               </th>
               <th>Hình ảnh</th>
               <th>Tên</th>

@@ -12,6 +12,7 @@ import {
   RoomDetail,
   Service,
   Statistical,
+  WaitingList,
 } from "./pages/pages-admin";
 import MainLayoutUser from "./layouts/MainLayoutUser";
 import {
@@ -36,7 +37,6 @@ function App() {
     <Provider store={store}>
       <Router>
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/" element={<Login />} />
 
           <Route
@@ -50,6 +50,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="overview" element={<Overview />} />
             <Route path="approval-list" element={<ApprovalList />} />
+            <Route path="approved-list" element={<WaitingList />} />
             <Route path="room" element={<Room />} />
             <Route path="room/detail/:id" element={<RoomDetail />} />
             <Route path="location" element={<Location />} />

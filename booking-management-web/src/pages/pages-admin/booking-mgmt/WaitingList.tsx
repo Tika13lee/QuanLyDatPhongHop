@@ -1,41 +1,262 @@
 import classNames from "classnames/bind";
 import styles from "./WaitingList.module.scss";
-import { useState } from "react";
-import ApprovalList from "./ApprovalList";
-import PaymentList from "./PaymentList";
+import { useEffect, useState } from "react";
+import {
+  RequestFormProps,
+  ReservationDetailProps,
+  RoomProps,
+} from "../../../data/data";
+import useFetch from "../../../hooks/useFetch";
+import DetailModal from "../../../components/Modal/DetailRequestModal";
+import IconWrapper from "../../../components/icons/IconWrapper";
+import { FiRefreshCw, MdOutlineInfo } from "../../../components/icons/icons";
+import { formatDateString, getHourMinute } from "../../../utilities";
+import LoadingSpinner from "../../../components/spinner/LoadingSpinner";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const cx = classNames.bind(styles);
 
-const WaitingList = () => {
-  const [activeTab, setActiveTab] = useState("approval");
-
-  return (
-    <div className={cx("waiting-list-container")}>
-      <div className={cx("tab-container")}>
-        <div className={cx("tab-header")}>
-          <div
-            className={cx("tab-item", { active: activeTab === "approval" })}
-            onClick={() => setActiveTab("approval")}
-          >
-            <p>Danh sách phê duyệt</p>
-          </div>
-          <div
-            className={cx("tab-item", { active: activeTab === "payment" })}
-            onClick={() => setActiveTab("payment")}
-          >
-            <p>Danh sách thanh toán</p>
-          </div>
-        </div>
-
-        <div className={cx("divide")}></div>
-
-        <div className={cx("tab-content")}>
-          {activeTab === "approval" && <ApprovalList />}
-          {activeTab === "payment" && <PaymentList />}
-        </div>
-      </div>
-    </div>
-  );
+type DataSearch = {
+  dayStart: string;
+  typeRequestForm: string;
 };
 
-export default WaitingList;
+function ApprovedList() {
+  const user = useSelector((state: RootState) => state.user);
+  console.log("user", user);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequestForm, setSelectedRequestForm] =
+    useState<RequestFormProps | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [typeRequestForm, setTypeRequestForm] = useState<string>("");
+  const [approvalFormList, setApprovalFormList] = useState<RequestFormProps[]>(
+    []
+  );
+
+  // Lấy danh sách lịch đặt phòng đã phê duyệt
+  const {
+    data: approvedList,
+    loading: loadingApprovedList,
+    error: errorApprovedList,
+  } = useFetch<RequestFormProps[]>(
+    `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED`
+  );
+
+  useEffect(() => {
+    if (approvedList) {
+      // Lọc danh sách yêu cầu theo từ khóa tìm kiếm
+      const filteredRequestList = approvedList?.filter((form) => {
+        const titleMatch = form.requestReservation.title
+          .toLowerCase()
+          .includes(searchQuery);
+        const nameBookerMatch = form.reservations[0].booker.employeeName
+          .toLowerCase()
+          .includes(searchQuery);
+        const roomNameMatch = form.reservations[0].room.roomName
+          .toLowerCase()
+          .includes(searchQuery);
+        return titleMatch || nameBookerMatch || roomNameMatch;
+      });
+      setApprovalFormList(filteredRequestList ?? []);
+    }
+  }, [approvedList, searchQuery]);
+
+  // dữ liệu tìm kiếm
+  const [dataSearch, setDataSearch] = useState<DataSearch>({
+    dayStart: "",
+    typeRequestForm: typeRequestForm,
+  });
+
+  useEffect(() => {
+    setDataSearch({
+      dayStart: startDate ? new Date(startDate).toISOString() : "",
+      typeRequestForm: typeRequestForm,
+    });
+    console.log("dataSearch", dataSearch);
+
+    // Gọi API với dữ liệu tìm kiếm
+    fetch(
+      `http://localhost:8080/api/v1/requestForm/getRequestFormByApproverId?approverId=${user?.employeeId}&statusRequestForm=APPROVED&dayStart=${dataSearch.dayStart}&typeRequestForm=${dataSearch.typeRequestForm}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setApprovalFormList(data);
+        setDataSearch({
+          dayStart: startDate ? new Date(startDate).toISOString() : "",
+          typeRequestForm: typeRequestForm,
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, [startDate, typeRequestForm]);
+
+  // Mở modal
+  const handleShowDetails = (requestForm: RequestFormProps) => {
+    setSelectedRequestForm(requestForm);
+    setIsModalOpen(true);
+  };
+
+  // Đóng modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedRequestForm(null);
+  };
+
+  return (
+    <div className={cx("approved-list")}>
+      <div className={cx("approve-search")}>
+        <div className={cx("search-row")}>
+          <label>Tìm kiếm</label>
+          <input
+            type="text"
+            placeholder="Nhập tiêu đề, tên người đặt, tên phòng"
+            className={cx("search-input")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
+          />
+        </div>
+        <div className={cx("search-row")}>
+          <label>Thời gian</label>
+          <input
+            type="date"
+            className={cx("search-input")}
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setDataSearch({
+                ...dataSearch,
+                dayStart: new Date(e.target.value).toISOString(),
+              });
+            }}
+          />
+        </div>
+        <div className={cx("search-row")}>
+          <label>Loại yêu cầu</label>
+          <select
+            className={cx("search-input")}
+            name="typeRequestForm"
+            value={typeRequestForm}
+            onChange={(e) => {
+              setTypeRequestForm(e.target.value);
+              setDataSearch({
+                ...dataSearch,
+                typeRequestForm: e.target.value,
+              });
+            }}
+          >
+            <option value="">Tất cả</option>
+            <option value="RESERVATION_ONETIME">Đặt lịch một lần</option>
+            <option value="RESERVATION_RECURRING">Đặt lịch định kỳ</option>
+            <option value="UPDATE_RESERVATION">Cập nhật</option>
+          </select>
+        </div>
+        <div className={cx("search-row")}>
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setStartDate("");
+              setTypeRequestForm("");
+              setDataSearch({
+                dayStart: "",
+                typeRequestForm: "",
+              });
+            }}
+          >
+            <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
+          </button>
+        </div>
+      </div>
+
+      {loadingApprovedList ? (
+        <LoadingSpinner />
+      ) : Array.isArray(approvalFormList) && approvalFormList.length === 0 ? (
+        <p className={cx("no-schedule-message")}>
+          Bạn không có lịch đã phê duyệt
+        </p>
+      ) : (
+        <div className={cx("schedule-list")}>
+          <table className={cx("schedule-table")}>
+            <thead>
+              <tr>
+                <th>Tiêu đề</th>
+                <th>Ngày</th>
+                <th>Thời gian</th>
+                <th>Người đặt</th>
+                <th>Thời gian gửi</th>
+                <th>Thời gian phê duyệt</th>
+                <th>Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(approvalFormList) &&
+                [...approvalFormList]
+                  .sort(
+                    (a, b) =>
+                      new Date(b.timeResponse).getTime() -
+                      new Date(a.timeResponse).getTime()
+                  )
+                  .map((schedule) => {
+                    return (
+                      <tr key={schedule.requestFormId}>
+                        <td>{schedule.requestReservation.title}</td>
+                        <td>
+                          {formatDateString(
+                            schedule.requestReservation.timeStart
+                          )}
+                        </td>
+                        <td>
+                          {getHourMinute(schedule.requestReservation.timeStart)}{" "}
+                          - {getHourMinute(schedule.requestReservation.timeEnd)}
+                        </td>
+                        <td>{schedule.reservations[0].booker.employeeName}</td>
+                        <td>{formatDateString(schedule.timeRequest)}</td>
+                        <td>{formatDateString(schedule.timeResponse)}</td>
+                        <td>
+                          <div
+                            className={cx("actions")}
+                            onClick={() => handleShowDetails(schedule)}
+                          >
+                            <IconWrapper icon={MdOutlineInfo} color="#FFBB49" />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <DetailModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        requestForm={selectedRequestForm}
+      />
+    </div>
+  );
+}
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case "CHECKED_IN":
+      return "Đã nhận phòng";
+    case "COMPLETED":
+      return "Đã hoàn thành";
+    case "WAITING":
+      return "Chờ nhận phòng";
+    case "CANCELLED":
+      return "Đã hủy";
+    case "PENDING":
+      return "Đang chờ phê duyệt";
+    case "NO_APPROVED":
+      return "Không được phê duyệt";
+    default:
+      return "Đang chờ hủy";
+  }
+};
+
+export default ApprovedList;
