@@ -521,7 +521,7 @@ function Statistical() {
           )}
         </div>
 
-        <div className={cx("card")}>
+        {/* <div className={cx("card")}>
           <div className={cx("cardHeader")}>
             <h2>Tổng chi phí trong năm (theo tháng)</h2>
             <select
@@ -561,7 +561,7 @@ function Statistical() {
               <Bar dataKey="chiPhi" fill="#FFCCFF" barSize={24} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </div> */}
       </div>
     </div>
   );

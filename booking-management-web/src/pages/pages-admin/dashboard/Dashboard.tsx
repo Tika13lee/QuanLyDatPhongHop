@@ -61,6 +61,7 @@ const Dashboard = () => {
   });
 
   const today = new Date().toISOString();
+<<<<<<< HEAD
   const todayString = today.split("T")[0];
   useEffect(() => {
     const fetchStats = async () => {
@@ -84,20 +85,49 @@ const Dashboard = () => {
           ),
           // axios.get("/totalCostByDate", { params: { date: today } }),
         ]);
+=======
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const [totalRes, completedRes, canceledRes] = await Promise.all([
+  //         axios.get(
+  //           "http://localhost:8080/api/v1/statistical/countReservationByDate",
+  //           { params: { date: today } }
+  //         ),
+  //         axios.get(
+  //           "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatusCheckin",
+  //           {
+  //             params: { date: today },
+  //           }
+  //         ),
+  //         axios.get(
+  //           "http://localhost:8080/api/v1/statistical/countReservationByDateAndStatus",
+  //           {
+  //             params: { date: today },
+  //           }
+  //         ),
+  //         // axios.get("/totalCostByDate", { params: { date: today } }),
+  //       ]);
+>>>>>>> ee6ed33b053c3171a2826f391bc437d548a4fff6
 
-        setStats({
-          total: totalRes.data,
-          completed: completedRes.data,
-          canceled: canceledRes.data,
-          totalCost: 0,
-        });
-      } catch (err) {
-        console.error("Lỗi khi tải dữ liệu thống kê", err);
-      }
-    };
+  //       setStats({
+  //         total: totalRes.data,
+  //         completed: completedRes.data,
+  //         canceled: canceledRes.data,
+  //         totalCost: 0,
+  //       });
+  //     } catch (err) {
+  //       console.error("Lỗi khi tải dữ liệu thống kê", err);
+  //     }
+  //   };
 
+<<<<<<< HEAD
     fetchStats();
   }, [todayString]);
+=======
+  //   fetchStats();
+  // }, [today]);
+>>>>>>> ee6ed33b053c3171a2826f391bc437d548a4fff6
 
   return (
     <div className={cx("dashboard")}>
