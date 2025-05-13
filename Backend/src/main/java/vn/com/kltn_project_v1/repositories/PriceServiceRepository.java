@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 import vn.com.kltn_project_v1.model.PriceService;
 @Repository
 public interface PriceServiceRepository extends JpaRepository<PriceService, Long> {
+    PriceService findPriceServiceByService_ServiceIdAndPrice_PriceId(long serviceId, long priceId);
 }

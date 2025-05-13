@@ -27,6 +27,9 @@ public class ReservationService implements IReservation {
     private final EmployeeRepository employeeRepository;
     private final NotificationService notificationService;
     private final RequestFormRepository requestFormRepository;
+    private final PriceRepository priceRepository;
+    private final PriceRoomRepository priceRoomRepository;
+    private final PriceServiceRepository priceServiceRepository;
     @Override
     public List<ReservationViewDTO> getAllReservationInRoom(long roomId, Date dayStart, Date dayEnd) {
         List<Reservation> reservations = reservationRepository.findReservationsByRoomRoomIdAndTime(roomId, dayStart, dayEnd);
@@ -297,16 +300,24 @@ public class ReservationService implements IReservation {
         return reservationViewDTOS;
     }
     private int totalMoney(List<Long> serviceIds, Long roomId, Date timeStart, Date timeEnd) {
+        Price price = priceRepository.findActivePrice(timeStart);
+        if(price == null) {
+            return 0;
+        }
+        if(price.getPriceRoom() == null || price.getPriceService() == null) {
+            return 0;
+        }
+        int priceRoom = priceRoomRepository.findPriceRoomByRoom_RoomIdAndPrice_PriceId(roomId, price.getPriceId()).getValue();
+
         int total = 0;
         for(Long serviceId : serviceIds){
-            total += serviceRepository.findById(serviceId).get().getPriceService().getValue();
+            total += priceServiceRepository.findPriceServiceByService_ServiceIdAndPrice_PriceId(serviceId, price.getPriceId()).getValue();
         }
-        Room room = roomRepository.findById(roomId).orElse(null);
         int diffInMinutes = (int)(timeEnd.getTime() - timeStart.getTime()) / (60 * 1000);
         System.out.println("diffInMinutes: " + diffInMinutes);
-        System.out.println("roomPrice: " + room.getPriceRoom().getValue() );
-        assert room != null;
-        total += room.getPriceRoom().getValue() * diffInMinutes/10;
+        System.out.println("priceRoom: " + priceRoom);
+
+        total += priceRoom * diffInMinutes/10;
         return total;
     }
 }

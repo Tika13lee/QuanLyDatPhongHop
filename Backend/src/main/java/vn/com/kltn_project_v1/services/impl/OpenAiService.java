@@ -14,6 +14,7 @@ import vn.com.kltn_project_v1.services.IOpenAi;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -26,9 +27,10 @@ public class OpenAiService implements IOpenAi {
 
     private final WebClient webClient;
     public String extractIntentAndEntities(String message)  {
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        LocalDateTime nowLocal = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        ZonedDateTime nowZoned = ZonedDateTime.of(nowLocal, ZoneId.of("Asia/Ho_Chi_Minh"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd 'tháng' MM 'năm' yyyy 'lúc' HH:mm 'giờ' 'GMT'X");
-        String toDay = now.format(formatter);
+        String toDay = nowZoned.format(formatter);
         String prompt = """
                     Bạn là trợ lý AI giúp đặt phòng họp nội bộ. 
                     Người dùng nhắn: "%s"

@@ -62,12 +62,14 @@ public class RequestFormService implements IRequestForm {
                 if(!requestForm.getTypeRequestForm().equals(TypeRequestForm.UPDATE_RESERVATION)){
                     requestForms.add(approveRequestFormCreate(requestForm));
                 }else {
-                    RequestForm requestFormOld = requestFormRepository.findRequestFormByReservationId(requestForm.getReservations().get(0).getReservationId()).get(0);
+                    List<RequestForm> requestForms1 = requestFormRepository.findRequestFormByReservationId(requestForm.getReservations().get(0).getReservationId());
+                    RequestForm requestFormOld = requestForms1.get(0);
+                    RequestForm requestFormCreate = requestForms1.get(requestForms1.size()-1);
                     System.out.println(requestFormOld.getReservations().size());
                     if(requestFormOld.getReservations().size()==1){
                         requestForms.add(approveRequestFormUpdateOne(requestForm));
                     }else{
-                        requestForms.add(approveRequestFormUpdateMany(requestForm,requestFormOld));
+                        requestForms.add(approveRequestFormUpdateMany(requestForm,requestFormOld,requestFormCreate));
 
                     }
                 }
@@ -101,7 +103,7 @@ public class RequestFormService implements IRequestForm {
         reservationService.updateReservationNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getAttendants());
         return requestFormRepository.save(requestForm);
     }
-    protected RequestForm approveRequestFormUpdateMany(RequestForm requestForm, RequestForm requestFormOld){
+    protected RequestForm approveRequestFormUpdateMany(RequestForm requestForm, RequestForm requestFormOld, RequestForm requestFormCreate){
         ArrayList<Date> timeFinishNew = new ArrayList<>();// danh sách lịch cần tạo
         System.out.println("1");
         List<Date> timeFinishOld = new ArrayList<>(requestForm.getRequestReservation().getTimeFinishFrequency());
@@ -149,12 +151,14 @@ public class RequestFormService implements IRequestForm {
             });
             requestForm.getReservations().addAll(reservations);
             requestForm.getRequestReservation().setTimeFinishFrequency(timeFinishOld);
+            requestFormCreate.getReservations().addAll(reservations);
+            requestFormCreate.getRequestReservation().setTimeFinishFrequency(timeFinishOld);
         }
 
         requestForm.setStatusRequestForm(StatusRequestForm.APPROVED);
         requestForm.setTimeResponse(new Date());
         reservationService.updateReservationNotification(requestForm.getReservations().get(0), requestForm.getReservations().get(0).getAttendants());
-
+        requestFormRepository.save(requestFormCreate);
         return requestFormRepository.save(requestForm);
     }
     @Override
