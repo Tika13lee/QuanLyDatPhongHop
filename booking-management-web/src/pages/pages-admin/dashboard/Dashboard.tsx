@@ -61,6 +61,7 @@ const Dashboard = () => {
   });
 
   const today = new Date().toISOString();
+  const todayString = today.split("T")[0];
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -96,7 +97,7 @@ const Dashboard = () => {
     };
 
     fetchStats();
-  }, [today]);
+  }, [todayString]);
 
   return (
     <div className={cx("dashboard")}>
@@ -120,7 +121,7 @@ const Dashboard = () => {
                   <span className={cx("symbol")}>✅</span>Số lịch hoàn thành
                 </h3>
                 <p>
-                {stats.completed} <small>cuộc họp</small>
+                  {stats.completed} <small>cuộc họp</small>
                 </p>
               </div>
             </div>
@@ -130,7 +131,7 @@ const Dashboard = () => {
                   <span className={cx("symbol")}>❌</span>Số lịch đã hủy
                 </h3>
                 <p>
-                {stats.canceled} <small>cuộc họp</small>
+                  {stats.canceled} <small>cuộc họp</small>
                 </p>
               </div>
               <div className={cx("summaryCard")}>

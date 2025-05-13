@@ -4,7 +4,7 @@ import IconWrapper from "../../../components/icons/IconWrapper";
 import { FaEdit, FiRefreshCw } from "../../../components/icons/icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { RequestFormProps } from "../../../data/data";
+import { RequestFormProps, ReservationDetailProps } from "../../../data/data";
 import {
   formatCurrencyVND,
   formatDateString,
@@ -28,7 +28,8 @@ function FrequencySchedules() {
   const [isEdit, setIsEdit] = useState(false);
   const [selectedFrequencyEndDate, setSelectedFrequencyEndDate] =
     useState<Date | null>(null);
-
+  const [lastReservation, setLastReservation] =
+    useState<ReservationDetailProps>();
   // popup thông báo
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
@@ -54,9 +55,13 @@ function FrequencySchedules() {
   }, []);
 
   // mở modal chi tiết
-  const handleOpenModalDetail = (schedule: RequestFormProps) => {
+  const handleOpenModalDetail = (
+    schedule: RequestFormProps,
+    lastNonCanceledReservation: ReservationDetailProps | undefined
+  ) => {
     setSelectedSchedule(schedule);
     setOpenModalDetail(true);
+    setLastReservation(lastNonCanceledReservation);
   };
 
   // đóng modal chi tiết
@@ -165,58 +170,80 @@ function FrequencySchedules() {
 
       {/* ds lịch */}
       <div className={cx("schedule-list")}>
-        {eventsByDay.map((event, index) => (
-          <div
-            className={cx("event-item")}
-            key={index}
-            onClick={() => handleOpenModalDetail(event)}
-          >
-            <div className={cx("event-info")}>
-              <div className={cx("event-time")}>
-                <span style={{ color: "red" }}>●</span>{" "}
-                {getHourMinute(event.reservations[0].timeStart)} -{" "}
-                {getHourMinute(event.reservations[0].timeEnd)} {""}
-                <span className={cx("event-repeat")}>
-                  ⏰{formatDateString(event.reservations[0].timeStart)} đến{" "}
-                  {formatDateString(
-                    event.reservations[event.reservations.length - 1].timeStart
-                  )}
-                </span>
-              </div>
-              <div className={cx("event-title")}>
-                {event.reservations[0].title}
-              </div>
-            </div>
+        {eventsByDay.map((event, index) => {
+          const lastNonCanceledReservation = [...event.reservations]
+            .reverse()
+            .find(
+              (reservation) => reservation.statusReservation !== "CANCELED"
+            );
 
-            <div className={cx("event-info")}>
-              <div className={cx("event-room")}>
-                Phòng {""}
-                {event.reservations[0].room.roomName}
-              </div>
-              <div className={cx("event-location")}>
-                {event.reservations[0].room.location.building.branch.branchName}{" "}
-                {event.reservations[0].room.location.building.buildingName}-{" "}
-                {event.reservations[0].room.location.floor}
-              </div>
-            </div>
+          // Lấy reservation đầu tiên (nếu có)
+          const firstReservation = event.reservations[0];
 
-            <div className={cx("event-participants")}>
-              {event.reservations[0].attendants.slice(0, 5).map((avatar, i) => (
-                <img
-                  key={i}
-                  src={avatar.avatar}
-                  alt="avatar"
-                  className={cx("avatar")}
-                />
-              ))}
-              {event.reservations[0].attendants.length > 5 && (
-                <span className={cx("more-participants")}>
-                  +{event.reservations[0].attendants.length - 5}
-                </span>
-              )}
+          return (
+            <div
+              className={cx("event-item")}
+              key={index}
+              onClick={() =>
+                handleOpenModalDetail(event, lastNonCanceledReservation)
+              }
+            >
+              <div className={cx("event-info")}>
+                <div className={cx("event-time")}>
+                  <span style={{ color: "red" }}>●</span>{" "}
+                  {firstReservation?.timeStart &&
+                    getHourMinute(firstReservation.timeStart)}{" "}
+                  -{" "}
+                  {firstReservation?.timeEnd &&
+                    getHourMinute(firstReservation.timeEnd)}{" "}
+                  {""}
+                  <span className={cx("event-repeat")}>
+                    ⏰
+                    {firstReservation?.timeStart &&
+                      formatDateString(firstReservation.timeStart)}{" "}
+                    đến{" "}
+                    {lastNonCanceledReservation?.timeStart &&
+                      formatDateString(lastNonCanceledReservation.timeStart)}
+                  </span>
+                </div>
+                <div className={cx("event-title")}>
+                  {firstReservation?.title}
+                </div>
+              </div>
+
+              <div className={cx("event-info")}>
+                <div className={cx("event-room")}>
+                  Phòng {""}
+                  {firstReservation?.room?.roomName}
+                </div>
+                <div className={cx("event-location")}>
+                  {
+                    firstReservation?.room?.location?.building?.branch
+                      ?.branchName
+                  }{" "}
+                  {firstReservation?.room?.location?.building?.buildingName}-{" "}
+                  {firstReservation?.room?.location?.floor}
+                </div>
+              </div>
+
+              <div className={cx("event-participants")}>
+                {firstReservation?.attendants?.slice(0, 5).map((avatar, i) => (
+                  <img
+                    key={i}
+                    src={avatar.avatar}
+                    alt="avatar"
+                    className={cx("avatar")}
+                  />
+                ))}
+                {firstReservation?.attendants?.length > 5 && (
+                  <span className={cx("more-participants")}>
+                    +{firstReservation?.attendants.length - 5}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* modal detail */}
@@ -300,12 +327,7 @@ function FrequencySchedules() {
                         {formatDateString(
                           selectedSchedule.reservations[0].timeStart
                         )}{" "}
-                        đến{" "}
-                        {formatDateString(
-                          selectedSchedule.reservations[
-                            selectedSchedule.reservations.length - 1
-                          ].timeStart
-                        )}
+                        đến {formatDateString(lastReservation?.timeStart + "")}
                       </>
                     )}
                 </p>
