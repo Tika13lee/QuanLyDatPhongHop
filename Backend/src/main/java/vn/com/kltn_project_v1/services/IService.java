@@ -15,4 +15,5 @@ public interface IService {
     List<Service> getServiceByName(String name);
     Service getServiceById(Long id);
 
+    int getPriceByServiceId(Long id);
 }

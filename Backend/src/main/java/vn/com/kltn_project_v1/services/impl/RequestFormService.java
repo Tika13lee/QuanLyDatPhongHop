@@ -216,8 +216,8 @@ public class RequestFormService implements IRequestForm {
     }
 
     @Override
-    public List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm) {
-        return requestFormRepository.findRequestFormByStatusPending(statusRequestForm);
+    public List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm, TypeRequestForm typeRequestForm, Date dayStart) {
+        return requestFormRepository.findRequestFormByStatusPending(statusRequestForm, typeRequestForm, dayStart);
     }
     @Override
     public List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO){

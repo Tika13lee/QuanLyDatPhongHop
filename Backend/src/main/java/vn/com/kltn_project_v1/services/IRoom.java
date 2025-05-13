@@ -27,5 +27,7 @@ public interface IRoom {
     public Room updateRoom(RoomDTO roomDTO) throws DataNotFoundException;
     public List<Room> getRoomNotApprover() throws DataNotFoundException;
     public List<Room> getRoomByApproverId(Long approverId) throws DataNotFoundException;
+
+    int getPriceRoomById(Long roomId) throws DataNotFoundException;
 }
 

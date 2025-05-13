@@ -84,9 +84,9 @@ public class RequestFormController {
         }
     }
     @GetMapping("/getRequestFormByStatus")
-    public ResponseEntity<?> getRequestFormByStatusPending(@RequestParam(required = false) StatusRequestForm statusRequestForm) {
+    public ResponseEntity<?> getRequestFormByStatusPending(@RequestParam(required = false) StatusRequestForm statusRequestForm, @RequestParam(required = false) TypeRequestForm typeRequestForm, @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dayRequest) {
         try {
-            return ResponseEntity.ok(requestFormService.getRequestFormByStatus(statusRequestForm));
+            return ResponseEntity.ok(requestFormService.getRequestFormByStatus(statusRequestForm, typeRequestForm, dayRequest));
         } catch (Exception e) {
             return ResponseEntity.ok(e.toString());
         }

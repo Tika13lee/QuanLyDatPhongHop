@@ -37,4 +37,8 @@ public class ServiceController {
     public ResponseEntity<?> getServiceById(@RequestParam Long id) {
         return ResponseEntity.ok(serviceService.getServiceById(id));
     }
+    @GetMapping("/getPriceService")
+    public ResponseEntity<?> getPriceService(@RequestParam Long id) {
+        return ResponseEntity.ok(serviceService.getPriceByServiceId(id));
+    }
 }

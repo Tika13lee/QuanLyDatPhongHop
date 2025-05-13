@@ -18,7 +18,7 @@ public interface IRequestForm {
     List<RequestForm> getRequestFormByBookerId(Long bookerId, StatusRequestForm statusRequestForm, TypeRequestForm typeRequestForm,Date dayStart);
 
     List<RequestForm> getRequestFormByApproverId(Long approverId, StatusRequestForm statusRequestForm, TypeRequestForm typeRequestForm, Date dayStart,Long roomId);
-    List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm);
+    List<RequestForm> getRequestFormByStatus(StatusRequestForm statusRequestForm, TypeRequestForm typeRequestForm, Date dayStart);
     List<Reservation> checkDayRequestForm(RequestFormDTO requestFormDTO);
     RequestForm createRequestFormUpdateReservationOne(RequestFormDTO requestFormDTO);
     RequestForm createRequestFormUpdateReservationMany(Long requestFormId, Date dayFisnishFrequencyNew);

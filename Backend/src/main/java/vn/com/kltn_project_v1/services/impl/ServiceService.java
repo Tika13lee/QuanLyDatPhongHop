@@ -76,4 +76,16 @@ public class ServiceService implements IService {
     public Service getServiceById(Long id) {
         return serviceRepository.findById(id).orElse(null);
     }
+    @Override
+    public int getPriceByServiceId(Long id) {
+    Service service = serviceRepository.findById(id).orElse(null);
+        if (service == null) {
+            return 0;
+        }
+        vn.com.kltn_project_v1.model.PriceService priceService = priceServiceRepository.findPriceServiceByService_ServiceIdAndPrice_PriceId(service.getServiceId(), service.getPriceService().getPrice().getPriceId());
+        if (priceService == null) {
+            return 0;
+        }
+        return priceService.getValue();
+    }
 }

@@ -218,7 +218,14 @@ public class RoomService implements IRoom {
     public List<Room> getRoomByApproverId(Long approverId) throws DataNotFoundException {
         return roomRepository.findRoomsByApproverId(approverId);
     }
-
+    @Override
+    public int getPriceRoomById(Long roomId) throws DataNotFoundException {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(()->new DataNotFoundException("Room not found"));
+        Price price = priceRepository.findActivePrice(Date.from(Instant.now()));
+        PriceRoom priceRoom = priceRoomRepository.findPriceRoomByRoom_RoomIdAndPrice_PriceId(room.getRoomId(),price.getPriceId());
+        return priceRoom.getValue();
+    }
 
     public List<RoomDTO> convertRoomToRoomDTO(List<Room> rooms){
         return rooms.stream().map(this::convertRoomToDTO).toList();

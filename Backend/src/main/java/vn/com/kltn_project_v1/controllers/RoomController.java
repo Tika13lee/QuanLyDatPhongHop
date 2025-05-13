@@ -226,4 +226,12 @@ public class RoomController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/getPriceRoom")
+    public ResponseEntity<?> getPriceRoom(@RequestParam Long roomId) {
+        try {
+            return ResponseEntity.ok(roomService.getPriceRoomById(roomId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
