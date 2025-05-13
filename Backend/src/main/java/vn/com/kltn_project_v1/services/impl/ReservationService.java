@@ -97,6 +97,7 @@ public class ReservationService implements IReservation {
 
     @Override
     public Map<String,Object> checkDataCheckIn(Long roomId, Long employeeId) {
+
         Date TimeCheckin = new Date();
         String mesResult = "";
         Map<String,Object> response = new ConcurrentHashMap<>();
@@ -107,34 +108,32 @@ public class ReservationService implements IReservation {
             return response;
         }else {
             List<Reservation> reservationsOutTime = reservationRepository.findReservationCheckInOutTime(employeeId, TimeCheckin);
-            if (reservationsOutTime.isEmpty()) {
+            System.out.println(reservationsOutTime.size());
+            System.out.println(reservationsInDay.size());
+            if (reservationsInDay.size()==reservationsOutTime.size()) {
                 mesResult = "Hết lịch trong ngày";
                 response.put("message", mesResult);
                 return response;
             }else {
+                List<Reservation> reservationCheckin = reservationRepository.findReservationCheckInInTime(employeeId,TimeCheckin);
                 SimpleDateFormat formatter = new SimpleDateFormat("HH'h'mm");
-                String formattedTime = formatter.format(reservationsInDay.get(0).getTimeStart());
-                if(reservationsInDay.get(0).getRoom().getRoomId() != roomId) {
-                    mesResult= "Phòng không đúng, lịch hiện tại của bạn là phòng " + reservationsInDay.get(0).getRoom().getRoomName() + " vào lúc " + formattedTime;
-//                    mesResult+= reservationsInDay.stream().map(r ->{
-//                         return "\nlịch phòng này vào lúc " + formatter.format(r.getTimeStart());
-//                    });
-                    for (int i=1;i<reservationsInDay.size();i++) {
-                        mesResult+="\nlịch phòng này vào lúc " + formatter.format(reservationsInDay.get(i).getTimeStart());
-                    }
-                    response.put("message", mesResult);
+                String formattedTime = formatter.format(reservationCheckin.get(0).getTimeStart());
+                if(reservationCheckin.get(0).getRoom().getRoomId() != roomId) {
+                    mesResult= "Lịch gần nhất của bạn không phải phòng này" ;
+                    response.put("message",mesResult);
                 }else {
-                    System.out.println(reservationsInDay.get(0).getTimeStart());
+                    System.out.println(reservationCheckin.get(0).getTimeStart());
                     System.out.println(TimeCheckin);
-                     if(!reservationsInDay.get(0).getTimeStart().before(TimeCheckin)){
+                     if(!reservationCheckin.get(0).getTimeStart().before(TimeCheckin)){
                         mesResult = "Chưa đến giờ checkin, " + "lịch của bạn vào lúc " + formattedTime;
                          response.put("message", mesResult);
                     }else {
                         mesResult = "Checkin thành công";
-                        reservationsInDay.get(0).setStatusReservation(StatusReservation.CHECKED_IN);
-                        reservationRepository.save(reservationsInDay.get(0));
+                         reservationCheckin.get(0).setStatusReservation(StatusReservation.CHECKED_IN);
+                         reservationCheckin.get(0).setTimeCheckIn(TimeCheckin);
+                        reservationRepository.save(reservationCheckin.get(0));
                         response.put("message", mesResult);
-                        response.put("reservation", reservationsInDay.get(0));
+                        response.put("reservation", reservationCheckin.get(0));
                     }
                 }
             }
