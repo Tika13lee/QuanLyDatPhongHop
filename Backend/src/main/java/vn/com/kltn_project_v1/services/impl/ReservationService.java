@@ -160,6 +160,9 @@ public class ReservationService implements IReservation {
     @Override
     public void inviteMembersNotification(Reservation reservation, List<Employee> employees) {
         for (Employee employee : employees) {
+            if (employee.getEmployeeId()==(reservation.getBooker().getEmployeeId())) {
+                continue;
+            }
             notificationService.notifyUser(
                     employee,
                     NotificationType.INVITE_TO_RESERVATION,
@@ -300,8 +303,10 @@ public class ReservationService implements IReservation {
         }
         Room room = roomRepository.findById(roomId).orElse(null);
         int diffInMinutes = (int)(timeEnd.getTime() - timeStart.getTime()) / (60 * 1000);
+        System.out.println("diffInMinutes: " + diffInMinutes);
+        System.out.println("roomPrice: " + room.getPriceRoom().getValue() );
         assert room != null;
-        total += room.getPriceRoom().getValue() * diffInMinutes;
+        total += room.getPriceRoom().getValue() * diffInMinutes/10;
         return total;
     }
 }

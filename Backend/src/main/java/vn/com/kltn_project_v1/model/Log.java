@@ -15,7 +15,6 @@ public class Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long logId;
-
     private String action;
     private Date time;
     @OneToOne(fetch = FetchType.LAZY)

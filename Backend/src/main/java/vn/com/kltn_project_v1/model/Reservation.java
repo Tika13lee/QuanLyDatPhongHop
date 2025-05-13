@@ -21,7 +21,6 @@ public class Reservation {
     private Date timeStart;
     private Date timeEnd;
     private Date timeCheckIn;
-    private Date timeCheckOut;
     private Date timeCancel;
     private String note;
     @ElementCollection(fetch = FetchType.EAGER)
@@ -36,7 +35,7 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "bookerId")
     private Employee booker;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Employee.class)
     @JoinTable(
             name = "reservation_employee",
             joinColumns = @JoinColumn(name = "reservationId"),
@@ -50,22 +49,17 @@ public class Reservation {
             joinColumns = @JoinColumn(name = "reservationId"),
             inverseJoinColumns = @JoinColumn(name = "serviceId")
     )
-    @ToString.Exclude
+    @ToString.Exclude()
     private List<Service> services;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cancleReservationId")
-    @ToString.Exclude
-    private CancelReservation cancelReservation;
     @ManyToOne
     @JoinColumn(name = "roomId")
     private Room room;
 
-    public Reservation(Date time, Date timeStart, Date timeEnd, Date timeCheckIn, Date timeCheckOut, String note, List<String> filePaths, String description, String title, Frequency frequency, StatusReservation statusReservation, Employee booker, List<Employee> attendants, List<Service> services, CancelReservation cancelReservation, Room room) {
+    public Reservation(Date time, Date timeStart, Date timeEnd, Date timeCheckIn, String note, List<String> filePaths, String description, String title, Frequency frequency, StatusReservation statusReservation, Employee booker, List<Employee> attendants, List<Service> services, Room room) {
         this.time = time;
         this.timeStart = timeStart;
         this.timeEnd = timeEnd;
         this.timeCheckIn = timeCheckIn;
-        this.timeCheckOut = timeCheckOut;
         this.note = note;
         this.filePaths = filePaths;
         this.description = description;
@@ -75,7 +69,6 @@ public class Reservation {
         this.booker = booker;
         this.attendants = attendants;
         this.services = services;
-        this.cancelReservation = cancelReservation;
         this.room = room;
     }
 }

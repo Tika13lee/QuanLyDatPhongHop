@@ -41,7 +41,7 @@ public class RequestFormService implements IRequestForm {
         requestForm.setTypeRequestForm(requestFormDTO.getTypeRequestForm());
         List<Reservation> reservations =  reservationService.createReservation(modelMapper.map(requestForm.getRequestReservation(), ReservationDTO.class));
         requestForm.setReservations(reservations);
-        notificationService.approveNotification(requestForm, employeeRepository.findById(requestFormDTO.getReservationDTO().getBookerId()).orElse(null));
+        notificationService.approveNotification(requestForm, reservations.get(0).getRoom().getApprover());
         return requestFormRepository.save(requestForm);
     }
     @Override
