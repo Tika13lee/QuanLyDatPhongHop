@@ -5,7 +5,7 @@ import { IoIosArrowBack, MdOutlineEdit } from "../../../components/icons/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import { DeviceProps, RoomDeviceProps } from "../../../data/data";
+import { DeviceProps, RoomDeviceProps, RoomProps } from "../../../data/data";
 import { FaPlus } from "react-icons/fa";
 import usePost from "../../../hooks/usePost";
 import PopupNotification from "../../../components/popup/PopupNotification";
@@ -20,6 +20,7 @@ type RoomDevice = {
 
 const RoomDetail = () => {
   const navigate = useNavigate();
+  const [roomDetail, setRoomDetail] = useState<any>();
   const [isModelEditOpen, setIsModelEditOpen] = useState(false);
   const [isModelAddDeviceOpen, setIsModelAddDeviceOpen] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState<{
@@ -38,7 +39,7 @@ const RoomDetail = () => {
 
   // Lấy thông tin phòng
   let {
-    data: roomDetail,
+    data: roomDetailData,
     loading,
     error,
     setData,
@@ -46,7 +47,12 @@ const RoomDetail = () => {
     id ? `http://localhost:8080/api/v1/room/getRoomById?roomId=${id}` : ""
   );
 
-  console.log("roomDetail", roomDetail);
+  // set dữ liệu phòng
+  useEffect(() => {
+    if (roomDetailData) {
+      setRoomDetail(roomDetailData);
+    }
+  }, [roomDetailData]);
 
   // set ds thiết bị vào mảng mới
   useEffect(() => {
@@ -101,6 +107,8 @@ const RoomDetail = () => {
   const handleSubmitDevices = async () => {
     const roomId = roomDetail?.roomId;
 
+    console.log("roomId", roomDetail);
+
     if (!roomId) {
       setPopupMessage("Lỗi khi thêm thiết bị: không tìm thấy phòng.");
       setPopupType("error");
@@ -124,17 +132,12 @@ const RoomDetail = () => {
       setRoomDevices((prev) => [...prev, { deviceName, quantity }]);
       console.log("roomDevices1", roomDevices);
     }
-
-    setPopupMessage("Thêm thiết bị thành công!");
-    setPopupType("success");
-    setIsPopupOpen(true);
     handleCloseAddDeviceModal();
   };
 
   // đóng mở modal thêm thiết bị
   const handleOpenAddDeviceModal = () => {
     setIsModelAddDeviceOpen(true);
-    console.log("Add device");
   };
   const handleCloseAddDeviceModal = () => {
     setIsModelAddDeviceOpen(false);
@@ -192,9 +195,9 @@ const RoomDetail = () => {
     console.log("response", response);
 
     if (response) {
-      setPopupMessage("Cập nhật phòng thành công!");
-      setPopupType("success");
-      setIsPopupOpen(true);
+      // setPopupMessage("Cập nhật phòng thành công!");
+      // setPopupType("success");
+      // setIsPopupOpen(true);
 
       handleCloseUpdateModal();
     } else {
@@ -222,11 +225,6 @@ const RoomDetail = () => {
     setIsModelEditOpen(false);
   };
 
-  // Hàm đóng popup thông báo
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-  };
-
   const [urlQR, setUrlQR] = useState("");
   const [pdfPath, setPdfPath] = useState("");
 
@@ -249,8 +247,6 @@ const RoomDetail = () => {
         document.body.removeChild(link);
       });
   };
-
-  console.log(urlQR);
 
   return (
     <div className={cx("room-detail-container")}>
@@ -501,6 +497,7 @@ const RoomDetail = () => {
                   <p>Không có thiết bị nào.</p>
                 )}
               </div>
+
               {/* modal thêm device */}
               {isModelAddDeviceOpen && (
                 <div
@@ -546,7 +543,7 @@ const RoomDetail = () => {
                                   <input
                                     type="number"
                                     defaultValue={1}
-                                    min={0}
+                                    min={1}
                                     value={
                                       selectedDevice
                                         ? selectedDevice.quantity
@@ -593,7 +590,7 @@ const RoomDetail = () => {
         message={popupMessage}
         type={popupType}
         isOpen={isPopupOpen}
-        onClose={handleClosePopup}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   );

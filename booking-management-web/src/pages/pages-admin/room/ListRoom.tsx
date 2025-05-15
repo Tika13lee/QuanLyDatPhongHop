@@ -162,6 +162,16 @@ function ListRoom() {
       const searchUrl = `http://localhost:8080/api/v1/room/searchRoomByName?roomName=${query}`;
       const response = await axios.get(searchUrl);
       setRooms(response.data);
+
+      const prices: { [roomId: number]: number } = {};
+      await Promise.all(
+        response.data.map(async (room: RoomProps2) => {
+          const price = await fetchRoomPrice(room.roomId);
+          prices[room.roomId] = price;
+        })
+      );
+      setRoomPrices(prices);
+
       console.log(response.data);
       setTotalPage(response.data.totalPage);
       setPage(1);
@@ -319,7 +329,6 @@ function ListRoom() {
                       : "Không có thông tin vị trí"}
                   </td>
                   <td>{room.capacity}</td>
-                  {/* <td>{formatCurrencyVND(Number(room.price))}</td> */}
                   <td>
                     {roomPrices[room.roomId] !== undefined
                       ? formatCurrencyVND(roomPrices[room.roomId])

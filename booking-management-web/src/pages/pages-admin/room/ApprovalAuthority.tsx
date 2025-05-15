@@ -1,13 +1,12 @@
 import classNames from "classnames/bind";
 import styles from "./ApprovalAuthority.module.scss";
 import { BranchProps, EmployeeProps, RoomProps } from "../../../data/data";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import { formatCurrencyVND } from "../../../utilities";
 import IconWrapper from "../../../components/icons/IconWrapper";
 import { FiRefreshCw, SiFusionauth } from "../../../components/icons/icons";
 import CloseModalButton from "../../../components/Modal/CloseModalButton";
-import { FaPlus } from "react-icons/fa";
 import PopupNotification from "../../../components/popup/PopupNotification";
 
 const cx = classNames.bind(styles);
@@ -45,6 +44,14 @@ function ApprovalAuthority() {
     }
   }, [data]);
 
+  const { data: employees, loading: employeesLoading } = useFetch<
+    EmployeeProps[]
+  >("http://localhost:8080/api/v1/employee/getAllEmployee");
+
+  const approverListData = employees?.filter(
+    (emp) => emp.account.role === "APPROVER"
+  );
+
   // tìm kiếm nhân viên
   useEffect(() => {
     if (!phoneInput.trim()) {
@@ -53,21 +60,16 @@ function ApprovalAuthority() {
       return;
     }
 
-    const delay = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:8080/api/v1/employee/getEmployeeByPhoneOrName?phoneOrName=${encodeURIComponent(
-            phoneInput
-          )}`
-        );
-        const data: EmployeeProps[] = await res.json();
-        setSuggestedEmployees(data);
-        setShowSuggestions(true);
-      } catch (err) {
-        console.error("Lỗi tìm nhân viên:", err);
-        setSuggestedEmployees([]);
-        setShowSuggestions(false);
-      }
+    const delay = setTimeout(() => {
+      const keyword = phoneInput.trim().toLowerCase();
+
+      const filtered =
+        approverListData?.filter((emp) =>
+          emp.phone.toLowerCase().includes(keyword)
+        ) || [];
+
+      setSuggestedEmployees(filtered);
+      setShowSuggestions(filtered.length > 0);
     }, 300);
 
     return () => clearTimeout(delay);
@@ -121,6 +123,9 @@ function ApprovalAuthority() {
         setOpenEmployees(false);
         setPhoneInput("");
         setSelectedEmployee(null);
+        setSearchRoomName("");
+        setSelectedBranch("");
+
         setRoomsNotApproved((prevRooms) =>
           prevRooms.filter((room) => room.roomId !== roomId)
         );
@@ -142,6 +147,7 @@ function ApprovalAuthority() {
     "http://localhost:8080/api/v1/location/getAllBranch"
   );
 
+  // lọc phòng theo tên và chi nhánh
   const filteredRooms = roomsNotApproved.filter((room) => {
     let matchBranch = true;
 
@@ -151,7 +157,7 @@ function ApprovalAuthority() {
       if ("building" in loc && typeof loc.building === "object") {
         matchBranch = loc.building.branch.branchName === selectedBranch;
       } else {
-        matchBranch = false; // nếu không có building hợp lệ, không thể so sánh
+        matchBranch = false;
       }
     }
     const matchName = searchRoomName.trim()
@@ -197,10 +203,12 @@ function ApprovalAuthority() {
           </select>
         </div>
         <div>
-          <button onClick={() => {
-            setSelectedBranch("");
-            setSearchRoomName("");
-          }}>
+          <button
+            onClick={() => {
+              setSelectedBranch("");
+              setSearchRoomName("");
+            }}
+          >
             <IconWrapper icon={FiRefreshCw} color="#0d6efd" size={18} />
           </button>
         </div>
@@ -267,7 +275,7 @@ function ApprovalAuthority() {
         <div className={cx("modal-overlay")}>
           <div className={cx("modal-content")}>
             <CloseModalButton onClick={() => setOpenEmployees(false)} />
-            <h3>Tìm nhân viên phê duyệt cho phòng</h3>
+            <h3>Tìm người phê duyệt cho phòng</h3>
             <div className={cx("modal-body")}>
               <div
                 className={cx("form-group")}

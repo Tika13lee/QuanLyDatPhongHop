@@ -92,6 +92,20 @@ const Employee = () => {
         console.error("Lỗi khi lấy danh sách phòng ban:", error)
       );
   }, [filters.branchName]);
+  useEffect(() => {
+    if (!branchName) return;
+
+    fetch(
+      `http://localhost:8080/api/v1/department/getDepartmentByBranchName?branchName=${branchName}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setDepartments(data);
+      })
+      .catch((error) =>
+        console.error("Lỗi khi lấy danh sách phòng ban:", error)
+      );
+  }, [branchName]);
 
   // Hàm xử lý thay đổi trong ô tìm kiếm
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,7 +263,7 @@ const Employee = () => {
     setBranchName(
       emp.department?.location?.building?.branch?.branchName || "N/A"
     );
-  
+    
     setSelectedEmployee(emp);
     setFormData({
       employeeName: emp.employeeName,
