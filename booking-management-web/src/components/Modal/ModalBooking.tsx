@@ -332,9 +332,9 @@ const ModalBooking: React.FC<ModalBookingProps> = ({
       return { isValid: false, message: "Vui lòng nhập tiêu đề cuộc họp!" };
     }
 
-    if (selectedEmployees.length === 1) {
-      return { isValid: false, message: "Vui lòng thêm người tham gia!" };
-    }
+    // if (selectedEmployees.length === 1) {
+    //   return { isValid: false, message: "Vui lòng thêm người tham gia!" };
+    // }
 
     return { isValid: true, message: "" };
   };
