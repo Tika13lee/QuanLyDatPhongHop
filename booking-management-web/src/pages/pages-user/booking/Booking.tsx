@@ -221,7 +221,56 @@ function Booking() {
     });
     setIsModalOpen(true);
   };
+  useEffect(() => {
+    const dfMessenger = document.createElement(
+      "df-messenger"
+    ) as HTMLDfMessengerElement;
+    dfMessenger.setAttribute("location", "asia-southeast1");
+    dfMessenger.setAttribute("project-id", "atomic-byway-459220-k7");
+    dfMessenger.setAttribute(
+      "agent-id",
+      "3ccee593-18b6-43f4-bb5b-01a326096d56"
+    );
+    dfMessenger.setAttribute("language-code", "vi");
+    dfMessenger.setAttribute("max-query-length", "-1");
 
+    const chatBubble = document.createElement(
+      "df-messenger-chat-bubble"
+    ) as HTMLDfMessengerChatBubbleElement;
+    chatBubble.setAttribute("chat-title", "BotChat-Reservation");
+    dfMessenger.appendChild(chatBubble);
+
+    document.body.appendChild(dfMessenger);
+
+    const style = document.createElement("style");
+    style.textContent = `
+      df-messenger {
+        z-index: 999;
+        position: fixed;
+        --df-messenger-font-color: #000;
+        --df-messenger-font-family: Google Sans;
+        --df-messenger-chat-background: #f3f6fc;
+        --df-messenger-message-user-background: #d3e3fd;
+        --df-messenger-message-bot-background: #fff;
+        bottom: 16px;
+        right: 16px;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      const existingDfMessenger = document.querySelector("df-messenger");
+      if (existingDfMessenger && document.body.contains(existingDfMessenger)) {
+        document.body.removeChild(existingDfMessenger);
+      }
+      const existingStyle = document.querySelector(
+        'style[textContent*="df-messenger {"]'
+      );
+      if (existingStyle && document.head.contains(existingStyle)) {
+        document.head.removeChild(existingStyle);
+      }
+    };
+  }, []);
   return (
     <div className={cx("overview-container")}>
       <ToastContainer />
@@ -453,5 +502,17 @@ function Booking() {
     </div>
   );
 }
+declare global {
+  interface HTMLDfMessengerElement extends HTMLElement {
+    location?: string;
+    projectId?: string;
+    agentId?: string;
+    languageCode?: string;
+    maxQueryLength?: string | number;
+  }
 
+  interface HTMLDfMessengerChatBubbleElement extends HTMLElement {
+    chatTitle?: string;
+  }
+}
 export default Booking;

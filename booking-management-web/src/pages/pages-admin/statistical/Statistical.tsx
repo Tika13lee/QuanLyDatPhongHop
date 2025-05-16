@@ -21,6 +21,7 @@ import {
 import useFetch from "../../../hooks/useFetch";
 import { BranchProps, EmployeeProps } from "../../../data/data";
 import { formatCurrencyVND, formatDateString } from "../../../utilities";
+import DatePicker from "react-datepicker";
 
 const cx = classNames.bind(styles);
 
@@ -60,27 +61,38 @@ const chiPhiTheoThang = [
   { name: "Tháng 12", chiPhi: 400000000 },
 ];
 
-const avg =
-  chiPhiTheoThang.reduce((acc, item) => acc + Number(item.chiPhi), 0) /
-  chiPhiTheoThang.length;
-
 function Statistical() {
+  const now = new Date();
   const currentMonth = new Date().getMonth() + 1;
-  const [selectedYear, setSelectedYear] = useState(2024);
   const [selectedMonthPrice, setSelectedMonthPrice] = useState(
     currentMonth.toString()
   );
 
-  const [selectedMonthService, setSelectedMonthService] = useState(
-    currentMonth.toString()
-  );
-  const [selectedMonthBranch, setSelectedMonthBranch] = useState(
-    currentMonth.toString()
-  );
-
   const [selectedBranch, setSelectedBarnch] = useState<string>("1");
-  const [selectedMonthDept, setSelectedMonthDept] = useState(
-    currentMonth.toString()
+
+  const [startService, setStartService] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth(), 1)
+  );
+  const [endService, setEndService] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  );
+  const [startBranch, setStartBranch] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth(), 1)
+  );
+  const [endBranch, setEndBranch] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  );
+  const [startRoom, setStartRoom] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth(), 1)
+  );
+  const [endRoom, setEndRoom] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  );
+  const [startPrice, setStartPrice] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth(), 1)
+  );
+  const [endPrice, setEndPrice] = useState<Date>(
+    new Date(now.getFullYear(), now.getMonth() + 1, 0)
   );
 
   // lấy nhân viên
@@ -119,19 +131,15 @@ function Statistical() {
   };
 
   const { data: tiLeDichVu } = useFetch<[]>(
-    `http://localhost:8080/api/v1/statistical/statisticalService?startDate=${getMonthDateRange(
-      selectedMonthService
-    ).startDate.toISOString()}&endDate=${getMonthDateRange(
-      selectedMonthService
-    ).endDate.toISOString()}`
+    `http://localhost:8080/api/v1/statistical/statisticalService?startDate=${startService.toISOString()}&endDate=${endService.toISOString()}`
   );
 
   const { data: chiNhanhData } = useFetch<StatisticalBranchData[]>(
-    `http://localhost:8080/api/v1/statistical/statisticalBranchData?startDate=${getMonthDateRange(
-      selectedMonthBranch
-    ).startDate.toISOString()}&endDate=${getMonthDateRange(
-      selectedMonthBranch
-    ).endDate.toISOString()}`
+    `http://localhost:8080/api/v1/statistical/statisticalBranchData?startDate=${startBranch.toISOString()}&endDate=${endBranch.toISOString()}`
+  );
+
+  const { data: phongData } = useFetch<[]>(
+    `http://localhost:8080/api/v1/statistical/statisticalRoom?startDate=${startRoom.toISOString()}&endDate=${endRoom.toISOString()}&branchId=${selectedBranch}`
   );
 
   const { data: chiPhiTheoNgay } = useFetch<[]>(
@@ -140,14 +148,6 @@ function Statistical() {
     ).startDate.toISOString()}&endDate=${getMonthDateRange(
       selectedMonthPrice
     ).endDate.toISOString()}`
-  );
-
-  const { data: phongData } = useFetch<[]>(
-    `http://localhost:8080/api/v1/statistical/statisticalRoom?startDate=${getMonthDateRange(
-      selectedMonthDept
-    ).startDate.toISOString()}&endDate=${getMonthDateRange(
-      selectedMonthDept
-    ).endDate.toISOString()}&branchId=${selectedBranch}`
   );
 
   return (
@@ -198,18 +198,31 @@ function Statistical() {
       <div className={cx("charts-container")}>
         {/* Tỉ lệ sử dụng dịch vụ  */}
         <div className={cx("card-pie")}>
+          <h2>Tỉ lệ sử dụng dịch vụ </h2>
           <div className={cx("cardHeader")}>
-            <h2>Tỉ lệ sử dụng dịch vụ </h2>
-            <select
-              value={selectedMonthService}
-              onChange={(e) => setSelectedMonthService(e.target.value)}
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  Tháng {i + 1}
-                </option>
-              ))}
-            </select>
+            <div>
+              Từ ngày{" "}
+              <DatePicker
+                selected={startService}
+                onChange={(date: Date | null) => {
+                  if (date) setStartService(date);
+                }}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Từ ngày"
+              />
+            </div>
+            <div>
+              Đến ngày{" "}
+              <DatePicker
+                selected={endService}
+                onChange={(date: Date | null) => {
+                  if (date) setEndService(date);
+                }}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Đến ngày"
+                minDate={startService}
+              />
+            </div>
           </div>
           {tiLeDichVu && tiLeDichVu.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -247,9 +260,32 @@ function Statistical() {
 
         {/* Tổng chi phí & số cuộc họp của mỗi chi nhánh */}
         <div className={cx("card")}>
+          <h2>Tổng chi phí & số cuộc họp của mỗi chi nhánh</h2>
           <div className={cx("cardHeader")}>
-            <h2>Tổng chi phí & số cuộc họp của mỗi chi nhánh</h2>
-            <select
+            <div>
+              Từ ngày{" "}
+              <DatePicker
+                selected={startBranch}
+                onChange={(date: Date | null) => {
+                  if (date) setStartBranch(date);
+                }}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Từ ngày"
+              />
+            </div>
+            <div>
+              Đến ngày{" "}
+              <DatePicker
+                selected={endBranch}
+                onChange={(date: Date | null) => {
+                  if (date) setEndBranch(date);
+                }}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Đến ngày"
+                minDate={startBranch}
+              />
+            </div>
+            {/* <select
               value={selectedMonthBranch}
               onChange={(e) => setSelectedMonthBranch(e.target.value)}
             >
@@ -258,7 +294,7 @@ function Statistical() {
                   Tháng {i + 1}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
           {chiNhanhData && chiNhanhData.length > 0 ? (
             <ResponsiveContainer width="100%" height={330}>
@@ -346,16 +382,29 @@ function Statistical() {
               ))
             )}
           </select>
-          <select
-            value={selectedMonthDept}
-            onChange={(e) => setSelectedMonthDept(e.target.value)}
-          >
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                Tháng {i + 1}
-              </option>
-            ))}
-          </select>
+          <div>
+            Từ ngày{" "}
+            <DatePicker
+              selected={startRoom}
+              onChange={(date: Date | null) => {
+                if (date) setStartRoom(date);
+              }}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Từ ngày"
+            />
+          </div>
+          <div>
+            Đến ngày{" "}
+            <DatePicker
+              selected={endRoom}
+              onChange={(date: Date | null) => {
+                if (date) setEndRoom(date);
+              }}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Đến ngày"
+              minDate={startRoom}
+            />
+          </div>
         </div>
         {phongData && phongData.length > 0 ? (
           <ResponsiveContainer width="100%" height={450}>
@@ -426,6 +475,29 @@ function Statistical() {
         <div className={cx("card")}>
           <div className={cx("cardHeader")}>
             <h2>Tổng chi phí trong tháng (theo ngày)</h2>
+            {/* <div>
+              Từ ngày{" "}
+              <DatePicker
+                selected={startPrice}
+                onChange={(date: Date | null) => {
+                  if (date) setStartPrice(date);
+                }}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Từ ngày"
+              />
+            </div>
+            <div>
+              Đến ngày{" "}
+              <DatePicker
+                selected={endPrice}
+                onChange={(date: Date | null) => {
+                  if (date) setEndPrice(date);
+                }}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Đến ngày"
+                minDate={startPrice}
+              />
+            </div> */}
             <select
               value={selectedMonthPrice}
               onChange={(e) => setSelectedMonthPrice(e.target.value)}
