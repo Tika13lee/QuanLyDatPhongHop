@@ -356,13 +356,13 @@ export default function InfoRoomRegister({ navigation, route }) {
       Alert.alert("Thống báo", "Vui lòng nhập tiêu đề cuộc họp");
       return false;
     }
-    if (listSelectedParticipantRender.length < 2) {
-      Alert.alert(
-        "Thông báo",
-        "Số lượng người tham gia tối thiểu là 2 người. Vui lòng chọn thêm!"
-      );
-      return false;
-    }
+    // if (listSelectedParticipantRender.length < 2) {
+    //   Alert.alert(
+    //     "Thông báo",
+    //     "Số lượng người tham gia tối thiểu là 2 người. Vui lòng chọn thêm!"
+    //   );
+    //   return false;
+    // }
     return true;
   };
 
@@ -512,6 +512,7 @@ export default function InfoRoomRegister({ navigation, route }) {
     if (formatFrequency(frequency) == "ONE_TIME") setDayEnd(selectedDate);
     if (selectedDate != new Date().toISOString().split("T")[0]) {
       setTimeStart("07:00");
+      setArrTimeStartRender(renderTime().slice(0, renderTime().length - 3));
       setTimeEndFilterByTimeStart(handleUpdateTimeEndByTimeStart("07:00"));
       setTimeEnd(handleUpdateTimeEndByTimeStart("07:00")[0].time);
     } else {

@@ -47,12 +47,43 @@ export default function ModelUpdateProfile({closeModal, data, handleUpdateProfil
     };
       
 
+    // const handleSubmit = async () => {
+    //     let avtUpload;
+        
+    //     if(avt) {
+    //         avtUpload = await handleUploadToCloudinary(avtBase64);
+    //     } else {avtUpload = ""};
+    //     try{
+    //         const responseUpdate = await axiosConfig().put(
+    //             "/api/v1/employee/upDateEmployee",
+    //             {
+    //                 employeeId: data.employeeId,
+    //                 phone: data.phone,
+    //                 email: email,
+    //                 employeeName: userName,
+    //                 departmentId: data.department.departmentId,
+    //                 role: data.account.role,
+    //                 avatar: avtUpload
+    //             }
+    //         )
+    //         data.employeeName = responseUpdate.data.employeeName;
+    //         data.email = responseUpdate.data.email;
+    //         data.avatar = responseUpdate.data.avatar;
+    //         handleUpdateProfile(data);
+    //         closeModal();
+    //     } catch(e) {
+    //         console.log(e);
+            
+    //     }
+        
+    // }
     const handleSubmit = async () => {
         let avtUpload;
         
         if(avt) {
             avtUpload = await handleUploadToCloudinary(avtBase64);
-        } else {avtUpload = ""};
+        } else {
+            avtUpload = data.avatar};
         try{
             const responseUpdate = await axiosConfig().put(
                 "/api/v1/employee/upDateEmployee",

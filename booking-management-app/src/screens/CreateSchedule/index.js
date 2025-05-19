@@ -99,6 +99,10 @@ export default function CreateSchedule({ navigation, route }) {
   const [inputSearch, setInputSearch] = useState("");
   const debounceValue = useDebounce(inputSearch, 200);
   const [roomsDataDefault, setRoomsDataDefault] = useState([]);
+  
+  const switchPageNotification = () => {
+    navigation.navigate("Notification");
+  }
 
   // info push modal
   const branchOption = {
@@ -196,6 +200,7 @@ export default function CreateSchedule({ navigation, route }) {
         leftIcon={"menu"}
         rightIcon={"bell"}
         handleOnPressLeftIcon={() => setIsOpenModal(true)}
+        switchPageNotification={switchPageNotification}
       >
         <View style={style.containerFilterSearch}>
           <TextInput
