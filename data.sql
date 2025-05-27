@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   PRIMARY KEY (`account_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.account: ~29 rows (approximately)
+-- Dumping data for table ql_datphong.account: ~31 rows (approximately)
 INSERT INTO `account` (`account_id`, `password`, `role`, `user_name`, `is_first_login`) VALUES
 	(1, '$2a$10$iSmcTxu66e5L5.xDINKGTO/z87cOLfmSSoievyYe1zqdKLdUrwvkK', 'APPROVER', '0914653334', b'0'),
 	(2, '$2a$10$QUe48S5mHlSHAtrEZyLJV.9GIlAUzCt0NfRr63a10J4ftM0N9h0hu', 'ADMIN', '0798553184', b'0'),
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS `employee` (
   CONSTRAINT `FKcfg6ajo8oske94exynxpf7tf9` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.employee: ~28 rows (approximately)
+-- Dumping data for table ql_datphong.employee: ~30 rows (approximately)
 INSERT INTO `employee` (`employee_id`, `avatar`, `email`, `employee_name`, `is_actived`, `phone`, `account_id`, `department_id`) VALUES
 	(1, 'https://res.cloudinary.com/drfbxuss6/image/upload/v1747208112/okccp1ga9zqw40k087su.jpg', '1234a@gmail.com', 'Nguyễn Trọng Đạt', b'1', '0914653334', 1, 1),
 	(2, 'https://chiemtaimobile.vn/images/companies/1/%E1%BA%A2nh%20Blog/avatar-facebook-dep/top-36-anh-dai-dien-dep-cho-nu/hinh-anh-avatar-cute-nu-facebook.jpg?1708402214695', 'kieu123@gmail.com', 'Thúy Kiều', b'1', '0798553184', 2, 1),
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
   CONSTRAINT `FKlqe9ufv97bnfabl1inwbkbc1g` FOREIGN KEY (`employee_employee_id`) REFERENCES `employee` (`employee_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.notification: ~256 rows (approximately)
+-- Dumping data for table ql_datphong.notification: ~262 rows (approximately)
 INSERT INTO `notification` (`id`, `created_at`, `message`, `is_read`, `target_id`, `target_type`, `type`, `employee_employee_id`) VALUES
 	(1, '2025-04-06 09:48:07.106517', 'Bạn được mời tham gia cuộc họp: Đánh giá 3', b'1', 93, 'reservation', 'INVITE_TO_RESERVATION', 1),
 	(2, '2025-04-06 09:48:07.117491', 'Bạn được mời tham gia cuộc họp: Đánh giá 3', b'0', 93, 'reservation', 'INVITE_TO_RESERVATION', 5),
@@ -585,7 +585,7 @@ CREATE TABLE IF NOT EXISTS `price_room` (
   CONSTRAINT `FK8eqadmnyk5fnxc43tb45c6i5t` FOREIGN KEY (`price_id`) REFERENCES `price` (`price_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=216 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.price_room: ~168 rows (approximately)
+-- Dumping data for table ql_datphong.price_room: ~192 rows (approximately)
 INSERT INTO `price_room` (`price_room_id`, `value`, `price_id`, `room_id`) VALUES
 	(1, 150000, 60, 1),
 	(2, 150000, 60, 2),
@@ -901,7 +901,7 @@ CREATE TABLE IF NOT EXISTS `request_form` (
   CONSTRAINT `FKgmwfeoqaw7utlpwec164wlu52` FOREIGN KEY (`request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_form: ~63 rows (approximately)
+-- Dumping data for table ql_datphong.request_form: ~82 rows (approximately)
 INSERT INTO `request_form` (`request_form_id`, `reason_reject`, `status_request_form`, `time_request`, `time_response`, `type_request_form`, `request_reservation_id`) VALUES
 	(1, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', '2025-03-22 10:04:26.847000', 'RESERVATION_ONETIME', 1),
 	(2, NULL, 'APPROVED', '2025-03-20 15:00:00.000000', '2025-03-22 10:04:26.847000', 'RESERVATION_ONETIME', 2),
@@ -996,7 +996,7 @@ CREATE TABLE IF NOT EXISTS `request_form_reservations` (
   CONSTRAINT `FKgqum23i5l7ebxfmd03ox86knc` FOREIGN KEY (`request_form_id`) REFERENCES `request_form` (`request_form_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_form_reservations: ~107 rows (approximately)
+-- Dumping data for table ql_datphong.request_form_reservations: ~125 rows (approximately)
 INSERT INTO `request_form_reservations` (`request_form_id`, `reservation_id`) VALUES
 	(4, 39),
 	(5, 40),
@@ -1139,7 +1139,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation` (
   PRIMARY KEY (`request_reservation_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation: ~53 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation: ~84 rows (approximately)
 INSERT INTO `request_reservation` (`request_reservation_id`, `booker_id`, `description`, `frequency`, `note`, `room_id`, `time`, `time_end`, `time_start`, `title`) VALUES
 	(1, 1, 'kho khan cua hoc', 0, 'mang theo tai lieu tuan truoc', 1, '2025-03-20 15:00:00.000000', '2025-03-21 14:00:00.000000', '2025-03-21 13:00:00.000000', 'Xử lý tồn đọng'),
 	(2, 1, 'kho khan cua hoc', 0, 'mang theo tai lieu tuan truoc', 1, '2025-03-22 15:00:00.000000', '2025-03-23 14:00:00.000000', '2025-03-23 13:00:00.000000', 'Giới thiệu về AI'),
@@ -1151,12 +1151,12 @@ INSERT INTO `request_reservation` (`request_reservation_id`, `booker_id`, `descr
 	(11, 1, 'sak', 0, 'nộp tài liệu', 3, '2025-03-21 03:13:30.220000', '2025-03-22 09:00:00.000000', '2025-03-22 08:30:00.000000', 'Kế hoạch mới'),
 	(12, 1, 'sa', 0, 'nộp tài liệu', 3, '2025-03-21 03:17:05.961000', '2025-03-21 09:00:00.000000', '2025-03-21 08:30:00.000000', 'Tổng kết công việc tuần'),
 	(13, 1, 'Đem tài liệu', 0, 'Đi đúng giờ', 9, '2025-03-22 13:02:15.406000', '2025-03-27 10:00:00.000000', '2025-03-27 08:00:00.000000', 'Họp nội bộ'),
-	(14, 0, NULL, NULL, 'Đi đúng giờ', 0, '2025-03-22 15:00:00.000000', '2025-03-26 11:00:00.000000', '2025-03-26 10:00:00.000000', 'Đánh giá hiệu suất tháng'),
+	(14, 0, NULL, 0, 'Đi đúng giờ', 0, '2025-03-22 15:00:00.000000', '2025-03-26 11:00:00.000000', '2025-03-26 10:00:00.000000', 'Đánh giá hiệu suất tháng'),
 	(15, 1, 'Đem tài liệu', 0, 'Đi đúng giờ', 3, '2025-03-24 08:00:07.627000', '2025-03-29 14:30:00.000000', '2025-03-29 13:00:00.000000', 'Khóa luận'),
 	(16, 1, 'Cuộc họp quan trọng', 0, 'Đi đúng giờ', 8, '2025-03-24 08:00:54.727000', '2025-03-28 14:30:00.000000', '2025-03-28 13:00:00.000000', 'Báo cáo tài chính'),
 	(17, 1, 'Đem tài liệu', 1, 'Đi đúng giờ', 2, '2025-03-24 08:01:50.529000', '2025-03-30 08:30:00.000000', '2025-03-30 08:00:00.000000', 'Báo cáo đầu tuần'),
 	(18, 1, 'Cuộc họp quan trọng', 0, 'Đi đúng giờ', 7, '2025-03-24 08:04:12.901000', '2025-03-24 10:30:00.000000', '2025-03-24 09:00:00.000000', 'Phương hướng doanh nghiệp'),
-	(19, 0, NULL, NULL, 'Đi đúng giờ', 0, '2025-03-22 15:00:00.000000', '2025-03-26 11:00:00.000000', '2025-03-26 10:00:00.000000', 'Đánh giá hiệu suất tháng'),
+	(19, 0, NULL, 0, 'Đi đúng giờ', 0, '2025-03-22 15:00:00.000000', '2025-03-26 11:00:00.000000', '2025-03-26 10:00:00.000000', 'Đánh giá hiệu suất tháng'),
 	(20, 1, 'Đem tài liệu', 1, 'Đi đúng giờ', 8, '2025-03-24 08:43:27.682000', '2025-03-24 12:30:00.000000', '2025-03-24 11:30:00.000000', 'Cuộc họp hằng tuần'),
 	(22, 1, 'Rất bổ ích', 0, 'Rất bổ ích', 8, '2025-03-26 12:26:18.964000', '2025-03-28 10:00:00.000000', '2025-03-28 09:30:00.000000', 'Định hướng tương lai'),
 	(23, 1, 'Đem tài liệu', 0, 'Đi đúng giờ', 3, '2025-03-26 14:15:37.632000', '2025-03-27 10:30:00.000000', '2025-03-27 09:00:00.000000', 'Phát triển ứng dụng'),
@@ -1168,7 +1168,7 @@ INSERT INTO `request_reservation` (`request_reservation_id`, `booker_id`, `descr
 	(29, 1, 'Cuộc họp quan trọng', 0, 'Đi đúng giờ', 3, '2025-03-26 15:45:41.631000', '2025-04-01 14:30:00.000000', '2025-04-01 13:30:00.000000', 'Dự án khởi nghiệp'),
 	(30, 1, '', 0, '', 3, '2025-03-26 15:48:44.346000', '2025-04-01 08:30:00.000000', '2025-04-01 08:00:00.000000', 'Dự án Ủng hộ người nghèo'),
 	(31, 1, '', 0, '', 7, '2025-03-26 15:53:09.853000', '2025-04-02 10:00:00.000000', '2025-04-02 09:30:00.000000', 'Đánh giá năng lực'),
-	(32, 0, NULL, NULL, '', 0, '2025-03-26 15:07:47.985000', '2025-03-27 07:30:00.000000', '2025-03-27 07:00:00.000000', 'Huy động vốn'),
+	(32, 0, NULL, 0, '', 0, '2025-03-26 15:07:47.985000', '2025-03-27 07:30:00.000000', '2025-03-27 07:00:00.000000', 'Huy động vốn'),
 	(33, 1, 'Rất bổ ích', 0, 'Rất bổ ích', 8, '2025-03-26 12:26:18.964000', '2025-03-28 10:00:00.000000', '2025-03-28 09:30:00.000000', 'Định hướng tương lai'),
 	(34, 1, 'Cuộc họp quan trọng', 2, 'Đi đúng giờ', 10, '2025-03-27 11:37:59.395000', '2025-04-02 14:00:00.000000', '2025-04-02 13:00:00.000000', 'Tần suất tháng 4'),
 	(35, 1, 'Cuộc họp quan trọng', 1, 'Đi đúng giờ', 7, '2025-03-27 11:43:52.037000', '2025-04-05 14:30:00.000000', '2025-04-05 14:00:00.000000', 'Cung ứng tháng 4'),
@@ -1234,7 +1234,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_employee_ids` (
   CONSTRAINT `FK6mg0270i3c0kisbagweokgy2w` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_employee_ids: ~175 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_employee_ids: ~209 rows (approximately)
 INSERT INTO `request_reservation_employee_ids` (`request_reservation_request_reservation_id`, `employee_ids`) VALUES
 	(1, 4),
 	(1, 2),
@@ -1454,7 +1454,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_file_paths` (
   CONSTRAINT `FK24et6fkmono2ad04j18nv1o75` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_file_paths: ~24 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_file_paths: ~25 rows (approximately)
 INSERT INTO `request_reservation_file_paths` (`request_reservation_request_reservation_id`, `file_paths`) VALUES
 	(1, 'file1'),
 	(1, 'file2'),
@@ -1490,7 +1490,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_service_ids` (
   CONSTRAINT `FKh8f65v65tge9ikupt91pa2hy8` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_service_ids: ~52 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_service_ids: ~72 rows (approximately)
 INSERT INTO `request_reservation_service_ids` (`request_reservation_request_reservation_id`, `service_ids`) VALUES
 	(1, 1),
 	(1, 2),
@@ -1573,7 +1573,7 @@ CREATE TABLE IF NOT EXISTS `request_reservation_time_finish_frequency` (
   CONSTRAINT `FKa0p9flnsdheg6oxuu4c7njldx` FOREIGN KEY (`request_reservation_request_reservation_id`) REFERENCES `request_reservation` (`request_reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.request_reservation_time_finish_frequency: ~121 rows (approximately)
+-- Dumping data for table ql_datphong.request_reservation_time_finish_frequency: ~139 rows (approximately)
 INSERT INTO `request_reservation_time_finish_frequency` (`request_reservation_request_reservation_id`, `time_finish_frequency`) VALUES
 	(1, '2025-03-22 21:00:00.000000'),
 	(2, '2025-03-22 21:00:00.000000'),
@@ -1744,7 +1744,7 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   CONSTRAINT `FKm8xumi0g23038cw32oiva2ymw` FOREIGN KEY (`room_id`) REFERENCES `room` (`room_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.reservation: ~123 rows (approximately)
+-- Dumping data for table ql_datphong.reservation: ~148 rows (approximately)
 INSERT INTO `reservation` (`reservation_id`, `booker_id`, `description`, `frequency`, `note`, `status_reservation`, `time`, `time_check_in`, `time_check_out`, `time_end`, `time_start`, `title`, `total`, `cancle_reservation_id`, `room_id`, `time_approve`, `time_cancel`, `time_payment`) VALUES
 	(1, 1, ' ', 'ONE_TIME', '1', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-02-28 08:30:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 10:00:00.000000', '2025-02-28 08:30:00.000000', 'Nghiên cứu khoa học', 200000, NULL, 1, '2025-03-17 10:06:10.456000', NULL, NULL),
 	(2, 3, ' ', 'ONE_TIME', 'a', 'COMPLETED', '2025-02-28 01:35:28.000000', '2025-03-01 08:30:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 10:00:00.000000', '2025-03-01 08:30:00.000000', 'Kế hoạch truyền thông', 250000, NULL, 1, '2025-03-17 10:06:10.548000', NULL, NULL),
@@ -1905,7 +1905,7 @@ CREATE TABLE IF NOT EXISTS `reservation_employee` (
   CONSTRAINT `FKmc5vf42lypo9yrgftkonn2bvh` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.reservation_employee: ~298 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_employee: ~363 rows (approximately)
 INSERT INTO `reservation_employee` (`reservation_id`, `employee_id`) VALUES
 	(1, 1),
 	(4, 11),
@@ -2279,7 +2279,7 @@ CREATE TABLE IF NOT EXISTS `reservation_file_paths` (
   CONSTRAINT `FKchwrit7lhcf142bui6a74ypv2` FOREIGN KEY (`reservation_reservation_id`) REFERENCES `reservation` (`reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.reservation_file_paths: ~54 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_file_paths: ~56 rows (approximately)
 INSERT INTO `reservation_file_paths` (`reservation_reservation_id`, `file_paths`) VALUES
 	(16, 'file1'),
 	(16, 'file2'),
@@ -2305,18 +2305,18 @@ INSERT INTO `reservation_file_paths` (`reservation_reservation_id`, `file_paths`
 	(33, 'C:\\fakepath\\Screenshot 2025-02-09 090926.png'),
 	(34, 'C:\\fakepath\\Screenshot 2025-02-09 091803.png'),
 	(35, 'C:\\fakepath\\Screenshot 2025-02-10 195409.png'),
-	(36, 'file1'),
-	(36, 'file2'),
-	(37, 'file1'),
-	(37, 'file2'),
-	(38, 'file1'),
-	(38, 'file2'),
-	(39, 'file1'),
-	(39, 'file2'),
-	(40, 'file1'),
-	(40, 'file2'),
-	(41, 'file1'),
-	(41, 'file2'),
+	(36, 'C:\\fakepath\\01_KLTN.docx'),
+	(36, 'C:\\fakepath\\01_KLTN.docx'),
+	(37, 'C:\\fakepath\\01_KLTN.docx'),
+	(37, 'C:\\fakepath\\01_KLTN.docx'),
+	(38, 'C:\\fakepath\\01_KLTN.docx'),
+	(38, 'C:\\fakepath\\01_KLTN.docx'),
+	(39, 'C:\\fakepath\\01_KLTN.docx'),
+	(39, 'C:\\fakepath\\01_KLTN.docx'),
+	(40, 'C:\\fakepath\\01_KLTN.docx'),
+	(40, 'C:\\fakepath\\01_KLTN.docx'),
+	(41, 'C:\\fakepath\\01_KLTN.docx'),
+	(41, 'C:\\fakepath\\01_KLTN.docx'),
 	(42, 'C:\\fakepath\\Screenshot 2025-02-09 105805.png'),
 	(43, 'C:\\fakepath\\Screenshot 2025-02-09 105805.png'),
 	(44, 'C:\\fakepath\\Screenshot 2025-02-09 105805.png'),
@@ -2332,8 +2332,8 @@ INSERT INTO `reservation_file_paths` (`reservation_reservation_id`, `file_paths`
 	(63, 'C:\\fakepath\\Screenshot 2025-01-23 203418.png'),
 	(64, 'C:\\fakepath\\Screenshot 2025-02-06 110840.png'),
 	(66, 'C:\\fakepath\\dac-ta-usecase.docx'),
-	(84, '1'),
-	(88, '1'),
+	(84, 'C:\\fakepath\\01_KLTN.docx'),
+	(88, 'C:\\fakepath\\01_KLTN.docx'),
 	(62, 'C:\\fakepath\\Screenshot 2025-01-23 203418.png'),
 	(121, 'blob:http://localhost:3000/baff8618-d436-4322-8165-bfb83f915c70'),
 	(137, 'C:\\fakepath\\01_KLTN.docx');
@@ -2348,7 +2348,7 @@ CREATE TABLE IF NOT EXISTS `reservation_service` (
   CONSTRAINT `FKky2gr8jk9fw121e8rxogc8ccm` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.reservation_service: ~119 rows (approximately)
+-- Dumping data for table ql_datphong.reservation_service: ~141 rows (approximately)
 INSERT INTO `reservation_service` (`reservation_id`, `service_id`) VALUES
 	(1, 1),
 	(2, 3),
@@ -2511,7 +2511,7 @@ CREATE TABLE IF NOT EXISTS `room` (
   CONSTRAINT `FKrqejnp96gs9ldf7o6fciylxkt` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table ql_datphong.room: ~31 rows (approximately)
+-- Dumping data for table ql_datphong.room: ~32 rows (approximately)
 INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_room`, `location_id`, `approver_id`, `price_room_id`) VALUES
 	(1, 20, 'Maria', 'AVAILABLE', 'VIP', 4, 1, 124),
 	(2, 20, 'Vokkaa', 'AVAILABLE', 'DEFAULT', 6, 1, 125),
@@ -2521,28 +2521,28 @@ INSERT INTO `room` (`room_id`, `capacity`, `room_name`, `status_room`, `type_roo
 	(8, 10, 'Nội vụ', 'MAINTAIN', 'VIP', 9, 1, 128),
 	(9, 10, 'Tài chính', 'AVAILABLE', 'VIP', 13, 4, 130),
 	(10, 15, 'A3.02', 'AVAILABLE', 'VIP', 14, 1, 131),
-	(11, 5, 'Matcha 1A', 'AVAILABLE', 'VIP', 15, NULL, 132),
-	(12, 10, 'Visiusss', 'AVAILABLE', 'DEFAULT', 11, NULL, 133),
+	(11, 5, 'Matcha 1A', 'AVAILABLE', 'VIP', 15, 1, 132),
+	(12, 10, 'Visiusss', 'AVAILABLE', 'DEFAULT', 11, 1, 133),
 	(13, 10, 'Salabeto', 'AVAILABLE', 'VIP', 12, 4, 134),
-	(14, 25, 'Alaxender', 'AVAILABLE', 'VIP', 16, NULL, 135),
-	(15, 20, 'Napolaon', 'AVAILABLE', 'VIP', 17, NULL, 136),
-	(16, 40, 'Nankaasai', 'AVAILABLE', 'VIP', 18, NULL, 137),
-	(17, 30, 'Naddascva', 'AVAILABLE', 'VIP', 19, NULL, 138),
-	(18, 15, 'JoBatcap', 'AVAILABLE', 'VIP', 20, NULL, 139),
-	(19, 30, 'A4.02', 'AVAILABLE', 'VIP', 2, NULL, 140),
-	(21, 15, 'A4.03', 'AVAILABLE', 'VIP', 2, NULL, 141),
-	(22, 30, 'A13', 'AVAILABLE', 'VIP', 1, NULL, 142),
-	(23, 20, 'A07', 'MAINTAIN', 'DEFAULT', 24, NULL, 143),
+	(14, 25, 'Alaxender', 'AVAILABLE', 'VIP', 16, 1, 135),
+	(15, 20, 'Napolaon', 'AVAILABLE', 'VIP', 17, 1, 136),
+	(16, 40, 'Nankaasai', 'AVAILABLE', 'VIP', 18, 1, 137),
+	(17, 30, 'Naddascva', 'AVAILABLE', 'VIP', 19, 1, 138),
+	(18, 15, 'JoBatcap', 'AVAILABLE', 'VIP', 20, 1, 139),
+	(19, 30, 'A4.02', 'AVAILABLE', 'VIP', 2, 1, 140),
+	(21, 15, 'A4.03', 'AVAILABLE', 'VIP', 2, 1, 141),
+	(22, 30, 'A13', 'AVAILABLE', 'VIP', 1, 1, 142),
+	(23, 20, 'A07', 'MAINTAIN', 'DEFAULT', 24, 1, 143),
 	(24, 15, 'Sunflower', 'AVAILABLE', 'VIP', 29, 4, 144),
-	(25, 30, 'Lavender', 'AVAILABLE', 'DEFAULT', 29, NULL, 150),
-	(26, 20, 'Snowdrop', 'AVAILABLE', 'DEFAULT', 29, NULL, 156),
-	(27, 15, 'Jasmine', 'AVAILABLE', 'DEFAULT', 11, NULL, 162),
-	(28, 15, 'Orchid', 'AVAILABLE', 'DEFAULT', 29, NULL, 168),
-	(29, 15, 'Gemstone', 'AVAILABLE', 'DEFAULT', 5, NULL, 174),
-	(30, 20, 'Diamond', 'AVAILABLE', 'DEFAULT', 5, NULL, 180),
-	(31, 30, 'Sapphire', 'AVAILABLE', 'CONFERENCEROOM', 5, NULL, 186),
-	(32, 20, 'Spinel', 'AVAILABLE', 'DEFAULT', 24, NULL, 192),
-	(33, 20, 'Carnelian', 'AVAILABLE', 'DEFAULT', 25, NULL, 198),
+	(25, 30, 'Lavender', 'AVAILABLE', 'DEFAULT', 29, 1, 150),
+	(26, 20, 'Snowdrop', 'AVAILABLE', 'DEFAULT', 29, 1, 156),
+	(27, 15, 'Jasmine', 'AVAILABLE', 'DEFAULT', 11, 1, 162),
+	(28, 15, 'Orchid', 'AVAILABLE', 'DEFAULT', 29, 1, 168),
+	(29, 15, 'Gemstone', 'AVAILABLE', 'DEFAULT', 5, 1, 174),
+	(30, 20, 'Diamond', 'AVAILABLE', 'DEFAULT', 5, 1, 180),
+	(31, 30, 'Sapphire', 'AVAILABLE', 'CONFERENCEROOM', 5, 1, 186),
+	(32, 20, 'Spinel', 'AVAILABLE', 'DEFAULT', 24, 1, 192),
+	(33, 20, 'Carnelian', 'AVAILABLE', 'DEFAULT', 25, 1, 198),
 	(34, 20, 'Start', 'AVAILABLE', 'DEFAULT', 26, 1, 204),
 	(35, 15, 'Kinh doanh', 'AVAILABLE', 'DEFAULT', 29, 1, 210);
 
@@ -2557,7 +2557,7 @@ CREATE TABLE IF NOT EXISTS `room_device` (
   CONSTRAINT `FKi0ck9pu6eoan6rntpybydtp29` FOREIGN KEY (`device_id`) REFERENCES `device` (`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.room_device: ~75 rows (approximately)
+-- Dumping data for table ql_datphong.room_device: ~85 rows (approximately)
 INSERT INTO `room_device` (`quantity`, `room_id`, `device_id`) VALUES
 	(1, 1, 1),
 	(1, 2, 1),
@@ -2653,7 +2653,7 @@ CREATE TABLE IF NOT EXISTS `room_imgs` (
   CONSTRAINT `FKrnck0q2se0qpxlgrq4e17b3mi` FOREIGN KEY (`room_room_id`) REFERENCES `room` (`room_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table ql_datphong.room_imgs: ~39 rows (approximately)
+-- Dumping data for table ql_datphong.room_imgs: ~46 rows (approximately)
 INSERT INTO `room_imgs` (`room_room_id`, `imgs`) VALUES
 	(7, 'https://thietkenoithat.com/Portals/0/xNews/uploads/2022/10/20/thiet-ke-phong-hop(15).jpg'),
 	(7, 'https://smartdecor.vn/wp-content/uploads/2023/12/mau-noi-that-phong-hop-dep-8.jpg'),
@@ -2728,7 +2728,7 @@ INSERT INTO `service` (`service_id`, `description`, `service_name`, `price_servi
 	(12, 'In và chuẩn bị tài liệu cho người tham dự', 'In tài liệu họp', 91),
 	(13, 'Truyền hình cuộc họp qua mạng nội bộ', 'Quay trực tiếp livestream', 92),
 	(14, ' Bảng tên để bàn theo tên người tham dự', 'Gắn bảng tên người tham dự', 93),
-	(15, ' tốt', 'Bánh', 94),
+	(15, 'Bánh ngọt', 'Bánh', 94),
 	(16, 'Hoa và trái cây tươi mua trong ngày', 'Hoa quả', 95);
 
 -- Dumping structure for table ql_datphong.token
